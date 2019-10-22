@@ -73,44 +73,6 @@ class IndexController extends Controller
       return response()->json($result);
     }
 
-    // function join_index($action, $request) {
-    //   $result = [];
-    //   $head = DB::connection($action['schema_1'])->table($action['table_1']);
-    //
-    //   $search   = $action["filter"];
-    //   if (count($search) > 0) {
-    //     foreach ($search as $value) {
-    //       if ($value["operator"] == "like")
-    //         $head->Where($value["property"],$value["operator"],$value["value"]."%");
-    //       else if($value["operator"] == "eq")
-    //         $head->whereDate($value["property"],'=',$value["value"]);
-    //       else if($value["operator"] == "gt")
-    //         $head->whereDate($value["property"],'>=',$value["value"]);
-    //       else if($value["operator"] == "lt")
-    //         $head->whereDate($value["property"],'<=',$value["value"]);
-    //     }
-    //   }
-    //   if ($action['start'] != '' && $action['limit'] != ''){
-    //     $head->skip($action['start'])->take($action['limit']);
-    //   }
-    //   $head = $head->get();
-    //   foreach ($head as $list) {
-    //     $newDt = [];
-    //     foreach ($list as $key => $value) {
-    //       $newDt[$key] = $value;
-    //     }
-    //     // $detil = DB::connection($action['schema_2'])->table($action['table_2'])->where($action['relation_2'],  $list->$action['relation_1']);
-    //     $detil = DB::connection($action['schema_2'])->table($action['table_2'])->where($action['relation'],  $list->$action['relation'])->get();
-    //     foreach ($detil as $listS) {
-    //       foreach ($listS as $key => $value) {
-    //         $newDt[$key] = $value;
-    //       }
-    //     }
-    //     $result[] = $newDt;
-    //   }
-    //   return response()->json($result);
-    // }
-
     function validasi($action, $request) {
       $latest   = DB::connection("mdm")->table('JS_VALIDATION')->where('action', 'like', $action."%")->select(["field", "mandatori"])->get();
       $decode   = json_decode(json_encode($latest), true);
