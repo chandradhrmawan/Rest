@@ -160,24 +160,21 @@ class BillingEngine{
 
 	public static function storeCustomerProfileTariffAndUper($input){
         DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->delete();
-        $setS = [];
         foreach ($input['TARIFF'] as $list) {
-          $setS[] = [ 'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'], 'TARIFF_HDR_ID' => $list['TARIFF_HDR_ID']];
+	        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([ 
+	        	'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'], 
+	        	'TARIFF_HDR_ID' => $list['TARIFF_HDR_ID']
+	        ]);
         }
-        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert($setS);
-        
         DB::connection('eng')->table('TS_UPER')->where('UPER_CUST_ID', $input['CUST_PROFILE_ID'])->delete();
-        $setS = [];
         foreach ($input['UPER'] as $list) {
-          $setS[] = [ 
-            'UPER_CUST_ID' => $input['CUST_PROFILE_ID'], 
-            'UPER_NOTA' => $list['UPER_NOTA'],
-            'UPER_PRESENTASE' => $list['UPER_PRESENTASE'],
-            'BRANCH_ID' => 12
-          ];
+	        DB::connection('eng')->table('TS_UPER')->insert([ 
+	        	'UPER_CUST_ID' => $input['CUST_PROFILE_ID'], 
+	        	'UPER_NOTA' => $list['UPER_NOTA'],
+	        	'UPER_PRESENTASE' => $list['UPER_PRESENTASE'],
+	        	'BRANCH_ID' => 12
+	        ]);
         }
-        DB::connection('eng')->table('TS_UPER')->insert($setS);
-
         return response()->json([
           "result" => "Success, store and set profile tariff and uper customer",
         ]);
