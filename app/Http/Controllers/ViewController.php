@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
+use App\Helper\Testing;
 
 class ViewController extends Controller
 {
@@ -33,7 +34,8 @@ class ViewController extends Controller
 
     function testing($input, $request)
     {
-      return response()->json('$data');
+      // return response()->json('asd');
+      return Testing::testing($input);
     }
 
     function storeProfileTariff($input, $request) {

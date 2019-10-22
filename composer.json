@@ -17,7 +17,11 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/"
-        }
+        },
+        "files": [
+            "app/Helper/FileUpload.php",
+            "app/Helper/BillingEngine.php"
+        ]
     },
     "autoload-dev": {
         "classmap": [
