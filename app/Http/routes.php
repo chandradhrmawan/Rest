@@ -19,6 +19,6 @@ $app->get('/key', function() {
     return str_random(32);
 });
 
-$app->get('/index', 'IndexController@api');
-$app->get('/view',  'ViewController@api');
-$app->get('/store', 'StoreController@api');
+$app->post('/index', 'IndexController@api');
+$app->post('/view',  'ViewController@api');
+$app->post('/store', 'StoreController@api');
