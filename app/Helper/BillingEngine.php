@@ -11,15 +11,19 @@ use App\Helper\FileUpload;
 class BillingEngine{
 
 	public static function storeProfileTariff($input){
+        $head       = $input['header_set'];
+        $detil      = $input['detil'];
+        $datenow    = Carbon::now()->format('m/d/Y');
+
 		foreach ($detil as $list) {
           if (!empty($list['ALAT'])) {
             $each       = explode('/', $list['ALAT']);
             $subisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-              "EQUIPMENT_ID" => $each[0],
+              "EQUIPMENT_TYPE_ID" => $each[0],
               "EQUIPMENT_UNIT" => $each[1]
             ])->get();
             if (count($subisocode) == 0) {
-              return response()->json(["result" => "Fail, iso code not found"]);
+              return response()->json(["result" => "Fail, iso code not found", "ALAT" => $list]);
             }
           }
 
@@ -30,8 +34,8 @@ class BillingEngine{
               "COMMODITY_ID"      => $each[1],
               "COMMODITY_UNIT_ID" => $each[2]
             ])->get();
-            if (count($subisocode) == 0) {
-              return response()->json(["result" => "Fail, iso code not found"]);
+            if (count($isocode) == 0) {
+              return response()->json(["result" => "Fail, iso code not found", "BARANG" => $list]);
             }
           }
 
@@ -42,15 +46,11 @@ class BillingEngine{
               "CONT_TYPE"   => $each[1],
               "CONT_STATUS" => $each[2]
             ])->get();
-            if (count($subisocode) == 0) {
-              return response()->json(["result" => "Fail, iso code not found"]);
+            if (count($isocode) == 0) {
+              return response()->json(["result" => "Fail, iso code not found", "KONTAINER" => $list]);
             }
           }
         }
-
-        $head       = $input['header_set'];
-        $detil      = $input['detil'];
-        $datenow    = Carbon::now()->format('m/d/Y');
 
         // store head
 
@@ -81,7 +81,7 @@ class BillingEngine{
               // Get Data with / separater
               $each       = explode('/', $list['ALAT']);
               $alatisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-                "EQUIPMENT_ID" => $each[0],
+                "EQUIPMENT_TYPE_ID" => $each[0],
                 "EQUIPMENT_UNIT" => $each[1]
               ])->get();
               $alatisocode = $alatisocode[0]->iso_code;
