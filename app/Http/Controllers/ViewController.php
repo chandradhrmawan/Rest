@@ -38,6 +38,11 @@ class ViewController extends Controller
       {
         return BillingEngine::viewProfileTariff($input);
       }
+
+      function viewCustomerProfileTariff($input, $request)
+      {
+        return BillingEngine::viewCustomerProfileTariff($input);
+      }
     // BillingEngine
 
     // RoleManagemnt

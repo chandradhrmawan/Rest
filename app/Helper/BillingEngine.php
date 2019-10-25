@@ -13,7 +13,7 @@ class BillingEngine{
 	public static function storeProfileTariff($input){
         $head       = $input['header_set'];
         $detil      = $input['detil'];
-        $datenow    = Carbon::now()->format('m/d/Y');
+        $datenow    = Carbon::now()->format('Y-m-d');
 
 		foreach ($detil as $list) {
           if (!empty($list['ALAT'])) {
@@ -68,14 +68,14 @@ class BillingEngine{
           }
 
           $headS->tariff_type   = $head['TARIFF_TYPE'];
-          $headS->tariff_start  = \DB::raw("TO_DATE('".$head['TARIFF_START']."', 'DD/MM/YYYY')");
-          $headS->tariff_end    = \DB::raw("TO_DATE('".$head['TARIFF_END']."', 'DD/MM/YYYY')");
+          $headS->tariff_start  = \DB::raw("TO_DATE('".$head['TARIFF_START']."', 'YYYY-MM-DD')");
+          $headS->tariff_end    = \DB::raw("TO_DATE('".$head['TARIFF_END']."', 'YYYY-MM-DD')");
           $headS->tariff_no     = $head['TARIFF_NO'];
           $headS->tariff_status = $head['TARIFF_STATUS'];
           $headS->service_code  = $head['SERVICE_CODE'];
           $headS->branch_id     = 10; // SESSION LOGIN
           $headS->created_by    = 1; // SESSION LOGIN
-          $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'MM/DD/YYYY')");
+          $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
 
@@ -305,6 +305,15 @@ class BillingEngine{
     	return response()->json([
     		'TxProfileTariffHdr' => $header,
     		'TsTariff' => $response_detil
+    	]);
+    }
+
+    public static function viewCustomerProfileTariff($input){
+    	$TsCustomerProfile = DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->leftJoin('TX_PROFILE_TARIFF_HDR', 'TS_CUSTOMER_PROFILE.TARIFF_HDR_ID', '=', 'TX_PROFILE_TARIFF_HDR.TARIFF_ID')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->get();
+    	$TsUper = DB::connection('eng')->table('TS_UPER')->leftJoin('TM_NOTA', 'TS_UPER.UPER_NOTA', '=', 'TM_NOTA.NOTA_ID')->where('UPER_CUST_ID', $input['CUST_PROFILE_ID'])->get();
+    	return response()->json([
+    		"TsCustomerProfile" => $TsCustomerProfile,
+    		"TsUper" => $TsUper
     	]);
     }
 }
