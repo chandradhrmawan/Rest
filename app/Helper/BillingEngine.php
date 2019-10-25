@@ -200,6 +200,20 @@ class BillingEngine{
     	$response_detil = [];
     	foreach ($detil as $list) {
     		$newDt = [];
+    		$equipment_type_name = "";
+    		$equipment_unit_name = "";
+    		$equipment_unit_min = "";
+    		$equipment_unit_code = "";
+    		$package_name = "";
+    		$package_code = "";
+    		$commodity_name = "";
+    		$commodity_unit_code = "";
+    		$commodity_unit_name = "";
+    		$commodity_unit_min = "";
+    		$cont_desc = "";
+    		$cont_status_desc = "";
+    		$cont_type_desc = "";
+
     		foreach ($list as $key => $value) {
     			$newDt[$key] = $value;
     			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
@@ -210,12 +224,12 @@ class BillingEngine{
     							$newDt[$keyS] = $valueS;
     						}
     						if (strtoupper($keyS) == 'EQUIPMENT_TYPE_ID') {
-    							$newDt['equipment_type_name'] = DB::connection('mdm')->table('TM_EQUIPMENT_TYPE')->where('EQUIPMENT_TYPE_ID',$valueS)->first()->equipment_type_name;
+    							$equipment_type_name = DB::connection('mdm')->table('TM_EQUIPMENT_TYPE')->where('EQUIPMENT_TYPE_ID',$valueS)->first()->equipment_type_name;
     						}else if (strtoupper($keyS) == 'EQUIPMENT_UNIT') {
     							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
-    							$newDt['equipment_unit_code'] = $get->unit_code;
-    							$newDt['equipment_unit_name'] = $get->unit_name;
-    							$newDt['equipment_unit_min'] = $get->unit_min;
+    							$equipment_unit_code = $get->unit_code;
+    							$equipment_unit_name = $get->unit_name;
+    							$equipment_unit_min = $get->unit_min;
     						}
     					}
     				}
@@ -227,16 +241,16 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'PACKAGE_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_PACKAGE')->where('PACKAGE_ID',$valueS)->first();
-    							$newDt['package_name'] = $get->package_name;
-    							$newDt['package_code'] = $get->package_code;
+    							$package_name = $get->package_name;
+    							$package_code = $get->package_code;
     						}else if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
-    							$newDt['commodity_name'] = $get->commodity_name;
+    							$commodity_name = $get->commodity_name;
     						}else if (strtoupper($keyS) == 'COMMODITY_UNIT_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
-    							$newDt['commodity_unit_code'] = $get->unit_code;
-    							$newDt['commodity_unit_name'] = $get->unit_name;
-    							$newDt['commodity_unit_min'] = $get->unit_min;
+    							$commodity_unit_code = $get->unit_code;
+    							$commodity_unit_name = $get->unit_name;
+    							$commodity_unit_min = $get->unit_min;
     						}
     					}
     				}
@@ -248,13 +262,13 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
-    							$newDt['cont_desc'] = $get->cont_desc;
+    							$cont_desc = $get->cont_desc;
     						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
-    							$newDt['cont_status_desc'] = $get->cont_status_desc;
+    							$cont_status_desc = $get->cont_status_desc;
     						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
-    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE_DESC',$valueS)->first();
-    							$newDt['cont_type_desc'] = $get->cont_type_desc;
+    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE',$valueS)->first();
+    							$cont_type_desc = $get->cont_type_desc;
     						}
     					}
     				}
@@ -267,16 +281,16 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'PACKAGE_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_PACKAGE')->where('PACKAGE_ID',$valueS)->first();
-    							$newDt['package_name'] = $get->package_name;
-    							$newDt['package_code'] = $get->package_code;
+    							$package_name = $get->package_name;
+    							$package_code = $get->package_code;
     						}else if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
-    							$newDt['commodity_name'] = $get->commodity_name;
+    							$commodity_name = $get->commodity_name;
     						}else if (strtoupper($keyS) == 'COMMODITY_UNIT_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
-    							$newDt['commodity_unit_code'] = $get->unit_code;
-    							$newDt['commodity_unit_name'] = $get->unit_name;
-    							$newDt['commodity_unit_min'] = $get->unit_min;
+    							$commodity_unit_code = $get->unit_code;
+    							$commodity_unit_name = $get->unit_name;
+    							$commodity_unit_min = $get->unit_min;
     						}
     					}
     				}
@@ -288,18 +302,32 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
-    							$newDt['cont_desc'] = $get->cont_desc;
+    							$cont_desc = $get->cont_desc;
     						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
-    							$newDt['cont_status_desc'] = $get->cont_status_desc;
+    							$cont_status_desc = $get->cont_status_desc;
     						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
-    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE_DESC',$valueS)->first();
-    							$newDt['cont_type_desc'] = $get->cont_type_desc;
+    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE',$valueS)->first();
+    							$cont_type_desc = $get->cont_type_desc;
     						}
     					}
     				}
     			}
     		}
+
+    		$newDt['equipment_type_name'] = $equipment_type_name;
+    		$newDt['equipment_unit_code'] = $equipment_unit_code;
+    		$newDt['equipment_unit_name'] = $equipment_unit_name;
+    		$newDt['equipment_unit_min'] = $equipment_unit_min;
+    		$newDt['package_name'] = $package_name;
+    		$newDt['package_code'] = $package_code;
+    		$newDt['commodity_name'] = $commodity_name;
+    		$newDt['commodity_unit_code'] = $commodity_unit_code;
+    		$newDt['commodity_unit_name'] = $commodity_unit_name;
+    		$newDt['commodity_unit_min'] = $commodity_unit_min;
+    		$newDt['cont_desc'] = $cont_desc;
+    		$newDt['cont_status_desc'] = $cont_status_desc;
+    		$newDt['cont_type_desc'] = $cont_type_desc;
     		$response_detil[] = $newDt;
     	}
     	return response()->json([
