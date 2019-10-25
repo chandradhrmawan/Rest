@@ -194,8 +194,7 @@ class BillingEngine{
         ]);
     }
 
-    public static function viewProfileTariff($input)
-    {
+    public static function viewProfileTariff($input){
     	$header = TxProfileTariffHdr::find($input['TARIFF_ID']);
     	$detil = DB::connection('eng')->table('TS_TARIFF')->where('TARIFF_PROF_HDR_ID', $input['TARIFF_ID'])->orderBy('TARIFF_ID', 'DESC')->get();
     	$response_detil = [];
@@ -210,6 +209,14 @@ class BillingEngine{
     						if (strtoupper($keyS) != 'ISO_CODE') {
     							$newDt[$keyS] = $valueS;
     						}
+    						if (strtoupper($keyS) == 'EQUIPMENT_TYPE_ID') {
+    							$newDt['equipment_type_name'] = DB::connection('mdm')->table('TM_EQUIPMENT_TYPE')->where('EQUIPMENT_TYPE_ID',$valueS)->first()->equipment_type_name;
+    						}else if (strtoupper($keyS) == 'EQUIPMENT_UNIT') {
+    							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
+    							$newDt['equipment_unit_code'] = $get->unit_code;
+    							$newDt['equipment_unit_name'] = $get->unit_name;
+    							$newDt['equipment_unit_min'] = $get->unit_min;
+    						}
     					}
     				}
     				$como = DB::connection('mdm')->table('TM_ISO_COMMODITY')->where('ISO_CODE',$value)->first();
@@ -218,6 +225,19 @@ class BillingEngine{
     						if (strtoupper($keyS) != 'ISO_CODE') {
     							$newDt[$keyS] = $valueS;
     						}
+    						if (strtoupper($keyS) == 'PACKAGE_ID' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_PACKAGE')->where('PACKAGE_ID',$valueS)->first();
+    							$newDt['package_name'] = $get->package_name;
+    							$newDt['package_code'] = $get->package_code;
+    						}else if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
+    							$newDt['commodity_name'] = $get->commodity_name;
+    						}else if (strtoupper($keyS) == 'COMMODITY_UNIT_ID' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
+    							$newDt['commodity_unit_code'] = $get->unit_code;
+    							$newDt['commodity_unit_name'] = $get->unit_name;
+    							$newDt['commodity_unit_min'] = $get->unit_min;
+    						}
     					}
     				}
     				$cont = DB::connection('mdm')->table('TM_ISO_CONT')->where('ISO_CODE',$value)->first();
@@ -225,6 +245,16 @@ class BillingEngine{
     					foreach ($cont as $keyS => $valueS) {
     						if (strtoupper($keyS) != 'ISO_CODE') {
     							$newDt[$keyS] = $valueS;
+    						}
+    						if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
+    							$newDt['cont_desc'] = $get->cont_desc;
+    						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
+    							$newDt['cont_status_desc'] = $get->cont_status_desc;
+    						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE_DESC',$valueS)->first();
+    							$newDt['cont_type_desc'] = $get->cont_type_desc;
     						}
     					}
     				}
@@ -235,6 +265,19 @@ class BillingEngine{
     						if (strtoupper($keyS) != 'ISO_CODE') {
     							$newDt[$keyS] = $valueS;
     						}
+    						if (strtoupper($keyS) == 'PACKAGE_ID' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_PACKAGE')->where('PACKAGE_ID',$valueS)->first();
+    							$newDt['package_name'] = $get->package_name;
+    							$newDt['package_code'] = $get->package_code;
+    						}else if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
+    							$newDt['commodity_name'] = $get->commodity_name;
+    						}else if (strtoupper($keyS) == 'COMMODITY_UNIT_ID' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
+    							$newDt['commodity_unit_code'] = $get->unit_code;
+    							$newDt['commodity_unit_name'] = $get->unit_name;
+    							$newDt['commodity_unit_min'] = $get->unit_min;
+    						}
     					}
     				}
     				$cont = DB::connection('mdm')->table('TM_ISO_CONT')->where('ISO_CODE',$value)->first();
@@ -242,6 +285,16 @@ class BillingEngine{
     					foreach ($cont as $keyS => $valueS) {
     						if (strtoupper($keyS) != 'ISO_CODE') {
     							$newDt[$keyS] = $valueS;
+    						}
+    						if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
+    							$newDt['cont_desc'] = $get->cont_desc;
+    						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
+    							$newDt['cont_status_desc'] = $get->cont_status_desc;
+    						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
+    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE_DESC',$valueS)->first();
+    							$newDt['cont_type_desc'] = $get->cont_type_desc;
     						}
     					}
     				}
