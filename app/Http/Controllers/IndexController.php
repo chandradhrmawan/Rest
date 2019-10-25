@@ -150,7 +150,7 @@ class IndexController extends Controller
       $connect  = \DB::connection($input["db"])->table($input["table"]);
 
       if ($input['field'] != '' && $input['query'] != '') {
-        $connect->Where($value["field"],'like',$value["query"]."%");
+        $connect->Where($input["field"],'like',$input["query"]."%");
       }
 
       if ($input['start'] != '' && $input['limit'] != '') {
