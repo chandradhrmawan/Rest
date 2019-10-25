@@ -60,6 +60,20 @@ class StoreController extends Controller
       return response(["result"=>$parameter, "count"=>count($parameter)]);
     }
 
+    function publicCreate($input, $request){
+      DB::connection($input['schema'])->table($input['table'])->insert($input['set_data']);
+      return response()->json([
+        "result" => "Success, create ".$input['table']." data",
+      ]);
+    }
+
+    function publicUpdate($input, $request){
+      DB::connection($input['schema'])->table($input['table'])->where($input['condition'])->update($input['set_data']);
+      return response()->json([
+        "result" => "Success, update ".$input['table']." data",
+      ]);
+    }
+
     // BillingEngine
       function storeProfileTariff($input) {
         return BillingEngine::storeProfileTariff($input);
@@ -77,7 +91,7 @@ class StoreController extends Controller
         return RoleManagemnt::storeRolePermesion($input);
       }
     // RoleManagemnt
-      
+
     // Schema OmCargo
     function storeTxHdrBm($input) {
       $header        = $input["HEADER"];
