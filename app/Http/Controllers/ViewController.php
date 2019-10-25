@@ -7,6 +7,7 @@ use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
+use App\Helper\RoleManagemnt;
 
 class ViewController extends Controller
 {
@@ -32,9 +33,18 @@ class ViewController extends Controller
       return response()->json($data);
     }
 
-    function viewProfileTariff($input, $request)
-    {
-      return BillingEngine::viewProfileTariff($input);
-    }
+    // BillingEngine
+      function viewProfileTariff($input, $request)
+      {
+        return BillingEngine::viewProfileTariff($input);
+      }
+    // BillingEngine
+
+    // RoleManagemnt
+      function permissionGet($input, $request)
+      {
+        return RoleManagemnt::permissionGet($input);
+      }
+    // RoleManagemnt
 
 }
