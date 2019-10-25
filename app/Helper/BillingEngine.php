@@ -11,11 +11,15 @@ use App\Helper\FileUpload;
 class BillingEngine{
 
 	public static function storeProfileTariff($input){
+		$head       = $input['header_set'];
+		$detil      = $input['detil'];
+		$datenow    = Carbon::now()->format('m/d/Y');
+
 		foreach ($detil as $list) {
           if (!empty($list['ALAT'])) {
             $each       = explode('/', $list['ALAT']);
             $subisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-              "EQUIPMENT_ID" => $each[0],
+              "EQUIPMENT_TYPE_ID" => $each[0],
               "EQUIPMENT_UNIT" => $each[1]
             ])->get();
             if (count($subisocode) == 0) {
@@ -47,11 +51,6 @@ class BillingEngine{
             }
           }
         }
-
-        $head       = $input['header_set'];
-        $detil      = $input['detil'];
-        $datenow    = Carbon::now()->format('m/d/Y');
-
         // store head
 
           if(empty($head['TARIFF_ID'])){
@@ -81,7 +80,7 @@ class BillingEngine{
               // Get Data with / separater
               $each       = explode('/', $list['ALAT']);
               $alatisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-                "EQUIPMENT_ID" => $each[0],
+                "EQUIPMENT_TYPE_ID" => $each[0],
                 "EQUIPMENT_UNIT" => $each[1]
               ])->get();
               $alatisocode = $alatisocode[0]->iso_code;
@@ -161,15 +160,15 @@ class BillingEngine{
 	public static function storeCustomerProfileTariffAndUper($input){
         DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->delete();
         foreach ($input['TARIFF'] as $list) {
-	        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([ 
-	        	'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'], 
+	        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([
+	        	'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'],
 	        	'TARIFF_HDR_ID' => $list['TARIFF_HDR_ID']
 	        ]);
         }
         DB::connection('eng')->table('TS_UPER')->where('UPER_CUST_ID', $input['CUST_PROFILE_ID'])->delete();
         foreach ($input['UPER'] as $list) {
-	        DB::connection('eng')->table('TS_UPER')->insert([ 
-	        	'UPER_CUST_ID' => $input['CUST_PROFILE_ID'], 
+	        DB::connection('eng')->table('TS_UPER')->insert([
+	        	'UPER_CUST_ID' => $input['CUST_PROFILE_ID'],
 	        	'UPER_NOTA' => $list['UPER_NOTA'],
 	        	'UPER_PRESENTASE' => $list['UPER_PRESENTASE'],
 	        	'BRANCH_ID' => 12
