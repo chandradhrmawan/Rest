@@ -73,7 +73,7 @@ class BillingEngine{
           $headS->tariff_no     = $head['TARIFF_NO'];
           $headS->tariff_status = $head['TARIFF_STATUS'];
           $headS->service_code  = $head['SERVICE_CODE'];
-          $headS->branch_id     = 10; // SESSION LOGIN
+          $headS->branch_id     = 12; // SESSION LOGIN
           $headS->created_by    = 1; // SESSION LOGIN
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
