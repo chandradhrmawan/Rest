@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 use App\Helper\BillingEngine;
+use App\Helper\RoleManagemnt;
 
 class StoreController extends Controller
 {
@@ -20,6 +21,7 @@ class StoreController extends Controller
 
     public function api(Request $request) {
       $input  = $this->request->all();
+      $request = $request;
       $action = $input["action"];
       return $this->$action($input, $request);
     }
@@ -55,13 +57,21 @@ class StoreController extends Controller
       return response(["result"=>$parameter, "count"=>count($parameter)]);
     }
 
-    // schema billing_engine
+    // BillingEngine
       function storeProfileTariff($input) {
         return BillingEngine::storeProfileTariff($input);
       }
       function storeCustomerProfileTariffAndUper($input){
         return BillingEngine::storeCustomerProfileTariffAndUper($input);
       }
-    // schema billing_engine
+    // BillingEngine
 
+    // RoleManagemnt
+      function storeRole($input){
+        return RoleManagemnt::storeRole($input);
+      }
+      function storeRolePermesion($input){
+        return RoleManagemnt::storeRolePermesion($input);
+      }
+    // RoleManagemnt
 }
