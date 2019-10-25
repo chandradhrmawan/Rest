@@ -19,6 +19,7 @@ $app->get('/key', function() {
     return str_random(32);
 });
 
+$app->post('auth/login',['uses' => 'AuthController@authenticate']);
 $app->post('/index', 'IndexController@api');
 $app->post('/view',  'ViewController@api');
 $app->post('/store', 'StoreController@api');

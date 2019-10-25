@@ -175,15 +175,15 @@ class BillingEngine{
 	public static function storeCustomerProfileTariffAndUper($input){
         DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->delete();
         foreach ($input['TARIFF'] as $list) {
-	        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([ 
-	        	'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'], 
+	        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([
+	        	'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'],
 	        	'TARIFF_HDR_ID' => $list['TARIFF_HDR_ID']
 	        ]);
         }
         DB::connection('eng')->table('TS_UPER')->where('UPER_CUST_ID', $input['CUST_PROFILE_ID'])->delete();
         foreach ($input['UPER'] as $list) {
-	        DB::connection('eng')->table('TS_UPER')->insert([ 
-	        	'UPER_CUST_ID' => $input['CUST_PROFILE_ID'], 
+	        DB::connection('eng')->table('TS_UPER')->insert([
+	        	'UPER_CUST_ID' => $input['CUST_PROFILE_ID'],
 	        	'UPER_NOTA' => $list['UPER_NOTA'],
 	        	'UPER_PRESENTASE' => $list['UPER_PRESENTASE'],
 	        	'BRANCH_ID' => 12
@@ -298,7 +298,7 @@ class BillingEngine{
     						}
     					}
     				}
-    			}    			
+    			}
     		}
     		$response_detil[] = $newDt;
     	}
