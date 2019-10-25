@@ -68,6 +68,8 @@ class StoreController extends Controller
     }
 
     function publicUpdate($input, $request){
+      // return response()->json($input['condition']);
+      // return response()->json(DB::connection($input['schema'])->table($input['table'])->where($input['condition'])->get());
       DB::connection($input['schema'])->table($input['table'])->where($input['condition'])->update($input['set_data']);
       return response()->json([
         "result" => "Success, update ".$input['table']." data",
