@@ -344,4 +344,127 @@ class BillingEngine{
     		"TsUper" => $TsUper
     	]);
     }
+
+    public static function calculateTariff($input){
+    	// build detil
+	    	$detil = $input['detil'];
+	    	$countD = 0;
+	    	$setD = '';
+	    	foreach ($detil as $list) { 
+	    		$countD++;
+	    		$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
+	    		$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
+	    		$setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
+	    		$setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
+	    		$setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
+	    		$setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
+	    		$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
+	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
+	    		$setD .= ' list_detail('.$countD.') := detail; ';
+	    	}
+		// build detil
+
+	    // build eqpt
+	    	$eqpt = $input['eqpt'];
+	    	$countE = 0;
+	    	$setE = '';
+	    	foreach ($eqpt as $list) { 
+	    		$countE++;
+	    		$setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE'].';';
+	    		$setE .= ' equip.EQ_QTY := '.$list['EQ_QTY'].';';
+	    		$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
+	    		$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
+	    		$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
+	    		$setE .= ' list_equip('.$countE.') := equip; ';
+	    	}
+		// build eqpt
+
+	    // build paysplit
+	    	$paysplit = $input['paysplit'];
+	    	$countP = 0;
+	    	$setP = '';
+	    	foreach ($paysplit as $list) { 
+	    		$countP++;
+	    		$setE .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+	    		$setE .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
+	    		$setE .= ' list_paysplit('.$countP.') := paysplit; ';
+	    	}
+		// build paysplit
+
+		// build head
+	    	$head = $input['head'];
+	    	$setH = " P_SOURCE_ID => 'NPK_BILLING',";
+	    	$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
+	    	$setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
+	    	$setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
+	    	$setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
+	    	$setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
+	    	if (empty($head['P_DATE_IN'])) {
+	    		$setH .= " P_DATE_IN => NULL,";
+	    	}else{
+	    		$setH .= " P_DATE_IN => to_date(".$head['P_DATE_IN'].",'yyyy-MM-dd'),";
+	    	}
+	    	if (empty($head['P_DATE_OUT'])) {
+	    		$setH .= " P_DATE_OUT => NULL,";
+	    	}else{
+	    		$setH .= " P_DATE_OUT => to_date(".$head['P_DATE_OUT'].",'yyyy-MM-dd'),";
+	    	}
+	    	$setH .= " P_TRADE => '".$head['P_TRADE']."',";
+	    	$setH .= " P_TL => '".$head['P_TL']."',";
+	    	$setH .= " P_DETAIL => list_detail,";
+	    	$setH .= " P_EQUIPMENT => list_equip,";
+	    	$setH .= " P_PAY_SPLIT => list_paysplit,";
+	    	$setH .= " P_USER_ID => ".$head['P_USER_ID'].",";
+	    	$setH .= " P_RESULT_FLAG => P_RESULT_FLAG,";
+	    	$setH .= " P_RESULT_MSG => P_RESULT_MSG ";
+		// build head
+
+		// set data
+	    	$set_data = [
+	    		'b_no' => $head['P_BOOKING_NUMBER'],
+	    		'head' => $setH,
+	    		'detil' => $setD,
+	    		'eqpt' => $setE,
+	    		'paysplit' => $setP
+	    	];
+		// set data
+
+		return static::calculateTariffExcute($set_data);
+    }
+
+    private static function calculateTariffExcute($input){
+    	$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
+    	if (!empty($head)) {
+    		$head = $head[0];
+    		DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
+    		DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->delete();
+    	}
+    	$link = oci_connect('BILLING_ENGINE', 'billing_engine', '10.88.48.124/NPKSBILD');
+    	$sql = " DECLARE
+		    detail PKG_MAIN.BOOKING_DTL;
+		    equip PKG_MAIN.BOOKING_EQUIP;
+		    paysplit PKG_MAIN.BOOKING_PAYSPLIT;
+		    list_detail PKG_MAIN.BOOKING_DTL_TBL;
+		    list_equip PKG_MAIN.BOOKING_EQUIP_TBL;
+		    list_paysplit PKG_MAIN.BOOKING_PAYSPLIT_TBL;
+		    P_RESULT_FLAG VARCHAR2(200);
+		    P_RESULT_MSG VARCHAR2(200);
+		BEGIN ".$input['detil']." ".$input['eqpt']." ".$input['paysplit'];
+    	$sql .= " PKG_MAIN.GET_TARIFF( ".$input['head']." );END;";
+
+    	// return $sql;
+    	$stmt = oci_parse($link,$sql);
+
+    	// gak nemu buat nerima retun pesan dari prosedur
+    	// oci_bind_by_name($stmt, "P_RESULT_FLAG", $out_status, 40);
+    	// oci_bind_by_name($stmt, "P_RESULT_MSG", $out_message, 40);
+    	$query = oci_execute($stmt);
+
+		$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
+		if (!empty($head)) {
+    		return ['out_status' => true, 'result' => 'Success, Send Request'];
+    	}else{
+			return ['out_status' => false, 'result' => 'Fail, Send Request'];
+    	}
+    }
 }

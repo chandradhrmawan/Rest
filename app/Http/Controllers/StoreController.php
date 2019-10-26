@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Helper\FileUpload;
 use App\Helper\BillingEngine;
 use App\Helper\RoleManagemnt;
+use App\Helper\RequestBooking;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 
@@ -68,12 +69,14 @@ class StoreController extends Controller
     }
 
     function publicUpdate($input, $request){
-      // return response()->json($input['condition']);
-      // return response()->json(DB::connection($input['schema'])->table($input['table'])->where($input['condition'])->get());
       DB::connection($input['schema'])->table($input['table'])->where($input['condition'])->update($input['set_data']);
       return response()->json([
         "result" => "Success, update ".$input['table']." data",
       ]);
+    }
+
+    function sendRequest($input){
+      return RequestBooking::sendRequest($input);
     }
 
     // BillingEngine
