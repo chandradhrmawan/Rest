@@ -75,9 +75,15 @@ class StoreController extends Controller
       ]);
     }
 
-    function sendRequest($input){
-      return RequestBooking::sendRequest($input);
-    }
+    // RequestBooking
+      function sendRequest($input){
+        return RequestBooking::sendRequest($input);
+      }
+
+      function approvalRequest($input){
+        return RequestBooking::approvalRequest($input);
+      }
+    // RequestBooking
 
     // BillingEngine
       function storeProfileTariff($input) {
