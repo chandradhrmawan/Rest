@@ -46,10 +46,12 @@ class IndexController extends Controller
         foreach ($list as $key => $value) {
           $newDt[$key] = $value;
         }
+        $relasia = $action['relation'][0];
+        $relasib = $action['relation'][1];
         if (count($action["relation"]) > 1) {
-          $detil = DB::connection($schema[1])->table($table[1])->where($action['relation'][1],  $list->$action['relation'][0]);
+          $detil = DB::connection($schema[1])->table($table[1])->where($action['relation'][1],  $list->$relasia);
         } else {
-          $detil = DB::connection($schema[1])->table($table[1])->where($action['relation'][0],  $list->$action['relation'][0]);
+          $detil = DB::connection($schema[1])->table($table[1])->where($action['relation'][0],  $list->$relasia);
         }
 
         for ($i=0; $i < count($action['filter_2']["data"]); $i++) {
@@ -70,7 +72,7 @@ class IndexController extends Controller
         }
         $result[] = $newDt;
       }
-      return response()->json($result);
+      return response()->json($head);
     }
 
     function validasi($action, $request) {
@@ -273,4 +275,28 @@ class IndexController extends Controller
 
         return response()->json(['pebListResponse' => $body->searchPEBInterfaceResponse]);
     }
-}
+
+    function viewHeaderDetail($input) {
+        $data    = $input["data"];
+        $count   = count($input["data"]);
+        $pk      = $input["HEADER"]["PK"][0];
+        $pkVal   = $input["HEADER"]["PK"][1];
+        foreach ($data as $data) {
+          $val     = $input[$data];
+          $connnection  = DB::connection($val["DB"])->table($val["TABLE"]);
+            if ($data == "HEADER") {
+               $header   = $connnection->where($pk, "like", $pkVal)->get();
+               $header   = json_decode(json_encode($header), TRUE);
+               $vwdata = ["HEADER" => $header];
+            }
+
+              else {
+              $fk      = $val["FK"][0];
+              $fkhdr   = $header[0][$val["FK"][1]];
+              $detail  = $connnection->where($fk, "like", $fkhdr)->get();
+              $vwdata[$data] = $detail;
+            }
+        }
+        return response()->json($vwdata);
+      }
+    }
