@@ -104,7 +104,7 @@ class StoreController extends Controller
     // RoleManagemnt
 
     // Schema OmCargo
-    function storeTxHdrBm($input) {
+    function storeHdrBm($input) {
       $header        = $input["HEADER"];
       $splitNota     = $input["SPLIT_NOTA"];
       $sewaAlat      = $input["SEWA_ALAT"];
@@ -251,7 +251,7 @@ class StoreController extends Controller
       ]);
     }
 
-    function storeTxHdrRec($input) {
+    function storeHdrRec($input) {
       $header        = $input["HEADER"];
       $splitNota     = $input["SPLIT_NOTA"];
       $sewaAlat      = $input["SEWA_ALAT"];
@@ -314,6 +314,7 @@ class StoreController extends Controller
         ]);
       }
 
+      // retribusi Alat Tidak Masuk
       foreach ($retribusiAlat as $list) {
         DB::connection("omcargo")->table('TX_EQUIPMENT')->insert([
           'req_no'            => $reqNumber,
@@ -349,6 +350,7 @@ class StoreController extends Controller
       // Detail
         DB::connection("omcargo")->table('TX_DTL_REC')->where('DTL_REC_ID', '=', $headS->bm_id)->delete();
         foreach ($detail as $list) {
+          $dtl_in = str_replace("T"," ",$list["DTL_IN"]);
           DB::connection("omcargo")->table('TX_DTL_REC')->insert([
             "hdr_rec_id"        => $headS->bm_id,
             "dtl_pkg_id"        => $list["DTL_PKG_ID"],
@@ -361,10 +363,10 @@ class StoreController extends Controller
             "dtl_unit_id"       => $list["DTL_UNIT_ID"],
             "dtl_unit_name"     => $list["DTL_UNIT_NAME"],
             "dtl_qty"           => $list["DTL_QTY"],
-            "dtl_in"            => $list["DTL_IN"],
             "dtl_rec_bl"        => $list["DTL_REC_BL"],
-            "dtl_create_by"     => "1",
-            "dtl_create_date"   => "2019-10-10",
+            "dtl_in"            => $dtl_in
+            // "dtl_create_by"     => "1",
+            // "dtl_create_date"   => "2019-10-10",
             // "dtl_bl"            => $list["DTL_BL"],
             // "dtl_cont_type"     => $list["DTL_CONT_TYPE"],
             // "dtl_cont_status"   => $list["DTL_CONT_STATUS"],
@@ -399,5 +401,45 @@ class StoreController extends Controller
         "result" => "Success, store and set Receiving",
       ]);
     }
-    // Schema OmCargo
+
+    function saveheaderdetail($input) {
+      $data    = $input["data"];
+      $count   = count($input["data"]);
+      $cek     = $input["HEADER"]["PK"];
+      foreach ($data as $data) {
+        $val     = $input[$data];
+        $connnection  = DB::connection($val["DB"])->table($val["TABLE"]);
+        if ($data == "HEADER") {
+          $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
+          if ($hdr[0][$cek] == '') {
+            foreach ($val["VALUE"] as $value) {
+              $insert       = $connnection->insert([$value]);
+            }
+          } else {
+            foreach ($val["VALUE"] as $value) {
+              $insert       = $connnection->where($cek,$hdr[0][$cek])->update($value);
+            }
+          }
+          $header   = $connnection->orderby($val["PK"], "desc")->first();
+          $header   = json_decode(json_encode($header), TRUE);
+        }
+        else if($data == "FILE") {
+          foreach ($val["VALUE"] as $list) {
+            $directory  = $val["DB"].'/'.$val["TABLE"].'/'.str_random(5).'/';
+            $response   = FileUpload::upload_file($list, $directory);
+            $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_name'=>$list["PATH"],'doc_path'=>$response['link']];
+            if ($response['response'] == true) {
+              $connnection->insert([$addVal]);
+              }
+            }
+        } else {
+          foreach ($val["VALUE"] as $value) {
+            $addVal = [$val["FK"][0]=>$header[$val["FK"][1]]]+$value;
+            $insert = $connnection->insert([$addVal]);
+            }
+          }
+        }
+      return response()->json(["result"=>"Save or Update Success", "header" => $header]);
+    }
+
 }
