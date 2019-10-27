@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helper\FileUpload;
 use App\Helper\BillingEngine;
+use App\Helper\RoleManagemnt;
+use App\Helper\RequestBooking;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 
@@ -23,6 +25,7 @@ class StoreController extends Controller
 
     public function api(Request $request) {
       $input  = $this->request->all();
+      $request = $request;
       $action = $input["action"];
       return $this->$action($input, $request);
     }
@@ -58,14 +61,41 @@ class StoreController extends Controller
       return response(["result"=>$parameter, "count"=>count($parameter)]);
     }
 
-    // schema billing_engine
-    function storeProfileTariff($input) {
-      return BillingEngine::storeProfileTariff($input);
+    function publicCreate($input, $request){
+      DB::connection($input['schema'])->table($input['table'])->insert($input['set_data']);
+      return response()->json([
+        "result" => "Success, create ".$input['table']." data",
+      ]);
     }
-    function storeCustomerProfileTariffAndUper($input){
+
+    function publicUpdate($input, $request){
+      DB::connection($input['schema'])->table($input['table'])->where($input['condition'])->update($input['set_data']);
+      return response()->json([
+        "result" => "Success, update ".$input['table']." data",
+      ]);
+    }
+
+    function sendRequest($input){
+      return RequestBooking::sendRequest($input);
+    }
+
+    // BillingEngine
+      function storeProfileTariff($input) {
+        return BillingEngine::storeProfileTariff($input);
+      }
+      function storeCustomerProfileTariffAndUper($input){
         return BillingEngine::storeCustomerProfileTariffAndUper($input);
       }
-    // schema billing_engine
+    // BillingEngine
+
+    // RoleManagemnt
+      function storeRole($input){
+        return RoleManagemnt::storeRole($input);
+      }
+      function storeRolePermesion($input){
+        return RoleManagemnt::storeRolePermesion($input);
+      }
+    // RoleManagemnt
 
     // Schema OmCargo
     function storeHdrBm($input) {

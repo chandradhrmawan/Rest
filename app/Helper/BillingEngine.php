@@ -13,7 +13,7 @@ class BillingEngine{
 	public static function storeProfileTariff($input){
         $head       = $input['header_set'];
         $detil      = $input['detil'];
-        $datenow    = Carbon::now()->format('m/d/Y');
+        $datenow    = Carbon::now()->format('Y-m-d');
 
 		foreach ($detil as $list) {
           if (!empty($list['ALAT'])) {
@@ -68,14 +68,14 @@ class BillingEngine{
           }
 
           $headS->tariff_type   = $head['TARIFF_TYPE'];
-          $headS->tariff_start  = \DB::raw("TO_DATE('".$head['TARIFF_START']."', 'DD/MM/YYYY')");
-          $headS->tariff_end    = \DB::raw("TO_DATE('".$head['TARIFF_END']."', 'DD/MM/YYYY')");
+          $headS->tariff_start  = \DB::raw("TO_DATE('".$head['TARIFF_START']."', 'YYYY-MM-DD')");
+          $headS->tariff_end    = \DB::raw("TO_DATE('".$head['TARIFF_END']."', 'YYYY-MM-DD')");
           $headS->tariff_no     = $head['TARIFF_NO'];
           $headS->tariff_status = $head['TARIFF_STATUS'];
           $headS->service_code  = $head['SERVICE_CODE'];
-          $headS->branch_id     = 10; // SESSION LOGIN
+          $headS->branch_id     = 12; // SESSION LOGIN
           $headS->created_by    = 1; // SESSION LOGIN
-          $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'MM/DD/YYYY')");
+          $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
 
@@ -200,6 +200,20 @@ class BillingEngine{
     	$response_detil = [];
     	foreach ($detil as $list) {
     		$newDt = [];
+    		$equipment_type_name = "";
+    		$equipment_unit_name = "";
+    		$equipment_unit_min = "";
+    		$equipment_unit_code = "";
+    		$package_name = "";
+    		$package_code = "";
+    		$commodity_name = "";
+    		$commodity_unit_code = "";
+    		$commodity_unit_name = "";
+    		$commodity_unit_min = "";
+    		$cont_desc = "";
+    		$cont_status_desc = "";
+    		$cont_type_desc = "";
+
     		foreach ($list as $key => $value) {
     			$newDt[$key] = $value;
     			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
@@ -210,12 +224,12 @@ class BillingEngine{
     							$newDt[$keyS] = $valueS;
     						}
     						if (strtoupper($keyS) == 'EQUIPMENT_TYPE_ID') {
-    							$newDt['equipment_type_name'] = DB::connection('mdm')->table('TM_EQUIPMENT_TYPE')->where('EQUIPMENT_TYPE_ID',$valueS)->first()->equipment_type_name;
+    							$equipment_type_name = DB::connection('mdm')->table('TM_EQUIPMENT_TYPE')->where('EQUIPMENT_TYPE_ID',$valueS)->first()->equipment_type_name;
     						}else if (strtoupper($keyS) == 'EQUIPMENT_UNIT') {
     							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
-    							$newDt['equipment_unit_code'] = $get->unit_code;
-    							$newDt['equipment_unit_name'] = $get->unit_name;
-    							$newDt['equipment_unit_min'] = $get->unit_min;
+    							$equipment_unit_code = $get->unit_code;
+    							$equipment_unit_name = $get->unit_name;
+    							$equipment_unit_min = $get->unit_min;
     						}
     					}
     				}
@@ -227,16 +241,16 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'PACKAGE_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_PACKAGE')->where('PACKAGE_ID',$valueS)->first();
-    							$newDt['package_name'] = $get->package_name;
-    							$newDt['package_code'] = $get->package_code;
+    							$package_name = $get->package_name;
+    							$package_code = $get->package_code;
     						}else if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
-    							$newDt['commodity_name'] = $get->commodity_name;
+    							$commodity_name = $get->commodity_name;
     						}else if (strtoupper($keyS) == 'COMMODITY_UNIT_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
-    							$newDt['commodity_unit_code'] = $get->unit_code;
-    							$newDt['commodity_unit_name'] = $get->unit_name;
-    							$newDt['commodity_unit_min'] = $get->unit_min;
+    							$commodity_unit_code = $get->unit_code;
+    							$commodity_unit_name = $get->unit_name;
+    							$commodity_unit_min = $get->unit_min;
     						}
     					}
     				}
@@ -248,13 +262,13 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
-    							$newDt['cont_desc'] = $get->cont_desc;
+    							$cont_desc = $get->cont_desc;
     						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
-    							$newDt['cont_status_desc'] = $get->cont_status_desc;
+    							$cont_status_desc = $get->cont_status_desc;
     						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
-    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE_DESC',$valueS)->first();
-    							$newDt['cont_type_desc'] = $get->cont_type_desc;
+    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE',$valueS)->first();
+    							$cont_type_desc = $get->cont_type_desc;
     						}
     					}
     				}
@@ -267,16 +281,16 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'PACKAGE_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_PACKAGE')->where('PACKAGE_ID',$valueS)->first();
-    							$newDt['package_name'] = $get->package_name;
-    							$newDt['package_code'] = $get->package_code;
+    							$package_name = $get->package_name;
+    							$package_code = $get->package_code;
     						}else if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
-    							$newDt['commodity_name'] = $get->commodity_name;
+    							$commodity_name = $get->commodity_name;
     						}else if (strtoupper($keyS) == 'COMMODITY_UNIT_ID' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
-    							$newDt['commodity_unit_code'] = $get->unit_code;
-    							$newDt['commodity_unit_name'] = $get->unit_name;
-    							$newDt['commodity_unit_min'] = $get->unit_min;
+    							$commodity_unit_code = $get->unit_code;
+    							$commodity_unit_name = $get->unit_name;
+    							$commodity_unit_min = $get->unit_min;
     						}
     					}
     				}
@@ -288,23 +302,169 @@ class BillingEngine{
     						}
     						if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
-    							$newDt['cont_desc'] = $get->cont_desc;
+    							$cont_desc = $get->cont_desc;
     						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
     							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
-    							$newDt['cont_status_desc'] = $get->cont_status_desc;
+    							$cont_status_desc = $get->cont_status_desc;
     						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
-    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE_DESC',$valueS)->first();
-    							$newDt['cont_type_desc'] = $get->cont_type_desc;
+    							$get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE',$valueS)->first();
+    							$cont_type_desc = $get->cont_type_desc;
     						}
     					}
     				}
     			}
     		}
+
+    		$newDt['equipment_type_name'] = $equipment_type_name;
+    		$newDt['equipment_unit_code'] = $equipment_unit_code;
+    		$newDt['equipment_unit_name'] = $equipment_unit_name;
+    		$newDt['equipment_unit_min'] = $equipment_unit_min;
+    		$newDt['package_name'] = $package_name;
+    		$newDt['package_code'] = $package_code;
+    		$newDt['commodity_name'] = $commodity_name;
+    		$newDt['commodity_unit_code'] = $commodity_unit_code;
+    		$newDt['commodity_unit_name'] = $commodity_unit_name;
+    		$newDt['commodity_unit_min'] = $commodity_unit_min;
+    		$newDt['cont_desc'] = $cont_desc;
+    		$newDt['cont_status_desc'] = $cont_status_desc;
+    		$newDt['cont_type_desc'] = $cont_type_desc;
     		$response_detil[] = $newDt;
     	}
     	return response()->json([
     		'TxProfileTariffHdr' => $header,
     		'TsTariff' => $response_detil
     	]);
+    }
+
+    public static function viewCustomerProfileTariff($input){
+    	$TsCustomerProfile = DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->leftJoin('TX_PROFILE_TARIFF_HDR', 'TS_CUSTOMER_PROFILE.TARIFF_HDR_ID', '=', 'TX_PROFILE_TARIFF_HDR.TARIFF_ID')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->get();
+    	$TsUper = DB::connection('eng')->table('TS_UPER')->leftJoin('TM_NOTA', 'TS_UPER.UPER_NOTA', '=', 'TM_NOTA.NOTA_ID')->where('UPER_CUST_ID', $input['CUST_PROFILE_ID'])->get();
+    	return response()->json([
+    		"TsCustomerProfile" => $TsCustomerProfile,
+    		"TsUper" => $TsUper
+    	]);
+    }
+
+    public static function calculateTariff($input){
+    	// build detil
+	    	$detil = $input['detil'];
+	    	$countD = 0;
+	    	$setD = '';
+	    	foreach ($detil as $list) { 
+	    		$countD++;
+	    		$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
+	    		$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
+	    		$setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
+	    		$setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
+	    		$setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
+	    		$setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
+	    		$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
+	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
+	    		$setD .= ' list_detail('.$countD.') := detail; ';
+	    	}
+		// build detil
+
+	    // build eqpt
+	    	$eqpt = $input['eqpt'];
+	    	$countE = 0;
+	    	$setE = '';
+	    	foreach ($eqpt as $list) { 
+	    		$countE++;
+	    		$setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE'].';';
+	    		$setE .= ' equip.EQ_QTY := '.$list['EQ_QTY'].';';
+	    		$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
+	    		$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
+	    		$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
+	    		$setE .= ' list_equip('.$countE.') := equip; ';
+	    	}
+		// build eqpt
+
+	    // build paysplit
+	    	$paysplit = $input['paysplit'];
+	    	$countP = 0;
+	    	$setP = '';
+	    	foreach ($paysplit as $list) { 
+	    		$countP++;
+	    		$setE .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+	    		$setE .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
+	    		$setE .= ' list_paysplit('.$countP.') := paysplit; ';
+	    	}
+		// build paysplit
+
+		// build head
+	    	$head = $input['head'];
+	    	$setH = " P_SOURCE_ID => 'NPK_BILLING',";
+	    	$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
+	    	$setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
+	    	$setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
+	    	$setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
+	    	$setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
+	    	if (empty($head['P_DATE_IN'])) {
+	    		$setH .= " P_DATE_IN => NULL,";
+	    	}else{
+	    		$setH .= " P_DATE_IN => to_date(".$head['P_DATE_IN'].",'yyyy-MM-dd'),";
+	    	}
+	    	if (empty($head['P_DATE_OUT'])) {
+	    		$setH .= " P_DATE_OUT => NULL,";
+	    	}else{
+	    		$setH .= " P_DATE_OUT => to_date(".$head['P_DATE_OUT'].",'yyyy-MM-dd'),";
+	    	}
+	    	$setH .= " P_TRADE => '".$head['P_TRADE']."',";
+	    	$setH .= " P_TL => '".$head['P_TL']."',";
+	    	$setH .= " P_DETAIL => list_detail,";
+	    	$setH .= " P_EQUIPMENT => list_equip,";
+	    	$setH .= " P_PAY_SPLIT => list_paysplit,";
+	    	$setH .= " P_USER_ID => ".$head['P_USER_ID'].",";
+	    	$setH .= " P_RESULT_FLAG => P_RESULT_FLAG,";
+	    	$setH .= " P_RESULT_MSG => P_RESULT_MSG ";
+		// build head
+
+		// set data
+	    	$set_data = [
+	    		'b_no' => $head['P_BOOKING_NUMBER'],
+	    		'head' => $setH,
+	    		'detil' => $setD,
+	    		'eqpt' => $setE,
+	    		'paysplit' => $setP
+	    	];
+		// set data
+
+		return static::calculateTariffExcute($set_data);
+    }
+
+    private static function calculateTariffExcute($input){
+    	$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
+    	if (!empty($head)) {
+    		$head = $head[0];
+    		DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
+    		DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->delete();
+    	}
+    	$link = oci_connect('BILLING_ENGINE', 'billing_engine', '10.88.48.124/NPKSBILD');
+    	$sql = " DECLARE
+		    detail PKG_MAIN.BOOKING_DTL;
+		    equip PKG_MAIN.BOOKING_EQUIP;
+		    paysplit PKG_MAIN.BOOKING_PAYSPLIT;
+		    list_detail PKG_MAIN.BOOKING_DTL_TBL;
+		    list_equip PKG_MAIN.BOOKING_EQUIP_TBL;
+		    list_paysplit PKG_MAIN.BOOKING_PAYSPLIT_TBL;
+		    P_RESULT_FLAG VARCHAR2(200);
+		    P_RESULT_MSG VARCHAR2(200);
+		BEGIN ".$input['detil']." ".$input['eqpt']." ".$input['paysplit'];
+    	$sql .= " PKG_MAIN.GET_TARIFF( ".$input['head']." );END;";
+
+    	// return $sql;
+    	$stmt = oci_parse($link,$sql);
+
+    	// gak nemu buat nerima retun pesan dari prosedur
+    	// oci_bind_by_name($stmt, "P_RESULT_FLAG", $out_status, 40);
+    	// oci_bind_by_name($stmt, "P_RESULT_MSG", $out_message, 40);
+    	$query = oci_execute($stmt);
+
+		$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
+		if (!empty($head)) {
+    		return ['out_status' => true, 'result' => 'Success, Send Request'];
+    	}else{
+			return ['out_status' => false, 'result' => 'Fail, Send Request'];
+    	}
     }
 }

@@ -22,7 +22,9 @@
         },
         "files": [
             "app/Helper/FileUpload.php",
-            "app/Helper/BillingEngine.php"
+            "app/Helper/RequestBooking.php",
+            "app/Helper/BillingEngine.php",
+            "app/Helper/RoleManagemnt.php"
         ]
     },
     "autoload-dev": {
