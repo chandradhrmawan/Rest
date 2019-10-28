@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
+use App\Helper\ConnectedTOS;
 
 use App\Models\OmCargo\TsUnit;
 
@@ -22,6 +23,10 @@ class IndexController extends Controller
       $input  = $this->request->all();
       $action = $input["action"];
       return $this->$action($input, $request);
+    }
+
+    function getRealisasionTOS($input, $request){
+      return ConnectedTOS::realTos($input);
     }
 
     function join_filter($action, $request) {
