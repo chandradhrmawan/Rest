@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helper\FileUpload;
 use App\Helper\BillingEngine;
-use App\Helper\RoleManagemnt;
+use App\Helper\UserAndRoleManagemnt;
 use App\Helper\RequestBooking;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
@@ -94,14 +94,20 @@ class StoreController extends Controller
       }
     // BillingEngine
 
-    // RoleManagemnt
+    // UserAndRoleManagemnt
       function storeRole($input){
-        return RoleManagemnt::storeRole($input);
+        return UserAndRoleManagemnt::storeRole($input);
       }
       function storeRolePermesion($input){
-        return RoleManagemnt::storeRolePermesion($input);
+        return UserAndRoleManagemnt::storeRolePermesion($input);
       }
-    // RoleManagemnt
+      function storeUser($input){
+        return UserAndRoleManagemnt::storeUser($input);
+      }
+      function changePasswordUser($input){
+        return UserAndRoleManagemnt::changePasswordUser($input);
+      }
+    // UserAndRoleManagemnt
 
     // Schema OmCargo
     function saveheaderdetail($input) {

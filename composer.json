@@ -9,6 +9,7 @@
         "laravel/lumen-framework": "5.2.*",
         "vlucas/phpdotenv": "~2.2",
         "yajra/laravel-oci8": "^5",
+        "guzzlehttp/guzzle": "^6.3",
         "firebase/php-jwt": "^5.0",
         "tymon/jwt-auth": "^0.5.12"
     },
@@ -21,10 +22,11 @@
             "App\\": "app/"
         },
         "files": [
+            "app/Helper/ConnectedTOS.php",
             "app/Helper/FileUpload.php",
             "app/Helper/RequestBooking.php",
             "app/Helper/BillingEngine.php",
-            "app/Helper/RoleManagemnt.php"
+            "app/Helper/UserAndRoleManagemnt.php"
         ]
     },
     "autoload-dev": {
