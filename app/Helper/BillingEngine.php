@@ -497,7 +497,15 @@ class BillingEngine{
     		$head = (array)$head;
     		$result = DB::connection('eng')->table('TX_LOG')->where('TEMP_HDR_ID', $head['temp_hdr_id'])->get();
     		$result = $result[0];
-			return (array)$result;
+    		$result = (array)$result;
+
+    		$response = ['result_flag' => $result['result_flag'], 'result_msg' => $result['result_msg']];
+    		if ($result['result_flag'] != 'S') {
+    			$response[] = ["Success"=>false];
+    		}else{
+    			$response[] = ["Success"=>true];
+    		}
+			return $response;
     	}
     }
 }
