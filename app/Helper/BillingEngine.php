@@ -490,7 +490,7 @@ class BillingEngine{
     	$query = oci_execute($stmt);
 
 		$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
-		if (!empty($head)) {
+		if (empty($head)) {
     		return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, prosedur bug'];
     	}else{
     		$head = $head[0];
@@ -501,9 +501,9 @@ class BillingEngine{
 
     		$response = ['result_flag' => $result['result_flag'], 'result_msg' => $result['result_msg']];
     		if ($result['result_flag'] != 'S') {
-    			$response[] = ["Success"=>false];
+    			$response["Success"] = false;
     		}else{
-    			$response[] = ["Success"=>true];
+    			$response["Success"] = true;
     		}
 			return $response;
     	}

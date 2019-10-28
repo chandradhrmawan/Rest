@@ -62,37 +62,35 @@ class RequestBooking{
 					$newD['DTL_DATE_IN'] = 'NULL';
 				}
 
-				if ($config['head_tab_detil_date_out_old'] != null) {
-					if ($input['table'] == 'TX_HDR_DEL') {
-						$findEx = DB::connection('omcargo')->select(DB::raw("
-							SELECT 
-								X.DTL_OUT AS date_out_old,
-								Y.DTL_OUT AS date_out 
-							FROM (
-								SELECT 
-									DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
-								FROM 
-									TX_HDR_DEL A 
-								JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
-							) X
-							JOIN (
-								SELECT 
-									DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
-								FROM 
-									TX_HDR_DEL A 
-								JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
-							) Y
-							ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."';
+				if ($config['head_tab_detil_date_out_old'] != null and ($input['table'] == 'TX_HDR_DEL' and $find['del_extend_status'] != 'N') ) {
+					$findEx = DB::connection('omcargo')->select(DB::raw("
+						SELECT 
+						X.DTL_OUT AS date_out_old,
+						Y.DTL_OUT AS date_out 
+						FROM (
+						SELECT 
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
+						FROM 
+						TX_HDR_DEL A 
+						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+						) X
+						JOIN (
+						SELECT 
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
+						FROM 
+						TX_HDR_DEL A 
+						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+						) Y
+						ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."'
 						"));
-						if (empty($findEx)) {
-							$newD['DTL_DATE_OUT_OLD'] = 'NULL';
-							$newD['DTL_DATE_OUT'] = 'NULL';
-						}else{
-							$findEx = $findEx[0];
-							$findEx = (array)$findEx;
-							$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.$findEx['date_out_old'].'\',\'yyyy-MM-dd\')';
-							$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.$findEx['date_out'].'\',\'yyyy-MM-dd\')';
-						}
+					if (empty($findEx)) {
+						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+						$newD['DTL_DATE_OUT'] = 'NULL';
+					}else{
+						$findEx = $findEx[0];
+						$findEx = (array)$findEx;
+						$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.$findEx['date_out_old'].'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.$findEx['date_out'].'\',\'yyyy-MM-dd\')';
 					}
 				}else{
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
@@ -325,7 +323,7 @@ class RequestBooking{
         		"head_tab_detil_date_out_old" => 'extension',
         		"head_status" => "del_status",
         		"head_primery" => "del_id",
-        		"head_forigen" => "del_hdr_id",
+        		"head_forigen" => "hdr_del_id",
         		"head_no" => "del_no",
         		"head_by" => "del_create_by",
         		"head_date" => "del_date",
