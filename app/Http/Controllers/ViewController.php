@@ -7,7 +7,7 @@ use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
-use App\Helper\RoleManagemnt;
+use App\Helper\UserAndRoleManagemnt;
 
 class ViewController extends Controller
 {
@@ -45,11 +45,11 @@ class ViewController extends Controller
       }
     // BillingEngine
 
-    // RoleManagemnt
+    // UserAndRoleManagemnt
       function permissionGet($input, $request)
       {
-        return RoleManagemnt::permissionGet($input);
+        return UserAndRoleManagemnt::permissionGet($input);
       }
-    // RoleManagemnt
+    // UserAndRoleManagemnt
 
 }
