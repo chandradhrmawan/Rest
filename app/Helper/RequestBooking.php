@@ -165,18 +165,18 @@ class RequestBooking{
 		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
-			return response()->json(['result' => "Fail, requst not found!"]);
+			return response()->json(['result' => "Fail, requst not found!", "Success" => false]);
 		}
 		$find = (array)$find[0];
 		if ($input['approved'] == 'false') {
 			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
-				$config['head_status'] => 1
+				$config['head_status'] => 4
 			]);
 			return response()->json(['result' => "Success, rejected requst"]);
 		}
 		$uper = DB::connection('eng')->table('V_PAY_SPLIT')->where('BOOKING_NUMBER',$find['head_no'])->get();
 		if (empty($uper)) {
-			return response()->json(['result' => "Fail, uper and tariff not found!"]);
+			return response()->json(['result' => "Fail, uper and tariff not found!", "Success" => false]);
 		}
 		$uper = $uper[0];
 		$uper = (array)$uper;
@@ -185,10 +185,6 @@ class RequestBooking{
 			return response()->json(['result' => "Fail", 'logs' => $cekU[0]]);
 		}
 		$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
-
-		DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
-			$config['head_status'] => 3
-		]);
 
 		$datenow    = Carbon::now()->format('Y-m-d');
 		$headU = new TxHdrUper;
@@ -201,13 +197,13 @@ class RequestBooking{
 		$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
 		$headU->uper_amount = $uper['uper_total'];
 		$headU->uper_currency_code = $uper['currency'];
-		// $headU->uper_status // ?
-		// $headU->uper_context // ?
-		// $headU->uper_sub_context // ?
-		// $headU->uper_terminal // ?
+		$headU->uper_status = 'P';
+		$headU->uper_context = 'BRG'; // blm fix
+		$headU->uper_sub_context = 'BRG03'; // blm fix
+		// $headU->uper_terminal // ? ambil dari header - terminal code
 		$headU->uper_branch_id = $uper['branch_id'];
-		// $headU->uper_vessel_name // ?
-		// $headU->uper_faktur_no // ?
+		// $headU->uper_vessel_name // ? ambi dari header - vessel name
+		$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
 		$headU->uper_trade_type = $uper['trade_type'];
 		$headU->uper_req_no = $uper['booking_number'];
 		$headU->uper_ppn = $uper['ppn'];
@@ -221,23 +217,31 @@ class RequestBooking{
 			$list = (array)$list;
 			$set_data = [
 				"uper_hdr_id" => $headU->uper_id,
-				"dtl_line" => ,
-				"dtl_line_desc" => ,
-				"dtl_line_context" => ,
-				"dtl_service_type" => ,
-				"dtl_amout" => ,
+				// "dtl_line" => , // perlu konfimasi
+				// "dtl_line_desc" => , // perlu konfimasi
+				// "dtl_line_context" => , // perlu konfimasi
+				"dtl_service_type" => $list['group_tariff_name'],
+				"dtl_amout" => $list['uper'], // blm fix
 				"dtl_ppn" => $list["ppn"],
-				"dtl_masa1" => ,
-				"dtl_masa12" => ,
-				"dtl_masa2" => ,
+				// "dtl_masa1" => , // cooming soon
+				// "dtl_masa12" => , // cooming soon
+				// "dtl_masa2" => , // cooming soon
 				"dtl_tariff" => $list["tariff"],
-				"dtl_package" => ,
-				"dtl_qty" => ,
+				// "dtl_package" => , // cooming soon
+				"dtl_qty" => $list["qty"],
 				"dtl_unit" => $list["unit_id"],
+				"DTL_GROUP_TARIFF_ID" => $list["group_tariff_id"],
+				"DTL_GROUP_TARIFF_NAME" => $list["group_tariff_name"],
 				"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 			];
 			DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
 		}
+
+		DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+			$config['head_status'] => 3
+		]);
+
+		return response()->json(['result' => "Success, approved request!"]);
     }
 
     private static function config($input){
