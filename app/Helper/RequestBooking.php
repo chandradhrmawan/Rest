@@ -200,9 +200,9 @@ class RequestBooking{
 		$headU->uper_status = 'P'; // blm fix
 		$headU->uper_context = 'BRG'; // blm fix
 		$headU->uper_sub_context = 'BRG03'; // blm fix
-		// $headU->uper_terminal // ? ambil dari header - terminal code
+		$headU->uper_terminal_code = $find[$config['head_terminal_code']];
 		$headU->uper_branch_id = $uper['branch_id'];
-		// $headU->uper_vessel_name // ? ambi dari header - vessel name
+		$headU->uper_vessel_name = $find[$config['head_vessel_name']];
 		$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
 		$headU->uper_trade_type = $uper['trade_type'];
 		$headU->uper_req_no = $uper['booking_number'];
@@ -211,6 +211,23 @@ class RequestBooking{
 		// $headU->uper_paid_date // ? pasti null
 		$headU->uper_percent = $uper['uper_percent'];
 		$headU->uper_dpp = $uper['dpp'];
+		if ($config['head_pbm_id'] != null) {
+			$headU->uper_pbm_id = $find[$config['head_pbm_id']];
+		}
+		if ($config['head_pbm_name'] != null) {
+			$headU->uper_pbm_name = $find[$config['head_pbm_name']];
+		}
+		if ($config['head_shipping_agent_id'] != null) {
+			$headU->uper_shipping_agent_id = $find[$config['head_shipping_agent_id']];
+		}
+		if ($config['head_shipping_agent_name'] != null) {
+			$headU->uper_shipping_agent_name = $find[$config['head_shipping_agent_name']];
+		}
+		$headU->uper_req_date = $find[$config['head_date']];
+		if ($config['head_terminal_name'] != null) {
+			$headU->uper_terminal_name = $find[$config['head_terminal_name']];
+		}
+		$headU->uper_nota_id = $uper['nota_id'];
 		$headU->save();
 
 		foreach ($uperD as $list) {
@@ -262,7 +279,15 @@ class RequestBooking{
         		"head_date" => "bm_date",
         		"head_branch" => "bm_branch_id",
         		"head_cust" => "bm_cust_id",
-        		"head_trade" => "bm_trade_type"
+        		"head_trade" => "bm_trade_type",
+        		"head_terminal_code" => "bm_terminal_code",
+        		"head_terminal_name" => "bm_terminal_name",
+        		"head_pbm_id" => "bm_pbm_id",
+        		"head_pbm_name" => "bm_pbm_name",
+        		"head_shipping_agent_id" => "bm_shipping_agent_id",
+        		"head_shipping_agent_name" => "bm_shipping_agent_name",
+        		"head_vessel_code" => "bm_vessel_code",
+        		"head_vessel_name" => "bm_vessel_name"
         	],
         	"TX_HDR_REC" => [
         		"head_nota_id" => "14",
@@ -280,7 +305,15 @@ class RequestBooking{
         		"head_date" => "rec_date",
         		"head_branch" => "rec_branch_id",
         		"head_cust" => "rec_cust_id",
-        		"head_trade" => "rec_trade_type"
+        		"head_trade" => "rec_trade_type",
+        		"head_terminal_code" => "rec_terminal_code",
+        		"head_terminal_name" => "rec_terminal_name",
+        		"head_pbm_id" => null,
+        		"head_pbm_name" => null,
+        		"head_shipping_agent_id" => null,
+        		"head_shipping_agent_name" => null,
+        		"head_vessel_code" => "rec_vessel_code",
+        		"head_vessel_name" => "rec_vessel_name"
         	],
         	"TX_HDR_DEL" => [
         		"head_nota_id" => "15",
@@ -298,7 +331,15 @@ class RequestBooking{
         		"head_date" => "del_date",
         		"head_branch" => "del_branch_id",
         		"head_cust" => "del_cust_id",
-        		"head_trade" => "del_trade_type"
+        		"head_trade" => "del_trade_type",
+        		"head_terminal_code" => "del_terminal_code",
+        		"head_terminal_name" => "del_terminal_name",
+        		"head_pbm_id" => null,
+        		"head_pbm_name" => null,
+        		"head_shipping_agent_id" => null,
+        		"head_shipping_agent_name" => null,
+        		"head_vessel_code" => "del_vessel_code",
+        		"head_vessel_name" => "del_vessel_name"
         	]
         ];
 
