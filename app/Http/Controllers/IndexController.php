@@ -299,4 +299,21 @@ class IndexController extends Controller
         }
         return response()->json($vwdata);
       }
+
+    function join($input) {
+      $connection = DB::connection($input["db"])->table($input["table"]);
+      foreach ($input["join"] as $list) {
+        $connection->join($list["table"], $list["field1"], '=', $list["field2"]);
+      }
+
+      if(!empty($input["where"][0])) {
+        $connection->where($input["where"]);
+      }
+      if(!empty($input["select"][0])) {
+        $connection->select($input["select"]);
+      }
+
+      $data = $connection->get();
+      return response()->json($data);
     }
+}
