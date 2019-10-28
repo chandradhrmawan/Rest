@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\OmUster\TmMenu;
 use App\Models\OmUster\TrRole;
+use Illuminate\Support\Facades\Hash;
 
 class UserAndRoleManagemnt{
 
@@ -19,10 +20,10 @@ class UserAndRoleManagemnt{
       'user_status' => 0
     ];
     if (empty($input['user_id'])) {
-      DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update($set_data);
-    }else{
-      $set_data['user_password'] = Hash::make('cintaIPC');
+      $set_data['user_passwd'] = Hash::make('cintaIPC');
       DB::connection('omuster')->table('TM_USER')->insert($set_data);
+    }else{
+      DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update($set_data);
     }
     return response()->json([
       "result" => "Success, store user data"
