@@ -23,7 +23,7 @@ class BillingEngine{
               "EQUIPMENT_UNIT" => $each[1]
             ])->get();
             if (count($subisocode) == 0) {
-              return response()->json(["result" => "Fail, iso code not found", "ALAT" => $list]);
+              return response()->json(["Success"=>false, "result" => "Fail, iso code not found", "ALAT" => $list]);
             }
           }
 
@@ -42,7 +42,7 @@ class BillingEngine{
             }
             $isocode    = $isocode->get();
             if (count($isocode) == 0) {
-              return response()->json(["result" => "Fail, iso code not found", "BARANG" => $list]);
+              return response()->json(["Success"=>false, "result" => "Fail, iso code not found", "BARANG" => $list]);
             }
           }
 
@@ -54,7 +54,7 @@ class BillingEngine{
               "CONT_STATUS" => $each[2]
             ])->get();
             if (count($isocode) == 0) {
-              return response()->json(["result" => "Fail, iso code not found", "KONTAINER" => $list]);
+              return response()->json(["Success"=>false, "result" => "Fail, iso code not found", "KONTAINER" => $list]);
             }
           }
         }
@@ -484,14 +484,14 @@ class BillingEngine{
     	// return $sql;
     	$stmt = oci_parse($link,$sql);
 
-    	// gak nemu buat nerima retun pesan dari prosedur
+    	// gak nemu buat nerima retun pesan dari prosedur // di ubah cara pengecekannya ngambil dari table TX_LOG
     	// oci_bind_by_name($stmt, "P_RESULT_FLAG", $out_status, 40);
     	// oci_bind_by_name($stmt, "P_RESULT_MSG", $out_message, 40);
     	$query = oci_execute($stmt);
 
 		$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
 		if (!empty($head)) {
-    		return ['result_flag' => false, 'result_msg' => 'Fail, prosedur bug'];
+    		return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, prosedur bug'];
     	}else{
     		$head = $head[0];
     		$head = (array)$head;

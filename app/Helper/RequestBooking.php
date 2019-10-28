@@ -62,20 +62,50 @@ class RequestBooking{
 					$newD['DTL_DATE_IN'] = 'NULL';
 				}
 
-				if ($config['head_tab_detil_date_out'] != null) {
+				if ($config['head_tab_detil_date_out_old'] != null) {
 					if ($input['table'] == 'TX_HDR_DEL') {
-						$newD['DTL_DATE_OUT'] = empty($list[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$list[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
-					}else{
-						$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$find[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+						$findEx = DB::connection('omcargo')->select(DB::raw("
+							SELECT 
+								X.DTL_OUT AS date_out_old,
+								Y.DTL_OUT AS date_out 
+							FROM (
+								SELECT 
+									DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
+								FROM 
+									TX_HDR_DEL A 
+								JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+							) X
+							JOIN (
+								SELECT 
+									DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
+								FROM 
+									TX_HDR_DEL A 
+								JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+							) Y
+							ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."';
+						"));
+						if (empty($findEx)) {
+							$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+							$newD['DTL_DATE_OUT'] = 'NULL';
+						}else{
+							$findEx = $findEx[0];
+							$findEx = (array)$findEx;
+							$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.$findEx['date_out_old'].'\',\'yyyy-MM-dd\')';
+							$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.$findEx['date_out'].'\',\'yyyy-MM-dd\')';
+						}
 					}
 				}else{
-					$newD['DTL_DATE_OUT'] = 'NULL';
-				}
-
-				if ($config['head_tab_detil_date_out_old'] != null) {
-					$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.$list[$config['head_tab_detil_date_out_old']].'\',\'yyyy-MM-dd\')';
-				}else{
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+
+					if ($config['head_tab_detil_date_out'] != null) {
+						if ($input['table'] == 'TX_HDR_DEL') {
+							$newD['DTL_DATE_OUT'] = empty($list[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$list[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+						}else{
+							$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$find[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+						}
+					}else{
+						$newD['DTL_DATE_OUT'] = 'NULL';
+					}
 				}
 
 				$setD[] = $newD;
@@ -181,8 +211,8 @@ class RequestBooking{
 		$headU->uper_trade_type = $uper['trade_type'];
 		$headU->uper_req_no = $uper['booking_number'];
 		$headU->uper_ppn = $uper['ppn'];
-		// $headU->uper_paid // ?
-		// $headU->uper_paid_date // ?
+		// $headU->uper_paid // ? pasti null
+		// $headU->uper_paid_date // ? pasti null
 		$headU->uper_percent = $uper['uper_percent'];
 		$headU->uper_dpp = $uper['dpp'];
 		$headU->save();
@@ -200,11 +230,11 @@ class RequestBooking{
 				"dtl_masa1" => ,
 				"dtl_masa12" => ,
 				"dtl_masa2" => ,
-				"dtl_tariff" => ,
+				"dtl_tariff" => $list["tariff"],
 				"dtl_package" => ,
 				"dtl_qty" => ,
-				"dtl_unit" => ,
-				"dtl_create_date" => ,
+				"dtl_unit" => $list["unit_id"],
+				"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 			];
 			DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
 		}
@@ -255,7 +285,7 @@ class RequestBooking{
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'del_atd',
         		"head_tab_detil_date_out" => 'dtl_out',
-        		"head_tab_detil_date_out_old" => null,
+        		"head_tab_detil_date_out_old" => 'extension',
         		"head_status" => "del_status",
         		"head_primery" => "del_id",
         		"head_forigen" => "del_hdr_id",
