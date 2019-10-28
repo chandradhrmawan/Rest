@@ -197,7 +197,7 @@ class RequestBooking{
 		$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
 		$headU->uper_amount = $uper['uper_total'];
 		$headU->uper_currency_code = $uper['currency'];
-		$headU->uper_status = 'P';
+		$headU->uper_status = 'P'; // blm fix
 		$headU->uper_context = 'BRG'; // blm fix
 		$headU->uper_sub_context = 'BRG03'; // blm fix
 		// $headU->uper_terminal // ? ambil dari header - terminal code

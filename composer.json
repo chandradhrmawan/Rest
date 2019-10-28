@@ -24,7 +24,7 @@
             "app/Helper/FileUpload.php",
             "app/Helper/RequestBooking.php",
             "app/Helper/BillingEngine.php",
-            "app/Helper/RoleManagemnt.php"
+            "app/Helper/UserAndRoleManagemnt.php"
         ]
     },
     "autoload-dev": {

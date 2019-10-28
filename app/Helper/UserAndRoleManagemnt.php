@@ -7,7 +7,36 @@ use Illuminate\Http\Request;
 use App\Models\OmUster\TmMenu;
 use App\Models\OmUster\TrRole;
 
-class RoleManagemnt{
+class UserAndRoleManagemnt{
+
+  public static function storeUser($input){
+    $set_data = [
+      'user_name' => $input['user_name'],
+      'user_role' => $input['user_role'],
+      'user_nik' => $input['user_nik'],
+      'user_branch_id' => $input['user_branch_id'],
+      'user_full_name' => $input['user_full_name'],
+      'user_status' => 0
+    ];
+    if (empty($input['user_id'])) {
+      DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update($set_data);
+    }else{
+      $set_data['user_password'] = Hash::make('cintaIPC');
+      DB::connection('omuster')->table('TM_USER')->insert($set_data);
+    }
+    return response()->json([
+      "result" => "Success, store user data"
+    ]);
+  }
+
+  public static function changePasswordUser($input){
+      DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update([
+        'user_password' => Hash::make($input['user_password'])
+      ]);
+    return response()->json([
+      "result" => "Success, change password user data"
+    ]);
+  }
 
   public static function storeRole($input){
     if (empty($input['ROLE_ID'])) {
@@ -39,8 +68,7 @@ class RoleManagemnt{
     ]);
   }
 
-	public static function permissionGet($input)
-  {
+	public static function permissionGet($input){
       $role = static::role_data($input['ROLE_ID'],'permission');
       if ($role == false) {
         return response()->json(['response' => 'Fail, your role cant not found!']);
