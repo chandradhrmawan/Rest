@@ -5,16 +5,16 @@ namespace App\Helper;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
+use App\Models\OmCargo\TxHdrUper;
 
 class RequestBooking{
 
 	public static function sendRequest($input){
-		$requst_config = static::config();
 		$input['table'] = strtoupper($input['table']);
-		$config = $requst_config[$input['table']];
+		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
-			return response()->json_decode(['result' => "Fail, requst not found!"]);
+			return response()->json(['result' => "Fail, requst not found!"]);
 		}
 		$find = (array)$find[0];
 
@@ -28,7 +28,6 @@ class RequestBooking{
 			$setH['P_DATE_IN'] = NULL;
 			$setH['P_DATE_OUT'] = NULL;
 			$setH['P_TRADE'] = $find[$config['head_trade']];
-			$setH['P_TL'] = 'N';
 			$setH['P_USER_ID'] = $find[$config['head_by']];
 		// build head
 
@@ -46,6 +45,69 @@ class RequestBooking{
 				$newD['DTL_CONT_STATUS'] = empty($list['dtl_cont_status']) ? 'NULL' : $list['dtl_cont_status'];
 				$newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
 				$newD['DTL_QTY'] = empty($list['dtl_qty']) ? 'NULL' : $list['dtl_qty'];
+
+				if ($config['head_tab_detil_tl'] != null) {
+					$newD['DTL_TL'] = empty($list[$config['head_tab_detil_tl']]) ? 'NULL' : $list[$config['head_tab_detil_tl']];
+				}else{
+					$newD['DTL_TL'] = 'NULL';
+				}
+
+				if ($config['head_tab_detil_date_in'] != null) {
+					if ($input['table'] == 'TX_HDR_REC') {
+						$newD['DTL_DATE_IN'] = empty($list[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.$list[$config['head_tab_detil_date_in']].'\',\'yyyy-MM-dd\')';
+					}else{
+						$newD['DTL_DATE_IN'] = empty($find[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.$find[$config['head_tab_detil_date_in']].'\',\'yyyy-MM-dd\')';
+					}
+				}else{
+					$newD['DTL_DATE_IN'] = 'NULL';
+				}
+
+				if ($config['head_tab_detil_date_out_old'] != null) {
+					if ($input['table'] == 'TX_HDR_DEL') {
+						$findEx = DB::connection('omcargo')->select(DB::raw("
+							SELECT 
+								X.DTL_OUT AS date_out_old,
+								Y.DTL_OUT AS date_out 
+							FROM (
+								SELECT 
+									DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
+								FROM 
+									TX_HDR_DEL A 
+								JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+							) X
+							JOIN (
+								SELECT 
+									DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
+								FROM 
+									TX_HDR_DEL A 
+								JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+							) Y
+							ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."';
+						"));
+						if (empty($findEx)) {
+							$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+							$newD['DTL_DATE_OUT'] = 'NULL';
+						}else{
+							$findEx = $findEx[0];
+							$findEx = (array)$findEx;
+							$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.$findEx['date_out_old'].'\',\'yyyy-MM-dd\')';
+							$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.$findEx['date_out'].'\',\'yyyy-MM-dd\')';
+						}
+					}
+				}else{
+					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+
+					if ($config['head_tab_detil_date_out'] != null) {
+						if ($input['table'] == 'TX_HDR_DEL') {
+							$newD['DTL_DATE_OUT'] = empty($list[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$list[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+						}else{
+							$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$find[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+						}
+					}else{
+						$newD['DTL_DATE_OUT'] = 'NULL';
+					}
+				}
+
 				$setD[] = $newD;
 			}
 		// build detil
@@ -87,9 +149,10 @@ class RequestBooking{
 			];
 		// set data
 
+		// return $tariffResp = BillingEngine::calculateTariff($set_data);
 		$tariffResp = BillingEngine::calculateTariff($set_data);
 
-		if ($tariffResp['out_status'] == true) {
+		if ($tariffResp['result_flag'] == 'S') {
 			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 2
 			]);
@@ -97,12 +160,100 @@ class RequestBooking{
 		return response()->json($tariffResp);
     }
 
-    private static function config(){
-    	return $requst_config = [
+    public static function approvalRequest($input){
+    	$input['table'] = strtoupper($input['table']);
+		$config = static::config($input['table']);
+		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+		if (empty($find)) {
+			return response()->json(['result' => "Fail, requst not found!", "Success" => false]);
+		}
+		$find = (array)$find[0];
+		if ($input['approved'] == 'false') {
+			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+				$config['head_status'] => 4
+			]);
+			return response()->json(['result' => "Success, rejected requst"]);
+		}
+		$uper = DB::connection('eng')->table('V_PAY_SPLIT')->where('BOOKING_NUMBER',$find['head_no'])->get();
+		if (empty($uper)) {
+			return response()->json(['result' => "Fail, uper and tariff not found!", "Success" => false]);
+		}
+		$uper = $uper[0];
+		$uper = (array)$uper;
+		$cekU = DB::connection('eng')->table('TX_LOG')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
+		if ($cekU[0]->result_flag != 'S') {
+			return response()->json(['result' => "Fail", 'logs' => $cekU[0]]);
+		}
+		$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
+
+		$datenow    = Carbon::now()->format('Y-m-d');
+		$headU = new TxHdrUper;
+		// $headU->uper_no // dari triger
+		$headU->uper_org_id = $uper['branch_org_id'];
+		$headU->uper_cust_id = $uper['customer_id'];
+		$headU->uper_cust_name = $uper['alt_name'];
+		$headU->uper_cust_npwp = $uper['npwp'];
+		$headU->uper_cust_address = $uper['address'];
+		$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+		$headU->uper_amount = $uper['uper_total'];
+		$headU->uper_currency_code = $uper['currency'];
+		$headU->uper_status = 'P';
+		$headU->uper_context = 'BRG'; // blm fix
+		$headU->uper_sub_context = 'BRG03'; // blm fix
+		// $headU->uper_terminal // ? ambil dari header - terminal code
+		$headU->uper_branch_id = $uper['branch_id'];
+		// $headU->uper_vessel_name // ? ambi dari header - vessel name
+		$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
+		$headU->uper_trade_type = $uper['trade_type'];
+		$headU->uper_req_no = $uper['booking_number'];
+		$headU->uper_ppn = $uper['ppn'];
+		// $headU->uper_paid // ? pasti null
+		// $headU->uper_paid_date // ? pasti null
+		$headU->uper_percent = $uper['uper_percent'];
+		$headU->uper_dpp = $uper['dpp'];
+		$headU->save();
+
+		foreach ($uperD as $list) {
+			$list = (array)$list;
+			$set_data = [
+				"uper_hdr_id" => $headU->uper_id,
+				// "dtl_line" => , // perlu konfimasi
+				// "dtl_line_desc" => , // perlu konfimasi
+				// "dtl_line_context" => , // perlu konfimasi
+				"dtl_service_type" => $list['group_tariff_name'],
+				"dtl_amout" => $list['uper'], // blm fix
+				"dtl_ppn" => $list["ppn"],
+				// "dtl_masa1" => , // cooming soon
+				// "dtl_masa12" => , // cooming soon
+				// "dtl_masa2" => , // cooming soon
+				"dtl_tariff" => $list["tariff"],
+				// "dtl_package" => , // cooming soon
+				"dtl_qty" => $list["qty"],
+				"dtl_unit" => $list["unit_id"],
+				"DTL_GROUP_TARIFF_ID" => $list["group_tariff_id"],
+				"DTL_GROUP_TARIFF_NAME" => $list["group_tariff_name"],
+				"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+			];
+			DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
+		}
+
+		DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+			$config['head_status'] => 3
+		]);
+
+		return response()->json(['result' => "Success, approved request!"]);
+    }
+
+    private static function config($input){
+    	$requst_config = [
         	"TX_HDR_BM" => [
         		"head_nota_id" => 13,
         		"head_tab" => "TX_HDR_BM",
         		"head_tab_detil" => "TX_DTL_BM",
+        		"head_tab_detil_tl" => "dtl_bm_tl",
+        		"head_tab_detil_date_in" => null,
+        		"head_tab_detil_date_out" => null,
+        		"head_tab_detil_date_out_old" => null,
         		"head_status" => "bm_status",
         		"head_primery" => "bm_id",
         		"head_forigen" => "hdr_bm_id",
@@ -111,14 +262,16 @@ class RequestBooking{
         		"head_date" => "bm_date",
         		"head_branch" => "bm_branch_id",
         		"head_cust" => "bm_cust_id",
-        		"head_date_in" => null,
-        		"head_date_out" => null,
         		"head_trade" => "bm_trade_type"
         	],
         	"TX_HDR_REC" => [
         		"head_nota_id" => "14",
         		"head_tab" => "TX_HDR_REC",
         		"head_tab_detil" => "TX_DTL_REC",
+        		"head_tab_detil_tl" => null,
+        		"head_tab_detil_date_in" => 'dtl_in',
+        		"head_tab_detil_date_out" => 'rec_atd',
+        		"head_tab_detil_date_out_old" => null,
         		"head_status" => "rec_status",
         		"head_primery" => "rec_id",
         		"head_forigen" => "hdr_rec_id",
@@ -127,14 +280,16 @@ class RequestBooking{
         		"head_date" => "rec_date",
         		"head_branch" => "rec_branch_id",
         		"head_cust" => "rec_cust_id",
-        		"head_date_in" => null,
-        		"head_date_out" => null,
         		"head_trade" => "rec_trade_type"
         	],
         	"TX_HDR_DEL" => [
         		"head_nota_id" => "15",
         		"head_tab" => "TX_HDR_DEL",
         		"head_tab_detil" => "TX_DTL_DEL",
+        		"head_tab_detil_tl" => null,
+        		"head_tab_detil_date_in" => 'del_atd',
+        		"head_tab_detil_date_out" => 'dtl_out',
+        		"head_tab_detil_date_out_old" => 'extension',
         		"head_status" => "del_status",
         		"head_primery" => "del_id",
         		"head_forigen" => "del_hdr_id",
@@ -143,10 +298,10 @@ class RequestBooking{
         		"head_date" => "del_date",
         		"head_branch" => "del_branch_id",
         		"head_cust" => "del_cust_id",
-        		"head_date_in" => null,
-        		"head_date_out" => null,
         		"head_trade" => "del_trade_type"
         	]
         ];
+
+        return $requst_config[$input];
     }
 }
