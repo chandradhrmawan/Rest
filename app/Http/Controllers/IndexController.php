@@ -316,4 +316,42 @@ class IndexController extends Controller
       $data = $connection->get();
       return response()->json($data);
     }
+
+    function xml($input, $request) {
+        $xml  = new \SimpleXMLElement('<root/>');
+        $data = json_decode(json_encode($input));
+        // $array = array_flip($data);
+        // array_walk_recursive($array, array ($xml, 'addChild'));
+        return $xml->asXML();
+    }
+
+    function whereQuery($input) {
+      $connect   = \DB::connection($input["db"])->table($input["table"]);
+      if(!empty($input["where"][0])) {
+        $connect->where($input["where"]);
+      }
+
+      if (!empty($input["query"]) && !empty($input["field"])) {
+        $connect->where($input["field"],"like", "%".$input["query"]."%");
+      }
+      $data      = $connect->get();
+      $count     = $connect->count();
+      return response()->json(["result"=>$data, "count"=>$count]);
+    }
+
+    function whereIn($input) {
+      $connect   = \DB::connection($input["db"])->table($input["table"]);
+
+      if(!empty($input["whereIn"][0])) {
+      $in        = $input["whereIn"];
+      $connect->whereIn($in[0], $in[1]);
+      }
+
+      if(!empty($input["where"][0])) {
+        $connect->where($input["where"]);
+      }
+
+      $data      = $connect->get();
+      return response()->json($data);
+    }
 }

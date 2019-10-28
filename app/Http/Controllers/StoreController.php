@@ -150,6 +150,10 @@ class StoreController extends Controller
             if (isset($value["id"])) {
               unset($value["id"]);
             }
+            if (isset($value["DTL_OUT"])) {
+              $value["DTL_OUT"] = str_replace("T"," ",$value["DTL_OUT"]);
+              $value["DTL_OUT"] = str_replace(".000Z","",$value["DTL_OUT"]);
+            }
             if (isset($value["DTL_IN"])) {
               $value["DTL_IN"] = str_replace("T"," ",$value["DTL_IN"]);
             }
@@ -172,10 +176,10 @@ class StoreController extends Controller
     }
 
     // function test($input) {
-    //   // $dtl_in = str_replace("T"," ",$list["DTL_IN"]);
-    //   if (isset($input["value"]["DTL_IN"])) {
-    //     $input["value"]["DTL_IN"] = str_replace("T"," ",$input["value"]["DTL_IN"]);
+    //   if (isset($input["VALUE"]["DTL_OUT"])) {
+    //     $input["VALUE"]["DTL_OUT"] = str_replace("T"," ",$input["VALUE"]["DTL_OUT"]);
+    //     $input["VALUE"]["DTL_OUT"] = str_replace(".000Z","",$input["VALUE"]["DTL_OUT"]);
     //   }
-    //   return response($input["value"]["DTL_IN"]);
+    //   return response($input["VALUE"]["DTL_OUT"]);
     // }
 }
