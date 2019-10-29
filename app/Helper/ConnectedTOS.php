@@ -83,4 +83,8 @@ class ConnectedTOS{
     ]);
 	}
 
+  public static function sendRequestBooking($input){
+    // buat fungsi get data request booking dan send ke tos contoh lemparnya ada di funct realtos line 26 sampai 53
+  }
+
 }
