@@ -5,6 +5,7 @@ namespace App\Helper;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\OmCargo\TxHdrBm;
+use Illuminate\Support\Facades\DB;
 
 class ConnectedTOS{
 
@@ -41,33 +42,37 @@ class ConnectedTOS{
               $username,
               $password
             ],
-            'headers'  => ['content-type' => 'application/x-www-form-urlencoded'],
-            'form_params' => $string_json,
+            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+            'body' => $string_json,
             "debug" => false
           );
           try {
             $res = $client->post($endpoint_url, $options);
           } catch (ClientException $e) {
-            // return $e->getResponse();
+            return $e->getResponse();
           }
 
-          $response = json_decode($res->getBody()->getContents());
+          $response = json_decode(json_encode($res->getBody()->getContents()));
+          $response = json_decode($response, true);
+          $response = $response['esbBody']['results'][0];
 
-          $newreal = $response['esbBody']['results'][0];
-          DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
-             'idvsb'=> $newreal['idVsbVoyage'],
-             'bl_no'=> $newreal['blNumber'],
-             'package'=> $newreal['packageName'],
-             'is_hz'=> $newreal['hz'],
-             'is_disturb'=> $newreal['disturb'],
-             'ei'=> $newreal['ei'],
-             'tl'=> $newreal['tl'],
-             'total_ton'=> $newreal['ttlTon'],
-             'total_cubic'=> $newreal['ttlCubic'],
-             'oi'=> $newreal['oi'],
-             'rpact'=> $newreal['rpact'],
-             'omcargoid'=> $newreal['omCargoid']
-          ]);
+          if (!empty($response['idVsbVoyage'])) {
+            $newreal = $response['esbBody']['results'][0];
+            DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
+               'idvsb'=> $newreal['idVsbVoyage'],
+               'bl_no'=> $newreal['blNumber'],
+               'package'=> $newreal['packageName'],
+               'is_hz'=> $newreal['hz'],
+               'is_disturb'=> $newreal['disturb'],
+               'ei'=> $newreal['ei'],
+               'tl'=> $newreal['tl'],
+               'total_ton'=> $newreal['ttlTon'],
+               'total_cubic'=> $newreal['ttlCubic'],
+               'oi'=> $newreal['oi'],
+               'rpact'=> $newreal['rpact'],
+               'omcargoid'=> $newreal['omCargoid']
+            ]);
+          }
       }
     }
 
@@ -77,5 +82,5 @@ class ConnectedTOS{
       'result' => "Success, get data real from tos!"
     ]);
 	}
-  
+
 }
