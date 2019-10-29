@@ -185,6 +185,8 @@ class RequestBooking{
 		$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
 
 		$datenow    = Carbon::now()->format('Y-m-d');
+		// $branch_code = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID',$uper['branch_id'])->get();
+		// $branch_code = $branch_code[0]->branch_code;
 		$headU = new TxHdrUper;
 		// $headU->uper_no // dari triger
 		$headU->uper_org_id = $uper['branch_org_id'];
@@ -200,6 +202,7 @@ class RequestBooking{
 		$headU->uper_sub_context = 'BRG03'; // blm fix
 		$headU->uper_terminal_code = $find[$config['head_terminal_code']];
 		$headU->uper_branch_id = $uper['branch_id'];
+		// $headU->uper_branch_code = $branch_code; // kemungkinan ditambah
 		$headU->uper_vessel_name = $find[$config['head_vessel_name']];
 		$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
 		$headU->uper_trade_type = $uper['trade_type'];

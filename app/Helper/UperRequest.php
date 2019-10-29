@@ -28,6 +28,7 @@ class UperRequest{
     $pay->pay_bank_code = $input['pay_bank_code'];
     $pay->pay_bank_name = $input['pay_bank_name'];
     $pay->pay_branch_id = $input['pay_branch_id'];
+    // $pay->pay_branch_code = $input['pay_branch_code']; // kemungkinan ditambah
     $pay->pay_account_no = $input['pay_account_no'];
     $pay->pay_account_name = $input['pay_account_name'];
     $pay->pay_amount = $input['pay_amount'];
