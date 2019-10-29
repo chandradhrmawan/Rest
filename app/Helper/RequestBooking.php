@@ -247,6 +247,10 @@ class RequestBooking{
 				"dtl_unit" => $list["unit_id"],
 				"DTL_GROUP_TARIFF_ID" => $list["group_tariff_id"],
 				"DTL_GROUP_TARIFF_NAME" => $list["group_tariff_name"],
+				// "DTL_BL" => $list[""], // tunggu dari adi
+				"DTL_DPP" => $list["tariff_cal"],
+				"DTL_COMMODITY" => $list["commodity_name"],
+				"DTL_EQUIPMENT" => $list["equipment_name"],
 				"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 			];
 			DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
