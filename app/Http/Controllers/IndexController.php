@@ -71,13 +71,13 @@ class IndexController extends Controller
 
         $detil = $detil->get();
         foreach ($detil as $listS) {
-          foreach ($listS as $key => $value) {
-            $newDt[$key] = $value;
+          foreach ($listS as $keyS => $valueS) {
+            $newDt[$keyS] = $valueS;
           }
         }
         $result[] = $newDt;
       }
-      return response()->json($head);
+      return response()->json($result);
     }
 
     function validasi($action, $request) {
