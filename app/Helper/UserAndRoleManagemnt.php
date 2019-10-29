@@ -21,7 +21,7 @@ class UserAndRoleManagemnt{
     ];
 
     if (isset($input['user_password']) and !empty($input['user_password'])) {
-      $set_data['user_password'] = Hash::make($input['user_password']);
+      $set_data['user_passwd'] = Hash::make($input['user_password']);
     }
 
     if (empty($input['user_id'])) {
