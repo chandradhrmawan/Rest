@@ -31,7 +31,7 @@ class TxProfileTariffHdr extends Model
     public function getBranchCodeAttribute(){
       $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
       if (count($get) > 0) {
-        return $get->branch_code;
+        return $get[0]->branch_code;
       }else{
         return '-';
       }
@@ -40,7 +40,7 @@ class TxProfileTariffHdr extends Model
     public function getBranchNameAttribute(){
       $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
       if (count($get) > 0) {
-        return $get->branch_name;
+        return $get[0]->branch_name;
       }else{
         return '-';
       }
