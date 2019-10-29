@@ -34,45 +34,45 @@ class ConnectedTOS{
             }
           }';
 
-          $username="npk_billing";
-          $password ="npk_billing";
-          $client = new Client();
-          $options= array(
-            'auth' => [
-              $username,
-              $password
-            ],
-            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-            'body' => $string_json,
-            "debug" => false
-          );
-          try {
-            $res = $client->post($endpoint_url, $options);
-          } catch (ClientException $e) {
-            return $e->getResponse();
-          }
+        $username="npk_billing";
+        $password ="npk_billing";
+        $client = new Client();
+        $options= array(
+          'auth' => [
+            $username,
+            $password
+          ],
+          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+          'body' => $string_json,
+          "debug" => false
+        );
+        try {
+          $res = $client->post($endpoint_url, $options);
+        } catch (ClientException $e) {
+          return $e->getResponse();
+        }
 
-          $response = json_decode(json_encode($res->getBody()->getContents()));
-          $response = json_decode($response, true);
-          $response = $response['esbBody']['results'][0];
+        $response = json_decode(json_encode($res->getBody()->getContents()));
+        $response = json_decode($response, true);
+        $response = $response['esbBody']['results'][0];
 
-          if (!empty($response['idVsbVoyage'])) {
-            $newreal = $response['esbBody']['results'][0];
-            DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
-               'idvsb'=> $newreal['idVsbVoyage'],
-               'bl_no'=> $newreal['blNumber'],
-               'package'=> $newreal['packageName'],
-               'is_hz'=> $newreal['hz'],
-               'is_disturb'=> $newreal['disturb'],
-               'ei'=> $newreal['ei'],
-               'tl'=> $newreal['tl'],
-               'total_ton'=> $newreal['ttlTon'],
-               'total_cubic'=> $newreal['ttlCubic'],
-               'oi'=> $newreal['oi'],
-               'rpact'=> $newreal['rpact'],
-               'omcargoid'=> $newreal['omCargoid']
-            ]);
-          }
+        if (!empty($response['idVsbVoyage'])) {
+          $newreal = $response['esbBody']['results'][0];
+          DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
+             'idvsb'=> $newreal['idVsbVoyage'],
+             'bl_no'=> $newreal['blNumber'],
+             'package'=> $newreal['packageName'],
+             'is_hz'=> $newreal['hz'],
+             'is_disturb'=> $newreal['disturb'],
+             'ei'=> $newreal['ei'],
+             'tl'=> $newreal['tl'],
+             'total_ton'=> $newreal['ttlTon'],
+             'total_cubic'=> $newreal['ttlCubic'],
+             'oi'=> $newreal['oi'],
+             'rpact'=> $newreal['rpact'],
+             'omcargoid'=> $newreal['omCargoid']
+          ]);
+        }
       }
     }
 
