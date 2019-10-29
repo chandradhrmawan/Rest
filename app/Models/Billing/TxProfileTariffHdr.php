@@ -3,6 +3,7 @@
 namespace App\Models\Billing;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class TxProfileTariffHdr extends Model
 {
@@ -24,4 +25,24 @@ class TxProfileTariffHdr extends Model
     	"tariff_file",
     	"tariff_short_name"
     ];
+
+    protected $appends = ['branch_code','branch_name'];
+
+    public function getBranchCodeAttribute(){
+      $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
+      if (count($get) > 0) {
+        return $get->branch_code;
+      }else{
+        return '-';
+      }
+    }
+
+    public function getBranchNameAttribute(){
+      $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
+      if (count($get) > 0) {
+        return $get->branch_name;
+      }else{
+        return '-';
+      }
+    }
 }
