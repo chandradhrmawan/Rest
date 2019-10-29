@@ -11,7 +11,7 @@ use App\Helper\ConnectedTOS;
 class UperRequest{
 
 	public static function storeUperPayment($input){
-    $uper = TxHdrUper::where('uper_no',$input['pay_req_no'])->first();
+    $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
     if (empty($uper)) {
       return response()->json(["Success"=>false, "result" => "Fail, uper not found"]);
     }
@@ -20,6 +20,7 @@ class UperRequest{
     }
     $datenow    = Carbon::now()->format('Y-m-d');
     $pay = new TxPayment;
+    $pay->pay_no = $input['pay_no'];
     $pay->pay_req_no = $input['pay_req_no'];
     $pay->pay_method = $input['pay_method'];
     $pay->pay_cust_id = $input['pay_cust_id'];
