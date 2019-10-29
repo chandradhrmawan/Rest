@@ -15,7 +15,7 @@ class UperRequest{
     if (empty($uper)) {
       return response()->json(["Success"=>false, "result" => "Fail, uper not found"]);
     }
-    if ($uper->uper_status == 1) {
+    if ($uper->uper_paid == 'Y') {
       return response()->json(["Success"=>false, "result" => "Fail, uper already paid"]);
     }
     $datenow    = Carbon::now()->format('Y-m-d');
