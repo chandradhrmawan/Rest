@@ -28,7 +28,7 @@ class GlobalHelper{
             $vwdata[$data] = $detail;
           }
       }
-      return response()->json($vwdata);
+      return $vwdata;
     }
 
   public static function join_filter($action) {
@@ -79,7 +79,7 @@ class GlobalHelper{
         }
         $result[] = $newDt;
       }
-      return response()->json($head);
+      return $head;
     }
 
   public static function index($input) {
@@ -91,7 +91,7 @@ class GlobalHelper{
       $result   = $connect->get();
       $count    = $connect->count();
 
-      return response()->json(["result"=>$result, "count"=>$count]);
+      return ["result"=>$result, "count"=>$count];
     }
 
   public static function filter($input) {
@@ -115,7 +115,7 @@ class GlobalHelper{
 
       $result  = $connect->get();
       $count   = $connect->count();
-      return response()->json(["result"=>$result, "count"=>$count]);
+      return ["result"=>$result, "count"=>$count];
     }
 
   public static function filterByGrid($input) {
@@ -139,7 +139,7 @@ class GlobalHelper{
     $result   = $connect->get();
     $count    = $connect->count();
 
-    return response()->json(["result"=>$result, "count"=>$count]);
+    return ["result"=>$result, "count"=>$count];
   }
 
   public static function autoComplete($input) {
@@ -160,7 +160,7 @@ class GlobalHelper{
     $result   = $connect->get();
     $count    = $connect->count();
 
-    return response()->json(["result"=>$result, "count"=>$count]);
+    return ["result"=>$result, "count"=>$count];
   }
 
   public static function join($input) {
@@ -189,7 +189,7 @@ class GlobalHelper{
     // }
     // $conCross->where(["CUSTOMER_ID", "=", "12402110"]);
     // $data = $conCross->get();
-    return response()->json($data);
+    return $data;
 
   }
 
@@ -210,7 +210,7 @@ class GlobalHelper{
 
     $data      = $connect->get();
     $count     = $connect->count();
-    return response()->json(["result"=>$data, "count"=>$count]);
+    return ["result"=>$data, "count"=>$count];
   }
 
   public static function whereIn($input) {
@@ -226,6 +226,6 @@ class GlobalHelper{
     }
 
     $data      = $connect->get();
-    return response()->json($data);
+    return $data;
   }
 }
