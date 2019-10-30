@@ -12,11 +12,11 @@ class ConnectedTOS{
 	public static function realTos($input){
 		$count = DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('REAL_REQ_NO', $input['req_no'])->count();
     if ($count > 0) {
-      return response()->json(['result' => "Fail, realisation has been created!", "Success" => false]);
+      return ['result' => "Fail, realisation has been created!", "Success" => false];
     }
     $req = TxHdrBm::where('BM_NO', $input['req_no'])->first();
     if (empty($req)) {
-      return response()->json(['result' => "Fail, request not found!", "Success" => false]);
+      return ['result' => "Fail, request not found!", "Success" => false];
     }
     $ckp = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id', $req->bm_id)->where('dtl_pkg_id', 4)->get();
 
@@ -76,11 +76,11 @@ class ConnectedTOS{
       }
     }
 
-    return response()->json([
+    return [
       'req_header' => $req,
       'req_detil' => DB::connection('omcargo')->select(DB::raw("select * from TX_DTL_BM A left join TX_REAL_TOS B on B.BL_NO = A.DTL_BM_BL where A.HDR_BM_ID = ".$req->bm_id)),
       'result' => "Success, get data real from tos!"
-    ]);
+    ];
 	}
 
   public static function sendRequestBooking($input){

@@ -23,7 +23,7 @@ class BillingEngine{
               "EQUIPMENT_UNIT" => $each[1]
             ])->get();
             if (count($subisocode) == 0) {
-              return response()->json(["Success"=>false, "result" => "Fail, iso code not found alat", "ALAT" => $list]);
+              return ["Success"=>false, "result" => "Fail, iso code not found alat", "ALAT" => $list];
             }
           }
 
@@ -42,7 +42,7 @@ class BillingEngine{
             }
             $isocode    = $isocode->get();
             if (count($isocode) == 0) {
-              return response()->json(["Success"=>false, "result" => "Fail, iso code not found barang", "BARANG" => $list]);
+              return ["Success"=>false, "result" => "Fail, iso code not found barang", "BARANG" => $list];
             }
           }
 
@@ -54,7 +54,7 @@ class BillingEngine{
               "CONT_STATUS" => $each[2]
             ])->get();
             if (count($isocode) == 0) {
-              return response()->json(["Success"=>false, "result" => "Fail, iso code not found kontainer", "KONTAINER" => $list]);
+              return ["Success"=>false, "result" => "Fail, iso code not found kontainer", "KONTAINER" => $list];
             }
           }
         }
@@ -167,9 +167,7 @@ class BillingEngine{
           }
         }
 
-        return response()->json([
-          "result" => "Success, store profile tariff data",
-        ]);
+        return [ "result" => "Success, store profile tariff data"];
 	}
 
 	public static function storeCustomerProfileTariffAndUper($input){
@@ -190,9 +188,7 @@ class BillingEngine{
 	        	'BRANCH_ID' => 12
 	        ]);
         }
-        return response()->json([
-          "result" => "Success, store and set profile tariff and uper customer",
-        ]);
+        return [ "result" => "Success, store and set profile tariff and uper customer" ];
     }
 
     public static function viewProfileTariff($input){
@@ -365,19 +361,19 @@ class BillingEngine{
     		$newDt['group_tarif_name'] = $group_tariff_name;
     		$response_detil[] = $newDt;
     	}
-    	return response()->json([
+    	return [
     		'TxProfileTariffHdr' => $header,
     		'TsTariff' => $response_detil
-    	]);
+    	];
     }
 
     public static function viewCustomerProfileTariff($input){
     	$TsCustomerProfile = DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->leftJoin('TX_PROFILE_TARIFF_HDR', 'TS_CUSTOMER_PROFILE.TARIFF_HDR_ID', '=', 'TX_PROFILE_TARIFF_HDR.TARIFF_ID')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->get();
     	$TsUper = DB::connection('eng')->table('TS_UPER')->leftJoin('TM_NOTA', 'TS_UPER.UPER_NOTA', '=', 'TM_NOTA.NOTA_ID')->where('UPER_CUST_ID', $input['CUST_PROFILE_ID'])->get();
-    	return response()->json([
+    	return [
     		"TsCustomerProfile" => $TsCustomerProfile,
     		"TsUper" => $TsUper
-    	]);
+    	];
     }
 
     public static function calculateTariff($input){

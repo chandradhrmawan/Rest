@@ -14,7 +14,7 @@ class RequestBooking{
 		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
-			return response()->json(['result' => "Fail, requst not found!"]);
+			return ['result' => "Fail, requst not found!"];
 		}
 		$find = (array)$find[0];
 
@@ -155,7 +155,7 @@ class RequestBooking{
 				$config['head_status'] => 2
 			]);
 		}
-		return response()->json($tariffResp);
+		return $tariffResp;
     }
 
     public static function approvalRequest($input){
@@ -163,24 +163,24 @@ class RequestBooking{
 		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
-			return response()->json(['result' => "Fail, requst not found!", "Success" => false]);
+			return ['result' => "Fail, requst not found!", "Success" => false];
 		}
 		$find = (array)$find[0];
 		if ($input['approved'] == 'false') {
 			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 4
 			]);
-			return response()->json(['result' => "Success, rejected requst"]);
+			return ['result' => "Success, rejected requst"];
 		}
 		$uper = DB::connection('eng')->table('V_PAY_SPLIT')->where('BOOKING_NUMBER',$find['head_no'])->get();
 		if (empty($uper)) {
-			return response()->json(['result' => "Fail, uper and tariff not found!", "Success" => false]);
+			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
 		}
 		$uper = $uper[0];
 		$uper = (array)$uper;
 		$cekU = DB::connection('eng')->table('TX_LOG')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
 		if ($cekU[0]->result_flag != 'S') {
-			return response()->json(['result' => "Fail", 'logs' => $cekU[0]]);
+			return ['result' => "Fail", 'logs' => $cekU[0]];
 		}
 		$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
 
@@ -263,7 +263,7 @@ class RequestBooking{
 			$config['head_status'] => 3
 		]);
 
-		return response()->json(['result' => "Success, approved request!"]);
+		return ['result' => "Success, approved request!"];
     }
 
     private static function config($input){
