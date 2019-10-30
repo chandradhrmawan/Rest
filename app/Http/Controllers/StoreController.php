@@ -9,6 +9,7 @@ use App\Helper\FileUpload;
 use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
 use App\Helper\RequestBooking;
+use App\Helper\UperRequest;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 
@@ -93,6 +94,12 @@ class StoreController extends Controller
         return BillingEngine::storeCustomerProfileTariffAndUper($input);
       }
     // BillingEngine
+
+    // UperRequest
+      function storeUperPayment($input){
+        return UperRequest::storeUperPayment($input);
+      }
+    // UperRequest
 
     // UserAndRoleManagemnt
       function storeRole($input){

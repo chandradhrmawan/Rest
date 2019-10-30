@@ -176,6 +176,7 @@ class BillingEngine{
         DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->where('CUST_PROFILE_ID', $input['CUST_PROFILE_ID'])->delete();
         foreach ($input['TARIFF'] as $list) {
 	        DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([
+	        	'CUST_PROFILE_STATUS' => $input['CUST_PROFILE_STATUS'],
 	        	'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'],
 	        	'TARIFF_HDR_ID' => $list['TARIFF_HDR_ID']
 	        ]);

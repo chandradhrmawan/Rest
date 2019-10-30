@@ -5,6 +5,7 @@ namespace App\Helper;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\OmCargo\TxHdrBm;
+use Illuminate\Support\Facades\DB;
 
 class ConnectedTOS{
 
@@ -33,26 +34,29 @@ class ConnectedTOS{
             }
           }';
 
-          $username="npk_billing";
-          $password ="npk_billing";
-          $client = new Client();
-          $options= array(
-            'auth' => [
-              $username,
-              $password
-            ],
-            'headers'  => ['content-type' => 'application/x-www-form-urlencoded'],
-            'form_params' => $string_json,
-            "debug" => false
-          );
-          try {
-            $res = $client->post($endpoint_url, $options);
-          } catch (ClientException $e) {
-            // return $e->getResponse();
-          }
+        $username="npk_billing";
+        $password ="npk_billing";
+        $client = new Client();
+        $options= array(
+          'auth' => [
+            $username,
+            $password
+          ],
+          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+          'body' => $string_json,
+          "debug" => false
+        );
+        try {
+          $res = $client->post($endpoint_url, $options);
+        } catch (ClientException $e) {
+          return $e->getResponse();
+        }
 
-          $response = json_decode($res->getBody()->getContents());
+        $response = json_decode(json_encode($res->getBody()->getContents()));
+        $response = json_decode($response, true);
+        $response = $response['esbBody']['results'][0];
 
+        if (!empty($response['idVsbVoyage'])) {
           $newreal = $response['esbBody']['results'][0];
           DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
              'idvsb'=> $newreal['idVsbVoyage'],
@@ -68,6 +72,7 @@ class ConnectedTOS{
              'rpact'=> $newreal['rpact'],
              'omcargoid'=> $newreal['omCargoid']
           ]);
+        }
       }
     }
 
@@ -77,5 +82,9 @@ class ConnectedTOS{
       'result' => "Success, get data real from tos!"
     ]);
 	}
-  
+
+  public static function sendRequestBooking($input){
+    // buat fungsi get data request booking dan send ke tos contoh lemparnya ada di funct realtos line 26 sampai 53
+  }
+
 }

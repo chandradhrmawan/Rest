@@ -19,6 +19,11 @@ class UserAndRoleManagemnt{
       'user_full_name' => $input['user_full_name'],
       'user_status' => 0
     ];
+
+    if (isset($input['user_password']) and !empty($input['user_password'])) {
+      $set_data['user_passwd'] = Hash::make($input['user_password']);
+    }
+
     if (empty($input['user_id'])) {
       $set_data['user_passwd'] = Hash::make('cintaIPC');
       DB::connection('omuster')->table('TM_USER')->insert($set_data);
