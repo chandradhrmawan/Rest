@@ -23,7 +23,7 @@ class BillingEngine{
               "EQUIPMENT_UNIT" => $each[1]
             ])->get();
             if (count($subisocode) == 0) {
-              return response()->json(["Success"=>false, "result" => "Fail, iso code not found", "ALAT" => $list]);
+              return response()->json(["Success"=>false, "result" => "Fail, iso code not found alat", "ALAT" => $list]);
             }
           }
 
@@ -42,7 +42,7 @@ class BillingEngine{
             }
             $isocode    = $isocode->get();
             if (count($isocode) == 0) {
-              return response()->json(["Success"=>false, "result" => "Fail, iso code not found", "BARANG" => $list]);
+              return response()->json(["Success"=>false, "result" => "Fail, iso code not found barang", "BARANG" => $list]);
             }
           }
 
@@ -54,7 +54,7 @@ class BillingEngine{
               "CONT_STATUS" => $each[2]
             ])->get();
             if (count($isocode) == 0) {
-              return response()->json(["Success"=>false, "result" => "Fail, iso code not found", "KONTAINER" => $list]);
+              return response()->json(["Success"=>false, "result" => "Fail, iso code not found kontainer", "KONTAINER" => $list]);
             }
           }
         }
