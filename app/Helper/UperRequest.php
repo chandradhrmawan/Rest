@@ -13,10 +13,10 @@ class UperRequest{
 	public static function storeUperPayment($input){
     $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
     if (empty($uper)) {
-      return response()->json(["Success"=>false, "result" => "Fail, uper not found"]);
+      return ["Success"=>false, "result" => "Fail, uper not found"];
     }
     if ($uper->uper_paid == 'Y') {
-      return response()->json(["Success"=>false, "result" => "Fail, uper already paid"]);
+      return ["Success"=>false, "result" => "Fail, uper already paid"];
     }
     $datenow    = Carbon::now()->format('Y-m-d');
     $pay = new TxPayment;
@@ -52,7 +52,7 @@ class UperRequest{
       'uper_paid' => 'Y'
     ]);
 
-    return response()->json(["result" => "Success, paid uper"]);
+    return ["result" => "Success, paid uper"];
 	}
 
   private static function updateUperStatus($input){

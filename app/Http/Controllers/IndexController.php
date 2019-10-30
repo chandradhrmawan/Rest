@@ -21,21 +21,32 @@ class IndexController extends Controller
     }
 
     public function api(Request $request) {
-      $input  = $this->request->all();
+      $input  = $request->input();
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        $request = json_decode($input['request'], true);
+        $input = json_decode($input['request'], true);
+        $input['encode'] = 'true';
+      }
       $action = $input["action"];
-      return $this->$action($input, $request);
+      $response = $this->$action($input, $request);
+
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        return response()->json(['response' => $response]);
+      }else{
+        return response()->json($response);
+      }
     }
 
     function validasi($action, $request) {
-        $latest   = DB::connection("mdm")->table('JS_VALIDATION')->where('action', 'like', $action."%")->select(["field", "mandatori"])->get();
-        $decode   = json_decode(json_encode($latest), true);
-        $s        = array();
-        foreach ($decode as $data) {
-        $s[$data["field"]] = $data["mandatori"];
-        }
-        $this->validate($request, $s);
-        return response($latest);
+      $latest   = DB::connection("mdm")->table('JS_VALIDATION')->where('action', 'like', $action."%")->select(["field", "mandatori"])->get();
+      $decode   = json_decode(json_encode($latest), true);
+      $s        = array();
+      foreach ($decode as $data) {
+      $s[$data["field"]] = $data["mandatori"];
       }
+      $this->validate($request, $s);
+      return response($latest);
+    }
 
     function vessel_index($input, $request) {
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/trackingVessel";
@@ -104,49 +115,49 @@ class IndexController extends Controller
     }
 
     function peb_index($input, $request) {
-        $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
-        $endpoint_url="http://10.88.48.57:5555/restv2/tpsOnline/searchPEB";
-        $string_json = '{
-          "searchPEBRequest": {
-            "esbHeader": {
-              "externalId": "5275682735",
-              "timestamp": "YYYYMMDD HH:Mi:SS"
-              },
-              "esbBody": {
-                "username": "PLDB",
-                "password": "PLDB12345",
-                "noPEB": "'.$input['no_peb'].'",
-                "tglPEB": "'.$date.'",
-                "npwp": "'.$input['npwp'].'"
-              }
-            }
-          }';
-
-          $username="npk_billing";
-          $password ="npk_billing";
-          $client = new Client();
-          $options= array(
-            'auth' => [
-              $username,
-              $password
-            ],
-            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-            'body' => $string_json,
-            "debug" => false
-          );
-          try {
-            $res = $client->post($endpoint_url, $options);
-          } catch (ClientException $e) {
-            echo $e->getRequest() . "\n";
-            if ($e->hasResponse()) {
-              echo $e->getResponse() . "\n";
+      $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
+      $endpoint_url="http://10.88.48.57:5555/restv2/tpsOnline/searchPEB";
+      $string_json = '{
+        "searchPEBRequest": {
+          "esbHeader": {
+            "externalId": "5275682735",
+            "timestamp": "YYYYMMDD HH:Mi:SS"
+            },
+            "esbBody": {
+              "username": "PLDB",
+              "password": "PLDB12345",
+              "noPEB": "'.$input['no_peb'].'",
+              "tglPEB": "'.$date.'",
+              "npwp": "'.$input['npwp'].'"
             }
           }
+      }';
 
-          $body = json_decode($res->getBody()->getContents());
-
-          return response()->json(['pebListResponse' => $body->searchPEBInterfaceResponse]);
+      $username="npk_billing";
+      $password ="npk_billing";
+      $client = new Client();
+      $options= array(
+        'auth' => [
+          $username,
+          $password
+        ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        echo $e->getRequest() . "\n";
+        if ($e->hasResponse()) {
+          echo $e->getResponse() . "\n";
+        }
       }
+
+      $body = json_decode($res->getBody()->getContents());
+
+      return response()->json(['pebListResponse' => $body->searchPEBInterfaceResponse]);
+    }
 
     function getRealisasionTOS($input, $request){
       return ConnectedTOS::realTos($input);

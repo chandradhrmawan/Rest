@@ -22,12 +22,24 @@ class ViewController extends Controller
     }
 
     public function api(Request $request) {
-      $input  = $this->request->all();
+      $input  = $request->input();
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        $request = json_decode($input['request'], true);
+        $input = json_decode($input['request'], true);
+        $input['encode'] = 'true';
+      }
       $action = $input["action"];
-      return $this->$action($input, $request);
+      $request = $request;
+      $response = $this->$action($input, $request);
+
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        return response()->json(['response' => $response]);
+      }else{
+        return response()->json($response);
+      }
     }
 
-    public function view($input) {
+    public function view($input, $request) {
       $table  = $input["table"];
       $data   = \DB::connection('order')->table($table)->get();
       return response()->json($data);

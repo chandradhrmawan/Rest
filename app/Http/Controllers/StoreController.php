@@ -25,10 +25,21 @@ class StoreController extends Controller
     }
 
     public function api(Request $request) {
-      $input  = $this->request->all();
-      $request = $request;
+      $input  = $request->input();
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        $request = json_decode($input['request'], true);
+        $input = json_decode($input['request'], true);
+        $input['encode'] = 'true';
+      }
       $action = $input["action"];
-      return $this->$action($input, $request);
+      $request = $request;
+      $response = $this->$action($input, $request);
+
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        return response()->json(['response' => $response]);
+      }else{
+        return response()->json($response);
+      }
     }
 
     function validasi($action, $request) {
@@ -40,19 +51,6 @@ class StoreController extends Controller
       }
       $this->validate($request, $s);
       return response($latest);
-    }
-
-    function index($input, $request) {
-      $this->validasi($input["action"], $request);
-      $connect  = \DB::connection($input["db"])->table($input["table"]);
-
-      if ($input['start'] != '' && $input['limit'] != '')
-        $connect->skip($input['start'])->take($input['limit']);
-
-      $result   = $connect->get();
-      $count    = $connect->count();
-
-      return response()->json(["result"=>$result, "count"=>$count]);
     }
 
     function save($input, $request) {
@@ -77,47 +75,47 @@ class StoreController extends Controller
     }
 
     // RequestBooking
-      function sendRequest($input){
+      function sendRequest($input, $request){
         return RequestBooking::sendRequest($input);
       }
 
-      function approvalRequest($input){
+      function approvalRequest($input, $request){
         return RequestBooking::approvalRequest($input);
       }
     // RequestBooking
 
     // BillingEngine
-      function storeProfileTariff($input) {
+      function storeProfileTariff($input, $request){
         return BillingEngine::storeProfileTariff($input);
       }
-      function storeCustomerProfileTariffAndUper($input){
+      function storeCustomerProfileTariffAndUper($input, $request){
         return BillingEngine::storeCustomerProfileTariffAndUper($input);
       }
     // BillingEngine
 
     // UperRequest
-      function storeUperPayment($input){
+      function storeUperPayment($input, $request){
         return UperRequest::storeUperPayment($input);
       }
     // UperRequest
 
     // UserAndRoleManagemnt
-      function storeRole($input){
+      function storeRole($input, $request){
         return UserAndRoleManagemnt::storeRole($input);
       }
-      function storeRolePermesion($input){
+      function storeRolePermesion($input, $request){
         return UserAndRoleManagemnt::storeRolePermesion($input);
       }
-      function storeUser($input){
+      function storeUser($input, $request){
         return UserAndRoleManagemnt::storeUser($input);
       }
-      function changePasswordUser($input){
+      function changePasswordUser($input, $request){
         return UserAndRoleManagemnt::changePasswordUser($input);
       }
     // UserAndRoleManagemnt
 
     // Schema OmCargo
-    function saveheaderdetail($input) {
+    function saveheaderdetail($input, $request){
       $data    = $input["data"];
       $count   = count($input["data"]);
       $cek     = $input["HEADER"]["PK"];
@@ -180,7 +178,7 @@ class StoreController extends Controller
       return response()->json(["result"=>"Save or Update Success", "header" => $header]);
     }
 
-    function update($input) {
+    function update($input, $request){
       $connection = DB::connection($input["db"])->table($input["table"]);
       $connection->where($input["where"]);
       $connection->update($input["update"]);
@@ -188,7 +186,7 @@ class StoreController extends Controller
       return response()->json($data);
     }
 
-    // function test($input) {
+    // function test($input, $request){
     //   if (isset($input["VALUE"]["DTL_OUT"])) {
     //     $input["VALUE"]["DTL_OUT"] = str_replace("T"," ",$input["VALUE"]["DTL_OUT"]);
     //     $input["VALUE"]["DTL_OUT"] = str_replace(".000Z","",$input["VALUE"]["DTL_OUT"]);

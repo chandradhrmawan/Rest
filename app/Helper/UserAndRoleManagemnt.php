@@ -30,18 +30,18 @@ class UserAndRoleManagemnt{
     }else{
       DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update($set_data);
     }
-    return response()->json([
+    return [
       "result" => "Success, store user data"
-    ]);
+    ];
   }
 
   public static function changePasswordUser($input){
       DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update([
         'user_passwd' => Hash::make($input['user_password'])
       ]);
-    return response()->json([
+    return [
       "result" => "Success, change password user data"
-    ]);
+    ];
   }
 
   public static function storeRole($input){
@@ -55,10 +55,10 @@ class UserAndRoleManagemnt{
     $store->role_service = $input['ROLE_SERVICE'];
     $store->role_desc = $input['ROLE_DESC'];
     $store->save();
-    return response()->json([
+    return [
       "result" => "Success, store role data",
       "data" => $store
-    ]);
+    ];
   }
 
   public static function storeRolePermesion($input){
@@ -69,23 +69,23 @@ class UserAndRoleManagemnt{
         "menu_id"=>$id
       ]);
     }
-    return response()->json([
+    return [
       "result" => "Success, store role permission data",
-    ]);
+    ];
   }
 
 	public static function permissionGet($input){
       $role = static::role_data($input['ROLE_ID'],'permission');
       if ($role == false) {
-        return response()->json(['response' => 'Fail, your role cant not found!']);
+        return ['response' => 'Fail, your role cant not found!'];
       }
-      return response()->json(static::permission($role));
+      return static::permission($role);
   }
 
   private static function role_data($role_id, $type){
     $role = DB::connection('omuster')->table('TR_ROLE')->where('ROLE_ID', $role_id)->first();
     if ($type == 'role') {
-      return response()->json($role);
+      return $role;
     }else{
       if (empty($role)) {
         return false;
