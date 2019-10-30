@@ -37,6 +37,7 @@ class RequestBooking{
 			foreach ($detil as $list) { 
 				$newD = [];
 				$list = (array)$list;
+				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_Bl']]) ? 'NULL' : $list[$config['head_tab_detil_Bl']];
 				$newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
 				$newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
 				$newD['DTL_CHARACTER'] = empty($list['dtl_character_id']) ? 'NULL' : $list['dtl_character_id'];
@@ -185,8 +186,8 @@ class RequestBooking{
 		$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
 
 		$datenow    = Carbon::now()->format('Y-m-d');
-		// $branch_code = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID',$uper['branch_id'])->get();
-		// $branch_code = $branch_code[0]->branch_code;
+		$branch_code = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID',$uper['branch_id'])->get();
+		$branch_code = $branch_code[0]->branch_code;
 		$headU = new TxHdrUper;
 		// $headU->uper_no // dari triger
 		$headU->uper_org_id = $uper['branch_org_id'];
@@ -202,7 +203,7 @@ class RequestBooking{
 		$headU->uper_sub_context = 'BRG03'; // blm fix
 		$headU->uper_terminal_code = $find[$config['head_terminal_code']];
 		$headU->uper_branch_id = $uper['branch_id'];
-		// $headU->uper_branch_code = $branch_code; // kemungkinan ditambah
+		$headU->uper_branch_code = $branch_code; // kemungkinan ditambah
 		$headU->uper_vessel_name = $find[$config['head_vessel_name']];
 		$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
 		$headU->uper_trade_type = $uper['trade_type'];
@@ -245,12 +246,12 @@ class RequestBooking{
 				// "dtl_masa12" => , // cooming soon
 				// "dtl_masa2" => , // cooming soon
 				"dtl_tariff" => $list["tariff"],
-				// "dtl_package" => , // cooming soon
+				"dtl_package" => $list["package_name"], // cooming soon
 				"dtl_qty" => $list["qty"],
 				"dtl_unit" => $list["unit_id"],
 				"dtl_group_tariff_id" => $list["group_tariff_id"],
 				"dtl_group_tariff_name" => $list["group_tariff_name"],
-				// "dtl_bl" => $list[""], // tunggu dari adi
+				"dtl_bl" => $list["no_bl"],
 				"dtl_dpp" => $list["tariff_cal"],
 				"dtl_commodity" => $list["commodity_name"],
 				"dtl_equipment" => $list["equipment_name"],
@@ -272,6 +273,7 @@ class RequestBooking{
         		"head_nota_id" => 13,
         		"head_tab" => "TX_HDR_BM",
         		"head_tab_detil" => "TX_DTL_BM",
+        		"head_tab_detil_bl" => "dtl_bm_bl",
         		"head_tab_detil_tl" => "dtl_bm_tl",
         		"head_tab_detil_date_in" => null,
         		"head_tab_detil_date_out" => null,
@@ -298,6 +300,7 @@ class RequestBooking{
         		"head_nota_id" => "14",
         		"head_tab" => "TX_HDR_REC",
         		"head_tab_detil" => "TX_DTL_REC",
+        		"head_tab_detil_bl" => "dtl_bl",
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'dtl_in',
         		"head_tab_detil_date_out" => 'rec_atd',
@@ -324,6 +327,7 @@ class RequestBooking{
         		"head_nota_id" => "15",
         		"head_tab" => "TX_HDR_DEL",
         		"head_tab_detil" => "TX_DTL_DEL",
+        		"head_tab_detil_bl" => "dtl_bl",
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'del_atd',
         		"head_tab_detil_date_out" => 'dtl_out',
