@@ -25,7 +25,11 @@ class StoreController extends Controller
     }
 
     public function api(Request $request) {
-      $input  = $this->request->all();
+      $input  = $request->input();
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        $request = json_decode($input['request'], true);
+        $input = json_decode($input['request'], true);
+      }
       $request = $request;
       $action = $input["action"];
       return $this->$action($input, $request);
@@ -40,19 +44,6 @@ class StoreController extends Controller
       }
       $this->validate($request, $s);
       return response($latest);
-    }
-
-    function index($input, $request) {
-      $this->validasi($input["action"], $request);
-      $connect  = \DB::connection($input["db"])->table($input["table"]);
-
-      if ($input['start'] != '' && $input['limit'] != '')
-        $connect->skip($input['start'])->take($input['limit']);
-
-      $result   = $connect->get();
-      $count    = $connect->count();
-
-      return response()->json(["result"=>$result, "count"=>$count]);
     }
 
     function save($input, $request) {

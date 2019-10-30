@@ -20,7 +20,11 @@ class IndexController extends Controller
     }
 
     public function api(Request $request) {
-      $input  = $this->request->all();
+      $input  = $request->input();
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        $request = json_decode($input['request'], true);
+        $input = json_decode($input['request'], true);
+      }
       $action = $input["action"];
       return $this->$action($input, $request);
     }
@@ -92,7 +96,7 @@ class IndexController extends Controller
     }
 
     function index($input, $request) {
-      $this->validasi($input["action"], $request);
+      // $this->validasi($input["action"], $request);
       $connect  = \DB::connection($input["db"])->table($input["table"]);
 
       if ($input['start'] != '' && $input['limit'] != '')

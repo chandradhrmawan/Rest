@@ -22,7 +22,10 @@ class ViewController extends Controller
     }
 
     public function api(Request $request) {
-      $input  = $this->request->all();
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        $request = json_decode($input['request'], true);
+        $input = json_decode($input['request'], true);
+      }
       $action = $input["action"];
       return $this->$action($input, $request);
     }
