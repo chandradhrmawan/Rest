@@ -25,9 +25,16 @@ class IndexController extends Controller
       if (isset($input['encode']) and $input['encode'] == 'true') {
         $request = json_decode($input['request'], true);
         $input = json_decode($input['request'], true);
+        $input['encode'] = 'true';
       }
       $action = $input["action"];
-      return $this->$action($input, $request);
+      $response = $this->$action($input, $request);
+
+      if (isset($input['encode']) and $input['encode'] == 'true') {
+        return response()->json(['response' => $response]);
+      }else{
+        return response()->json($response);
+      }
     }
 
     function validasi($action, $request) {
