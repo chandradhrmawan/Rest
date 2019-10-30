@@ -59,7 +59,7 @@ class UperRequest{
     $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update(['uper_paid' => $input['uper_paid']]);
     $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->where('uper_paid', 'N')->count();
 
-    if ($cekStatus == 0) { // kirim data request booking ke tos
+    if ($cekStatus == 0) {
       ConnectedTOS::sendRequestBooking($input['uper_req_no']);
     }
   }

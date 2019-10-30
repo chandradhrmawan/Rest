@@ -84,7 +84,81 @@ class ConnectedTOS{
 	}
 
   public static function sendRequestBooking($input){
-    // buat fungsi get data request booking dan send ke tos contoh lemparnya ada di funct realtos line 26 sampai 53
+    $header = TxHdrBm::where('bm_no',$input)->first();
+    $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
+    static::sendRealBM($head, $detil);
+  }
+
+  private static function sendRealBM($head, $detil){
+    $vParam = $head->bm_no.'^'.$head->bm_cust_name.'^'.$head->bm_cust_id.'^'.$head->bm_cust_npwp.'^'.$head->bm_vessel_name.'^'.$head->bm_eta.'^'.$head->bm_open_stack.'^'.$head->bm_voyin.'^'.$head->bm_voyout.'^'.$head->bm_closing_time.'^BONGKAR MUAT^^^^^^^^^^^^'.$head->bm_etd.'^0^'.$head->bm_vvd_id.'^'.$head->bm_trade_type.'^^^';
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
+    $string_json = '{
+      "createBookingHeaderInterfaceRequest": {
+        "esbHeader": {
+          "externalId": "2",
+          "timestamp": "2"
+        },
+        "esbBody": {
+          "vParam": "'.$vParam.'",
+          "vId": "-",
+          "vReqNo": "-",
+          "vBlNo": "-"
+        }
+      }
+    }';
+
+    $username="npk_billing";
+    $password ="npk_billing";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      // return $e->getResponse();
+    }
+    foreach ($detil as $list) {
+      $vParam = $list->dtl_cmdty_name.'^'.$list->dtl_cont_type.'^^^^^^'.$list->dtl_qty.'^0^^';
+      $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
+      $string_json = '{
+        "createBookingDetailInterfaceRequest": {
+          "esbHeader": {
+            "externalId": "2",
+            "timestamp": "2"
+            },
+            "esbBody": {
+              "vParam": "'.$vParam.'",
+              "vId": "",
+              "vIdHeader": ""
+            }
+          }
+        }';
+
+        $username="npk_billing";
+        $password ="npk_billing";
+        $client = new Client();
+        $options= array(
+          'auth' => [
+            $username,
+            $password
+          ],
+          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+          'body' => $string_json,
+          "debug" => false
+        );
+        try {
+          $res = $client->post($endpoint_url, $options);
+        } catch (ClientException $e) {
+      // return $e->getResponse();
+        }
+    }
   }
 
 }

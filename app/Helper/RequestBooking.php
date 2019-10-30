@@ -25,8 +25,6 @@ class RequestBooking{
 			$setH['P_CUSTOMER_ID'] = $find[$config['head_cust']];
 			$setH['P_BOOKING_NUMBER'] = $find[$config['head_no']];
 			$setH['P_REALIZATION'] = 'N';
-			$setH['P_DATE_IN'] = NULL;
-			$setH['P_DATE_OUT'] = NULL;
 			$setH['P_TRADE'] = $find[$config['head_trade']];
 			$setH['P_USER_ID'] = $find[$config['head_by']];
 		// build head
@@ -270,7 +268,7 @@ class RequestBooking{
     private static function config($input){
     	$requst_config = [
         	"TX_HDR_BM" => [
-        		"head_nota_id" => 13,
+        		"head_nota_id" => "13",
         		"head_tab" => "TX_HDR_BM",
         		"head_tab_detil" => "TX_DTL_BM",
         		"head_tab_detil_bl" => "dtl_bm_bl",
