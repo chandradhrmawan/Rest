@@ -28,7 +28,7 @@ class GlobalHelper{
             $vwdata[$data] = $detail;
           }
       }
-      return response()->json($vwdata);
+      return $vwdata;
     }
 
   public static function join_filter($action) {
@@ -79,7 +79,7 @@ class GlobalHelper{
         }
         $result[] = $newDt;
       }
-      return response()->json($head);
+      return $head;
     }
 
   public static function index($input) {
@@ -91,7 +91,7 @@ class GlobalHelper{
       $result   = $connect->get();
       $count    = $connect->count();
 
-      return response()->json(["result"=>$result, "count"=>$count]);
+      return ["result"=>$result, "count"=>$count];
     }
 
   public static function filter($input) {
@@ -115,7 +115,7 @@ class GlobalHelper{
 
       $result  = $connect->get();
       $count   = $connect->count();
-      return response()->json(["result"=>$result, "count"=>$count]);
+      return ["result"=>$result, "count"=>$count];
     }
 
   public static function filterByGrid($input) {
@@ -139,7 +139,7 @@ class GlobalHelper{
     $result   = $connect->get();
     $count    = $connect->count();
 
-    return response()->json(["result"=>$result, "count"=>$count]);
+    return ["result"=>$result, "count"=>$count];
   }
 
   public static function autoComplete($input) {
@@ -160,7 +160,7 @@ class GlobalHelper{
     $result   = $connect->get();
     $count    = $connect->count();
 
-    return response()->json(["result"=>$result, "count"=>$count]);
+    return ["result"=>$result, "count"=>$count];
   }
 
   public static function join($input) {
@@ -181,8 +181,16 @@ class GlobalHelper{
     $connection->whereIn($in[0], $in[1]);
     }
 
-    $data = $connection->get();
-    return response()->json($data);
+    $data   = $connection->get();
+    // $decode = json_decode(json_encode($data), TRUE);
+    // $conCross = DB::connection($input["crossJoin"]["db"])->table($input["crossJoin"]["table"]);
+    // foreach ($decode as $value) {
+    //     $cek[] = [$input["crossJoin"]["field2"],"=", $value[$input["crossJoin"]["field1"]]];
+    // }
+    // $conCross->where(["CUSTOMER_ID", "=", "12402110"]);
+    // $data = $conCross->get();
+    return $data;
+
   }
 
   public static function whereQuery($input) {
@@ -194,9 +202,15 @@ class GlobalHelper{
     if (!empty($input["query"]) && !empty($input["field"])) {
       $connect->where($input["field"],"like", "%".$input["query"]."%");
     }
+
+    if(!empty($input["whereIn"][0])) {
+    $in        = $input["whereIn"];
+    $connect->whereIn($in[0], $in[1]);
+    }
+
     $data      = $connect->get();
     $count     = $connect->count();
-    return response()->json(["result"=>$data, "count"=>$count]);
+    return ["result"=>$data, "count"=>$count];
   }
 
   public static function whereIn($input) {
@@ -212,12 +226,6 @@ class GlobalHelper{
     }
 
     $data      = $connect->get();
-    return response()->json($data);
-  }
-
-  public static function joinMdmOrder($input) {
-    $conHeader   = \DB::connection($input["db"])->table($input["table"]);
-    $conHeader->get();
-    return response()->json($conHeader);
+    return $data;
   }
 }

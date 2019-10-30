@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use Validator;
-use App\User;
+use App\Models\OmUster\TmUser;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Firebase\JWT\ExpiredException;
@@ -27,13 +27,13 @@ class AuthController extends BaseController
     /**
      * Create a new token.
      *
-     * @param  \App\User   $user
+     * @param  \App\TmUser   $user
      * @return string
      */
-    protected function jwt(User $user) {
+    protected function jwt(TmUser $user) {
         $payload = [
-            'iss' => "lumen-jwt", // Issuer of the token
-            'sub' => $user->id, // Subject of the token
+            'iss' => "bearer", // Issuer of the token
+            'sub' => $user->user_id, // Subject of the token
             'iat' => time(), // Time when JWT was issued.
             'exp' => time() + 60*60 // Expiration time
         ];
@@ -45,16 +45,16 @@ class AuthController extends BaseController
     /**
      * Authenticate a user and return the token if the provided credentials are correct.
      *
-     * @param  \App\User   $user
+     * @param  \App\TmUser   $user
      * @return mixed
      */
-    public function authenticate(User $user) {
+    public function authenticate(TmUser $user) {
         $this->validate($this->request, [
-            'email'     => 'required|email',
-            'password'  => 'required'
+            'USER_NAME'     => 'required',
+            'USER_PASSWD'  => 'required'
         ]);
         // Find the user by email
-        $user = User::where('email', $this->request->input('email'))->first();
+        $user = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
         if (!$user) {
             // You wil probably have some sort of helpers or whatever
             // to make sure that you have the same response format for
@@ -65,8 +65,7 @@ class AuthController extends BaseController
             ], 400);
         }
         // Verify the password and generate the token
-        // if (Hash::check($this->request->input('password'), $user->password)) {
-        if ($this->request->input('password'), $user->password) {
+        if (Hash::check($this->request->input('USER_PASSWD'), $user["user_passwd"])) {
             return response()->json([
                 'token' => $this->jwt($user)
             ], 200);
@@ -75,5 +74,6 @@ class AuthController extends BaseController
         return response()->json([
             'error' => 'Email or password is wrong.'
         ], 400);
+
     }
 }
