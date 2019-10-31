@@ -36,9 +36,9 @@ class UserAndRoleManagemnt{
   }
 
   public static function changePasswordUser($input){
-      DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update([
+    DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update([
         'user_passwd' => Hash::make($input['user_password'])
-      ]);
+    ]);
     return [
       "result" => "Success, change password user data"
     ];
