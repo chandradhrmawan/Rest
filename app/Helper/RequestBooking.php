@@ -34,7 +34,7 @@ class RequestBooking{
 		// build detil
 			$setD = [];
 			$detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
-			foreach ($detil as $list) { 
+			foreach ($detil as $list) {
 				$newD = [];
 				$list = (array)$list;
 				$newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
@@ -64,21 +64,21 @@ class RequestBooking{
 
 				if ($config['head_tab_detil_date_out_old'] != null and ($input['table'] == 'TX_HDR_DEL' and $find['del_extend_status'] != 'N') ) {
 					$findEx = DB::connection('omcargo')->select(DB::raw("
-						SELECT 
+						SELECT
 						X.DTL_OUT AS date_out_old,
-						Y.DTL_OUT AS date_out 
+						Y.DTL_OUT AS date_out
 						FROM (
-						SELECT 
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
-						FROM 
-						TX_HDR_DEL A 
+						SELECT
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM
+						FROM
+						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) X
 						JOIN (
-						SELECT 
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM 
-						FROM 
-						TX_HDR_DEL A 
+						SELECT
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM
+						FROM
+						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) Y
 						ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."'
@@ -113,7 +113,7 @@ class RequestBooking{
 		// build eqpt
 			$setE = [];
 			$eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find[$config['head_no']])->get();
-			foreach ($eqpt as $list) { 
+			foreach ($eqpt as $list) {
 				$newE = [];
 				$list = (array)$list;
 				$newE['EQ_TYPE'] = empty($list['eq_type_id']) ? 'NULL' : $list['eq_type_id'];
@@ -129,7 +129,7 @@ class RequestBooking{
 			$setP = [];
 			$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
 			$paysplit = (array)$paysplit;
-			foreach ($paysplit as $list) { 
+			foreach ($paysplit as $list) {
 				$newP = [];
 				$list = (array)$list;
 				$newP['PS_CUST_ID'] = $list['cust_id'];
