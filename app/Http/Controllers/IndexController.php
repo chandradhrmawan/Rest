@@ -211,4 +211,12 @@ class IndexController extends Controller
     function joinMdmOrder($input) {
       return GlobalHelper::joinMdmOrder($input);
     }
+
+    function test($input) {
+      $data = json_encode($input["data"]);
+      $cek  = str_replace("bm_", "req_", $data);
+      $decode = json_decode($cek);
+      return $decode;
+    }
+
 }

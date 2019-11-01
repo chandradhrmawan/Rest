@@ -113,7 +113,15 @@ class GlobalHelper{
       else $connect->orwhere($data[$i], 'like', '%'.$value[$i].'%');
       }
 
-      $result  = $connect->get();
+      if (isset($input["changeKey"])) {
+        $result  = $connect->get();
+        $data    = json_encode($result);
+        $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
+        $result  = json_decode($change);
+      } else {
+        $result  = $connect->get();
+      }
+
       $count   = $connect->count();
       return ["result"=>$result, "count"=>$count];
     }

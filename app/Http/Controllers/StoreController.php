@@ -91,6 +91,9 @@ class StoreController extends Controller
       function storeCustomerProfileTariffAndUper($input, $request){
         return BillingEngine::storeCustomerProfileTariffAndUper($input);
       }
+      function getSimulasiTarif($input, $request){
+        return BillingEngine::getSimulasiTarif($input);
+      }
     // BillingEngine
 
     // UperRequest
@@ -119,12 +122,19 @@ class StoreController extends Controller
       $data    = $input["data"];
       $count   = count($input["data"]);
       $cek     = $input["HEADER"]["PK"];
+
+      if(!empty($input["HEADER"]["SEQUENCE"])) {
+      $sq      = $input["HEADER"]["SEQUENCE"];
+    } else {
+      $sq      = "Y";
+    }
+
       foreach ($data as $data) {
         $val     = $input[$data];
         $connnection  = DB::connection($val["DB"])->table($val["TABLE"]);
         if ($data == "HEADER") {
           $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
-          if ($hdr[0][$cek] == '') {
+          if ($hdr[0][$cek] == '' || $sq == "N") {
             foreach ($val["VALUE"] as $value) {
               $insert       = $connnection->insert([$value]);
             }
@@ -175,7 +185,7 @@ class StoreController extends Controller
             }
           }
         }
-      return response()->json(["result"=>"Save or Update Success", "header" => $header]);
+      return ["result"=>"Save or Update Success"];
     }
 
     function update($input, $request){
@@ -183,7 +193,7 @@ class StoreController extends Controller
       $connection->where($input["where"]);
       $connection->update($input["update"]);
       $data = $connection->get();
-      return response()->json($data);
+      return $data;
     }
 
     // function test($input, $request){
