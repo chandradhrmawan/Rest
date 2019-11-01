@@ -106,7 +106,6 @@ class StoreController extends Controller
     // UserAndRoleManagemnt
 
     // Schema OmCargo
-
     function saveheaderdetail($input) {
       return GlobalHelper::saveheaderdetail($input);
     }
@@ -122,8 +121,6 @@ class StoreController extends Controller
     //   }
     //   return response($input["VALUE"]["DTL_OUT"]);
     // }
-
-
 
   function putInvoice($input, $request){
     $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putInvoice";
