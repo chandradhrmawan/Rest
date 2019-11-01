@@ -31,7 +31,7 @@ class IndexController extends Controller
       $response = $this->$action($input, $request);
 
       if (isset($input['encode']) and $input['encode'] == 'true') {
-        return response()->json(['response' => $response]);
+        return response()->json(['response' => json_encode($response)]);
       }else{
         return response()->json($response);
       }

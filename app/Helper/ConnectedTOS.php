@@ -156,8 +156,9 @@ class ConnectedTOS{
         try {
           $res = $client->post($endpoint_url, $options);
         } catch (ClientException $e) {
-      // return $e->getResponse();
+          return $e->getResponse();
         }
+        $response = json_decode($res->getBody()->getContents());
     }
   }
 
