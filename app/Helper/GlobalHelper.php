@@ -334,6 +334,6 @@ class GlobalHelper{
     $parameter   = $input['parameter'];
     $connect    = \DB::connection($input["db"])->table($input["table"]);
     foreach ($parameter as $value) $connect->insert($parameter);
-    return response(["result"=>$parameter, "count"=>count($parameter)]);
+    return ["result"=>$parameter, "count"=>count($parameter)];
   }
 }

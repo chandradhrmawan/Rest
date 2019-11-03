@@ -111,7 +111,7 @@ class IndexController extends Controller
           ];
         }, (array) $data);
 
-        return response()->json(["result"=>$array_map, "count"=>count($array_map)]);
+        return ["result"=>$array_map, "count"=>count($array_map)];
     }
 
     function peb_index($input, $request) {
@@ -156,7 +156,7 @@ class IndexController extends Controller
 
       $body = json_decode($res->getBody()->getContents());
 
-      return response()->json(['pebListResponse' => $body->searchPEBInterfaceResponse]);
+      return ['pebListResponse' => $body->searchPEBInterfaceResponse];
     }
 
     function getRealisasionTOS($input, $request){
