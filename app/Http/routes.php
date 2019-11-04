@@ -21,8 +21,15 @@ $app->get('/key', function() {
 
 $app->post('auth/login',['uses' => 'AuthController@authenticate']);
 // $app->post('index',  ['middleware' => 'jwt.auth', 'uses' => 'IndexController@api']);
-$app->post('/view',  ['middleware' => 'jwt.auth', 'uses' => 'ViewController@api']);
+// $app->post('/view',  ['middleware' => 'jwt.auth', 'uses' => 'ViewController@api']);
 // $app->post('/store', ['middleware' => 'jwt.auth', 'uses' => 'StoreController@api']);
 $app->post('index',  'IndexController@api');
-// $app->post('/view',  'ViewController@api');
+$app->post('/view',  'ViewController@api');
 $app->post('/store', 'StoreController@api');
+
+$app->get('/print/uper/{id}','ViewController@printUper');
+$app->get('/print/proforma/{id}','ViewController@printProforma');
+$app->get('/print/getPass/{id}','ViewController@printGetPass');
+$app->get('/print/uper2/{id}','ViewController@printUper2');
+$app->get('/print/proforma2/{id}','ViewController@printProforma2');
+$app->get('/print/proformaReceiving/{id}','ViewController@printProformaReceiving');

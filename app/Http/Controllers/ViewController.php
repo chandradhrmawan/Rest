@@ -8,6 +8,7 @@ use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
+use Dompdf\Dompdf;
 
 class ViewController extends Controller
 {
@@ -46,22 +47,78 @@ class ViewController extends Controller
     }
 
     // BillingEngine
-      function viewProfileTariff($input, $request)
-      {
+    function viewProfileTariff($input, $request) {
         return BillingEngine::viewProfileTariff($input);
-      }
+    }
 
-      function viewCustomerProfileTariff($input, $request)
-      {
-        return BillingEngine::viewCustomerProfileTariff($input);
-      }
+    function viewCustomerProfileTariff($input, $request) {
+      return BillingEngine::viewCustomerProfileTariff($input);
+    }
     // BillingEngine
 
     // UserAndRoleManagemnt
-      function permissionGet($input, $request)
-      {
-        return UserAndRoleManagemnt::permissionGet($input);
-      }
+    function permissionGet($input, $request) {
+      return UserAndRoleManagemnt::permissionGet($input);
+    }
     // UserAndRoleManagemnt
 
+    function printUper($id) {
+      $html = view('print.uper');
+      // return $html;
+      $filename = "Test";
+      $dompdf = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+    }
+
+    function printGetPass($id) {
+      $html = view('print.getPass');
+      // return $html;
+      $filename = "Test";
+      $dompdf = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+    }
+
+    function printProforma2($id) {
+      $html = view('print.proforma2');
+      // return $html;
+      $filename = "Test";
+      $dompdf = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+    }
+
+    function printUper2($id) {
+      $html = view('print.uper2');
+      // return $html;
+      $filename = "Test";
+      $dompdf = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+    }
+
+    function printProformaReceiving($id) {
+      $html = view('print.proformaReceiving');
+      // return $html;
+      $filename = "Test";
+      $dompdf = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+    }
 }

@@ -4,8 +4,64 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "38f9f015594e6ed8c7705e2d5a8fab5b",
+    "content-hash": "99c77cbac5fde20b47270433927ad7af",
     "packages": [
+        {
+            "name": "barryvdh/laravel-dompdf",
+            "version": "v0.8.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/barryvdh/laravel-dompdf.git",
+                "reference": "7dcdecfa125c174d0abe723603633dc2756ea3af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/barryvdh/laravel-dompdf/zipball/7dcdecfa125c174d0abe723603633dc2756ea3af",
+                "reference": "7dcdecfa125c174d0abe723603633dc2756ea3af",
+                "shasum": ""
+            },
+            "require": {
+                "dompdf/dompdf": "^0.8",
+                "illuminate/support": "5.1.x|5.2.x|5.3.x|5.4.x|5.5.x|5.6.x",
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.8-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Barryvdh\\DomPDF\\ServiceProvider"
+                    ],
+                    "aliases": {
+                        "PDF": "Barryvdh\\DomPDF\\Facade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Barryvdh\\DomPDF\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Barry vd. Heuvel",
+                    "email": "barryvdh@gmail.com"
+                }
+            ],
+            "description": "A DOMPDF Wrapper for Laravel",
+            "keywords": [
+                "dompdf",
+                "laravel",
+                "pdf"
+            ],
+            "time": "2018-02-07T17:43:25+00:00"
+        },
         {
             "name": "doctrine/inflector",
             "version": "v1.3.0",
@@ -72,6 +128,72 @@
                 "string"
             ],
             "time": "2018-01-09T20:05:19+00:00"
+        },
+        {
+            "name": "dompdf/dompdf",
+            "version": "v0.8.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dompdf/dompdf.git",
+                "reference": "75f13c700009be21a1965dc2c5b68a8708c22ba2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/75f13c700009be21a1965dc2c5b68a8708c22ba2",
+                "reference": "75f13c700009be21a1965dc2c5b68a8708c22ba2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "ext-mbstring": "*",
+                "phenx/php-font-lib": "0.5.*",
+                "phenx/php-svg-lib": "0.3.*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8|^5.5|^6.5",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "suggest": {
+                "ext-gd": "Needed to process images",
+                "ext-gmagick": "Improves image processing performance",
+                "ext-imagick": "Improves image processing performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "0.7-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Dompdf\\": "src/"
+                },
+                "classmap": [
+                    "lib/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                },
+                {
+                    "name": "Brian Sweeney",
+                    "email": "eclecticgeek@gmail.com"
+                },
+                {
+                    "name": "Gabriel Bull",
+                    "email": "me@gabrielbull.com"
+                }
+            ],
+            "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
+            "homepage": "https://github.com/dompdf/dompdf",
+            "time": "2018-12-14T02:40:31+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -1500,6 +1622,66 @@
             "time": "2016-09-07T18:38:25+00:00"
         },
         {
+            "name": "milon/barcode",
+            "version": "6.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/milon/barcode.git",
+                "reference": "71454ba6d4ec3c70103379afb0376f51d0bf17ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/milon/barcode/zipball/71454ba6d4ec3c70103379afb0376f51d0bf17ce",
+                "reference": "71454ba6d4ec3c70103379afb0376f51d0bf17ce",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.*|~6",
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Milon\\Barcode\\BarcodeServiceProvider"
+                    ],
+                    "aliases": {
+                        "DNS1D": "Milon\\Barcode\\Facades\\DNS1DFacade",
+                        "DNS2D": "Milon\\Barcode\\Facades\\DNS2DFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Milon\\Barcode": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nuruzzaman Milon",
+                    "email": "contact@milon.im"
+                }
+            ],
+            "description": "Barcode generator like Qr Code , PDF417,C39, C39+,C39E,C39E+,C93,S25,S25+,I25,I25+,C128,C128A,C128B,C128C,2-Digits UPC-Based Extention,5-Digits UPC-Based Extention,EAN 8,EAN 13,UPC-A,UPC-E,MSI (Variation of Plessey code) ",
+            "keywords": [
+                "CODABAR",
+                "CODE 128",
+                "CODE 39",
+                "barcode",
+                "datamatrix",
+                "ean",
+                "laravel",
+                "pdf417",
+                "qr code",
+                "qrcode"
+            ],
+            "time": "2019-09-17T07:40:26+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.25.1",
             "source": {
@@ -1837,6 +2019,83 @@
             "time": "2018-04-04T21:48:54+00:00"
         },
         {
+            "name": "phenx/php-font-lib",
+            "version": "0.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PhenX/php-font-lib.git",
+                "reference": "760148820110a1ae0936e5cc35851e25a938bc97"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PhenX/php-font-lib/zipball/760148820110a1ae0936e5cc35851e25a938bc97",
+                "reference": "760148820110a1ae0936e5cc35851e25a938bc97",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FontLib\\": "src/FontLib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                }
+            ],
+            "description": "A library to read, parse, export and make subsets of different types of font files.",
+            "homepage": "https://github.com/PhenX/php-font-lib",
+            "time": "2017-09-13T16:14:37+00:00"
+        },
+        {
+            "name": "phenx/php-svg-lib",
+            "version": "v0.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PhenX/php-svg-lib.git",
+                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PhenX/php-svg-lib/zipball/5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+                "reference": "5fa61b65e612ce1ae15f69b3d223cb14ecc60e32",
+                "shasum": ""
+            },
+            "require": {
+                "sabberworm/php-css-parser": "^8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.5|^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Svg\\": "src/Svg"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Ménager",
+                    "email": "fabien.menager@gmail.com"
+                }
+            ],
+            "description": "A library to read, parse and export to PDF SVG files.",
+            "homepage": "https://github.com/PhenX/php-svg-lib",
+            "time": "2019-09-11T20:02:13+00:00"
+        },
+        {
             "name": "psr/http-message",
             "version": "1.0.1",
             "source": {
@@ -1888,16 +2147,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "bf73deb2b3b896a9d9c75f3f0d88185d2faa27e2"
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/bf73deb2b3b896a9d9c75f3f0d88185d2faa27e2",
-                "reference": "bf73deb2b3b896a9d9c75f3f0d88185d2faa27e2",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
                 "shasum": ""
             },
             "require": {
@@ -1931,7 +2190,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2019-10-25T08:06:51+00:00"
+            "time": "2019-11-01T11:05:21+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -1974,31 +2233,31 @@
             "time": "2019-03-08T08:55:37+00:00"
         },
         {
-            "name": "ralouphie/getallheaders",
-            "version": "3.0.3",
+            "name": "sabberworm/php-css-parser",
+            "version": "8.3.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ralouphie/getallheaders.git",
-                "reference": "120b605dfeb996808c31b6477290a714d356e822"
+                "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
+                "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ralouphie/getallheaders/zipball/120b605dfeb996808c31b6477290a714d356e822",
-                "reference": "120b605dfeb996808c31b6477290a714d356e822",
+                "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
+                "reference": "91bcc3e3fdb7386c9a2e0e0aa09ca75cc43f121f",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.6"
+                "php": ">=5.3.2"
             },
             "require-dev": {
-                "php-coveralls/php-coveralls": "^2.1",
-                "phpunit/phpunit": "^5 || ^6.5"
+                "codacy/coverage": "^1.4",
+                "phpunit/phpunit": "~4.8"
             },
             "type": "library",
             "autoload": {
-                "files": [
-                    "src/getallheaders.php"
-                ]
+                "psr-0": {
+                    "Sabberworm\\CSS": "lib/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2006,12 +2265,17 @@
             ],
             "authors": [
                 {
-                    "name": "Ralph Khattar",
-                    "email": "ralph.khattar@gmail.com"
+                    "name": "Raphael Schweikert"
                 }
             ],
-            "description": "A polyfill for getallheaders.",
-            "time": "2019-03-08T08:55:37+00:00"
+            "description": "Parser for CSS Files written in PHP",
+            "homepage": "http://www.sabberworm.com/blog/2010/6/10/php-css-parser",
+            "keywords": [
+                "css",
+                "parser",
+                "stylesheet"
+            ],
+            "time": "2019-02-22T07:42:52+00:00"
         },
         {
             "name": "symfony/console",
@@ -2132,16 +2396,16 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.4.32",
+            "version": "v3.4.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "3e922c4c3430b9de624e8a285dada5e61e230959"
+                "reference": "f9031c22ec127d4a2450760f81a8677fe8a10177"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/3e922c4c3430b9de624e8a285dada5e61e230959",
-                "reference": "3e922c4c3430b9de624e8a285dada5e61e230959",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/f9031c22ec127d4a2450760f81a8677fe8a10177",
+                "reference": "f9031c22ec127d4a2450760f81a8677fe8a10177",
                 "shasum": ""
             },
             "require": {
@@ -2191,7 +2455,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2019-08-23T08:05:57+00:00"
+            "time": "2019-10-24T15:33:53+00:00"
         },
         {
             "name": "symfony/finder",
