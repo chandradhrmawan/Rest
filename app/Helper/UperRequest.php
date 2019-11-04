@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\OmCargo\TxHdrUper;
 use App\Models\OmCargo\TxPayment;
 use Carbon\Carbon;
-use App\Helper\ConnectedTOS;
+use App\Helper\ConnectedExternalApps;
 
 class UperRequest{
 
@@ -60,7 +60,7 @@ class UperRequest{
     $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->where('uper_paid', 'N')->count();
 
     if ($cekStatus == 0) {
-      ConnectedTOS::sendRequestBooking($input['uper_req_no']);
+      ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
     }
   }
 }

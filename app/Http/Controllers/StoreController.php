@@ -14,6 +14,7 @@ use App\Helper\UperRequest;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 use App\Helper\GlobalHelper;
+use App\Helper\ConnectedExternalApps;
 
 class StoreController extends Controller
 {
@@ -42,6 +43,47 @@ class StoreController extends Controller
       }else{
         return response()->json($response);
       }
+    }
+
+    function truckRegistration($input){
+      $set_data = [
+        "truck_plat_no" => $input['truck_plat_no'],
+        "truck_rfid_code" => $input['truck_rfid'],
+        "customer_name" => $input['truck_cust_name'],
+        "customer_address" => $input['truck_cust_address'],
+        "cdm_customer_id" => $input['truck_cust_id'],
+        "truck_type" => $input['truck_type_name'],
+        "date" => $input['truck_date'],
+      ];
+      $set_data_self = [
+        "truck_id" => $input['truck_id'],
+        "truck_name" => $input['truck_name'],
+        "truck_plat_no" => $input['truck_plat_no'],
+        "truck_cust_id" => $input['truck_cust_id'],
+        "truck_cust_name" => $input['truck_cust_name'],
+        "truck_branch_id" => $input['truck_branch_id'],
+        "truck_date" => $input['truck_date'],
+        "truck_cust_address" => $input['truck_cust_address'],
+        "truck_type" => $input['truck_type'],
+        "truck_terminal_code" => $input['truck_terminal_code'],
+        "truck_plat_exp" => $input['truck_plat_exp'],
+        "truck_stnk_no" => $input['truck_stnk_no'],
+        "truck_stnk_exp" => $input['truck_stnk_exp'],
+        "truck_rfid" => $input['truck_rfid'],
+        "truck_type_name" => $input['truck_type_name']
+      ];
+      if ($input['type'] == "insert") {
+        DB::connection('mdm')->table('TM_TRUCK')->insert($set_data_self);
+        return ConnectedExternalApps::truckRegistration($set_data);
+      }else{
+        DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->update($set_data_self);
+        return ConnectedExternalApps::updateTid($set_data);
+      }
+
+    }
+
+    function createTCA($input){
+      return ConnectedExternalApps::createTCA($input);
     }
 
     function save($input, $request) {
