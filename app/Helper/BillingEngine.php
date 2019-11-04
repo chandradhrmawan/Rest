@@ -568,15 +568,18 @@ class BillingEngine{
 		// build eqpt
 
 		// build paysplit
-				$paysplit = $input['PAYSPLIT'];
-				$countP = 0;
-				$setP = '';
-				foreach ($paysplit as $list) {
-					$countP++;
-					$setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
-					$setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
-					$setP .= ' list_paysplit('.$countP.') := paysplit; ';
-				}
+        $setP = '';
+        if (isset($input['PAYSPLIT'])) {
+          $paysplit = $input['PAYSPLIT'];
+          $countP = 0;
+          $setP = '';
+          foreach ($paysplit as $list) {
+            $countP++;
+            $setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+            $setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
+            $setP .= ' list_paysplit('.$countP.') := paysplit; ';
+          }
+        }
 		// build paysplit
 
 		// build head
