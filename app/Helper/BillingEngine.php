@@ -185,7 +185,7 @@ class BillingEngine{
 	        	'UPER_CUST_ID' => $input['CUST_PROFILE_ID'],
 	        	'UPER_NOTA' => $list['UPER_NOTA'],
 	        	'UPER_PRESENTASE' => $list['UPER_PRESENTASE'],
-	        	'BRANCH_ID' => 12
+	        	'BRANCH_ID' => $input['BRANCH_ID']
 	        ]);
         }
         return [ "result" => "Success, store and set profile tariff and uper customer" ];
@@ -570,15 +570,18 @@ class BillingEngine{
 		// build eqpt
 
 		// build paysplit
-				// $paysplit = $input['PAYSPLIT'];
-				// $countP = 0;
-				// $setP = '';
-				// foreach ($paysplit as $list) {
-				// 	$countP++;
-				// 	$setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
-				// 	$setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
-				// 	$setP .= ' list_paysplit('.$countP.') := paysplit; ';
-				// }
+        $setP = '';
+        if (isset($input['PAYSPLIT'])) {
+          $paysplit = $input['PAYSPLIT'];
+          $countP = 0;
+          $setP = '';
+          foreach ($paysplit as $list) {
+            $countP++;
+            $setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+            $setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
+            $setP .= ' list_paysplit('.$countP.') := paysplit; ';
+          }
+        }
 		// build paysplit
 
 		// build head

@@ -35,7 +35,7 @@ class RequestBooking{
 			foreach ($detil as $list) {
 				$newD = [];
 				$list = (array)$list;
-				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_Bl']]) ? 'NULL' : $list[$config['head_tab_detil_Bl']];
+				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_bl']]) ? 'NULL' : $list[$config['head_tab_detil_bl']];
 				$newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
 				$newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
 				$newD['DTL_CHARACTER'] = empty($list['dtl_character_id']) ? 'NULL' : $list['dtl_character_id'];
@@ -167,7 +167,8 @@ class RequestBooking{
 		$find = (array)$find[0];
 		if ($input['approved'] == 'false') {
 			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
-				$config['head_status'] => 4
+				$config['head_status'] => 4,
+				$config['head_mark'] => $input['msg']
 			]);
 			return ['result' => "Success, rejected requst"];
 		}
@@ -259,7 +260,8 @@ class RequestBooking{
 		}
 
 		DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
-			$config['head_status'] => 3
+			$config['head_status'] => 3,
+			$config['head_mark'] => $input['msg']
 		]);
 
 		return ['result' => "Success, approved request!"];
@@ -270,6 +272,7 @@ class RequestBooking{
         	"TX_HDR_BM" => [
         		"head_nota_id" => "13",
         		"head_tab" => "TX_HDR_BM",
+        		"head_mark" => "bm_mark",
         		"head_tab_detil" => "TX_DTL_BM",
         		"head_tab_detil_bl" => "dtl_bm_bl",
         		"head_tab_detil_tl" => "dtl_bm_tl",
@@ -297,6 +300,7 @@ class RequestBooking{
         	"TX_HDR_REC" => [
         		"head_nota_id" => "14",
         		"head_tab" => "TX_HDR_REC",
+        		"head_mark" => "rec_mark",
         		"head_tab_detil" => "TX_DTL_REC",
         		"head_tab_detil_bl" => "dtl_bl",
         		"head_tab_detil_tl" => null,
@@ -324,6 +328,7 @@ class RequestBooking{
         	"TX_HDR_DEL" => [
         		"head_nota_id" => "15",
         		"head_tab" => "TX_HDR_DEL",
+        		"head_mark" => "del_mark",
         		"head_tab_detil" => "TX_DTL_DEL",
         		"head_tab_detil_bl" => "dtl_bl",
         		"head_tab_detil_tl" => null,

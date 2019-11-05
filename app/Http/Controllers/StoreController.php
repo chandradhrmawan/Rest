@@ -14,6 +14,7 @@ use App\Helper\UperRequest;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 use App\Helper\GlobalHelper;
+use App\Helper\ConnectedExternalApps;
 
 class StoreController extends Controller
 {
@@ -42,6 +43,112 @@ class StoreController extends Controller
       }else{
         return response()->json($response);
       }
+    }
+
+    function truckRegistration($input){
+      $set_data = [
+        "truck_plat_no" => $input['truck_plat_no'],
+        "truck_rfid_code" => $input['truck_rfid'],
+        "customer_name" => $input['truck_cust_name'],
+        "customer_address" => $input['truck_cust_address'],
+        "cdm_customer_id" => $input['truck_cust_id'],
+        "truck_type" => $input['truck_type_name'],
+        "date" => $input['truck_date'],
+      ];
+      $set_data_self = [
+        "truck_id" => $input['truck_id'],
+        "truck_name" => $input['truck_name'],
+        "truck_plat_no" => $input['truck_plat_no'],
+        "truck_cust_id" => $input['truck_cust_id'],
+        "truck_cust_name" => $input['truck_cust_name'],
+        "truck_branch_id" => $input['truck_branch_id'],
+        "truck_date" => $input['truck_date'],
+        "truck_cust_address" => $input['truck_cust_address'],
+        "truck_type" => $input['truck_type'],
+        "truck_terminal_code" => $input['truck_terminal_code'],
+        "truck_plat_exp" => $input['truck_plat_exp'],
+        "truck_stnk_no" => $input['truck_stnk_no'],
+        "truck_stnk_exp" => $input['truck_stnk_exp'],
+        "truck_rfid" => $input['truck_rfid'],
+        "truck_type_name" => $input['truck_type_name']
+      ];
+      if ($input['type'] == "insert") {
+        $result = ConnectedExternalApps::truckRegistration($set_data);
+        if ($result['truckRegistrationInterfaceResponse']['esbBody']['vMsg'] != "OK") {
+          return ["Success"=>false, "result" => $result['truckRegistrationInterfaceResponse']['esbBody']['vMsg']];
+        }
+        DB::connection('mdm')->table('TM_TRUCK')->insert($set_data_self);
+      }else{
+        // $result = ConnectedExternalApps::updateTid($set_data);
+        // if ($result['truckRegistrationInterfaceResponse']['esbBody']['vMsg'] != "OK") {
+        //   return ["Success"=>false, "result" => $result['truckRegistrationInterfaceResponse']['esbBody']['vMsg']];
+        // }
+        DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->update($set_data_self);
+      }
+
+      return ["Success"=>true, "result" => "Success, truck registration"];
+    }
+
+    function sendTCA($input){
+      $head = DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $input['id'])->get();
+      $head = $head[0];
+      if ($head->tca_req_type  == 1) {
+        $reques = DB::connection('omcargo')->table('TX_HDR_REC')->where('rec_no', $head->tca_req_no)->get();
+        $reques = $reques[0];
+        $vvdID = $reques->rec_vvd_id;
+        $vvdName = $reques->rec_vesel_name;
+        $vvdVI = $reques->rec_voyin;
+        $vvdVO = $reques->rec_voyout;
+      }else if ($head->tca_req_type  == 2) {
+        $reques = DB::connection('omcargo')->table('TX_HDR_DEL')->where('del_no', $head->tca_req_no)->get();
+        $reques = $reques[0];
+        $vvdID = $reques->del_vvd_id;
+        $vvdName = $reques->del_vesel_name;
+        $vvdVI = $reques->del_voyin;
+        $vvdVO = $reques->del_voyout;
+      }
+      $loop = DB::connection('omcargo')->table('TX_DTL_TCA')->where('tca_hdr_id', $input['id'])->get();
+      $detil = [];
+      foreach ($loop as $list) {
+        $truck = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id', $list->tca_truck_id)->get();
+        $truck = $truck[0];
+        $detil[] = [
+          "vNoRequest" => $head->tca_req_no,
+          "vTruckId" => $truck->truck_id,
+          "vTruckNumber" => $truck->truck_plat_no,
+          "vBlNumber" => $head->tca_bl,
+          "vTcaCompany" => $head->tca_cust_name,
+          "vEi" => $head->tca_req_type == 1 ? 'I' : 'E',
+          "vRfidCode" => $truck->truck_rfid,
+          "vIdServiceType" => $head->tca_req_type,
+          "vServiceType" => $head->tca_req_type_name,
+          "vIdTruck" => $truck->truck_id,
+          "vIdVvd" => $vvdID,
+          "vIdTerminal" => $head->tca_terminal_code
+        ];
+      }
+      $set_data = [
+        "vVessel" => $vvdName,
+        "vVin" => $vvdVI,
+        "vVout" => $vvdVO,
+        "vNoRequest" => $head->tca_req_no,
+        "vCustomerName" => $head->tca_cust_name,
+        "vCustomerId" => $head->tca_cust_id,
+        "vPkgName" => $head->tca_pkg_name,
+        "vQty" => $head->tca_qty,
+        "vTon" => $head->tca_qty,
+        "vBlNumber" => $head->tca_bl,
+        "vBlDate" => $head->tca_bl_date,
+        "vEi" => $head->tca_req_type == 1 ? 'I' : 'E',
+        "vHsCode" => $head->tca_hs_code,
+        "vIdServicetype" => $head->tca_req_type,
+        "vServiceType" => $head->tca_req_type_name,
+        "vIdVvd" => $vvdID,
+        "vIdTerminal" => $head->tca_terminal_code,
+        "detail" => $detil
+      ];
+      
+      return ConnectedExternalApps::createTCA($set_data);
     }
 
     function save($input, $request) {
