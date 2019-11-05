@@ -99,15 +99,20 @@ class ViewController extends Controller
     }
 
     function printUper2($id) {
-      $html = view('print.uper2');
-      // return $html;
-      $filename = "Test";
-      $dompdf = new Dompdf();
+      $connection = DB::connection('omcargo');
+      $header     = $connection->table("TX_HDR_UPER")->where("UPER_ID", "=", $id)->get();
+      $jshead     = json_decode(json_encode($header), TRUE);
+      $detail     = $connection->table("TX_DTL_UPER")->where("UPER_HDR_ID", "=", $jshead[0]["uper_id"])->get();
+      $html       = view('print.uper2',["header"=>$header, "detail"=>$detail]);
+      // return view('print.uper2',["header"=>$header, "detail"=>$detail]);
+      $filename   = "Test";
+      $dompdf     = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
       $dompdf->loadHtml($html);
       $dompdf->setPaper('A4', 'potrait');
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
+      // return $detail;
     }
 
     function printProformaReceiving($id) {

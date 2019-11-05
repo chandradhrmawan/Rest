@@ -87,7 +87,7 @@ class GlobalHelper{
         }
         $result[] = $newDt;
       }
-      return $head;
+      return $result;
     }
 
   public static function index($input) {
@@ -197,7 +197,29 @@ class GlobalHelper{
     $connection->whereIn($in[0], $in[1]);
     }
 
-    $data   = $connection->get();
+    if(!empty($input["whereNotIn"][0])) {
+    $in        = $input["whereNotIn"];
+    $connection->whereNotIn($in[0], $in[1]);
+    }
+
+    if (!empty($input["query"]) && !empty($input["field"])) {
+      $connection->where($input["field"],"like", "%".$input["query"]."%");
+    }
+
+    if(!empty($input["orderBy"][0])) {
+    $in        = $input["orderBy"];
+    $connection->orderby($in[0], $in[1]);
+    }
+
+    if (isset($input["changeKey"])) {
+      $result  = $connection->get();;
+      $data    = json_encode($result);
+      $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
+      $data    = json_decode($change);
+    } else {
+      $data   = $connection->get();
+
+    }
     // $decode = json_decode(json_encode($data), TRUE);
     // $conCross = DB::connection($input["crossJoin"]["db"])->table($input["crossJoin"]["table"]);
     // foreach ($decode as $value) {
@@ -246,6 +268,11 @@ class GlobalHelper{
 
     if(!empty($input["where"][0])) {
       $connect->where($input["where"]);
+    }
+
+    if(!empty($input["whereNotIn"][0])) {
+    $in        = $input["whereNotIn"];
+    $connection->whereNotIn($in[0], $in[1]);
     }
 
     $data      = $connect->get();

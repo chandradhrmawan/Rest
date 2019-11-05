@@ -538,15 +538,15 @@ class BillingEngine{
 					$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
 					$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
 					$setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
-					$setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
-					$setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
-					$setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
+					// $setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
+					// $setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
+					// $setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
 					$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
 					$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
 					$setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
-					$setD .= ' detail.DTL_DATE_IN := '.$list['DTL_DATE_IN'].';';
-					$setD .= ' detail.DTL_DATE_OUT_OLD := '.$list['DTL_DATE_OUT_OLD'].';';
-					$setD .= ' detail.DTL_DATE_OUT := '.$list['DTL_DATE_OUT'].';';
+					$setD .= ' detail.DTL_DATE_IN := to_date(\''.$list['DTL_DATE_IN'].'\',\'yyyy-MM-dd\');';
+					$setD .= ' detail.DTL_DATE_OUT_OLD := to_date(\''.$list['DTL_DATE_OUT_OLD'].'\',\'yyyy-MM-dd\');';
+					$setD .= ' detail.DTL_DATE_OUT := to_date(\''.$list['DTL_DATE_OUT'].'\',\'yyyy-MM-dd\');';
 					$setD .= ' list_detail('.$countD.') := detail; ';
 				}
 		// build detil
@@ -557,26 +557,28 @@ class BillingEngine{
 				$setE = '';
 				foreach ($eqpt as $list) {
 					$countE++;
-					$setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE'].';';
+					$setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE_ID'].';';
 					$setE .= ' equip.EQ_QTY := '.$list['EQ_QTY'].';';
-					$setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_QTY_PKG'].';';
+					$setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_PKG_ID'].';';
 					$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
 					$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
 					$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
 					$setE .= ' list_equip('.$countE.') := equip; ';
+					// $setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE'].';';
+					// $setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_QTY_PKG'].';';
 				}
 		// build eqpt
 
 		// build paysplit
-				$paysplit = $input['PAYSPLIT'];
-				$countP = 0;
-				$setP = '';
-				foreach ($paysplit as $list) {
-					$countP++;
-					$setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
-					$setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
-					$setP .= ' list_paysplit('.$countP.') := paysplit; ';
-				}
+				// $paysplit = $input['PAYSPLIT'];
+				// $countP = 0;
+				// $setP = '';
+				// foreach ($paysplit as $list) {
+				// 	$countP++;
+				// 	$setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+				// 	$setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
+				// 	$setP .= ' list_paysplit('.$countP.') := paysplit; ';
+				// }
 		// build paysplit
 
 		// build head
@@ -598,7 +600,7 @@ class BillingEngine{
 				$setH .= ");END;";
 		// build head
 
-		$sql    = $add.$setD.$setE.$setP.$setH;
+		$sql    = $add.$setD.$setE.$setH;
 		$link   = oci_connect('BILLING_ENGINE', 'billing_engine', '10.88.48.124/NPKSBILD');
 
 		// return $sql;

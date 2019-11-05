@@ -17,6 +17,7 @@
 	</style>
 </head>
 <body>
+	@foreach($header as $header)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
@@ -46,7 +47,7 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">PROFORMA USTER</center>
+<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">UPER USTER</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
@@ -59,12 +60,12 @@
         <tr>
           <td>Nama</td>
           <td>: </td>
-          <td>PT. Musi Kali Jaya</td>
+          <td>{{$header->uper_cust_name}}</td>
         </tr>
         <tr>
           <td>Alamat</td>
           <td>: </td>
-          <td>Jl. Jendral Sudirman No 3528<br>RT 027 KM 3.5</td>
+          <td>{{$header->uper_cust_address}}</td>
         </tr>
         <tr>
           <td>NPWP</td>
@@ -93,8 +94,8 @@
       </table>
     </td>
 	</tr>
+	@endforeach
 </table>
-
 <table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
 		<th rowspan="2">NO BL</th>
