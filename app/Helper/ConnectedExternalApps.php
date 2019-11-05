@@ -445,11 +445,12 @@ class ConnectedExternalApps{
     try {
       $res = $client->post($endpoint_url, $options);
     } catch (ClientException $e) {
-      echo $e->getRequest() . "\n";
+      $error = $e->getRequest() . "\n";
       if ($e->hasResponse()) {
-        echo $e->getResponse() . "\n";
+        $error .= $e->getResponse() . "\n";
       }
+      return ["Success"=>false, "result" => $error];
     }
-    return json_decode($res->getBody()->getContents(), true);
+    return ["Success"=>true, "result" => json_decode($res->getBody()->getContents(), true)];
   }
 }
