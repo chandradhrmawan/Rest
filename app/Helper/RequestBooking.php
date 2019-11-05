@@ -172,7 +172,7 @@ class RequestBooking{
 			]);
 			return ['result' => "Success, rejected requst"];
 		}
-		$uper = DB::connection('eng')->table('V_PAY_SPLIT')->where('BOOKING_NUMBER',$find['head_no'])->get();
+		$uper = DB::connection('eng')->table('V_PAY_SPLIT')->where('BOOKING_NUMBER',$find[$config['head_no']])->get();
 		if (empty($uper)) {
 			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
 		}
@@ -239,7 +239,7 @@ class RequestBooking{
 				// "dtl_line_desc" => , // perlu konfimasi
 				// "dtl_line_context" => , // perlu konfimasi
 				"dtl_service_type" => $list['group_tariff_name'],
-				"dtl_amout" => $list['uper'], // blm fix
+				"dtl_amount" => $list['uper'], // blm fix
 				"dtl_ppn" => $list["ppn"],
 				// "dtl_masa1" => , // cooming soon
 				// "dtl_masa12" => , // cooming soon
