@@ -201,7 +201,14 @@ class ConnectedExternalApps{
   }
 
   private static function sendRealBM($head, $detil){
-    $vParam = $head->bm_no.'^'.$head->bm_cust_name.'^'.$head->bm_cust_id.'^'.$head->bm_cust_npwp.'^'.$head->bm_vessel_name.'^'.$head->bm_eta.'^'.$head->bm_open_stack.'^'.$head->bm_voyin.'^'.$head->bm_voyout.'^'.$head->bm_closing_time.'^BONGKAR MUAT^^^^^^^^^^^^'.$head->bm_etd.'^0^'.$head->bm_vvd_id.'^'.$head->bm_trade_type.'^^^';
+    $consignee = '';
+    $oi = '';
+    $podpol = '';
+    $movetype = '';
+    $startenddate = '';
+    $blno = '';
+    $bldate = '';
+    $vParam = $head->bm_no.'^'.$head->bm_cust_name.'^'.$head->bm_cust_id.'^'.$head->bm_cust_npwp.'^'.$head->bm_vessel_name.'^'.$head->bm_eta.'^'.$head->bm_etd.'^'.$head->bm_open_stack.'^'.$head->bm_voyin.'^'.$head->bm_voyout.'^'.$head->bm_closing_time.'^BONGKAR MUAT^'.$consignee.'^'.$consignee.'^'.$oi.'^'.$podpol.'^'.$podpol.'^'.$movetype.'^'.$startenddate.'^'.$startenddate.'^'.$blno.'^0^'.$bldate.'^'.$head->bm_trade_type.'^'.$head->bm_vvd_id.'^';
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
     $string_json = '{
       "createBookingHeaderInterfaceRequest": {
@@ -235,7 +242,12 @@ class ConnectedExternalApps{
       // return $e->getResponse();
     }
     foreach ($detil as $list) {
-      $vParam = $list->dtl_cmdty_name.'^'.$list->dtl_cont_type.'^^^^^^'.$list->dtl_qty.'^0^^';
+      $merk = '';
+      $model = '';
+      $hz = '';
+      $distrub = '';
+      $wight = '';
+      $vParam = $list->dtl_cmdty_name.'^'.$list->dtl_cont_type.'^'.$merk.'^'.$model.'^'.$hz.'^'.$distrub.'^'.$wight.'^'.$list->dtl_qty.'^0^';
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
       $string_json = '{
         "createBookingDetailInterfaceRequest": {
