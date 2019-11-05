@@ -383,7 +383,7 @@ class BillingEngine{
 	    	$setD = '';
 	    	foreach ($detil as $list) {
 	    		$countD++;
-          $setD .= ' detail.DTL_BL := '.$list['DTL_BL'].';';
+          $setD .= ' detail.DTL_BL := \''.$list['DTL_BL'].'\';';
 	    		$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
 	    		$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
 	    		$setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
