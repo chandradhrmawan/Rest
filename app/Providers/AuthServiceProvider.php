@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Models\OmUster\TmUser;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -33,8 +34,12 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::viaRequest('api', function ($request) {
             if ($request->input('api_token')) {
-                return User::where('api_token', $request->input('api_token'))->first();
+                return TmUser::where('api_token', $request->input('api_token'))->first();
             }
         });
+
+      //   $this->app['auth']->viaRequest('api', function ($request) {
+      //   return app('auth')->setRequest($request)->user();
+      // });
     }
 }

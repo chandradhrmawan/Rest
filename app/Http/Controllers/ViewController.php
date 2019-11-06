@@ -42,8 +42,8 @@ class ViewController extends Controller
 
     public function view($input, $request) {
       $table  = $input["table"];
-      $data   = \DB::connection('order')->table($table)->get();
-      return response()->json($data);
+      $data   = \DB::connection($input["db"])->table($table)->get();
+      return $data;
     }
 
     // BillingEngine
