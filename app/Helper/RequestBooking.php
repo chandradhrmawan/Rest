@@ -35,7 +35,7 @@ class RequestBooking{
 			foreach ($detil as $list) {
 				$newD = [];
 				$list = (array)$list;
-				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_Bl']]) ? 'NULL' : $list[$config['head_tab_detil_Bl']];
+				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_bl']]) ? 'NULL' : $list[$config['head_tab_detil_bl']];
 				$newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
 				$newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
 				$newD['DTL_CHARACTER'] = empty($list['dtl_character_id']) ? 'NULL' : $list['dtl_character_id'];
