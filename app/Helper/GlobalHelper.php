@@ -96,6 +96,10 @@ class GlobalHelper{
       if ($input['start'] != '' && $input['limit'] != '')
         $connect->skip($input['start'])->take($input['limit']);
 
+      if (isset($input["selected"]) && $input["selected"] != '') {
+        $result  = $connect->select($input["selected"]);
+      }
+
       $result   = $connect->get();
       $count    = $connect->count();
 

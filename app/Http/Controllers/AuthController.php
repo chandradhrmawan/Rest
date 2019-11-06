@@ -34,7 +34,6 @@ class AuthController extends BaseController
         $payload = [
             'iss' => "bearer", // Issuer of the token
             'sub' => $user->user_id, // Subject of the token
-            'iat' => time(), // Time when JWT was issued.
             'exp' => time() + 60*60 // Expiration time
         ];
 
@@ -51,7 +50,7 @@ class AuthController extends BaseController
     public function authenticate(TmUser $user) {
         $this->validate($this->request, [
             'USER_NAME'     => 'required',
-            'USER_PASSWD'  => 'required'
+            'USER_PASSWD'   => 'required'
         ]);
         // Find the user by email
         $user = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
@@ -66,14 +65,20 @@ class AuthController extends BaseController
         }
         // Verify the password and generate the token
         if (Hash::check($this->request->input('USER_PASSWD'), $user["user_passwd"])) {
-            return response()->json([
-                'token' => $this->jwt($user)
-            ], 200);
+            $cek  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
+            if ($cek["user_status"] == "1") {
+              return response()->json(["message"=>"You Already Login", "token"=>$cek["api_token"]]);
+            } else {
+              $tes  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
+              return response()->json(["message"=>"Login Success", "token"=>$this->jwt($user)]);
+            }
         }
         // Bad Request response
         return response()->json([
             'error' => 'Email or password is wrong.'
         ], 400);
+
+        // return response($user);
 
     }
 }

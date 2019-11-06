@@ -21,10 +21,10 @@ $app->get('/key', function() {
 
 $app->post('auth/login',['uses' => 'AuthController@authenticate']);
 // $app->post('index',  ['middleware' => 'jwt.auth', 'uses' => 'IndexController@api']);
-// $app->post('/view',  ['middleware' => 'jwt.auth', 'uses' => 'ViewController@api']);
+$app->post('/view',  ['middleware' => 'jwt.auth', 'uses' => 'ViewController@api']);
 // $app->post('/store', ['middleware' => 'jwt.auth', 'uses' => 'StoreController@api']);
 $app->post('index',  'IndexController@api');
-$app->post('/view',  'ViewController@api');
+// $app->post('/view',  'ViewController@api');
 $app->post('/store', 'StoreController@api');
 
 $app->get('/print/uper/{id}','ViewController@printUper');
