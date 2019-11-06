@@ -65,14 +65,14 @@ class RealisasiHelper{
       }
     // build detil
 
-      // set data
-        $set_data = [
-          'head' => $setH,
-          'detil' => $setD,
-          'eqpt' => $setE,
-          'paysplit' => []
-        ];
-      // set data
+    // set data
+      $set_data = [
+        'head' => $setH,
+        'detil' => $setD,
+        'eqpt' => $setE,
+        'paysplit' => []
+      ];
+    // set data
 
     $tariffResp = BillingEngine::calculateTariff($set_data);
 
