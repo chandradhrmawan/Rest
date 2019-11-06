@@ -392,7 +392,11 @@ class BillingEngine{
 	    		$setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
 	    		$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
 	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
-	    		$setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
+          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+            $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].'\';';
+          }else{
+            $setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
+          }
 	    		$setD .= ' detail.DTL_DATE_IN := '.$list['DTL_DATE_IN'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT_OLD := '.$list['DTL_DATE_OUT_OLD'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT := '.$list['DTL_DATE_OUT'].';';
