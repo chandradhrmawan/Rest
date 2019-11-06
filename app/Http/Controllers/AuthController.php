@@ -65,13 +65,14 @@ class AuthController extends BaseController
         }
         // Verify the password and generate the token
         if (Hash::check($this->request->input('USER_PASSWD'), $user["user_passwd"])) {
-            $cek  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
-            if ($cek["user_status"] == "1") {
-              return response()->json(["message"=>"You Already Login", "token"=>$cek["api_token"]]);
-            } else {
+            $cek    = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
+            $result = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+            // if ($cek["user_status"] == "1") {
+            //   return response()->json(["message"=>"You Already Login", "data"=>$result]);
+            // } else {
               $tes  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
-              return response()->json(["message"=>"Login Success", "token"=>$this->jwt($user)]);
-            }
+              return response()->json(["message"=>"Login Success", "data"=>$result]);
+            // }
         }
         // Bad Request response
         return response()->json([

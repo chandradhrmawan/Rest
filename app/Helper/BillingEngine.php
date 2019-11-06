@@ -508,130 +508,72 @@ class BillingEngine{
   }
 
 	public static function getSimulasiTarif($input) {
-		$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['HEADER']["P_BOOKING_NUMBER"])->get();
-		if (!empty($head)) {
-			$head = $head[0];
-			DB::connection('eng')->table('TX_LOG')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
-			DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
-			DB::connection('eng')->table('TX_TEMP_TARIFF_SPLIT')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
-			DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['HEADER']["P_BOOKING_NUMBER"])->delete();
-		}
-		$add = "
-		DECLARE
-		detail PKG_TARIFF.BOOKING_DTL;
-		equip PKG_TARIFF.BOOKING_EQUIP;
-		paysplit PKG_TARIFF.BOOKING_PAYSPLIT;
-		list_detail PKG_TARIFF.BOOKING_DTL_TBL;
-		list_equip PKG_TARIFF.BOOKING_EQUIP_TBL;
-		list_paysplit PKG_TARIFF.BOOKING_PAYSPLIT_TBL;
-		P_RESULT_FLAG VARCHAR2(200);
-		P_RESULT_MSG VARCHAR2(200);
-		BEGIN";
+		// build head
+				$head 											= $input["HEADER"];
+				$setH 											= [];
+				$setH['P_NOTA_ID'] 					= $head['P_NOTA_ID'];
+				$setH['P_BRANCH_ID'] 				= $head['P_BRANCH_ID'];
+				$setH['P_CUSTOMER_ID'] 			= $head['P_CUSTOMER_ID'];
+				$setH['P_BOOKING_NUMBER'] 	= $head['P_BOOKING_NUMBER'];
+				$setH['P_REALIZATION'] 			= $head['P_REALIZATION'];
+				$setH['P_TRADE'] 						= $head['P_TRADE'];
+				$setH['P_USER_ID'] 					= $head['P_USER_ID'];
+		// build head
 
 		// build detil
-				$detil = $input['DETAIL'];
-				$countD = 0;
-				$setD = '';
+				$detil 											= $input["DETAIL"];
+				$datein 										= date('Y-m-d');
+				$dateout 										= date('Y-m-d', strtotime("+1 day"));
+				$setD = [];
 				foreach ($detil as $list) {
-					$countD++;
-					$setD .= ' detail.DTL_BL := \''.$list['DTL_BL'].'\';';
-					$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
-					$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
-					$setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
-					// $setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
-					// $setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
-					// $setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
-					$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
-					$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
-					$setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
-					$setD .= ' detail.DTL_DATE_IN := to_date(\''.$list['DTL_DATE_IN'].'\',\'yyyy-MM-dd\');';
-					$setD .= ' detail.DTL_DATE_OUT_OLD := to_date(\''.$list['DTL_DATE_OUT_OLD'].'\',\'yyyy-MM-dd\');';
-					$setD .= ' detail.DTL_DATE_OUT := to_date(\''.$list['DTL_DATE_OUT'].'\',\'yyyy-MM-dd\');';
-					$setD .= ' list_detail('.$countD.') := detail; ';
+					$newD 										= [];
+					$list 										= (array)$list;
+					$newD['DTL_BL'] 					= $list['DTL_BL'];
+					$newD['DTL_PKG_ID'] 			= $list['DTL_PKG_ID'];
+					$newD['DTL_CMDTY_ID'] 		= $list['DTL_CMDTY_ID'];
+					$newD['DTL_CHARACTER'] 		= $list['DTL_CHARACTER'];
+					$newD['DTL_CONT_SIZE'] 		= 'NULL';
+					$newD['DTL_CONT_TYPE'] 		= 'NULL';
+					$newD['DTL_CONT_STATUS'] 	= 'NULL';
+					$newD['DTL_UNIT_ID'] 			= $list['DTL_UNIT_ID'];
+					$newD['DTL_QTY'] 					= $list['DTL_QTY'];
+					$newD['DTL_TL'] 					= $list['DTL_TL'];
+					$newD['DTL_DATE_IN'] 			= empty($datein) ? 'NULL' : 'to_date(\''.$datein.'\',\'yyyy-MM-dd\')';
+					$newD['DTL_DATE_OUT'] 		= empty($dateout) ? 'NULL' : 'to_date(\''.$dateout.'\',\'yyyy-MM-dd\')';
+					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+					$setD[] = $newD;
 				}
 		// build detil
 
 		// build eqpt
-				$eqpt = $input['EQUIP'];
-				$countE = 0;
-				$setE = '';
+				$setE = [];
+				$eqpt 											= $input["EQUIP"];
 				foreach ($eqpt as $list) {
-					$countE++;
-					$setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE_ID'].';';
-					$setE .= ' equip.EQ_QTY := '.$list['EQ_QTY'].';';
-					$setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_PKG_ID'].';';
-					$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
-					$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
-					$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
-					$setE .= ' list_equip('.$countE.') := equip; ';
-					// $setE .= ' equip.EQ_TYPE := '.$list['EQ_TYPE'].';';
-					// $setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_QTY_PKG'].';';
+					$newE 										= [];
+					$list 										= (array)$list;
+					$newE['EQ_TYPE'] 					= empty($list['EQ_TYPE_ID']) ? 'NULL' : $list['EQ_TYPE_ID'];
+					$newE['EQ_QTY'] 					= empty($list['EQ_QTY']) ? 'NULL' : $list['EQ_QTY'];
+					$newE['EQ_UNIT_ID'] 			= empty($list['EQ_UNIT_ID']) ? 'NULL' : $list['EQ_UNIT_ID'];
+					$newE['EQ_GTRF_ID'] 			= empty($list['EQ_GTRF_ID']) ? 'NULL' : $list['EQ_GTRF_ID'];
+					$newE['EQ_PKG_ID'] 				= empty($list['EQ_PKG_ID']) ? 'NULL' : $list['EQ_PKG_ID'];
+					$setE[] = $newE;
 				}
 		// build eqpt
 
-		// build paysplit
-        $setP = '';
-        if (isset($input['PAYSPLIT'])) {
-          $paysplit = $input['PAYSPLIT'];
-          $countP = 0;
-          $setP = '';
-          foreach ($paysplit as $list) {
-            $countP++;
-            $setP .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
-            $setP .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
-            $setP .= ' list_paysplit('.$countP.') := paysplit; ';
-          }
-        }
-		// build paysplit
+		// set data
+			$set_data = [
+				'head' => $setH,
+				'detil' => $setD,
+				'eqpt' => $setE,
+				'paysplit' => []
+			];
 
-		// build head
-				$head  = $input['HEADER'];
-				$setH  = "PKG_TARIFF.GET_TARIFF(";
-				$setH .= " P_SOURCE_ID => 'NPK_BILLING',";
-				$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
-				$setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
-				$setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
-				$setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
-				$setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
-				$setH .= " P_TRADE => '".$head['P_TRADE']."',";
-				$setH .= " P_DETAIL => list_detail,";
-				$setH .= " P_EQUIPMENT => list_equip,";
-				$setH .= " P_PAY_SPLIT => list_paysplit,";
-				$setH .= " P_USER_ID => ".$head['P_USER_ID'].",";
-				$setH .= " P_RESULT_FLAG => P_RESULT_FLAG,";
-				$setH .= " P_RESULT_MSG => P_RESULT_MSG ";
-				$setH .= ");END;";
-		// build head
-
-		$sql    = $add.$setD.$setE.$setH;
-		$link   = oci_connect('BILLING_ENGINE', 'billing_engine', '10.88.48.124/NPKSBILD');
-
-		// return $sql;
-		$stmt   = oci_parse($link,$sql);
-		$query  = oci_execute($stmt);
-
-		$data   = DB::connection("eng")->table("TX_LOG")->orderBy('TEMP_HDR_ID', 'DESC')->get();
-		$head   = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['HEADER']["P_BOOKING_NUMBER"])->get();
-		if (empty($head)) {
-			return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, prosedur bug'];
-		}else{
-			$head = $head[0];
-			$head = (array)$head;
-			$result = DB::connection('eng')->table('TX_LOG')->where('TEMP_HDR_ID', $head['temp_hdr_id'])->get();
-			$result = $result[0];
-			$result = (array)$result;
-
-			$latest   = DB::connection("eng")->table("V_PAY_SPLIT")->where("TEMP_HDR_ID",$head['temp_hdr_id'])->get();
-
-			$response = ['result_flag' => $result['result_flag'], 'result_msg' => $result['result_msg']];
-			if ($result['result_flag'] != 'S') {
-				$response["Success"] = false;
-				$response["Data"] = $latest;
-			}else{
-				$response["Success"] = true;
-				$response["Data"] = $latest;
+			$tariffResp = BillingEngine::calculateTariff($set_data);
+			if ($tariffResp['result_flag'] != 'S') {
+				return $tariffResp;
 			}
-		return $response;
+
+			$getH = DB::connection('eng')->table('V_PAY_SPLIT')->where('booking_number',$head['P_BOOKING_NUMBER'])->get();
+			return $getH;
 		}
 	}
-}
