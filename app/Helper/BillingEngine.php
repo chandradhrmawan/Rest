@@ -383,10 +383,18 @@ class BillingEngine{
 	    	$setD = '';
 	    	foreach ($detil as $list) {
 	    		$countD++;
-          $setD .= ' detail.DTL_BL := \''.$list['DTL_BL'].'\';';
+          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+            $setD .= ' detail.DTL_BL := '.$list['DTL_BL'].';';
+          }else{
+            $setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
+          }
 	    		$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
 	    		$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
-	    		$setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
+          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+            $setD .= ' detail.DTL_CHARACTER := '.$list['DTL_CHARACTER'].';';
+          }else{
+            $setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
+          }
 	    		$setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
 	    		$setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
 	    		$setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
@@ -425,7 +433,11 @@ class BillingEngine{
 	    	$setP = '';
 	    	foreach ($paysplit as $list) {
 	    		$countP++;
-	    		$setE .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+            $setE .= ' paysplit.PS_CUST_ID := '.$list['PS_CUST_ID'].';';
+          }else{
+            $setE .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
+          }
 	    		$setE .= ' paysplit.PS_GTRF_ID := '.$list['PS_GTRF_ID'].';';
 	    		$setE .= ' list_paysplit('.$countP.') := paysplit; ';
 	    	}
