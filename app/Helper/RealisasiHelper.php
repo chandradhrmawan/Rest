@@ -113,15 +113,17 @@ class RealisasiHelper{
       $headN->save();
 
       $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$getH->group_tariff_id)->get();
+      $countLine = 0;
       foreach ($getD as $list) {
+        $countLine++;
         DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
           // "nota_dtl_id" => $list->, // dari triger
           "nota_hdr_id" => $headN->nota_id,
-          // "dtl_line" => $list->, // ?
-          // "dtl_line_desc" => $list->, // ?
+          "dtl_line" => $countLine,
+          "dtl_line_desc" => $list->memoline,
           // "dtl_line_context" => $list->, // ?
           "dtl_service_type" => $list->group_tariff_name,
-          // "dtl_amout" => $list->, // ?
+          "dtl_amout" => $list->total,
           "dtl_ppn" => $list->ppn,
           // "dtl_masa1" => $list->, // ?
           // "dtl_masa12" => $list->, // ?
