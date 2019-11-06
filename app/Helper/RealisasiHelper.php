@@ -134,6 +134,9 @@ class RealisasiHelper{
         ]);
       }
     }
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->udpate([
+      "bprp_status" => 2
+    ]);
     return ['result' => 'Success, Confirm BPRP Data!'];
   }
 }
