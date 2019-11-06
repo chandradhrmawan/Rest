@@ -554,8 +554,8 @@ class BillingEngine{
 					$newE['EQ_TYPE'] 					= empty($list['EQ_TYPE_ID']) ? 'NULL' : $list['EQ_TYPE_ID'];
 					$newE['EQ_QTY'] 					= empty($list['EQ_QTY']) ? 'NULL' : $list['EQ_QTY'];
 					$newE['EQ_UNIT_ID'] 			= empty($list['EQ_UNIT_ID']) ? 'NULL' : $list['EQ_UNIT_ID'];
-					$newE['EQ_GTRF_ID'] 			= empty($list['GROUP_TARIFF_ID']) ? 'NULL' : $list['GROUP_TARIFF_ID'];
-					$newE['EQ_PKG_ID'] 				= empty($list['PACKAGE_ID']) ? 'NULL' : $list['PACKAGE_ID'];
+					$newE['EQ_GTRF_ID'] 			= empty($list['EQ_GTRF_ID']) ? 'NULL' : $list['EQ_GTRF_ID'];
+					$newE['EQ_PKG_ID'] 				= empty($list['EQ_PKG_ID']) ? 'NULL' : $list['EQ_PKG_ID'];
 					$setE[] = $newE;
 				}
 		// build eqpt
