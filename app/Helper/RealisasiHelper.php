@@ -190,8 +190,8 @@ class RealisasiHelper{
         $newD['DTL_UNIT_ID'] = empty($list['dtl_req_unit_id']) ? 'NULL' : $list['dtl_req_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_in_qty']) ? 'NULL' : $list['dtl_in_qty'];
         $newD['DTL_TL'] = 'NULL';
-        $newD['DTL_DATE_IN'] = empty($list['dtl_datein']) ? 'NULL' : 'to_date(\''.$list['dtl_datein'].'\',\'yyyy-MM-dd\')';
-        $newD['DTL_DATE_OUT'] = empty($list['dtl_dateout']) ? 'NULL' : 'to_date(\''.$list['dtl_dateout'].'\',\'yyyy-MM-dd\')';
+        $newD['DTL_DATE_IN'] = empty($list['dtl_datein']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_datein'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+        $newD['DTL_DATE_OUT'] = empty($list['dtl_dateout']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_dateout'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
         $newD['DTL_DATE_OUT_OLD'] = 'NULL';
         // $newD['DTL_DATE_OUT_OLD'] = empty($list['date_out_old']) ? 'NULL' : 'to_date(\''.$list['date_out_old'].'\',\'yyyy-MM-dd\')';
         $setD[] = $newD;

@@ -90,17 +90,17 @@ class RequestBooking{
 					}else{
 						$findEx = $findEx[0];
 						$findEx = (array)$findEx;
-						$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.$findEx['date_out_old'].'\',\'yyyy-MM-dd\')';
-						$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.$findEx['date_out'].'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($findEx['date_out_old'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($findEx['date_out'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 				}else{
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 
 					if ($config['head_tab_detil_date_out'] != null) {
 						if ($input['table'] == 'TX_HDR_DEL') {
-							$newD['DTL_DATE_OUT'] = empty($list[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$list[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+							$newD['DTL_DATE_OUT'] = empty($list[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 						}else{
-							$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.$find[$config['head_tab_detil_date_out']].'\',\'yyyy-MM-dd\')';
+							$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 						}
 					}else{
 						$newD['DTL_DATE_OUT'] = 'NULL';

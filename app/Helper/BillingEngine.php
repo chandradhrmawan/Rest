@@ -554,8 +554,8 @@ class BillingEngine{
 					$newD['DTL_UNIT_ID'] 			= $list['DTL_UNIT_ID'];
 					$newD['DTL_QTY'] 					= $list['DTL_QTY'];
 					$newD['DTL_TL'] 					= $list['DTL_TL'];
-					$newD['DTL_DATE_IN'] 			= empty($datein) ? 'NULL' : 'to_date(\''.$datein.'\',\'yyyy-MM-dd\')';
-					$newD['DTL_DATE_OUT'] 		= empty($dateout) ? 'NULL' : 'to_date(\''.$dateout.'\',\'yyyy-MM-dd\')';
+					$newD['DTL_DATE_IN'] 			= empty($datein) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($datein)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$newD['DTL_DATE_OUT'] 		= empty($dateout) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 					$setD[] = $newD;
 				}
