@@ -35,7 +35,7 @@ class RequestBooking{
 			foreach ($detil as $list) {
 				$newD = [];
 				$list = (array)$list;
-				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_Bl']]) ? 'NULL' : $list[$config['head_tab_detil_Bl']];
+				$newD['DTL_BL'] = empty($list[$config['head_tab_detil_bl']]) ? 'NULL' : $list[$config['head_tab_detil_bl']];
 				$newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
 				$newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
 				$newD['DTL_CHARACTER'] = empty($list['dtl_character_id']) ? 'NULL' : $list['dtl_character_id'];
@@ -172,91 +172,89 @@ class RequestBooking{
 			]);
 			return ['result' => "Success, rejected requst"];
 		}
-		$uper = DB::connection('eng')->table('V_PAY_SPLIT')->where('BOOKING_NUMBER',$find[$config['head_no']])->get();
-		if (empty($uper)) {
+		$query = "SELECT * FROM V_PAY_SPLIT a JOIN TX_TEMP_TARIFF_SPLIT b ON a.temp_hdr_id=b.temp_hdr_id and a.customer_id=b.customer_id WHERE a.booking_number= '".$find[$config['head_no']]."'";
+		$upers = DB::connection('eng')->select(DB::raw($query));
+		if (empty($upers)) {
 			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
 		}
-		$uper = $uper[0];
-		$uper = (array)$uper;
-		$cekU = DB::connection('eng')->table('TX_LOG')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
-		if ($cekU[0]->result_flag != 'S') {
-			return ['result' => "Fail", 'logs' => $cekU[0]];
-		}
-		$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->get();
+		foreach ($upers as $uper) {
+			$uper = (array)$uper;
+			$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->where('group_tariff_id',$uper['group_tariff_id'])->get();
 
-		$datenow    = Carbon::now()->format('Y-m-d');
-		$branch_code = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID',$uper['branch_id'])->get();
-		$branch_code = $branch_code[0]->branch_code;
-		$headU = new TxHdrUper;
-		// $headU->uper_no // dari triger
-		$headU->uper_org_id = $uper['branch_org_id'];
-		$headU->uper_cust_id = $uper['customer_id'];
-		$headU->uper_cust_name = $uper['alt_name'];
-		$headU->uper_cust_npwp = $uper['npwp'];
-		$headU->uper_cust_address = $uper['address'];
-		$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
-		$headU->uper_amount = $uper['uper_total'];
-		$headU->uper_currency_code = $uper['currency'];
-		$headU->uper_status = 'P'; // blm fix
-		$headU->uper_context = 'BRG'; // blm fix
-		$headU->uper_sub_context = 'BRG03'; // blm fix
-		$headU->uper_terminal_code = $find[$config['head_terminal_code']];
-		$headU->uper_branch_id = $uper['branch_id'];
-		$headU->uper_branch_code = $branch_code; // kemungkinan ditambah
-		$headU->uper_vessel_name = $find[$config['head_vessel_name']];
-		$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
-		$headU->uper_trade_type = $uper['trade_type'];
-		$headU->uper_req_no = $uper['booking_number'];
-		$headU->uper_ppn = $uper['ppn'];
-		// $headU->uper_paid // ? pasti null
-		// $headU->uper_paid_date // ? pasti null
-		$headU->uper_percent = $uper['uper_percent'];
-		$headU->uper_dpp = $uper['dpp'];
-		if ($config['head_pbm_id'] != null) {
-			$headU->uper_pbm_id = $find[$config['head_pbm_id']];
-		}
-		if ($config['head_pbm_name'] != null) {
-			$headU->uper_pbm_name = $find[$config['head_pbm_name']];
-		}
-		if ($config['head_shipping_agent_id'] != null) {
-			$headU->uper_shipping_agent_id = $find[$config['head_shipping_agent_id']];
-		}
-		if ($config['head_shipping_agent_name'] != null) {
-			$headU->uper_shipping_agent_name = $find[$config['head_shipping_agent_name']];
-		}
-		$headU->uper_req_date = $find[$config['head_date']];
-		if ($config['head_terminal_name'] != null) {
-			$headU->uper_terminal_name = $find[$config['head_terminal_name']];
-		}
-		$headU->uper_nota_id = $uper['nota_id'];
-		$headU->save();
+			$datenow    = Carbon::now()->format('Y-m-d');
+			$branch_code = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID',$uper['branch_id'])->get();
+			$branch_code = $branch_code[0]->branch_code;
+			$headU = new TxHdrUper;
+			// $headU->uper_no // dari triger
+			$headU->uper_org_id = $uper['branch_org_id'];
+			$headU->uper_cust_id = $uper['customer_id'];
+			$headU->uper_cust_name = $uper['alt_name'];
+			$headU->uper_cust_npwp = $uper['npwp'];
+			$headU->uper_cust_address = $uper['address'];
+			$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+			$headU->uper_amount = $uper['uper_total'];
+			$headU->uper_currency_code = $uper['currency'];
+			$headU->uper_status = 'P'; // blm fix
+			$headU->uper_context = 'BRG'; // blm fix
+			$headU->uper_sub_context = 'BRG03'; // blm fix
+			$headU->uper_terminal_code = $find[$config['head_terminal_code']];
+			$headU->uper_branch_id = $uper['branch_id'];
+			$headU->uper_branch_code = $branch_code; // kemungkinan ditambah
+			$headU->uper_vessel_name = $find[$config['head_vessel_name']];
+			$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
+			$headU->uper_trade_type = $uper['trade_type'];
+			$headU->uper_req_no = $uper['booking_number'];
+			$headU->uper_ppn = $uper['ppn'];
+			// $headU->uper_paid // ? pasti null
+			// $headU->uper_paid_date // ? pasti null
+			$headU->uper_percent = $uper['uper_percent'];
+			$headU->uper_dpp = $uper['dpp'];
+			if ($config['head_pbm_id'] != null) {
+				$headU->uper_pbm_id = $find[$config['head_pbm_id']];
+			}
+			if ($config['head_pbm_name'] != null) {
+				$headU->uper_pbm_name = $find[$config['head_pbm_name']];
+			}
+			if ($config['head_shipping_agent_id'] != null) {
+				$headU->uper_shipping_agent_id = $find[$config['head_shipping_agent_id']];
+			}
+			if ($config['head_shipping_agent_name'] != null) {
+				$headU->uper_shipping_agent_name = $find[$config['head_shipping_agent_name']];
+			}
+			$headU->uper_req_date = $find[$config['head_date']];
+			if ($config['head_terminal_name'] != null) {
+				$headU->uper_terminal_name = $find[$config['head_terminal_name']];
+			}
+			$headU->uper_nota_id = $uper['nota_id'];
+			$headU->save();
 
-		foreach ($uperD as $list) {
-			$list = (array)$list;
-			$set_data = [
-				"uper_hdr_id" => $headU->uper_id,
-				// "dtl_line" => , // perlu konfimasi
-				// "dtl_line_desc" => , // perlu konfimasi
-				// "dtl_line_context" => , // perlu konfimasi
-				"dtl_service_type" => $list['group_tariff_name'],
-				"dtl_amount" => $list['uper'], // blm fix
-				"dtl_ppn" => $list["ppn"],
-				// "dtl_masa1" => , // cooming soon
-				// "dtl_masa12" => , // cooming soon
-				// "dtl_masa2" => , // cooming soon
-				"dtl_tariff" => $list["tariff"],
-				"dtl_package" => $list["package_name"], // cooming soon
-				"dtl_qty" => $list["qty"],
-				"dtl_unit" => $list["unit_id"],
-				"dtl_group_tariff_id" => $list["group_tariff_id"],
-				"dtl_group_tariff_name" => $list["group_tariff_name"],
-				"dtl_bl" => $list["no_bl"],
-				"dtl_dpp" => $list["tariff_cal"],
-				"dtl_commodity" => $list["commodity_name"],
-				"dtl_equipment" => $list["equipment_name"],
-				"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
-			];
-			DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
+			foreach ($uperD as $list) {
+				$list = (array)$list;
+				$set_data = [
+					"uper_hdr_id" => $headU->uper_id,
+					// "dtl_line" => , // perlu konfimasi
+					// "dtl_line_desc" => , // perlu konfimasi
+					// "dtl_line_context" => , // perlu konfimasi
+					"dtl_service_type" => $list['group_tariff_name'],
+					"dtl_amount" => $list['uper'], // blm fix
+					"dtl_ppn" => $list["ppn"],
+					// "dtl_masa1" => , // cooming soon
+					// "dtl_masa12" => , // cooming soon
+					// "dtl_masa2" => , // cooming soon
+					"dtl_tariff" => $list["tariff"],
+					"dtl_package" => $list["package_name"], // cooming soon
+					"dtl_qty" => $list["qty"],
+					"dtl_unit" => $list["unit_id"],
+					"dtl_group_tariff_id" => $list["group_tariff_id"],
+					"dtl_group_tariff_name" => $list["group_tariff_name"],
+					"dtl_bl" => $list["no_bl"],
+					"dtl_dpp" => $list["tariff_cal"],
+					"dtl_commodity" => $list["commodity_name"],
+					"dtl_equipment" => $list["equipment_name"],
+					"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+				];
+				DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
+			}
 		}
 
 		DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([

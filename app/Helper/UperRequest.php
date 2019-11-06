@@ -36,8 +36,11 @@ class UperRequest{
     $pay->pay_note = $input['pay_note'];
     $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
     $pay->pay_type = $input['pay_type'];
+    $pay->pay_dest_bank_code = $input['pay_dest_bank_code'];
+    $pay->pay_dest_bank_name = $input['pay_dest_bank_name'];
+    $pay->pay_dest_account_no = $input['pay_dest_account_no'];
+    $pay->pay_dest_account_name = $input['pay_dest_account_name'];
     $pay->save();
-
     $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
     $response   = FileUpload::upload_file($input['pay_file'], $directory);
     if ($response['response'] == true) {
