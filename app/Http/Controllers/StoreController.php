@@ -15,6 +15,7 @@ use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
+use App\Helper\RealisasiHelper;
 
 class StoreController extends Controller
 {
@@ -41,8 +42,24 @@ class StoreController extends Controller
       if (isset($input['encode']) and $input['encode'] == 'true') {
         return response()->json(['response' => json_encode($response)]);
       }else{
-        return response()->json($response);
+        if (isset($response['Success']) and $response['Success'] == false) {
+          return response()->json($response, 401);
+        }else{
+          return response()->json($response);
+        }
       }
+    }
+
+    function confirmRealBM($input){
+      $find = DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])
+        ->leftJoin('TX_HDR_BM', 'TX_HDR_REALISASI.real_req_no', '=', 'TX_HDR_BM.bm_no')->get();
+      if (empty($find)) {
+        return ['Success' => false, 'result' => 'Fail, not found data!'];
+      }
+    }
+
+    function confirmRealBPRP($input){
+        return RealisasiHelper::confirmRealBPRP($input);
     }
 
     function truckRegistration($input){
