@@ -51,15 +51,11 @@ class StoreController extends Controller
     }
 
     function confirmRealBM($input){
-      $find = DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])
-        ->leftJoin('TX_HDR_BM', 'TX_HDR_REALISASI.real_req_no', '=', 'TX_HDR_BM.bm_no')->get();
-      if (empty($find)) {
-        return ['Success' => false, 'result' => 'Fail, not found data!'];
-      }
+      return RealisasiHelper::confirmRealBM($input);
     }
 
     function confirmRealBPRP($input){
-        return RealisasiHelper::confirmRealBPRP($input);
+      return RealisasiHelper::confirmRealBPRP($input);
     }
 
     function truckRegistration($input){

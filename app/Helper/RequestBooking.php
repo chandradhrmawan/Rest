@@ -61,7 +61,7 @@ class RequestBooking{
 					$newD['DTL_DATE_IN'] = 'NULL';
 				}
 
-				if ($config['head_tab_detil_date_out_old'] != null and ($input['table'] == 'TX_HDR_DEL' and $find['del_extend_status'] != 'N') ) {
+				if ($config['head_tab_detil_date_out_old'] != null and ($input['table'] == 'TX_HDR_DEL' and $find['del_ext_status'] != 'N') ) {
 					$findEx = DB::connection('omcargo')->select(DB::raw("
 						SELECT
 						X.DTL_OUT AS date_out_old,
