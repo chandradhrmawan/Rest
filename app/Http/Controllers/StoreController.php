@@ -645,8 +645,5 @@ class StoreController extends Controller
       return $e->getResponse();
     }
   }
-
-  function test($input) {
-
-  }
+  
 }
