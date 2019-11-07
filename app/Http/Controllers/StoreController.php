@@ -50,6 +50,10 @@ class StoreController extends Controller
       }
     }
 
+    function rejectedProformaNota($input){
+      return RealisasiHelper::rejectedProformaNota($input);
+    }
+
     function confirmRealBM($input){
       return RealisasiHelper::confirmRealBM($input);
     }

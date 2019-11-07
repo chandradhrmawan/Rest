@@ -9,6 +9,7 @@ use App\Models\OmCargo\TxPayment;
 use Carbon\Carbon;
 use App\Helper\ConnectedExternalApps;
 use App\Helper\RequestBooking;
+use App\Models\OmCargo\TxHdrNota;
 
 class UperRequest{
 
@@ -108,13 +109,21 @@ class UperRequest{
     }
 
 	public static function storeUperPayment($input){
-        $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
-        if (empty($uper)) {
-          return ["Success"=>false, "result" => "Fail, uper not found"];
+        if ($input['pay_type'] == 1) {
+            $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
+            if (empty($uper)) {
+              return ["Success"=>false, "result" => "Fail, uper not found"];
+            }
+            if ($uper->uper_paid == 'Y') {
+              return ["Success"=>false, "result" => "Fail, uper already paid"];
+            }
+        } else if ($input['pay_type'] == 2) {
+            $nota = TxHdrNota::where('nota_no',$input['pay_no'])->first();
+            if (empty($nota)) {
+              return ["Success"=>false, "result" => "Fail, uper not found"];
+            }
         }
-        if ($uper->uper_paid == 'Y') {
-          return ["Success"=>false, "result" => "Fail, uper already paid"];
-        }
+
         $datenow    = Carbon::now()->format('Y-m-d');
         $pay = new TxPayment;
         $pay->pay_no = $input['pay_no'];
@@ -146,13 +155,16 @@ class UperRequest{
           ]);
         }
 
-        static::updateUperStatus([
-          'uper_id' => $uper->uper_id,
-          'uper_req_no' => $uper->uper_req_no,
-          'uper_paid' => 'Y'
-        ]);
-
-        return ["result" => "Success, paid uper"];
+        if ($input['pay_type'] == 1){
+            static::updateUperStatus([
+              'uper_id' => $uper->uper_id,
+              'uper_req_no' => $uper->uper_req_no,
+              'uper_paid' => 'Y'
+            ]);
+            return ["result" => "Success, paid uper"];
+        } else if ($input['pay_type'] == 2) {
+            return ["result" => "Success, paid nota"];
+        }
 	}
 
     private static function updateUperStatus($input){

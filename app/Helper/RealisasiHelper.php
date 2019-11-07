@@ -296,4 +296,15 @@ class RealisasiHelper{
     ]);
     return ['result' => 'Success, Confirm BPRP Data!'];
   }
+
+  public static function rejectedProformaNota($input){
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_no',$input['req_no'])->udpate([
+      "bprp_status"=>1
+    ]);
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('real_no',$input['req_no'])->udpate([
+      "real_status"=>1
+    ]);
+    return ['result' => 'Success, rejected proforma!'];
+  }
+
 }
