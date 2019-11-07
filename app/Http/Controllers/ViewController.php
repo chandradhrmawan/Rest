@@ -8,6 +8,7 @@ use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
+use App\Helper\UperRequest;
 use Dompdf\Dompdf;
 
 class ViewController extends Controller
@@ -44,6 +45,10 @@ class ViewController extends Controller
       $table  = $input["table"];
       $data   = \DB::connection($input["db"])->table($table)->get();
       return $data;
+    }
+
+    function viewTempUper($input, $request) {
+        return UperRequest::viewTempUper($input);
     }
 
     // BillingEngine
