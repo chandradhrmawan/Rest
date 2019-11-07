@@ -80,60 +80,69 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT * FROM V_PAY_SPLIT a JOIN TX_TEMP_TARIFF_SPLIT b ON a.temp_hdr_id=b.temp_hdr_id and a.customer_id=b.customer_id WHERE a.booking_number= '".$find->bprp_no."'";
+    $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->real_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
-      $headN = new TxHdrNota;
-      // $headN->nota_id = $getH->, // dari triger
-      // $headN->nota_no = $getH->, // dari triger
-      $headN->nota_org_id = $getH->branch_org_id;
-      $headN->nota_cust_id = $getH->customer_id;
-      $headN->nota_cust_name = $getH->alt_name;
-      $headN->nota_cust_npwp = $getH->npwp;
-      $headN->nota_cust_address = $getH->address;
-      $headN->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')"); // ?
-      $headN->nota_amount = $getH->total; // ?
-      $headN->nota_currency_code = $getH->currency;
-      // $headN->nota_status = $getH->; // ?
-      $headN->nota_context = 'BRG'; // sementara sampai ada info lebih lanjut
-      $headN->nota_sub_context = 'BRG03'; // sementara sampai ada info lebih lanjut
-      $headN->nota_terminal = $find->bm_terminal_name;
-      $headN->nota_branch_id = $getH->branch_id;
-      $headN->nota_vessel_name = $find->bm_vessel_name;
-      // $headN->nota_faktur_no = $getH->; // ?
-      $headN->nota_trade_type = $getH->trade_type;
-      $headN->nota_req_no = $find->bm_no;
-      $headN->nota_ppn = $getH->ppn;
-      // $headN->nota_paid = $getH->; // pasti null
-      // $headN->nota_paid_date = $getH->; // pasti null
-      // $headN->rest_payment = $getH->; // pasti null
-      $headN->nota_dpp = $getH->dpp;
-      $headN->nota_branch_code = $getH->branch_code;
-      $headN->save();
+      
+      $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
+      $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+      
+      // store head
+        $headN = new TxHdrNota;
+        // $headN->nota_id = $getH->, // dari triger
+        // $headN->nota_no = $getH->, // dari triger
+        $headN->nota_org_id = $getH->branch_org_id;
+        $headN->nota_cust_id = $getH->customer_id;
+        $headN->nota_cust_name = $getH->alt_name;
+        $headN->nota_cust_npwp = $getH->npwp;
+        $headN->nota_cust_address = $getH->address;
+        $headN->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')"); // ?
+        $headN->nota_amount = $getH->total; // ?
+        $headN->nota_currency_code = $getH->currency;
+        // $headN->nota_status = $getH->; // ?
+        $headN->nota_context = 'BRG'; // sementara sampai ada info lebih lanjut
+        $headN->nota_sub_context = 'BRG03'; // sementara sampai ada info lebih lanjut
+        $headN->nota_terminal = $find->bm_terminal_name;
+        $headN->nota_branch_id = $getH->branch_id;
+        $headN->nota_vessel_name = $find->bm_vessel_name;
+        // $headN->nota_faktur_no = $getH->; // ?
+        $headN->nota_trade_type = $getH->trade_type;
+        $headN->nota_req_no = $find->bm_no;
+        $headN->nota_ppn = $getH->ppn;
+        // $headN->nota_paid = $getH->; // pasti null
+        // $headN->nota_paid_date = $getH->; // pasti null
+        // $headN->rest_payment = $getH->; // pasti null
+        $headN->nota_dpp = $getH->dpp;
+        $headN->nota_branch_code = $getH->branch_code;
+        $headN->save();
+      // store head
 
-      $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$getH->group_tariff_id)->get();
-      $countLine = 0;
-      foreach ($getD as $list) {
-        $countLine++;
-        DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
-          // "nota_dtl_id" => $list->, // dari triger
-          "nota_hdr_id" => $headN->nota_id,
-          "dtl_line" => $countLine,
-          "dtl_line_desc" => $list->memoline,
-          // "dtl_line_context" => $list->, // ?
-          "dtl_service_type" => $list->group_tariff_name,
-          "dtl_amout" => $list->total,
-          "dtl_ppn" => $list->ppn,
-          // "dtl_masa1" => $list->, // ?
-          // "dtl_masa12" => $list->, // ?
-          // "dtl_masa2" => $list->, // ?
-          "dtl_tariff" => $list->tariff,
-          "dtl_package" => $list->package_name,
-          "dtl_qty" => $list->qty,
-          "dtl_unit" => $list->unit_id,
-          "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
-        ]);
+      foreach ($group_tariff as $grpTrf){
+        $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf->group_tariff_id)->get();
+        $countLine = 0;
+        foreach ($getD as $list) {
+          $countLine++;
+          DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
+            // "nota_dtl_id" => $list->, // dari triger
+            "nota_hdr_id" => $headN->nota_id,
+            "dtl_line" => $countLine,
+            "dtl_line_desc" => $list->memoline,
+            // "dtl_line_context" => $list->, // ?
+            "dtl_service_type" => $list->group_tariff_name,
+            "dtl_amout" => $list->total,
+            "dtl_ppn" => $list->ppn,
+            // "dtl_masa1" => $list->, // ?
+            // "dtl_masa12" => $list->, // ?
+            // "dtl_masa2" => $list->, // ?
+            "dtl_tariff" => $list->tariff,
+            "dtl_package" => $list->package_name,
+            "dtl_qty" => $list->qty,
+            "dtl_unit" => $list->unit_id,
+            "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+          ]);
+        }
       }
+
     }
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->udpate([
       "real_status" => 2
@@ -213,59 +222,66 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT * FROM V_PAY_SPLIT a JOIN TX_TEMP_TARIFF_SPLIT b ON a.temp_hdr_id=b.temp_hdr_id and a.customer_id=b.customer_id WHERE a.booking_number= '".$find->bprp_no."'";
+    $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->bprp_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
-      $headN = new TxHdrNota;
-      // $headN->nota_id = $getH->, // dari triger
-      // $headN->nota_no = $getH->, // dari triger
-      $headN->nota_org_id = $getH->branch_org_id;
-      $headN->nota_cust_id = $getH->customer_id;
-      $headN->nota_cust_name = $getH->alt_name;
-      $headN->nota_cust_npwp = $getH->npwp;
-      $headN->nota_cust_address = $getH->address;
-      $headN->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')"); // ?
-      $headN->nota_amount = $getH->total; // ?
-      $headN->nota_currency_code = $getH->currency;
-      // $headN->nota_status = $getH->; // ?
-      $headN->nota_context = 'BRG'; // sementara sampai ada info lebih lanjut
-      $headN->nota_sub_context = 'BRG03'; // sementara sampai ada info lebih lanjut
-      $headN->nota_terminal = $find->bprp_terminal_id;
-      $headN->nota_branch_id = $getH->branch_id;
-      $headN->nota_vessel_name = $find->bprp_vessel_name;
-      // $headN->nota_faktur_no = $getH->; // ?
-      $headN->nota_trade_type = $getH->trade_type;
-      $headN->nota_req_no = $find->bprp_no;
-      $headN->nota_ppn = $getH->ppn;
-      // $headN->nota_paid = $getH->; // pasti null
-      // $headN->nota_paid_date = $getH->; // pasti null
-      // $headN->rest_payment = $getH->; // pasti null
-      $headN->nota_dpp = $getH->dpp;
-      $headN->nota_branch_code = $getH->branch_code;
-      $headN->save();
+      // store head
+        $headN = new TxHdrNota;
+        // $headN->nota_id = $getH->, // dari triger
+        // $headN->nota_no = $getH->, // dari triger
+        $headN->nota_org_id = $getH->branch_org_id;
+        $headN->nota_cust_id = $getH->customer_id;
+        $headN->nota_cust_name = $getH->alt_name;
+        $headN->nota_cust_npwp = $getH->npwp;
+        $headN->nota_cust_address = $getH->address;
+        $headN->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')"); // ?
+        $headN->nota_amount = $getH->total; // ?
+        $headN->nota_currency_code = $getH->currency;
+        // $headN->nota_status = $getH->; // ?
+        $headN->nota_context = 'BRG'; // sementara sampai ada info lebih lanjut
+        $headN->nota_sub_context = 'BRG03'; // sementara sampai ada info lebih lanjut
+        $headN->nota_terminal = $find->bprp_terminal_id;
+        $headN->nota_branch_id = $getH->branch_id;
+        $headN->nota_vessel_name = $find->bprp_vessel_name;
+        // $headN->nota_faktur_no = $getH->; // ?
+        $headN->nota_trade_type = $getH->trade_type;
+        $headN->nota_req_no = $find->bprp_no;
+        $headN->nota_ppn = $getH->ppn;
+        // $headN->nota_paid = $getH->; // pasti null
+        // $headN->nota_paid_date = $getH->; // pasti null
+        // $headN->rest_payment = $getH->; // pasti null
+        $headN->nota_dpp = $getH->dpp;
+        $headN->nota_branch_code = $getH->branch_code;
+        $headN->save();
+      // store head
 
-      $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$getH->group_tariff_id)->get();
-      $countLine = 0;
-      foreach ($getD as $list) {
-        $countLine++;
-        DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
-          // "nota_dtl_id" => $list->, // dari triger
-          "nota_hdr_id" => $headN->nota_id,
-          "dtl_line" => $countLine,
-          "dtl_line_desc" => $list->memoline,
-          // "dtl_line_context" => $list->, // ?
-          "dtl_service_type" => $list->group_tariff_name,
-          "dtl_amout" => $list->total,
-          "dtl_ppn" => $list->ppn,
-          // "dtl_masa1" => $list->, // ?
-          // "dtl_masa12" => $list->, // ?
-          // "dtl_masa2" => $list->, // ?
-          "dtl_tariff" => $list->tariff,
-          "dtl_package" => $list->package_name,
-          "dtl_qty" => $list->qty,
-          "dtl_unit" => $list->unit_id,
-          "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
-        ]);
+      $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
+      $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+
+      foreach ($group_tariff as $grpTrf){
+        $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf->group_tariff_id)->get();
+        $countLine = 0;
+        foreach ($getD as $list) {
+          $countLine++;
+          DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
+            // "nota_dtl_id" => $list->, // dari triger
+            "nota_hdr_id" => $headN->nota_id,
+            "dtl_line" => $countLine,
+            "dtl_line_desc" => $list->memoline,
+            // "dtl_line_context" => $list->, // ?
+            "dtl_service_type" => $list->group_tariff_name,
+            "dtl_amout" => $list->total,
+            "dtl_ppn" => $list->ppn,
+            // "dtl_masa1" => $list->, // ?
+            // "dtl_masa12" => $list->, // ?
+            // "dtl_masa2" => $list->, // ?
+            "dtl_tariff" => $list->tariff,
+            "dtl_package" => $list->package_name,
+            "dtl_qty" => $list->qty,
+            "dtl_unit" => $list->unit_id,
+            "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+          ]);
+        }
       }
     }
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->udpate([

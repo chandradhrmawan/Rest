@@ -383,14 +383,14 @@ class BillingEngine{
 	    	$setD = '';
 	    	foreach ($detil as $list) {
 	    		$countD++;
-          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+          if ($list['DTL_BL'] == NULL or $list['DTL_BL'] == 'NULL') {
             $setD .= ' detail.DTL_BL := '.$list['DTL_BL'].';';
           }else{
-            $setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
+            $setD .= ' detail.DTL_BL := \''.$list['DTL_BL'].'\';';
           }
 	    		$setD .= ' detail.DTL_PKG_ID := '.$list['DTL_PKG_ID'].';';
 	    		$setD .= ' detail.DTL_CMDTY_ID := '.$list['DTL_CMDTY_ID'].';';
-          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+          if ($list['DTL_CHARACTER'] == NULL or $list['DTL_CHARACTER'] == 'NULL') {
             $setD .= ' detail.DTL_CHARACTER := '.$list['DTL_CHARACTER'].';';
           }else{
             $setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
