@@ -28,11 +28,12 @@ class UperRequest{
             $resultD = [];
             foreach ($group_tariff as $grpTrf){
                 $grpTrf = (array)$grpTrf;
-                $uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+                $uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
                 $countLine = 0;
                 foreach ($uperD as $list){
+                    $list = (array)$list;
                     $set_data = [
-                        "uper_hdr_id" => $headU->uper_id,
+                        // "uper_hdr_id" => $headU->uper_id,
                         "dtl_line" => $countLine,
                         "dtl_line_desc" => $list['memoline'],
                         // "dtl_line_context" => , // perlu konfimasi
@@ -51,8 +52,7 @@ class UperRequest{
                         "dtl_bl" => $list["no_bl"],
                         "dtl_dpp" => $list["tariff_cal"],
                         "dtl_commodity" => $list["commodity_name"],
-                        "dtl_equipment" => $list["equipment_name"],
-                        "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+                        "dtl_equipment" => $list["equipment_name"]
                     ];
                     $resultD[] = $set_data;
                 }
@@ -81,7 +81,7 @@ class UperRequest{
                   'uper_percent' => $getH->uper_percent,
                   'uper_dpp' => $getH->dpp,
                   'uper_nota_id' => $getH->nota_id,
-                  'uper_req_date' => $getH->head_date
+                  'uper_req_date' =>  $find[$config['head_date']]
                 ];
                 if ($config['head_pbm_id'] != null) {
                     $head['uper_pbm_id'] = $find[$config['head_pbm_id']];
