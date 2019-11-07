@@ -2,6 +2,7 @@
 
 namespace App\Helper;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\OmCargo\TxHdrUper;
 use App\Models\OmCargo\TxPayment;
