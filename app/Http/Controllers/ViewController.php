@@ -65,6 +65,10 @@ class ViewController extends Controller
     function permissionGet($input, $request) {
       return UserAndRoleManagemnt::permissionGet($input);
     }
+
+    public function menuTree(Request $request, $roll_id) {
+      return UserAndRoleManagemnt::menuTree($roll_id);
+    }
     // UserAndRoleManagemnt
 
     function printUper($id) {

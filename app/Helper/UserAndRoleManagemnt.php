@@ -82,7 +82,7 @@ class UserAndRoleManagemnt{
       return static::permission($role);
   }
 
-  private static function role_data($role_id, $type){
+  private static function role_data($role_id, $type = null){
     $role = DB::connection('omuster')->table('TR_ROLE')->where('ROLE_ID', $role_id)->first();
     if ($type == 'role') {
       return $role;
@@ -179,6 +179,94 @@ class UserAndRoleManagemnt{
       "expanded" => true,
       "text" => "NPK BILLING",
       "iconCls" => "x-fa fa-desktop",
+      "children" => $estjs
+    ];
+  }
+
+  public static function menuTree($roll_id){
+    $menu_id_allow = DB::connection('omuster')->table('TS_ROLE_MENU')->where('ROLE_ID', $roll_id)->orderBy('menu_id', 'asc')->pluck('menu_id');
+
+    $role = static::role_data($roll_id);
+    $menu = TmMenu::with(['menu_has_child' => function($query) use ($menu_id_allow) {
+      return $query->whereIn('menu_id',$menu_id_allow)->orderBy('menu_order', 'asc');
+    }])->whereNull('menu_parent_id')->where('menu_is_active', 1)->where('menu_service', $role['role_service'])->whereIn('menu_id',$menu_id_allow)->orderBy('menu_m_order', 'asc')->get();
+
+    $estjs = [];
+    foreach ($menu as $list) {
+      if (count($list['menu_has_child']) > 0) {
+        $addAg = [];
+        foreach ($list['menu_has_child'] as $listSc) {
+          if ($listSc->menu_is_active == 1) {
+            $addAgAg = [];
+            $finds = TmMenu::where('menu_parent_id', $listSc->menu_id)->where('menu_is_active', 1)->where('menu_service', $role['role_service'])->whereIn('menu_id',$menu_id_allow)->orderBy('menu_order', 'asc')->get();
+            if (count($finds) == 0) {
+              $add_th = [
+                "leaf" => true
+              ];
+            }else{
+              $add_th = [
+                "expanded" => false,
+                "selectable" =>false
+              ];
+              foreach ($finds as $find) {
+                $newSetAg = [
+                  "leaf" => true,
+                  "text" => $find->menu_name,
+                  "iconCls" => $find->menu_icon == null ? "" : $find->menu_icon,
+                  "viewType" => $find->menu_link
+                ];
+                $addAgAg[] = $newSetAg;
+              }
+            }
+            $newSet = [
+              "text" => $listSc->menu_name,
+              "iconCls" => $listSc->menu_icon == null ? "" : $listSc->menu_icon,
+              "viewType" => $listSc->menu_link
+            ];
+
+            foreach ($add_th as $key => $value) {
+              $newSet[$key] = $value;
+            }
+
+            if (count($addAgAg) > 0) {
+              $newSet['children'] = $addAgAg;
+            }
+            $addAg[] = $newSet;
+          }
+        }
+        $add_sc = [
+          "expanded" => false,
+          "selectable" =>false
+        ];
+      }else{
+        $addAg = [];
+        $add_sc = [
+          "leaf" => true,
+        ];
+      }
+
+      $add = [
+        "text" => $list->menu_name,
+        "iconCls" => $list->menu_icon == null ? "" : $list->menu_icon,
+        "viewType" => $list->menu_link
+      ];
+
+      if ($list->menu_name == 'Dashboard') {
+        $add['routeId'] = 'dashboard';
+      }
+
+      foreach ($add_sc as $key => $value) {
+        $add[$key] = $value;
+      }
+
+      if (count($addAg) > 0) {
+        $add['children'] = $addAg;
+      }
+
+      $estjs[] = $add;
+    }
+
+    return [
       "children" => $estjs
     ];
   }
