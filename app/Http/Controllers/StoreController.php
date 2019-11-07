@@ -645,5 +645,153 @@ class StoreController extends Controller
       return $e->getResponse();
     }
   }
-  
+
+  function retrievePayment($input) {
+    // DB::connection('omcargo')->table('payment')->insert($input["data"]);
+    return ["Result"=>"Success"];
+  }
+
+  function sendPayment($input) {
+    // DB::connection('omcargo')->table('payment')->insert($input["data"]);
+    return $input["data"];
+  }
+
+  // Tar Lanjutin
+  function test($input) {
+    // $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putInvoice";
+    $string_start= '
+        {
+         "arRequestDoc":{
+            "esbHeader":{
+               "internalId":"",
+               "externalId":"EDI-2910201921570203666",
+               "timestamp":"2019-10-29 21:57:020.36665400",
+               "responseTimestamp":"",
+               "responseCode":"",
+               "responseMessage":""
+            },
+            "esbBody":[{';
+
+    $string_end = '
+        }],
+        "esbSecurity":{
+         "orgId":"1827",
+         "batchSourceId":"",
+         "lastUpdateLogin":"",
+         "userId":"",
+         "respId":"",
+         "ledgerId":"",
+         "respApplId":"",
+         "batchSourceName":""
+                }
+             }
+          }';
+
+       $header      = json_decode(json_encode(DB::connection('omcargo')->table("TX_HDR_BM")->where('BM_ID', '=', $input["request"])->get()), TRUE);
+       $str_header  = '
+          "billerRequestId":"'.$header[0]['NOTA_NO'].'",
+          "orgId":"'.$header[0]['NOTA_ORG_ID'].'",
+          "trxNumber":"'.$header[0]['NOTA_NO'].'",
+          "trxNumberOrig":"",
+          "trxNumberPrev":"",
+          "trxTaxNumber":"",
+          "trxDate":"'.$header[0]['NOTA_DATE'].'",
+          "trxClass":"INV",
+          "trxTypeId":"-1",
+          "paymentReferenceNumber":"",
+          "referenceNumber":"",
+          "currencyCode":"'.$header[0]['NOTA_CURRENCY_CODE'].'",
+          "currencyType":"",
+          "currencyRate":"0",
+          "currencyDate":null,
+          "amount":"'.$header[0]['NOTA_AMOUNT'].'",
+          "customerNumber":"'.$header[0]['NOTA_CUST_ID'].'",
+          "customerClass":"",
+          "billToCustomerId":"-1",
+          "billToSiteUseId":"-1",
+          "termId":null,
+          "status":"P",
+          "headerContext":"BRG",
+          "headerSubContext":"BRG00",
+          "startDate":null,
+          "endDate":null,
+          "terminal":"'.$header[0]['NOTA_TERMINAL'].'",
+          "vesselName":"'.$header[0]['NOTA_VESSEL_NAME'].'",
+          "branchCode":"'.$header[0]['NOTA_BRANCH_CODE'].'",
+          "errorMessage":"",
+          "apiMessage":"",
+          "createdBy":"-1",
+          "creationDate":"2019-10-15 22:15:08",
+          "lastUpdatedBy":"-1",
+          "lastUpdateDate":"2019-10-15 22:15:08",
+          "lastUpdateLogin":"-1",
+          "customerTrxIdOut":null,
+          "processFlag":"",
+          "attribute1":"PTKM00",
+          "attribute2":"",
+          "attribute3":"",
+          "attribute4":"",
+          "attribute5":"",
+          "attribute6":"",
+          "attribute7":"",
+          "attribute8":"",
+          "attribute9":"",
+          "attribute10":"",
+          "attribute11":"",
+          "attribute12":"",
+          "attribute13":"",
+          "attribute14":"",
+          "attribute15":"",
+          "interfaceHeaderAttribute1":null,
+          "interfaceHeaderAttribute2":"",
+          "interfaceHeaderAttribute3":"MUAT/EXPORT",
+          "interfaceHeaderAttribute4":"SINDO EAGLE",
+          "interfaceHeaderAttribute5":"11/12",
+          "interfaceHeaderAttribute6":"15-OCT-19",
+          "interfaceHeaderAttribute7":"",
+          "interfaceHeaderAttribute8":"",
+          "interfaceHeaderAttribute9":"",
+          "interfaceHeaderAttribute10":"false",
+          "interfaceHeaderAttribute11":"",
+          "interfaceHeaderAttribute12":"",
+          "interfaceHeaderAttribute13":"",
+          "interfaceHeaderAttribute14":"",
+          "interfaceHeaderAttribute15":"",
+          "customerAddress":"'.$header[0]['NOTA_CUST_ADDRESS'].'",
+          "customerName":"'.$header[0]['NOTA_CUST_NAME'].'",
+          "sourceSystem":"ITOSJBI_NBM",
+          "arStatus":"N",
+          "sourceInvoice":"ITOSJBI_NBM",
+          "arMessage":"",
+          "customerNPWP":"'.$header[0]['NOTA_CUST_NPWP'].'",
+          "perKunjunganFrom":null,
+          "perKunjunganTo":null,
+          "jenisPerdagangan":"",
+          "docNum":"",
+          "statusLunas":"Y",
+          "tglPelunasan":"2019-10-15",
+          "amountTerbilang":"",
+          "ppnDipungutSendiri":"",
+          "ppnDipungutPemungut":"",
+          "ppnTidakDipungut":"",
+          "ppnDibebaskan":"",
+          "uangJaminan":"",
+          "piutang":"",
+          "sourceInvoiceType":"ITOS",
+          "branchAccount":"100",
+          "statusCetak":"",
+          "statusKirimEmail":"",
+          "amountDasarPenghasilan":"1390500",
+          "amountMaterai":null,
+          "ppn10Persen":"139050",
+          "statusKoreksi":"",
+          "tanggalKoreksi":null,
+          "keteranganKoreksi":""
+          ';
+    // $id_hdr      = $header[0]["bm_id"];
+    // $detail      =  DB::connection('omcargo')->table("TX_DTL_BM")->where('HDR_BM_ID', '=', $id_hdr)->get();
+    // $string_mid  = json_encode(["header"=>$header[0], "lines"=>$detail]);
+    // $string_json = $string_start.$string_mid.$string_end;
+    return $header[0]["bm_no"];
+  }
 }

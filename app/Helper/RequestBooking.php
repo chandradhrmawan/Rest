@@ -240,7 +240,7 @@ class RequestBooking{
 					$headU->uper_nota_id = $uper['nota_id'];
 					$headU->save();
 				// store head
-				
+
 				$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$uper['temp_hdr_id']."' AND CUSTOMER_ID = '".$uper['customer_id']."'";
 				$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
 
