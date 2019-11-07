@@ -6,6 +6,8 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Firebase\JWT\ExpiredException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
 use Laravel\Lumen\Routing\Controller as BaseController;
 class AuthController extends BaseController
 {
@@ -65,13 +67,16 @@ class AuthController extends BaseController
         }
         // Verify the password and generate the token
         if (Hash::check($this->request->input('USER_PASSWD'), $user["user_passwd"])) {
-            $cek    = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
-            $result = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+            $cek      = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
+            $header   = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+            $brnc_id  = json_decode(json_encode($header), TRUE);
+            $detail   = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID','=',$brnc_id['user_branch_id'])->get();
+
             // if ($cek["user_status"] == "1") {
             //   return response()->json(["message"=>"You Already Login", "data"=>$result]);
             // } else {
               $tes  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
-              return response()->json(["message"=>"Login Success", "data"=>$result]);
+              return response()->json(["message"=>"Login Success", "user"=>$brnc_id,"branch"=>$detail]);
             // }
         }
         // Bad Request response

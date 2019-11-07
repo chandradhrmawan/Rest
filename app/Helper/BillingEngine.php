@@ -401,7 +401,7 @@ class BillingEngine{
 	    		$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
 	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
           if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
-            $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].'\';';
+            $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].';';
           }else{
             $setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
           }
