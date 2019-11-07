@@ -214,6 +214,7 @@ class RequestBooking{
 					$headU->uper_vessel_name = $find[$config['head_vessel_name']];
 					$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
 					$headU->uper_trade_type = $uper['trade_type'];
+					$headU->uper_trade_name = $uper['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 					$headU->uper_req_no = $uper['booking_number'];
 					$headU->uper_ppn = $uper['ppn'];
 					// $headU->uper_paid // ? pasti null
@@ -288,7 +289,7 @@ class RequestBooking{
 		return ['result' => "Success, approved request!"];
     }
 
-    private static function config($input){
+    public static function config($input){
     	$requst_config = [
         	"TX_HDR_BM" => [
         		"head_nota_id" => "13",
