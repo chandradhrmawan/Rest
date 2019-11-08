@@ -260,6 +260,7 @@ class RequestBooking{
 							"dtl_service_type" => $list['group_tariff_name'],
 							"dtl_amount" => $list['uper'], // blm fix
 							"dtl_ppn" => $list["ppn"],
+							"dtl_masa" => $list["day_period"],
 							// "dtl_masa1" => , // cooming soon
 							// "dtl_masa12" => , // cooming soon
 							// "dtl_masa2" => , // cooming soon

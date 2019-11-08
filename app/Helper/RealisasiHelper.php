@@ -137,6 +137,7 @@ class RealisasiHelper{
             "dtl_service_type" => $list->group_tariff_name,
             "dtl_amout" => $list->total,
             "dtl_ppn" => $list->ppn,
+              "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
             // "dtl_masa12" => $list->, // ?
             // "dtl_masa2" => $list->, // ?
@@ -281,6 +282,7 @@ class RealisasiHelper{
             "dtl_service_type" => $list->group_tariff_name,
             "dtl_amout" => $list->total,
             "dtl_ppn" => $list->ppn,
+            "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
             // "dtl_masa12" => $list->, // ?
             // "dtl_masa2" => $list->, // ?
