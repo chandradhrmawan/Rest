@@ -146,6 +146,7 @@ class RealisasiHelper{
             "dtl_eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
+            "dtl_unit_name" => $list->unit_name,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
           ]);
         }
@@ -292,6 +293,7 @@ class RealisasiHelper{
             "dtl_eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
+            "dtl_unit_name" => $list->unit_name,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
           ]);
         }

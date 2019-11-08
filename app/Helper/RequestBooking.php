@@ -269,6 +269,7 @@ class RequestBooking{
 							"dtl_qty" => $list["qty"],
 							"dtl_eq_qty" => $list["eq_qty"],
 							"dtl_unit" => $list["unit_id"],
+							"dtl_unit_name" => $list["unit_name"],
 							"dtl_group_tariff_id" => $list["group_tariff_id"],
 							"dtl_group_tariff_name" => $list["group_tariff_name"],
 							"dtl_bl" => $list["no_bl"],
