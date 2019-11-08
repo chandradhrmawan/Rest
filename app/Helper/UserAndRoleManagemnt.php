@@ -266,15 +266,15 @@ class UserAndRoleManagemnt{
       $estjs[] = $add;
     }
 
-    // return [
-    //   "root" => [
-    //     "expanded" =>true,
-    //     "children" => $estjs
-    //   ]
-    // ];
     return [
+      "root" => [
+        "expanded" =>true,
         "children" => $estjs
+      ]
     ];
+    // return [
+    //     "children" => $estjs
+    // ];
   }
 
 }
