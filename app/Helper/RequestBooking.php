@@ -267,6 +267,7 @@ class RequestBooking{
 							"dtl_tariff" => $list["tariff"],
 							"dtl_package" => $list["package_name"],
 							"dtl_qty" => $list["qty"],
+							"eq_qty" => $list["eq_qty"],
 							"dtl_unit" => $list["unit_id"],
 							"dtl_group_tariff_id" => $list["group_tariff_id"],
 							"dtl_group_tariff_name" => $list["group_tariff_name"],

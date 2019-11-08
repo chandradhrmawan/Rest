@@ -137,12 +137,13 @@ class RealisasiHelper{
             "dtl_service_type" => $list->group_tariff_name,
             "dtl_amout" => $list->total,
             "dtl_ppn" => $list->ppn,
-              "dtl_masa" => $list->day_period,
+            "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
             // "dtl_masa12" => $list->, // ?
             // "dtl_masa2" => $list->, // ?
             "dtl_tariff" => $list->tariff,
             "dtl_package" => $list->package_name,
+            "eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
@@ -288,6 +289,7 @@ class RealisasiHelper{
             // "dtl_masa2" => $list->, // ?
             "dtl_tariff" => $list->tariff,
             "dtl_package" => $list->package_name,
+            "eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
