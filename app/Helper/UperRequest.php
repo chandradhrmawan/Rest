@@ -105,7 +105,7 @@ class UperRequest{
             $result[] = $head;
         }
 
-        return $result;
+        return [ "Success" => true, "result" => $result];
     }
 
 	public static function storePayment($input){

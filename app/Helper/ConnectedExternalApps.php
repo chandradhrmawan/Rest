@@ -325,7 +325,7 @@ class ConnectedExternalApps{
         echo $e->getResponse() . "\n";
       }
     }
-    return json_decode($res->getBody()->getContents());
+    return [json_decode($res->getBody()->getContents())];
   }
 
   public static function updateTid($input){
@@ -371,7 +371,7 @@ class ConnectedExternalApps{
         echo $e->getResponse() . "\n";
       }
     }
-    return json_decode($res->getBody()->getContents());
+    return [json_decode($res->getBody()->getContents())];
   }
 
   public static function createTCA($input){
