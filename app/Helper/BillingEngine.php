@@ -589,7 +589,44 @@ class BillingEngine{
 				return $tariffResp;
 			}
 
-			$getH = DB::connection('eng')->table('V_PAY_SPLIT')->where('booking_number',$head['P_BOOKING_NUMBER'])->get();
-			return $getH;
+			$getHS = DB::connection('eng')->table('V_PAY_SPLIT')->where('booking_number',$head['P_BOOKING_NUMBER'])->get();
+			foreach ($getHS as $getH){
+					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
+					$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+					$resultD = [];
+					foreach ($group_tariff as $grpTrf){
+							$grpTrf = (array)$grpTrf;
+							$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+							$countLine = 0;
+							foreach ($uperD as $list){
+									$list = (array)$list;
+									$set_data = [
+											// "uper_hdr_id" => $headU->uper_id,
+											"dtl_line" => $countLine,
+											"dtl_line_desc" => $list['memoline'],
+											// "dtl_line_context" => , // perlu konfimasi
+											"dtl_service_type" => $list['group_tariff_name'],
+											"dtl_amount" => $list['uper'], // blm fix
+											"dtl_ppn" => $list["ppn"],
+											// "dtl_masa1" => , // cooming soon
+											// "dtl_masa12" => , // cooming soon
+											// "dtl_masa2" => , // cooming soon
+											"dtl_tariff" => $list["tariff"],
+											"dtl_package" => $list["package_name"],
+											"dtl_qty" => $list["qty"],
+											"dtl_unit" => $list["unit_id"],
+											"dtl_group_tariff_id" => $list["group_tariff_id"],
+											"dtl_group_tariff_name" => $list["group_tariff_name"],
+											"dtl_bl" => $list["no_bl"],
+											"dtl_dpp" => $list["tariff_cal"],
+											"dtl_commodity" => $list["commodity_name"],
+											"dtl_equipment" => $list["equipment_name"]
+									];
+									$resultD[] = $set_data;
+							}
+						}
+					}
+
+			return ["Header"=>$getHS, "Detail"=>$resultD];
 		}
 	}
