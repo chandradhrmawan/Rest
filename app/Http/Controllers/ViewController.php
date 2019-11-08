@@ -131,4 +131,25 @@ class ViewController extends Controller
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
     }
+
+    function detailJoin($input) {
+        $id       = 40;
+        $detail   = [];
+        $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->join('TM_REFF', 'TM_REFF.REFF_ID', '=', 'TS_LUMPSUM_AREA.LUMPSUM_STACKING_TYPE')->where("LUMPSUM_ID", "=", $id)->get();
+        foreach ($data_a as $list) {
+          $newDt = [];
+          foreach ($list as $key => $value) {
+            $newDt[$key] = $value;
+          }
+
+        $data_b = DB::connection("mdm")->table('VIEW_STACKING_AREA')->where("code", $list->lumpsum_area_code)->select("name","branch")->get();
+        foreach ($data_b as $listS) {
+          foreach ($listS as $key => $value) {
+            $newDt[$key] = $value;
+          }
+        }
+        $detail[] = $newDt;
+      }
+      return ["result"=>$detail];
+    }
 }

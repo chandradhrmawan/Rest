@@ -20,7 +20,6 @@ class GlobalHelper{
              $header   = json_decode(json_encode($header), TRUE);
              $vwdata = ["HEADER" => $header];
           }
-
             else {
             $fk      = $val["FK"][0];
             $fkhdr   = $header[0][$val["FK"][1]];
@@ -34,6 +33,29 @@ class GlobalHelper{
         $data    = json_encode($result);
         $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
         $vwdata  = json_decode($change);
+      }
+
+      if (isset($input["spesial"])) {
+        if ($input["spesial"] == "TM_LUMPSUM") {
+          $id       = $input["HEADER"]["PK"][1];
+          $detail   = [];
+          $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->join('TM_REFF', 'TM_REFF.REFF_ID', '=', 'TS_LUMPSUM_AREA.LUMPSUM_STACKING_TYPE')->where("LUMPSUM_ID", "=", $id)->get();
+          foreach ($data_a as $list) {
+            $newDt = [];
+            foreach ($list as $key => $value) {
+              $newDt[$key] = $value;
+            }
+
+          $data_b = DB::connection("mdm")->table('VIEW_STACKING_AREA')->where("code", $list->lumpsum_area_code)->select("name","branch")->get();
+          foreach ($data_b as $listS) {
+            foreach ($listS as $key => $value) {
+              $newDt[$key] = $value;
+            }
+          }
+          $detail[] = $newDt;
+         }
+         $vwdata["DETAIL"] = $detail;
+        }
       }
 
       return $vwdata;
