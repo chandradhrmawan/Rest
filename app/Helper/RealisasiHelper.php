@@ -58,7 +58,7 @@ class RealisasiHelper{
         $newD['DTL_CONT_STATUS'] = empty($list['dtl_cont_status']) ? 'NULL' : $list['dtl_cont_status'];
         $newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_real_qty']) ? 'NULL' : $list['dtl_real_qty'];
-        $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_real_qty'];
+        $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_bm_tl'];
         $newD['DTL_DATE_IN'] = 'NULL';
         $newD['DTL_DATE_OUT'] = 'NULL';
         $newD['DTL_DATE_OUT_OLD'] = 'NULL';
@@ -75,6 +75,7 @@ class RealisasiHelper{
       ];
     // set data
 
+    // return $tariffResp = BillingEngine::calculateTariff($set_data);
     $tariffResp = BillingEngine::calculateTariff($set_data);
 
     if ($tariffResp['result_flag'] != 'S') {
@@ -149,7 +150,7 @@ class RealisasiHelper{
       }
 
     }
-    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
     return ['result' => 'Success, Confirm RBM Data!'];
@@ -292,7 +293,7 @@ class RealisasiHelper{
         }
       }
     }
-    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
     return ['result' => 'Success, Confirm BPRP Data!'];
