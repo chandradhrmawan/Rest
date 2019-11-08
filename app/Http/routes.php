@@ -27,6 +27,7 @@ $app->post('index',  'IndexController@api');
 // $app->post('/view',  'ViewController@api');
 $app->post('/store', 'StoreController@api');
 
+$app->post('/get-file', 'StoreController@testview_file');
 
 $app->post('/tree-menu/{roll_id}', 'ViewController@menuTree');
 

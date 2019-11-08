@@ -108,7 +108,7 @@ class UperRequest{
         return $result;
     }
 
-	public static function storeUperPayment($input){
+	public static function storePayment($input){
         if ($input['pay_type'] == 1) {
             $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
             if (empty($uper)) {

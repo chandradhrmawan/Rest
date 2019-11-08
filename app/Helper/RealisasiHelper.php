@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
+use App\Helper\ConnectedExternalApps;
 
 class RealisasiHelper{
 
@@ -305,6 +306,14 @@ class RealisasiHelper{
       "real_status"=>1
     ]);
     return ['result' => 'Success, rejected proforma!'];
+  }
+
+  public static function approvedProformaNota($input){
+    $nota = TxHdrNota::find($input['id']);
+    $nota->nota_status = 2;
+    $nota->save();
+    ConnectedExternalApps::sendNotaProforma($nota);
+    return ['result' => 'Success, approved proforma!'];
   }
 
 }
