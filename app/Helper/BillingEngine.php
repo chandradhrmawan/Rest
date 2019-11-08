@@ -433,7 +433,7 @@ class BillingEngine{
 	    	$setP = '';
 	    	foreach ($paysplit as $list) {
 	    		$countP++;
-          if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
+          if ($list['PS_CUST_ID'] == NULL or $list['PS_CUST_ID'] == 'NULL') {
             $setE .= ' paysplit.PS_CUST_ID := '.$list['PS_CUST_ID'].';';
           }else{
             $setE .= ' paysplit.PS_CUST_ID := \''.$list['PS_CUST_ID'].'\';';
