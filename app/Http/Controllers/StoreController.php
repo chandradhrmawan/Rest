@@ -16,6 +16,7 @@ use App\Models\OmCargo\TxHdrRec;
 use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
 use App\Helper\RealisasiHelper;
+use App\Models\Mdm\TmTruckCompany;
 
 class StoreController extends Controller
 {
@@ -72,6 +73,14 @@ class StoreController extends Controller
     }
 
     function truckRegistration($input){
+      if (empty($input['truck_cust_id'])) {
+        $new = new TmTruckCompany;
+        $new->comp_name = $input['truck_cust_name'];
+        $new->comp_address = $input['truck_cust_address'];
+        $new->comp_branch_id = $input['truck_branch_id'];
+        $new->save();
+        $input['truck_cust_id'] = $new->comp_id;
+      }
       $set_data = [
         "truck_plat_no" => $input['truck_plat_no'],
         "truck_rfid_code" => $input['truck_rfid'],
@@ -81,8 +90,9 @@ class StoreController extends Controller
         "truck_type" => $input['truck_type_name'],
         "date" => $input['truck_date'],
       ];
+
       $set_data_self = [
-        "truck_id" => $input['truck_id'],
+        "truck_id" => str_replace(' ','',$input['truck_plat_no']),
         "truck_name" => $input['truck_name'],
         "truck_plat_no" => $input['truck_plat_no'],
         "truck_cust_id" => $input['truck_cust_id'],
