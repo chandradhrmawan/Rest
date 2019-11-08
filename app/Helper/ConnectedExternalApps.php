@@ -453,4 +453,8 @@ class ConnectedExternalApps{
     }
     return ["Success"=>true, "result" => json_decode($res->getBody()->getContents(), true)];
   }
+
+  public static function sendNotaProforma($input){
+    // buat funct send proforma nota ke invoice
+  }
 }

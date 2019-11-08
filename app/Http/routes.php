@@ -27,6 +27,10 @@ $app->post('index',  'IndexController@api');
 // $app->post('/view',  'ViewController@api');
 $app->post('/store', 'StoreController@api');
 
+$app->post('/get-file', 'StoreController@testview_file');
+
+$app->post('/tree-menu/{roll_id}', 'ViewController@menuTree');
+
 $app->get('/print/uper/{id}','ViewController@printUper');
 $app->get('/print/proforma/{id}','ViewController@printProforma');
 $app->get('/print/getPass/{id}','ViewController@printGetPass');

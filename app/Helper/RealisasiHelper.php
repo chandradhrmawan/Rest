@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
+use App\Helper\ConnectedExternalApps;
 
 class RealisasiHelper{
 
@@ -88,7 +89,10 @@ class RealisasiHelper{
       $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
       
       // store head
-        $headN = new TxHdrNota;
+        $headN = TxHdrNota::where('nota_req_no',$getH->booking_number)->first();
+        if (empty($headN)) {
+          $headN = new TxHdrNota;
+        }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
         $headN->nota_org_id = $getH->branch_org_id;
@@ -107,7 +111,7 @@ class RealisasiHelper{
         $headN->nota_vessel_name = $find->bm_vessel_name;
         // $headN->nota_faktur_no = $getH->; // ?
         $headN->nota_trade_type = $getH->trade_type;
-        $headN->nota_req_no = $find->bm_no;
+        $headN->nota_req_no = $getH->booking_number;
         $headN->nota_ppn = $getH->ppn;
         // $headN->nota_paid = $getH->; // pasti null
         // $headN->nota_paid_date = $getH->; // pasti null
@@ -117,6 +121,7 @@ class RealisasiHelper{
         $headN->save();
       // store head
 
+      DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $headN->nota_id)->delete();
       foreach ($group_tariff as $grpTrf){
         $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf->group_tariff_id)->get();
         $countLine = 0;
@@ -226,7 +231,10 @@ class RealisasiHelper{
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
-        $headN = new TxHdrNota;
+        $headN = TxHdrNota::where('nota_req_no',$getH->booking_number)->first();
+        if (empty($headN)) {
+          $headN = new TxHdrNota;
+        }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
         $headN->nota_org_id = $getH->branch_org_id;
@@ -245,7 +253,7 @@ class RealisasiHelper{
         $headN->nota_vessel_name = $find->bprp_vessel_name;
         // $headN->nota_faktur_no = $getH->; // ?
         $headN->nota_trade_type = $getH->trade_type;
-        $headN->nota_req_no = $find->bprp_no;
+        $headN->nota_req_no = $getH->booking_number;
         $headN->nota_ppn = $getH->ppn;
         // $headN->nota_paid = $getH->; // pasti null
         // $headN->nota_paid_date = $getH->; // pasti null
@@ -289,4 +297,23 @@ class RealisasiHelper{
     ]);
     return ['result' => 'Success, Confirm BPRP Data!'];
   }
+
+  public static function rejectedProformaNota($input){
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_no',$input['req_no'])->udpate([
+      "bprp_status"=>1
+    ]);
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('real_no',$input['req_no'])->udpate([
+      "real_status"=>1
+    ]);
+    return ['result' => 'Success, rejected proforma!'];
+  }
+
+  public static function approvedProformaNota($input){
+    $nota = TxHdrNota::find($input['id']);
+    $nota->nota_status = 2;
+    $nota->save();
+    ConnectedExternalApps::sendNotaProforma($nota);
+    return ['result' => 'Success, approved proforma!'];
+  }
+
 }

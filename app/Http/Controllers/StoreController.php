@@ -50,6 +50,19 @@ class StoreController extends Controller
       }
     }
 
+    public function testview_file(){
+      $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
+      return base64_encode($file);
+    }
+
+    function rejectedProformaNota($input){
+      return RealisasiHelper::rejectedProformaNota($input);
+    }
+
+    function approvedProformaNota($input){
+      return RealisasiHelper::approvedProformaNota($input);
+    }
+
     function confirmRealBM($input){
       return RealisasiHelper::confirmRealBM($input);
     }
@@ -92,7 +105,6 @@ class StoreController extends Controller
         DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->update($set_data_self);
         return ConnectedExternalApps::updateTid($set_data);
       }
-
     }
 
     function createTCA($input){
@@ -140,8 +152,8 @@ class StoreController extends Controller
     // BillingEngine
 
     // UperRequest
-      function storeUperPayment($input, $request){
-        return UperRequest::storeUperPayment($input);
+      function storePayment($input, $request){
+        return UperRequest::storePayment($input);
       }
     // UperRequest
 
