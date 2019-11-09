@@ -111,18 +111,85 @@ class ViewController extends Controller
       $connection = DB::connection('omcargo');
       $header     = $connection->table("TX_HDR_UPER")->where("UPER_ID", "=", $id)->get();
       $jshead     = json_decode(json_encode($header), TRUE);
-      $detail     = $connection->table("TX_DTL_UPER")->where("UPER_HDR_ID", "=", $jshead[0]["uper_id"])->get();
-      $html       = view('print.uper2',["header"=>$header, "detail"=>$detail]);
-      // return view('print.uper2',["header"=>$header, "detail"=>$detail]);
-      $filename   = "Test";
-      $dompdf     = new Dompdf();
-      $dompdf->set_option('isRemoteEnabled', true);
-      $dompdf->loadHtml($html);
-      $dompdf->setPaper('A4', 'potrait');
-      $dompdf->render();
-      $dompdf->stream($filename, array("Attachment" => false));
-      // return $detail;
+      $stev       = $connection->table("TX_DTL_UPER")
+                    ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+                    ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+                    ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+                    ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like", "%STEVEDORING%"]])
+                    ->get();
+      $cargo      = $connection->table("TX_DTL_UPER")
+                    ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+                    ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+                    ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+                    ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like", "%CARGODORING%"]])
+                    ->get();
+      $angkutan    = $connection->table("TX_DTL_UPER")
+                    ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+                    ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+                    ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+                    ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like","ANGKUTAN LANGSUNG"]])
+                    ->get();
+      $sewa        = $connection->table("TX_DTL_UPER")
+                    ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+                    ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+                    ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+                    ->where([['UPER_HDR_ID', '=', $id],["dtl_service_type", "like","SEWA ALAT"]])
+                    ->get();
+      $dpp         = $connection->table("TX_DTL_UPER")->where('UPER_HDR_ID',$id)->sum("dtl_amount");
+      $ppn         = $dpp*10/100;
+      $terbilang   = $this->terbilang($dpp+$ppn);
+      if ($sewa) {
+        $html       = view('print.uper2',["header"=>$header, "angkutan"=>$angkutan, "stev"=>$stev, "cargo"=>$cargo, "sewa"=>$sewa, "dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
+      } else {
+        $html       = view('print.uper2',["header"=>$header, "angkutan"=>$angkutan, "stev"=>$stev, "cargo"=>$cargo, "sewa"=>"0", "dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
+      }
+      // $filename   = "Test";
+      // $dompdf     = new Dompdf();
+      // $dompdf->set_option('isRemoteEnabled', true);
+      // $dompdf->loadHtml($html);
+      // $dompdf->setPaper('A4', 'potrait');
+      // $dompdf->render();
+      // $dompdf->stream($filename, array("Attachment" => false));
+      return $stev;
     }
+
+    function penyebut($nilai) {
+      $nilai = abs($nilai);
+      $huruf = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+      $temp = "";
+      if ($nilai < 12) {
+          $temp = " ". $huruf[$nilai];
+      } else if ($nilai <20) {
+          $temp = $this->penyebut($nilai - 10). " belas";
+      } else if ($nilai < 100) {
+          $temp = $this->penyebut($nilai/10)." puluh". $this->penyebut($nilai % 10);
+      } else if ($nilai < 200) {
+          $temp = " seratus" . $this->penyebut($nilai - 100);
+      } else if ($nilai < 1000) {
+          $temp = $this->penyebut($nilai/100) . " ratus" . $this->penyebut($nilai % 100);
+      } else if ($nilai < 2000) {
+          $temp = " seribu" . $this->penyebut($nilai - 1000);
+      } else if ($nilai < 1000000) {
+          $temp = $this->penyebut($nilai/1000) . " ribu" . $this->penyebut($nilai % 1000);
+      } else if ($nilai < 1000000000) {
+          $temp = $this->penyebut($nilai/1000000) . " juta" . $this->penyebut($nilai % 1000000);
+      } else if ($nilai < 1000000000000) {
+          $temp = $this->penyebut($nilai/1000000000) . " milyar" . $this->penyebut(fmod($nilai,1000000000));
+      } else if ($nilai < 1000000000000000) {
+          $temp = $this->penyebut($nilai/1000000000000) . " triliun" . $this->penyebut(fmod($nilai,1000000000000));
+      }
+      return $temp;
+    }
+
+    function terbilang($nilai) {
+      if($nilai<0) {
+        $hasil = "minus ". trim($this->penyebut($nilai));
+      } else {
+        $hasil = trim($this->penyebut($nilai));
+      }
+      return $hasil;
+    }
+
 
     function printProformaReceiving($id) {
       $html = view('print.proformaReceiving');
@@ -136,24 +203,25 @@ class ViewController extends Controller
       $dompdf->stream($filename, array("Attachment" => false));
     }
 
-    function detailJoin($input) {
-        $id       = 40;
-        $detail   = [];
-        $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->join('TM_REFF', 'TM_REFF.REFF_ID', '=', 'TS_LUMPSUM_AREA.LUMPSUM_STACKING_TYPE')->where("LUMPSUM_ID", "=", $id)->get();
-        foreach ($data_a as $list) {
-          $newDt = [];
-          foreach ($list as $key => $value) {
-            $newDt[$key] = $value;
-          }
-
-        $data_b = DB::connection("mdm")->table('VIEW_STACKING_AREA')->where("code", $list->lumpsum_area_code)->select("name","branch")->get();
-        foreach ($data_b as $listS) {
-          foreach ($listS as $key => $value) {
-            $newDt[$key] = $value;
-          }
-        }
-        $detail[] = $newDt;
-      }
-      return ["result"=>$detail];
-    }
+    // Example Join MDM to Cargo
+    // function detailJoin($input) {
+    //     $id       = 40;
+    //     $detail   = [];
+    //     $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->join('TM_REFF', 'TM_REFF.REFF_ID', '=', 'TS_LUMPSUM_AREA.LUMPSUM_STACKING_TYPE')->where("LUMPSUM_ID", "=", $id)->get();
+    //     foreach ($data_a as $list) {
+    //       $newDt = [];
+    //       foreach ($list as $key => $value) {
+    //         $newDt[$key] = $value;
+    //       }
+    //
+    //     $data_b = DB::connection("mdm")->table('VIEW_STACKING_AREA')->where("code", $list->lumpsum_area_code)->select("name","branch")->get();
+    //     foreach ($data_b as $listS) {
+    //       foreach ($listS as $key => $value) {
+    //         $newDt[$key] = $value;
+    //       }
+    //     }
+    //     $detail[] = $newDt;
+    //   }
+    //   return ["result"=>$detail];
+    // }
 }

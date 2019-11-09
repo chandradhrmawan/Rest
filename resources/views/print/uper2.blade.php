@@ -27,20 +27,16 @@
       <td style="vertical-align:top;text-align:right">
         <table style="border-collapse:collapse; font-size:10px;">
           <tr>
-            <td>No. Nota</td>
-            <td>: 0100401941003011</td>
+            <td>No. Uper</td>
+            <td>: {{$header->uper_no}}</td>
           </tr>
+					<tr>
+						<td>No. Nota</td>
+						<td>: {{$header->uper_date}}</td>
+					</tr>
           <tr>
-            <td>Ex. Nota</td>
-            <td>: </td>
-          </tr>
-          <tr>
-            <td>No. Order</td>
-            <td>: STTF08190001446</td>
-          </tr>
-          <tr>
-            <td>No. Nota</td>
-            <td>: 29 Agustus 2019</td>
+            <td>No. Request</td>
+            <td>: {{$header->uper_req_no}}</td>
           </tr>
         </table>
       </td>
@@ -48,13 +44,13 @@
   </table>
 
 <center style="width:100%;background-color:orange;color:#fff;margin-top:20px">UPER USTER</center>
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
       <table style="border-collapse:collapse; font-size:10px;">
         <tr>
           <td colspan="3">
-            <font style="font-size:9;text-align:left"><b>Pengguna Jasa</b></font><br>
+            <font style="font-size:9;text-align:left"><b>Pengguna Jasa</b></font><br><br>
           </td>
         </tr>
         <tr>
@@ -70,206 +66,149 @@
         <tr>
           <td>NPWP</td>
           <td>: </td>
-          <td>01.274.986.7-308.000</td>
+          <td>{{$header->uper_cust_npwp}}</td>
         </tr>
       </table>
     </td>
 		<td>
-      <table style="border-collapse:collapse; font-size:9;">
+      <table style="border-collapse:collapse; font-size:10px;">
         <tr>
-          <td>No Do</td>
+          <td>Nama kapal</td>
           <td>: </td>
-        <td></td>
+        <td>{{$header->uper_vessel_name}}</td>
         </tr>
         <tr>
-          <td>No. SI</td>
+          <td>No.PBM </td>
           <td>: </td>
-          <td>MV Kota Dunia</td>
-        </tr>
-        <tr>
-          <td>Periode Kunjungan</td>
-          <td>: </td>
-          <td>23 Agustus 2019</td>
+          <td>{{$header->uper_pbm_id}}</td>
         </tr>
       </table>
     </td>
 	</tr>
 	@endforeach
 </table>
-<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
-		<th rowspan="2">NO BL</th>
-		<th rowspan="2">TL</th>
-		<th rowspan="2">Kemasan</th>
-		<th rowspan="2">BARANG</th>
-    <th rowspan="2">Satuan</th>
-    <th colspan="2">Qty</th>
-    <th rowspan="2">Tarif Dasar</th>
-    <th rowspan="2">Total</th>
+		<th rowspan="2" width="15%">NO BL</th>
+		<th rowspan="2" width="15%">TL</th>
+		<th rowspan="2" width="15%">Kemasan</th>
+		<th rowspan="2" width="15%">BARANG</th>
+    <th rowspan="2" width="5%">Satuan</th>
+    <th colspan="2" width="15%">Qty</th>
+    <th rowspan="2" width="10%">Tarif Dasar</th>
+    <th rowspan="2" width="10%">Total</th>
 	</tr>
   <tr style="text-align:center">
     <th>Bongkar</th>
     <th>Muat</th>
   </tr>
-  <tr>
-    <td style="border-right: 0;">123456790</td>
-    <td style="border-right: 0;border-left:0">NON-TL</td>
-    <td style="border-right: 0;border-left:0">Curah Kering</td>
-    <td style="border-right: 0;border-left:0">Beras</td>
-    <td style="border-right: 0;border-left:0">Ton</td>
+	@foreach($angkutan as $angkutan)
+  <tr style="background:yellow;">
+    <td style="border-right: 0;padding-left:10px">{{$angkutan->dtl_bl}}</td>
+    <td style="border-right: 0;border-left:0"></td>
+    <td style="border-right: 0;border-left:0"></td>
+    <td style="border-right: 0;border-left:0"></td>
+    <td style="border-right: 0;border-left:0;text-align:center"></td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-left:  0;"></td>
   </tr>
-  <tr>
+	@foreach($stev as $stev)
+	<tr>
     <td style="border-bottom: 0;padding-left:10px">Stevendoring</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>100</td>
-    <td></td>
-    <td>1.000</td>
-    <td>100.000</td>
+    <td><?php if ($stev->dtl_bm_tl == "N") { echo "NON-TL"; } else { echo "TL"; } ?></td>
+    <td>{{$stev->dtl_package}}</td>
+    <td>{{$stev->dtl_commodity}}</td>
+    <td style="text-align:center">{{$stev->dtl_unit_name}}</td>
+		<?php if ($stev->dtl_bm_type == "Bongkar") { ?>
+			<td style="text-align:center">{{$stev->dtl_qty}}</td>
+			<td></td>
+		<?php } else { ?>
+			<td></td>
+			<td style="text-align:center">{{$stev->dtl_qty}}</td>
+		<?php } ?>
+    <td style="text-align:right">{{number_format($stev->dtl_tariff)}}</td>
+    <td style="text-align:right">{{number_format($stev->dtl_amount)}}</td>
   </tr>
-  <tr>
-    <td style="border-bottom: 0;border-top: 0;padding-left:10px">Cargodoring</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>100</td>
-    <td></td>
-    <td>2.000</td>
-    <td>200.000</td>
+	@endforeach
+	@foreach($cargo as $cargo)
+	<tr>
+		<td style="border-bottom: 0;border-top: 0;padding-left:10px">Cargodoring</td>
+		<td><?php if ($cargo->dtl_bm_tl == "N") { echo "NON-TL"; } else { echo "TL"; } ?></td>
+		<td>{{$cargo->dtl_package}}</td>
+		<td>{{$cargo->dtl_commodity}}</td>
+		<td style="text-align:center">{{$cargo->dtl_unit_name}}</td>
+		<?php if ($cargo->dtl_bm_type == "Bongkar") { ?>
+			<td style="text-align:center">{{$cargo->dtl_qty}}</td>
+			<td></td>
+		<?php } else { ?>
+			<td></td>
+			<td style="text-align:center">{{$cargo->dtl_qty}}</td>
+		<?php } ?>
+		<td style="text-align:right">{{number_format($cargo->dtl_tariff)}}</td>
+		<td style="text-align:right">{{number_format($cargo->dtl_amount)}}</td>
+	</tr>
+	@endforeach
+	@endforeach
+  <tr style="background:yellow">
+    <td style="border-right: 0;padding-left:10px" colspan="9">Sewa Alat</td>
   </tr>
+	<?php if ($sewa == "0") { ?>
+		<tr>
+			<td colspan="9" style="padding-left:10px">Tidak Ada Sewa Alat</td>
+		</tr>
+	<?php } else { ?>
+		@foreach($sewa as $sewa)
+		  <tr>
+		    <td style="border-right: 0;padding-left:10px">{{$sewa->dtl_equipment}}</td>
+		    <td style="border-right: 0;border-left:0"></td>
+		    <td style="border-right: 0;border-left:0"></td>
+		    <td style="border-right: 0;border-left: style="text-align:center"0"></td>
+		    <td style="text-align:center">{{$sewa->dtl_unit_name}}</td>
+		    <?php if ($sewa->dtl_bm_type == "Bongkar") { ?>
+		      <td style="text-align:center">{{$sewa->dtl_qty}}</td>
+		      <td></td>
+		    <?php } else { ?>
+		      <td></td>
+		      <td style="text-align:center">{{$sewa->dtl_qty}}</td>
+		    <?php } ?>
+		    <td style="text-align:right">{{number_format($sewa->dtl_tariff)}}</td>
+		    <td style="text-align:right">{{number_format($sewa->dtl_amount)}}</td>
+		  </tr>
+		@endforeach
+	<?php } ?>
   <tr>
-    <td style="border-top: 0;padding-left:10px">PFS</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>100</td>
-    <td></td>
-    <td>5.000</td>
-    <td>100.000</td>
-  </tr>
-
-  <tr>
-    <td style="border-right: 0;">123456791</td>
-    <td style="border-right: 0;border-left:0">TL</td>
-    <td style="border-right: 0;border-left:0">Curah Kering</td>
-    <td style="border-right: 0;border-left:0">Beras</td>
-    <td style="border-right: 0;border-left:0">Ton</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-left: 0;"></td>
-  </tr>
-  <tr>
-    <td style="border-bottom: 0;padding-left:10px">Stevendoring</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>50</td>
-    <td></td>
-    <td>1.000</td>
-    <td>100.000</td>
-  </tr>
-  <tr>
-    <td style="border-bottom: 0;border-top: 0;padding-left:10px">Cargodoring</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>50</td>
-    <td></td>
-    <td>2.000</td>
-    <td>200.000</td>
-  </tr>
-  <tr>
-    <td style="border-top: 0;padding-left:10px">PFS</td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>50</td>
-    <td></td>
-    <td>5.000</td>
-    <td>100.000</td>
-  </tr>
-
-  <tr>
-    <td style="border-right: 0;">Sewa Alat</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-left: 0;"></td>
-  </tr>
-  <tr>
-    <td style="border-right: 0;padding-left:10px">Forklift 3 Ton</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0">Shift</td>
-    <td style="border-right: 0;border-left:0">1</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0">1000</td>
-    <td style="border-left: 0;">1000</td>
-  </tr>
-  <tr>
-    <td style="border-right: 0;padding-left:10px">Timbangan</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0">Ton</td>
-    <td style="border-right: 0;border-left:0">150</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0">1000</td>
-    <td style="border-left:  0;">150.000</td>
-  </tr>
-  <tr>
-    <td style="border-right: 0;border-bottom: 0;width:50%" colspan="6"></td>
-    <td style="border-right: 0;border-bottom: 0;border-left:0">DPP</td>
+    <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
+    <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DPP</td>
     <td style="border-right: 0;border-bottom: 0;border-left:0;text-align:right;padding-right:10px">IDR</td>
-    <td style="border-left:  0;border-bottom: 0;">1.000.000</td>
+    <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($dpp)}}</td>
   </tr>
   <tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="6"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0">PPN 10%</td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">PPN 10%</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:10px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;">100.000</td>
+    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($ppn)}}</td>
   </tr>
-  <tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="6"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0">Jumlah</td>
+	<tr>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Administrasi</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:10px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;">100.000</td>
+    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format(0)}}</td>
   </tr>
   <tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="6"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0">Tagihan</td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:10px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;">1.100.000</td>
-  </tr>
-  <tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="6"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0">Uper</td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:10px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;">0</td>
-  </tr>
-  <tr>
-    <td style="border-right: 0;border-top: 0;width:50%" colspan="6"></td>
-    <td style="border-right: 0;border-top: 0;border-left:0">Grand Total</td>
+    <td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
+    <td style="border-right: 0;border-top: 0;border-left:0" colspan="2">Grand Total</td>
     <td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:10px">IDR</td>
-    <td style="border-left:  0;border-top: 0;">1.100.000</td>
+    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($dpp+$ppn)}}</td>
   </tr>
+</table>
+<p style="font-size:10px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
+<table style="border-collapse:collapse; font-size:9px;margin-top:60px;float:right;text-align:center">
+	<tr><td>Palembang, 29 Agustus 2019</td></tr>
+	<tr><td>DGM Keuangan & Administrasi</td></tr>
+	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
+	<tr><td>NIPP. 287117773</td></tr>
 </table>
 </body>
 </html>
