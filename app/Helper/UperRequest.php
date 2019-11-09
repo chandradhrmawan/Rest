@@ -39,6 +39,8 @@ class UperRequest{
                         "dtl_line_desc" => $list['memoline'],
                         // "dtl_line_context" => , // perlu konfimasi
                         "dtl_service_type" => $list['group_tariff_name'],
+                        // Tambahan Mas Adi
+  											"dtl_total_tariff" => $list["tariff_uper"],
                         "dtl_amount" => $list['uper'], // blm fix
                         "dtl_ppn" => $list["ppn"],
                         // "dtl_masa1" => , // cooming soon

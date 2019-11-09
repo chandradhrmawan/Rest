@@ -408,6 +408,7 @@ class BillingEngine{
 	    		$setD .= ' detail.DTL_DATE_IN := '.$list['DTL_DATE_IN'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT_OLD := '.$list['DTL_DATE_OUT_OLD'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT := '.$list['DTL_DATE_OUT'].';';
+					$setD .= ' detail.DTL_PFS := Y' ;
 	    		$setD .= ' list_detail('.$countD.') := detail; ';
 	    	}
 		// build detil
@@ -557,6 +558,7 @@ class BillingEngine{
 					$newD['DTL_DATE_IN'] 			= empty($datein) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($datein)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT'] 		= empty($dateout) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+					// $newD['DTL_PFS'] = 'Y';
 					$setD[] = $newD;
 				}
 		// build detil
@@ -606,6 +608,8 @@ class BillingEngine{
 											"dtl_line_desc" => $list['memoline'],
 											// "dtl_line_context" => , // perlu konfimasi
 											"dtl_service_type" => $list['group_tariff_name'],
+											// Tambahan Mas Adi
+											"dtl_total_tariff" => $list["tariff_uper"],
 											"dtl_amount" => $list['uper'], // blm fix
 											"dtl_ppn" => $list["ppn"],
 											// "dtl_masa1" => , // cooming soon
