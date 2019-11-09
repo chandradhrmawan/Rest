@@ -55,7 +55,7 @@ class RequestBooking{
 					if ($input['table'] == 'TX_HDR_REC') {
 						$newD['DTL_DATE_IN'] = empty($list[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}else{
-						$newD['DTL_DATE_IN'] = empty($find[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_IN'] = empty($list[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 				}else{
 					$newD['DTL_DATE_IN'] = 'NULL';
@@ -357,7 +357,7 @@ class RequestBooking{
         		"head_tab_detil" => "TX_DTL_DEL",
         		"head_tab_detil_bl" => "dtl_bl",
         		"head_tab_detil_tl" => null,
-        		"head_tab_detil_date_in" => 'del_atd',
+        		"head_tab_detil_date_in" => 'dtl_in',
         		"head_tab_detil_date_out" => 'dtl_out',
         		"head_tab_detil_date_out_old" => 'extension',
         		"head_status" => "del_status",
