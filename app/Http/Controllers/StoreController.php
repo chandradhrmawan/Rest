@@ -124,14 +124,14 @@ class StoreController extends Controller
         $reques = DB::connection('omcargo')->table('TX_HDR_REC')->where('rec_no', $head->tca_req_no)->get();
         $reques = $reques[0];
         $vvdID = $reques->rec_vvd_id;
-        $vvdName = $reques->rec_vesel_name;
+        $vvdName = $reques->rec_vessel_name;
         $vvdVI = $reques->rec_voyin;
         $vvdVO = $reques->rec_voyout;
       }else if ($head->tca_req_type  == 2) {
         $reques = DB::connection('omcargo')->table('TX_HDR_DEL')->where('del_no', $head->tca_req_no)->get();
         $reques = $reques[0];
         $vvdID = $reques->del_vvd_id;
-        $vvdName = $reques->del_vesel_name;
+        $vvdName = $reques->del_vessel_name;
         $vvdVI = $reques->del_voyin;
         $vvdVO = $reques->del_voyout;
       }
