@@ -292,7 +292,7 @@ class ConnectedExternalApps{
                   "timestamp": "YYYYMMDD HH:Mi:SS"
               },
               "esbBody": {
-                  "vTruckId": "'.$input['truck_plat_no'].'",
+                  "vTruckId": "'. str_replace(' ','',$input['truck_plat_no']).'",
                   "vTruckNumber": "'.$input['truck_plat_no'].'",
                   "vRfidCode": "'.$input['truck_rfid_code'].'",
                   "vCustomerName": "'.$input['customer_name'].'",
@@ -325,7 +325,7 @@ class ConnectedExternalApps{
         echo $e->getResponse() . "\n";
       }
     }
-    return json_decode($res->getBody()->getContents());
+    return [json_decode($res->getBody()->getContents())];
   }
 
   public static function updateTid($input){
@@ -371,7 +371,7 @@ class ConnectedExternalApps{
         echo $e->getResponse() . "\n";
       }
     }
-    return json_decode($res->getBody()->getContents());
+    return [json_decode($res->getBody()->getContents())];
   }
 
   public static function createTCA($input){

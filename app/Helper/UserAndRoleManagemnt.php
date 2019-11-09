@@ -267,8 +267,14 @@ class UserAndRoleManagemnt{
     }
 
     return [
-      "children" => $estjs
+      "root" => [
+        "expanded" =>true,
+        "children" => $estjs
+      ]
     ];
+    // return [
+    //     "children" => $estjs
+    // ];
   }
 
 }

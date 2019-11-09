@@ -58,7 +58,7 @@ class RealisasiHelper{
         $newD['DTL_CONT_STATUS'] = empty($list['dtl_cont_status']) ? 'NULL' : $list['dtl_cont_status'];
         $newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_real_qty']) ? 'NULL' : $list['dtl_real_qty'];
-        $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_real_qty'];
+        $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_bm_tl'];
         $newD['DTL_DATE_IN'] = 'NULL';
         $newD['DTL_DATE_OUT'] = 'NULL';
         $newD['DTL_DATE_OUT_OLD'] = 'NULL';
@@ -75,6 +75,7 @@ class RealisasiHelper{
       ];
     // set data
 
+    // return $tariffResp = BillingEngine::calculateTariff($set_data);
     $tariffResp = BillingEngine::calculateTariff($set_data);
 
     if ($tariffResp['result_flag'] != 'S') {
@@ -136,20 +137,23 @@ class RealisasiHelper{
             "dtl_service_type" => $list->group_tariff_name,
             "dtl_amout" => $list->total,
             "dtl_ppn" => $list->ppn,
+            "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
             // "dtl_masa12" => $list->, // ?
             // "dtl_masa2" => $list->, // ?
             "dtl_tariff" => $list->tariff,
             "dtl_package" => $list->package_name,
+            "dtl_eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
+            "dtl_unit_name" => $list->unit_name,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
           ]);
         }
       }
 
     }
-    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
     return ['result' => 'Success, Confirm RBM Data!'];
@@ -280,19 +284,22 @@ class RealisasiHelper{
             "dtl_service_type" => $list->group_tariff_name,
             "dtl_amout" => $list->total,
             "dtl_ppn" => $list->ppn,
+            "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
             // "dtl_masa12" => $list->, // ?
             // "dtl_masa2" => $list->, // ?
             "dtl_tariff" => $list->tariff,
             "dtl_package" => $list->package_name,
+            "dtl_eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
+            "dtl_unit_name" => $list->unit_name,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
           ]);
         }
       }
     }
-    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
     return ['result' => 'Success, Confirm BPRP Data!'];
