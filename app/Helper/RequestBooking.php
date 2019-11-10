@@ -80,7 +80,7 @@ class RequestBooking{
 						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) Y
-						ON X.DEL_NO=Y.DEL_EXT_FROM_DATE WHERE Y.DEL_NO='".$find[$config['head_no']]."'
+						ON X.DTL_OUT=Y.DEL_EXT_FROM_DATE WHERE Y.DEL_NO='".$find[$config['head_no']]."'
 						"));
 					if (empty($findEx)) {
 						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
