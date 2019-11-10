@@ -258,7 +258,7 @@ class RequestBooking{
 							"dtl_line_desc" => $list['memoline'],
 							// "dtl_line_context" => , // perlu konfimasi
 							"dtl_service_type" => $list['group_tariff_name'],
-							"dtl_amount" => $list['uper'], // blm fix
+							"dtl_amount" => $list['tariff_cal_uper'],
 							"dtl_ppn" => $list["ppn"],
 							"dtl_masa" => $list["day_period"],
 							// "dtl_masa1" => , // cooming soon
