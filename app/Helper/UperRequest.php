@@ -128,6 +128,9 @@ class UperRequest{
 
         $datenow    = Carbon::now()->format('Y-m-d');
         $pay = new TxPayment;
+        if (isset($input['encode']) and $input['encode'] == 'true') {
+          $pay->pay_status = 2;
+        }
         $pay->pay_no = $input['pay_no'];
         $pay->pay_req_no = $input['pay_req_no'];
         $pay->pay_method = $input['pay_method'];
@@ -158,23 +161,42 @@ class UperRequest{
         }
 
         if ($input['pay_type'] == 1){
-            static::updateUperStatus([
-              'uper_id' => $uper->uper_id,
-              'uper_req_no' => $uper->uper_req_no,
-              'uper_paid' => 'Y'
-            ]);
+            if ($pay->pay_status == 1) {
+              static::updateUperStatus([
+                'uper_id' => $uper->uper_id,
+                'uper_req_no' => $uper->uper_req_no,
+                'uper_paid' => 'Y'
+              ]);
+            }
             return ["result" => "Success, paid uper"];
         } else if ($input['pay_type'] == 2) {
             return ["result" => "Success, paid nota"];
         }
 	}
 
-    private static function updateUperStatus($input){
-        $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update(['uper_paid' => $input['uper_paid']]);
-        $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->where('uper_paid', 'N')->count();
-
-        if ($cekStatus == 0) {
-          ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
-        }
+  public static function confirmPaymentUper($input){
+    $pay = TxPayment::find($input['id']);
+    if ($input['approved'] == 'true') {
+      $pay->pay_status = 1;
+    }else{
+      $pay->pay_status = 3;
     }
+    $pay->save();
+    $uper = TxHdrUper::where('uper_no',$pay->pay_no)->first();
+    static::updateUperStatus([
+      'uper_id' => $uper->uper_id,
+      'uper_req_no' => $uper->uper_req_no,
+      'uper_paid' => 'Y'
+    ]);
+    return ["result" => "Success, confirm uper payment"];
+  }
+
+  private static function updateUperStatus($input){
+      $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update(['uper_paid' => $input['uper_paid']]);
+      $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->where('uper_paid', 'N')->count();
+
+      if ($cekStatus == 0) {
+        ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
+      }
+  }
 }
