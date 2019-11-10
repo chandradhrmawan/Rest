@@ -264,6 +264,7 @@ class RequestBooking{
 							// "dtl_masa1" => , // cooming soon
 							// "dtl_masa12" => , // cooming soon
 							// "dtl_masa2" => , // cooming soon
+							"dtl_total_tariff" => $list["tariff_uper"],
 							"dtl_tariff" => $list["tariff"],
 							"dtl_package" => $list["package_name"],
 							"dtl_qty" => $list["qty"],
