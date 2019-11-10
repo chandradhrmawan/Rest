@@ -68,19 +68,19 @@ class RequestBooking{
 						Y.DTL_OUT AS date_out
 						FROM (
 						SELECT
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
 						FROM
 						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) X
 						JOIN (
 						SELECT
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
 						FROM
 						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) Y
-						ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."'
+						ON X.DEL_NO=Y.DEL_EXT_FROM_DATE WHERE Y.DEL_NO='".$find[$config['head_no']]."'
 						"));
 					if (empty($findEx)) {
 						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
