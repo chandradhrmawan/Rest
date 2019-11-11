@@ -31,7 +31,7 @@
             <td>: {{$header->uper_no}}</td>
           </tr>
 					<tr>
-						<td>No. Nota</td>
+						<td>Tgl. Nota</td>
 						<td>: {{$header->uper_date}}</td>
 					</tr>
           <tr>

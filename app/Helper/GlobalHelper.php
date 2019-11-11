@@ -14,16 +14,16 @@ class GlobalHelper{
       $pkVal   = $input["HEADER"]["PK"][1];
       foreach ($data as $data) {
         $val     = $input[$data];
-        $connnection  = DB::connection($val["DB"])->table($val["TABLE"]);
+        $connect  = DB::connection($val["DB"])->table($val["TABLE"]);
           if ($data == "HEADER") {
-             $header   = $connnection->where($pk, "like", $pkVal)->get();
+             $header   = $connect->where($pk, "like", $pkVal)->get();
              $header   = json_decode(json_encode($header), TRUE);
              $vwdata = ["HEADER" => $header];
           }
             else {
             $fk      = $val["FK"][0];
             $fkhdr   = $header[0][$val["FK"][1]];
-            $detail  = $connnection->where($fk, "like", $fkhdr)->get();
+            $detail  = $connect->where($fk, "like", $fkhdr)->get();
             $vwdata[$data] = $detail;
           }
       }
@@ -115,11 +115,16 @@ class GlobalHelper{
   public static function index($input) {
       $connect  = \DB::connection($input["db"])->table($input["table"]);
 
-      if ($input['start'] != '' && $input['limit'] != '')
+      if (!empty($input['start']) && !empty($input['limit']))
         $connect->skip($input['start'])->take($input['limit']);
 
-      if (isset($input["selected"]) && $input["selected"] != '') {
+      if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
+      }
+
+      if(!empty($input["orderby"][0])) {
+      $in        = $input["orderby"];
+      $connect->orderby($in[0], $in[1]);
       }
 
       $result   = $connect->get();
@@ -145,6 +150,18 @@ class GlobalHelper{
 
       else if($type == "and") $connect->Where($result);
       else $connect->orwhere($data[$i], 'like', '%'.$value[$i].'%');
+      }
+
+      if (!empty($input['start']) && !empty($input['limit']))
+        $connect->skip($input['start'])->take($input['limit']);
+
+      if (!empty($input["selected"])) {
+        $result  = $connect->select($input["selected"]);
+      }
+
+      if(!empty($input["orderby"][0])) {
+      $in        = $input["orderby"];
+      $connect->orderby($in[0], $in[1]);
       }
 
       if (isset($input["changeKey"])) {
@@ -175,8 +192,17 @@ class GlobalHelper{
         $connect->whereDate($value["property"],'<=',$value["value"]);
     }
 
-    if ($input['start'] != '' && $input['limit'] != '')
+    if (!empty($input['start']) && !empty($input['limit']))
       $connect->skip($input['start'])->take($input['limit']);
+
+    if (!empty($input["selected"])) {
+      $result  = $connect->select($input["selected"]);
+    }
+
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby($in[0], $in[1]);
+    }
 
     $result   = $connect->get();
     $count    = $connect->count();
@@ -191,13 +217,22 @@ class GlobalHelper{
       $connect->Where($input["field"],'like',$input["query"]."%");
     }
 
-    if ($input['start'] != '' && $input['limit'] != '') {
-      $connect->skip($input['start'])->take($input['limit']);
-    }
-
     if(!empty($input["groupby"])) {
       $connect->groupBy($input["groupby"]);
     }
+
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start'])->take($input['limit']);
+
+    if (!empty($input["selected"])) {
+      $result  = $connect->select($input["selected"]);
+    }
+
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby($in[0], $in[1]);
+    }
+
 
     $result   = $connect->get();
     $count    = $connect->count();
@@ -206,53 +241,54 @@ class GlobalHelper{
   }
 
   public static function join($input) {
-    $connection = DB::connection($input["db"])->table($input["table"]);
+    $connect = DB::connection($input["db"])->table($input["table"]);
     foreach ($input["join"] as $list) {
-      $connection->join($list["table"], $list["field1"], '=', $list["field2"]);
+      $connect->join($list["table"], $list["field1"], '=', $list["field2"]);
     }
 
     if(!empty($input["where"][0])) {
-      $connection->where($input["where"]);
+      $connect->where($input["where"]);
     }
-    if(!empty($input["select"][0])) {
-      $connection->select($input["select"]);
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start'])->take($input['limit']);
+
+    if (!empty($input["selected"])) {
+      $result  = $connect->select($input["selected"]);
+    }
+
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby($in[0], $in[1]);
     }
 
     if(!empty($input["whereIn"][0])) {
     $in        = $input["whereIn"];
-    $connection->whereIn($in[0], $in[1]);
+    $connect->whereIn($in[0], $in[1]);
     }
 
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
-    $connection->whereNotIn($in[0], $in[1]);
+    $connect->whereNotIn($in[0], $in[1]);
     }
 
     if (!empty($input["query"]) && !empty($input["field"])) {
-      $connection->where($input["field"],"like", "%".$input["query"]."%");
+      $connect->where($input["field"],"like", "%".$input["query"]."%");
     }
 
     if(!empty($input["orderBy"][0])) {
     $in        = $input["orderBy"];
-    $connection->orderby($in[0], $in[1]);
+    $connect->orderby($in[0], $in[1]);
     }
 
     if (isset($input["changeKey"])) {
-      $result  = $connection->get();;
+      $result  = $connect->get();;
       $data    = json_encode($result);
       $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
       $data    = json_decode($change);
     } else {
-      $data   = $connection->get();
+      $data   = $connect->get();
 
     }
-    // $decode = json_decode(json_encode($data), TRUE);
-    // $conCross = DB::connection($input["crossJoin"]["db"])->table($input["crossJoin"]["table"]);
-    // foreach ($decode as $value) {
-    //     $cek[] = [$input["crossJoin"]["field2"],"=", $value[$input["crossJoin"]["field1"]]];
-    // }
-    // $conCross->where(["CUSTOMER_ID", "=", "12402110"]);
-    // $data = $conCross->get();
     return $data;
 
   }
@@ -270,6 +306,18 @@ class GlobalHelper{
     if(!empty($input["whereIn"][0])) {
     $in        = $input["whereIn"];
     $connect->whereIn($in[0], $in[1]);
+    }
+
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start'])->take($input['limit']);
+
+    if (!empty($input["selected"])) {
+      $result  = $connect->select($input["selected"]);
+    }
+
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby($in[0], $in[1]);
     }
 
     if (isset($input["changeKey"])) {
@@ -298,7 +346,19 @@ class GlobalHelper{
 
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
-    $connection->whereNotIn($in[0], $in[1]);
+    $connect->whereNotIn($in[0], $in[1]);
+    }
+
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start'])->take($input['limit']);
+
+    if (!empty($input["selected"])) {
+      $result  = $connect->select($input["selected"]);
+    }
+
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby($in[0], $in[1]);
     }
 
     $data      = $connect->get();
@@ -318,25 +378,25 @@ class GlobalHelper{
 
     foreach ($data as $data) {
       $val     = $input[$data];
-      $connnection  = DB::connection($val["DB"])->table($val["TABLE"]);
+      $connect  = DB::connection($val["DB"])->table($val["TABLE"]);
       if ($data == "HEADER") {
         $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
         if ($hdr[0][$cek] == '' || $sq == "N") {
           foreach ($val["VALUE"] as $value) {
-            $insert       = $connnection->insert([$value]);
+            $insert       = $connect->insert([$value]);
           }
         } else {
           foreach ($val["VALUE"] as $value) {
-            $insert       = $connnection->where($cek,$hdr[0][$cek])->update($value);
+            $insert       = $connect->where($cek,$hdr[0][$cek])->update($value);
           }
         }
-        $header   = $connnection->orderby($val["PK"], "desc")->first();
+        $header   = $connect->orderby($val["PK"], "desc")->first();
         $header   = json_decode(json_encode($header), TRUE);
       }
       else if($data == "FILE") {
         if ($hdr[0][$cek] != '') {
-          $connnection->where($val["FK"][0], $header[$val["FK"][1]]);
-          $connnection->delete();
+          $connect->where($val["FK"][0], $header[$val["FK"][1]]);
+          $connect->delete();
         }
         foreach ($val["VALUE"] as $list) {
           if (isset($list["id"])) {
@@ -346,13 +406,13 @@ class GlobalHelper{
           $response   = FileUpload::upload_file($list, $directory);
           $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_name'=>$list["PATH"],'doc_path'=>$response['link']];
           if ($response['response'] == true) {
-              $connnection->insert([$addVal]);
+              $connect->insert([$addVal]);
             }
           }
       } else {
         if ($hdr[0][$cek] != '') {
-          $connnection->where($val["FK"][0], $header[$val["FK"][1]]);
-          $connnection->delete();
+          $connect->where($val["FK"][0], $header[$val["FK"][1]]);
+          $connect->delete();
         }
         foreach ($val["VALUE"] as $value) {
           if (isset($value["id"])) {
@@ -367,7 +427,7 @@ class GlobalHelper{
           }
           $addVal = [$val["FK"][0]=>$header[$val["FK"][1]]]+$value;
               if(empty($value["id"])) {
-                $connnection->insert([$addVal]);
+                $connect->insert([$addVal]);
               }
           }
         }

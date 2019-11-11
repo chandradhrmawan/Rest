@@ -96,15 +96,44 @@ class ViewController extends Controller
     }
 
     function printProforma2($id) {
-      $html = view('print.proforma2');
-      // return $html;
-      $filename = "Test";
-      $dompdf = new Dompdf();
-      $dompdf->set_option('isRemoteEnabled', true);
-      $dompdf->loadHtml($html);
-      $dompdf->setPaper('A4', 'potrait');
-      $dompdf->render();
-      $dompdf->stream($filename, array("Attachment" => false));
+      $connection = DB::connection('omcargo');
+      $header     = $connection->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
+      $html       = view('print.proforma2',["header"=>$header]);
+      $jshead     = json_decode(json_encode($header), TRUE);
+      // $stev       = $connection->table("TX_DTL_UPER")
+      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+      //               ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like", "%STEVEDORING%"]])
+      //               ->get();
+      // $cargo      = $connection->table("TX_DTL_UPER")
+      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+      //               ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like", "%CARGODORING%"]])
+      //               ->get();
+      // $angkutan    = $connection->table("TX_DTL_UPER")
+      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+      //               ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like","ANGKUTAN LANGSUNG"]])
+      //               ->get();
+      // $sewa        = $connection->table("TX_DTL_UPER")
+      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
+      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
+      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
+      //               ->where([['UPER_HDR_ID', '=', $id],["dtl_service_type", "like","SEWA ALAT"]])
+      //               ->get();
+
+        return $stev;
+      // return $header;
+      // $filename = "Test";
+      // $dompdf = new Dompdf();
+      // $dompdf->set_option('isRemoteEnabled', true);
+      // $dompdf->loadHtml($html);
+      // $dompdf->setPaper('A4', 'potrait');
+      // $dompdf->render();
+      // $dompdf->stream($filename, array("Attachment" => false));
     }
 
     function printUper2($id) {
@@ -143,13 +172,13 @@ class ViewController extends Controller
       } else {
         $html       = view('print.uper2',["header"=>$header, "angkutan"=>$angkutan, "stev"=>$stev, "cargo"=>$cargo, "sewa"=>"0", "dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
       }
-      // $filename   = "Test";
-      // $dompdf     = new Dompdf();
-      // $dompdf->set_option('isRemoteEnabled', true);
-      // $dompdf->loadHtml($html);
-      // $dompdf->setPaper('A4', 'potrait');
-      // $dompdf->render();
-      // $dompdf->stream($filename, array("Attachment" => false));
+      $filename   = "Test";
+      $dompdf     = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
       return $stev;
     }
 
