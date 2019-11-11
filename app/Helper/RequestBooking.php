@@ -68,19 +68,19 @@ class RequestBooking{
 						Y.DTL_OUT AS date_out
 						FROM (
 						SELECT
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
 						FROM
 						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) X
 						JOIN (
 						SELECT
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXTEND_FROM
+						DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
 						FROM
 						TX_HDR_DEL A
 						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
 						) Y
-						ON X.DEL_NO=Y.DEL_EXTEND_FROM WHERE Y.DEL_NO='".$find[$config['head_no']]."'
+						ON X.DTL_OUT=Y.DEL_EXT_FROM_DATE WHERE Y.DEL_NO='".$find[$config['head_no']]."'
 						"));
 					if (empty($findEx)) {
 						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
@@ -258,12 +258,13 @@ class RequestBooking{
 							"dtl_line_desc" => $list['memoline'],
 							// "dtl_line_context" => , // perlu konfimasi
 							"dtl_service_type" => $list['group_tariff_name'],
-							"dtl_amount" => $list['uper'], // blm fix
+							"dtl_amount" => $list['tariff_cal_uper'],
 							"dtl_ppn" => $list["ppn"],
 							"dtl_masa" => $list["day_period"],
 							// "dtl_masa1" => , // cooming soon
 							// "dtl_masa12" => , // cooming soon
 							// "dtl_masa2" => , // cooming soon
+							"dtl_total_tariff" => $list["tariff_uper"],
 							"dtl_tariff" => $list["tariff"],
 							"dtl_package" => $list["package_name"],
 							"dtl_qty" => $list["qty"],
@@ -327,7 +328,7 @@ class RequestBooking{
         		"head_tab" => "TX_HDR_REC",
         		"head_mark" => "rec_mark",
         		"head_tab_detil" => "TX_DTL_REC",
-        		"head_tab_detil_bl" => "dtl_bl",
+        		"head_tab_detil_bl" => "dtl_rec_bl",
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'dtl_in',
         		"head_tab_detil_date_out" => 'rec_etd',
@@ -355,7 +356,7 @@ class RequestBooking{
         		"head_tab" => "TX_HDR_DEL",
         		"head_mark" => "del_mark",
         		"head_tab_detil" => "TX_DTL_DEL",
-        		"head_tab_detil_bl" => "dtl_bl",
+        		"head_tab_detil_bl" => "dtl_del_bl",
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'dtl_in',
         		"head_tab_detil_date_out" => 'dtl_out',

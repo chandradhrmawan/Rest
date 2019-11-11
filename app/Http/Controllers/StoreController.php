@@ -223,6 +223,10 @@ class StoreController extends Controller
       function storePayment($input, $request){
         return UperRequest::storePayment($input);
       }
+
+      function confirmPaymentUper($input, $request){
+        return UperRequest::confirmPaymentUper($input);
+      }
     // UperRequest
 
     // UserAndRoleManagemnt
