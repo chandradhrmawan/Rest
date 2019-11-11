@@ -203,8 +203,7 @@ class RequestBooking{
 					$headU->uper_cust_npwp = $uper['npwp'];
 					$headU->uper_cust_address = $uper['address'];
 					$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
-					// $headU->uper_amount = $uper['total_uper'];
-					$headU->uper_amount = $uper['uper_total'];
+					$headU->uper_amount = $uper['total_uper'];
 					$headU->uper_currency_code = $uper['currency'];
 					$headU->uper_status = 'P'; // blm fix
 					$headU->uper_context = 'BRG'; // blm fix
@@ -217,13 +216,11 @@ class RequestBooking{
 					$headU->uper_trade_type = $uper['trade_type'];
 					$headU->uper_trade_name = $uper['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 					$headU->uper_req_no = $uper['booking_number'];
-					// $headU->uper_ppn = $uper['ppn_uper'];
-					$headU->uper_ppn = $uper['ppn'];
+					$headU->uper_ppn = $uper['ppn_uper'];
 					// $headU->uper_paid // ? pasti null
 					// $headU->uper_paid_date // ? pasti null
 					$headU->uper_percent = $uper['uper_percent'];
-					// $headU->uper_dpp = $uper['dpp_uper'];
-					$headU->uper_dpp = $uper['dpp'];
+					$headU->uper_dpp = $uper['dpp_uper'];
 					if ($config['head_pbm_id'] != null) {
 						$headU->uper_pbm_id = $find[$config['head_pbm_id']];
 					}
@@ -261,8 +258,7 @@ class RequestBooking{
 							"dtl_line_desc" => $list['memoline'],
 							// "dtl_line_context" => , // perlu konfimasi
 							"dtl_service_type" => $list['group_tariff_name'],
-							// "dtl_amount" => $list['total_uper'],
-							"dtl_amount" => $list['uper'],
+							"dtl_amount" => $list['total_uper'],
 							"dtl_ppn" => $list["ppn_uper"],
 							"dtl_masa" => $list["day_period"],
 							// "dtl_masa1" => , // cooming soon
