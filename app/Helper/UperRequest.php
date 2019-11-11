@@ -182,12 +182,14 @@ class UperRequest{
       $pay->pay_status = 3;
     }
     $pay->save();
-    $uper = TxHdrUper::where('uper_no',$pay->pay_no)->first();
-    static::updateUperStatus([
-      'uper_id' => $uper->uper_id,
-      'uper_req_no' => $uper->uper_req_no,
-      'uper_paid' => 'Y'
-    ]);
+    if ($input['approved'] == 'true') {
+      $uper = TxHdrUper::where('uper_no',$pay->pay_no)->first();
+      static::updateUperStatus([
+        'uper_id' => $uper->uper_id,
+        'uper_req_no' => $uper->uper_req_no,
+        'uper_paid' => 'Y'
+      ]);
+    }
     return ["result" => "Success, confirm uper payment"];
   }
 
