@@ -106,8 +106,4 @@ class IndexController extends Controller
     function joinMdmOrder($input) {
       return GlobalHelper::joinMdmOrder($input);
     }
-
-    function test($input) {
-      return response("berhasil");
-    }
 }

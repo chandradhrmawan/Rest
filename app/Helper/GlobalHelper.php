@@ -5,7 +5,7 @@ namespace App\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class GlobalHelper{
+class GlobalHelper {
 
   public static function viewHeaderDetail($input) {
       $data    = $input["data"];
@@ -39,14 +39,26 @@ class GlobalHelper{
         if ($input["spesial"] == "TM_LUMPSUM") {
           $id       = $input["HEADER"]["PK"][1];
           $detail   = [];
-          $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->join('TM_REFF', 'TM_REFF.REFF_ID', '=', 'TS_LUMPSUM_AREA.LUMPSUM_STACKING_TYPE')->where("LUMPSUM_ID", "=", $id)->get();
+          $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->where("LUMPSUM_ID", "=", $id)->get();
           foreach ($data_a as $list) {
             $newDt = [];
             foreach ($list as $key => $value) {
               $newDt[$key] = $value;
             }
 
-          $data_b = DB::connection("mdm")->table('VIEW_STACKING_AREA')->where("code", $list->lumpsum_area_code)->select("name","branch")->get();
+          $data_c = DB::connection("omcargo")->table('TM_REFF')->where("REFF_ID", "=", $list->lumpsum_stacking_type)->select("REFF_ID as lumpsum_stacking_type","REFF_NAME")->get();
+          foreach ($data_c as $listc) {
+            $newDt = [];
+            foreach ($listc as $key => $value) {
+              $newDt[$key] = $value;
+            }
+          }
+
+          if ($list->lumpsum_stacking_type == "2") {
+            $data_b = DB::connection("mdm")->table('TM_STORAGE')->where("storage_code", $list->lumpsum_area_code)->select("storage_code","storage_name","storage_branch_id")->get();
+          } else {
+            $data_b = DB::connection("mdm")->table('TM_YARD')->where("yard_code", $list->lumpsum_area_code)->select("yard_name","yard_branch_id")->get();
+          }
           foreach ($data_b as $listS) {
             foreach ($listS as $key => $value) {
               $newDt[$key] = $value;
@@ -116,7 +128,7 @@ class GlobalHelper{
       $connect  = \DB::connection($input["db"])->table($input["table"]);
 
       if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start'])->take($input['limit']);
+        $connect->skip($input['start']-1)->take($input['limit']);
 
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
@@ -153,7 +165,7 @@ class GlobalHelper{
       }
 
       if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start'])->take($input['limit']);
+        $connect->skip($input['start']-1)->take($input['limit']);
 
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
@@ -193,7 +205,7 @@ class GlobalHelper{
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start'])->take($input['limit']);
+      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
@@ -222,7 +234,7 @@ class GlobalHelper{
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start'])->take($input['limit']);
+      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
@@ -246,11 +258,8 @@ class GlobalHelper{
       $connect->join($list["table"], $list["field1"], '=', $list["field2"]);
     }
 
-    if(!empty($input["where"][0])) {
-      $connect->where($input["where"]);
-    }
     if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start'])->take($input['limit']);
+      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
@@ -259,6 +268,10 @@ class GlobalHelper{
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
     $connect->orderby($in[0], $in[1]);
+    }
+
+    if(!empty($input["where"][0])) {
+      $connect->where($input["where"]);
     }
 
     if(!empty($input["whereIn"][0])) {
@@ -309,7 +322,7 @@ class GlobalHelper{
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start'])->take($input['limit']);
+      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
@@ -350,7 +363,7 @@ class GlobalHelper{
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start'])->take($input['limit']);
+      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);

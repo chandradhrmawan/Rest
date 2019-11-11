@@ -17,7 +17,13 @@
 	</style>
 </head>
 <body>
+
 	@foreach($header as $header)
+	<?php if ($header->uper_paid == "Y") { ?>
+		<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:200px;transform: rotate(70deg);margin-top:100px;width:50%">
+	<?php } else { ?>
+		<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:100px;transform: rotate(20deg);">
+	<?php } ?>
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>

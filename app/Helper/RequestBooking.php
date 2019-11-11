@@ -158,7 +158,7 @@ class RequestBooking{
     }
 
     public static function approvalRequest($input){
-    	$input['table'] = strtoupper($input['table']);
+    $input['table'] = strtoupper($input['table']);
 		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
@@ -203,7 +203,7 @@ class RequestBooking{
 					$headU->uper_cust_npwp = $uper['npwp'];
 					$headU->uper_cust_address = $uper['address'];
 					$headU->uper_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
-					$headU->uper_amount = $uper['uper_total'];
+					$headU->uper_amount = $uper['total_uper'];
 					$headU->uper_currency_code = $uper['currency'];
 					$headU->uper_status = 'P'; // blm fix
 					$headU->uper_context = 'BRG'; // blm fix
@@ -216,11 +216,11 @@ class RequestBooking{
 					$headU->uper_trade_type = $uper['trade_type'];
 					$headU->uper_trade_name = $uper['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 					$headU->uper_req_no = $uper['booking_number'];
-					$headU->uper_ppn = $uper['ppn'];
+					$headU->uper_ppn = $uper['ppn_uper'];
 					// $headU->uper_paid // ? pasti null
 					// $headU->uper_paid_date // ? pasti null
-					$headU->uper_percent = $uper['uper_percent'];
-					$headU->uper_dpp = $uper['dpp'];
+					$headU->uper_percent = $uper['percent_uper'];
+					$headU->uper_dpp = $uper['dpp_uper'];
 					if ($config['head_pbm_id'] != null) {
 						$headU->uper_pbm_id = $find[$config['head_pbm_id']];
 					}
@@ -258,8 +258,8 @@ class RequestBooking{
 							"dtl_line_desc" => $list['memoline'],
 							// "dtl_line_context" => , // perlu konfimasi
 							"dtl_service_type" => $list['group_tariff_name'],
-							"dtl_amount" => $list['tariff_cal_uper'],
-							"dtl_ppn" => $list["ppn"],
+							"dtl_amount" => $list['total_uper'],
+							"dtl_ppn" => $list["ppn_uper"],
 							"dtl_masa" => $list["day_period"],
 							// "dtl_masa1" => , // cooming soon
 							// "dtl_masa12" => , // cooming soon
@@ -274,7 +274,7 @@ class RequestBooking{
 							"dtl_group_tariff_id" => $list["group_tariff_id"],
 							"dtl_group_tariff_name" => $list["group_tariff_name"],
 							"dtl_bl" => $list["no_bl"],
-							"dtl_dpp" => $list["tariff_cal"],
+							"dtl_dpp" => $list["tariff_cal_uper"],
 							"dtl_commodity" => $list["commodity_name"],
 							"dtl_equipment" => $list["equipment_name"],
 							"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
