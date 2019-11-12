@@ -19,7 +19,7 @@ class ConnectedExternalApps{
           },
           "esbBody": {
             "vesselName": "'.strtoupper($input['query']).'",
-            "ibisTerminalCode": "'.strtoupper($input['ibis_terminal_code']).'"
+            "ibisTerminalCode": "'.$input['ibis_terminal_code'].'"
           }
         }
       }';
@@ -47,26 +47,27 @@ class ConnectedExternalApps{
 
       $results = json_decode($res->getBody()->getContents());
       $data = $results->esbBody->results;
+      // return $data = $results->esbBody->results;
 
       $array_map = array_map(function($query) {
         return [
           'vessel' => $query->vessel,
           'voyageIn' => $query->voyageIn,
           'voyageOut' => $query->voyageOut,
-          'ata' => ($query->ata == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->ata)->format('Y-m-d H:i'),
-          'atd' => ($query->atd == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atd)->format('Y-m-d H:i'),
-          'atb' => ($query->atb == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atb)->format('Y-m-d H:i'),
-          'eta' => \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->eta)->format('Y-m-d H:i'),
-          'etd' => \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etd)->format('Y-m-d H:i'),
-          'etb' => ($query->etb == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etb)->format('Y-m-d H:i'),
-          'openStack' => ($query->openStack == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->openStack)->format('Y-m-d H:i'),
-          'closingTime' => ($query->closingTime == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTime)->format('Y-m-d H:i'),
-          'closingTimeDoc' => ($query->closingTimeDoc == null) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTimeDoc)->format('Y-m-d H:i'),
+          'ata' => (empty($query->ata)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->ata)->format('Y-m-d H:i'),
+          'atd' => (empty($query->atd)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atd)->format('Y-m-d H:i'),
+          'atb' => (empty($query->atb)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atb)->format('Y-m-d H:i'),
+          'eta' => (empty($query->eta)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->eta)->format('Y-m-d H:i'),
+          'etd' => (empty($query->etd)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etd)->format('Y-m-d H:i'),
+          'etb' => (empty($query->etb)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etb)->format('Y-m-d H:i'),
+          'openStack' => (empty($query->openStack)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->openStack)->format('Y-m-d H:i'),
+          'closingTime' => (empty($query->closingTime)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTime)->format('Y-m-d H:i'),
+          'closingTimeDoc' => (empty($query->closingTimeDoc)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTimeDoc)->format('Y-m-d H:i'),
           'voyage' => $query->voyage,
-          'idKade' => $query->idKade,
-          'terminalCode' => $query->terminalCode,
-          'ibisTerminalCode' => $query->ibisTerminalCode,
-          'active' => $query->active,
+          'idKade' => (empty($query->idKade)) ? null : $query->idKade,
+          'terminalCode' => (empty($query->terminalCode)) ? null : $query->idKade,
+          'ibisTerminalCode' => (empty($query->ibisTerminalCode)) ? null : $query->idKade,
+          'active' => (empty($query->active)) ? null : $query->idKade,
           'idVsbVoyage' => $query->idVsbVoyage,
           'vesselCode'=> $query->vesselCode
         ];
@@ -197,7 +198,7 @@ class ConnectedExternalApps{
   public static function sendRequestBooking($input){
     $header = TxHdrBm::where('bm_no',$input)->first();
     $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
-    static::sendRealBM($header, $detil);
+    return static::sendRealBM($header, $detil);
   }
 
   private static function sendRealBM($head, $detil){
@@ -208,9 +209,58 @@ class ConnectedExternalApps{
     $startenddate = '';
     $blno = '';
     $bldate = '';
-    $vParam = $head->bm_no.'^'.$head->bm_cust_name.'^'.$head->bm_cust_id.'^'.$head->bm_cust_npwp.'^'.$head->bm_vessel_name.'^'.$head->bm_eta.'^'.$head->bm_etd.'^'.$head->bm_open_stack.'^'.$head->bm_voyin.'^'.$head->bm_voyout.'^'.$head->bm_closing_time.'^BONGKAR MUAT^'.$consignee.'^'.$consignee.'^'.$oi.'^'.$podpol.'^'.$podpol.'^'.$movetype.'^'.$startenddate.'^'.$startenddate.'^'.$blno.'^0^'.$bldate.'^'.$head->bm_trade_type.'^'.$head->bm_vvd_id.'^';
+
+    if (empty($head->bm_eta)) {
+      $bm_eta = null;
+    }else{
+      $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_eta)->format('m/d/Y');
+    }
+    if (empty($head->bm_etd)) {
+      $bm_etd = null;
+    }else{
+      $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_etd)->format('m/d/Y');
+    }
+    if (empty($head->bm_open_stack)) {
+      $bm_open_stack = null;
+    }else{
+      $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_open_stack)->format('m/d/Y');
+    }
+    if (empty($head->bm_closing_time)) {
+      $bm_closing_time = null;
+    }else{
+      $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_closing_time)->format('m/d/Y');
+    }
+
+    $vParam = '';
+    $vParam .= $head->bm_no.'^';
+    $vParam .= $head->bm_cust_name.'^';
+    $vParam .= $head->bm_cust_id.'^';
+    $vParam .= $head->bm_cust_npwp.'^';
+    $vParam .= $head->bm_vessel_name.'^';
+    $vParam .= $bm_eta.'^';
+    $vParam .= $bm_etd.'^';
+    $vParam .= $head->bm_voyin.'^';
+    $vParam .= $head->bm_voyout.'^';
+    $vParam .= $bm_closing_time.'^';
+    $vParam .= 'BONGKAR MUAT^'; // ?
+    $vParam .= 'CONSIGNEE^'; // ?
+    $vParam .= $oi.'^'; // ?
+    $vParam .= $podpol.'^'; // ?
+    $vParam .= $podpol.'^'; // ?
+    $vParam .= $movetype.'^'; // ?
+    $vParam .= $startenddate.'^'; // ?
+    $vParam .= $startenddate.'^'; // ?
+    $vParam .= '0^'; // ?
+    $vParam .= $blno.'^'; // ?
+    $vParam .= $startenddate.'^'; // ?
+    $vParam .= '0^'; // ?
+    $vParam .= $head->bm_vvd_id.'^'; // ?
+    $vParam .= $oi.'^'; // ?
+    $vParam .= $startenddate.'^'; // ?
+    $vParam .= '0'; // ?
+
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
-    $string_json = '{
+    return $string_json = '{
       "createBookingHeaderInterfaceRequest": {
         "esbHeader": {
           "externalId": "2",
@@ -218,7 +268,7 @@ class ConnectedExternalApps{
         },
         "esbBody": {
           "vParam": "'.$vParam.'",
-          "vId": "'.$head->bm_no.'",
+          "vId": "'.$head->bm_id.'",
           "vReqNo": "'.$head->bm_no.'",
           "vBlNo": "'.$blno.'"
         }
@@ -239,7 +289,7 @@ class ConnectedExternalApps{
     try {
       $res = $client->post($endpoint_url, $options);
     } catch (ClientException $e) {
-      // return $e->getResponse();
+      return $e->getResponse();
     }
     foreach ($detil as $list) {
       $merk = '';
@@ -247,7 +297,20 @@ class ConnectedExternalApps{
       $hz = '';
       $distrub = '';
       $wight = '';
-      $vParam = $list->dtl_cmdty_name.'^'.$list->dtl_cont_type.'^'.$merk.'^'.$model.'^'.$hz.'^'.$distrub.'^'.$wight.'^'.$list->dtl_qty.'^0^';
+
+      $vParam = '';
+      $vParam .= $list->dtl_cmdty_name.'^';
+      $vParam .= $list->dtl_cont_type.'^';
+      $vParam .= $merk.'^'; // ?
+      $vParam .= $model.'^'; // ?
+      $vParam .= $hz.'^'; // ?
+      $vParam .= $distrub.'^'; // ?
+      $vParam .= $wight.'^'; // ?
+      $vParam .= $list->dtl_qty.'^';
+      $vParam .= 'N^'; // ?
+      $vParam .= '0'; // ?
+      
+
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
       $string_json = '{
         "createBookingDetailInterfaceRequest": {
@@ -277,9 +340,11 @@ class ConnectedExternalApps{
         try {
           $res = $client->post($endpoint_url, $options);
         } catch (ClientException $e) {
-      // return $e->getResponse();
+          return $e->getResponse();
         }
     }
+
+    return ['Success' => true];
   }
 
   public static function truckRegistration($input){
