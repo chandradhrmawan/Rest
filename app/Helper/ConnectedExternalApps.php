@@ -312,15 +312,17 @@ class ConnectedExternalApps{
       $vParamD .= 'N^'; // ?
       $vParamD .= '0'; // ?
 
+      $TEST = "GANDUM^TIPE^SEGITIGA BIRU^MODEL^N^N^100^100^N^50";
+
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
-      $string_json = '{
+      return $string_json = '{
         "createBookingDetailInterfaceRequest": {
           "esbHeader": {
             "externalId": "2",
             "timestamp": "2"
             },
             "esbBody": {
-              "vParam": "'.$vParamD.'",
+              "vParams": "'.$vParamD.'",
               "vId": "'.$list->dtl_bm_id.'",
               "vIdHeader": "'.$head->bm_id.'"
             }
