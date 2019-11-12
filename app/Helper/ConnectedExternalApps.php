@@ -294,24 +294,23 @@ class ConnectedExternalApps{
         return $e->getResponse();
       }
 
-      $merk = '';
-      $model = '';
-      $hz = '';
-      $distrub = '';
-      $wight = '';
+      $merk = '-';
+      $model = '-';
+      $hz = 'N';
+      $distrub = 'N';
+      $wight = '0';
 
-      $vParam = '';
-      $vParam .= $list->dtl_cmdty_name.'^';
-      $vParam .= $list->dtl_cont_type.'^';
-      $vParam .= $merk.'^'; // ?
-      $vParam .= $model.'^'; // ?
-      $vParam .= $hz.'^'; // ?
-      $vParam .= $distrub.'^'; // ?
-      $vParam .= $wight.'^'; // ?
-      $vParam .= $list->dtl_qty.'^';
-      $vParam .= 'N^'; // ?
-      $vParam .= '0'; // ?
-      $vParamD = $vParam;
+      $vParamD = '';
+      $vParamD .= $list->dtl_cmdty_name.'^';
+      $vParamD .= $list->dtl_cont_type.'^';
+      $vParamD .= $merk.'^'; // ?
+      $vParamD .= $model.'^'; // ?
+      $vParamD .= $hz.'^'; // ?
+      $vParamD .= $distrub.'^'; // ?
+      $vParamD .= $wight.'^'; // ?
+      $vParamD .= $list->dtl_qty.'^';
+      $vParamD .= 'N^'; // ?
+      $vParamD .= '0'; // ?
 
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
       $string_json = '{
