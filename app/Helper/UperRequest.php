@@ -39,21 +39,23 @@ class UperRequest{
                         "dtl_line_desc" => $list['memoline'],
                         // "dtl_line_context" => , // perlu konfimasi
                         "dtl_service_type" => $list['group_tariff_name'],
-                        // Tambahan Mas Adi
-  											"dtl_total_tariff" => $list["tariff_uper"],
-                        "dtl_amount" => $list['uper'], // blm fix
-                        "dtl_ppn" => $list["ppn"],
+                        "dtl_amount" => $list['total_uper'],
+                        "dtl_ppn" => $list["ppn_uper"],
+                        "dtl_masa" => $list["day_period"],
                         // "dtl_masa1" => , // cooming soon
                         // "dtl_masa12" => , // cooming soon
                         // "dtl_masa2" => , // cooming soon
+                        "dtl_total_tariff" => $list["tariff_uper"],
                         "dtl_tariff" => $list["tariff"],
                         "dtl_package" => $list["package_name"],
                         "dtl_qty" => $list["qty"],
+                        "dtl_eq_qty" => $list["eq_qty"],
                         "dtl_unit" => $list["unit_id"],
+                        "dtl_unit_name" => $list["unit_name"],
                         "dtl_group_tariff_id" => $list["group_tariff_id"],
                         "dtl_group_tariff_name" => $list["group_tariff_name"],
                         "dtl_bl" => $list["no_bl"],
-                        "dtl_dpp" => $list["tariff_cal"],
+                        "dtl_dpp" => $list["tariff_cal_uper"],
                         "dtl_commodity" => $list["commodity_name"],
                         "dtl_equipment" => $list["equipment_name"]
                     ];
