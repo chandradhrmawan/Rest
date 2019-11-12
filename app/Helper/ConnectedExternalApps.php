@@ -202,97 +202,98 @@ class ConnectedExternalApps{
   }
 
   private static function sendRealBM($head, $detil){
-    $consignee = '';
-    $oi = '';
-    $podpol = '';
-    $movetype = '';
-    $startenddate = '';
-    $blno = '';
-    $bldate = '';
-
-    if (empty($head->bm_eta)) {
-      $bm_eta = null;
-    }else{
-      $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_eta)->format('m/d/Y');
-    }
-    if (empty($head->bm_etd)) {
-      $bm_etd = null;
-    }else{
-      $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_etd)->format('m/d/Y');
-    }
-    if (empty($head->bm_open_stack)) {
-      $bm_open_stack = null;
-    }else{
-      $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_open_stack)->format('m/d/Y');
-    }
-    if (empty($head->bm_closing_time)) {
-      $bm_closing_time = null;
-    }else{
-      $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_closing_time)->format('m/d/Y');
-    }
-
-    $vParam = '';
-    $vParam .= $head->bm_no.'^';
-    $vParam .= $head->bm_cust_name.'^';
-    $vParam .= $head->bm_cust_id.'^';
-    $vParam .= $head->bm_cust_npwp.'^';
-    $vParam .= $head->bm_vessel_name.'^';
-    $vParam .= $bm_eta.'^';
-    $vParam .= $bm_etd.'^';
-    $vParam .= $head->bm_voyin.'^';
-    $vParam .= $head->bm_voyout.'^';
-    $vParam .= $bm_closing_time.'^';
-    $vParam .= 'BONGKAR MUAT^'; // ?
-    $vParam .= 'CONSIGNEE^'; // ?
-    $vParam .= $oi.'^'; // ?
-    $vParam .= $podpol.'^'; // ?
-    $vParam .= $podpol.'^'; // ?
-    $vParam .= $movetype.'^'; // ?
-    $vParam .= $startenddate.'^'; // ?
-    $vParam .= $startenddate.'^'; // ?
-    $vParam .= '0^'; // ?
-    $vParam .= $blno.'^'; // ?
-    $vParam .= $startenddate.'^'; // ?
-    $vParam .= '0^'; // ?
-    $vParam .= $head->bm_vvd_id.'^'; // ?
-    $vParam .= $oi.'^'; // ?
-    $vParam .= $startenddate.'^'; // ?
-    $vParam .= '0'; // ?
-    $vParamH = $vParam;
-
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
-    $string_json = '{
-      "createBookingHeaderInterfaceRequest": {
-        "esbHeader": {
-          "externalId": "2",
-          "timestamp": "2"
-        },
-        "esbBody": {
-          "vParam": "'.$vParamH.'",
-          "vId": "'.$head->bm_id.'",
-          "vReqNo": "'.$head->bm_no.'",
-          "vBlNo": "'.$blno.'"
-        }
-      }
-    }';
-    $username="npk_billing";
-    $password ="npk_billing";
-    $client = new Client();
-    $options= array(
-      'auth' => [
-        $username,
-        $password
-      ],
-      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-      'body' => $string_json,
-      "debug" => false
-    );
-    try {
-      $res = $client->post($endpoint_url, $options);
-    } catch (ClientException $e) {
-      return $e->getResponse();
-    }
     foreach ($detil as $list) {
+      $consignee = '';
+      $oi = '';
+      $podpol = '';
+      $movetype = '';
+      $startenddate = '';
+      $blno = $list->dtl_bm_bl;
+      $bldate = $list->dtl_create_date;
+
+      if (empty($head->bm_eta)) {
+        $bm_eta = null;
+      }else{
+        $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_eta)->format('m/d/Y');
+      }
+      if (empty($head->bm_etd)) {
+        $bm_etd = null;
+      }else{
+        $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_etd)->format('m/d/Y');
+      }
+      if (empty($head->bm_open_stack)) {
+        $bm_open_stack = null;
+      }else{
+        $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_open_stack)->format('m/d/Y');
+      }
+      if (empty($head->bm_closing_time)) {
+        $bm_closing_time = null;
+      }else{
+        $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_closing_time)->format('m/d/Y');
+      }
+
+      $vParam = '';
+      $vParam .= $head->bm_no.'^';
+      $vParam .= $head->bm_cust_name.'^';
+      $vParam .= $head->bm_cust_id.'^';
+      $vParam .= $head->bm_cust_npwp.'^';
+      $vParam .= $head->bm_vessel_name.'^';
+      $vParam .= $bm_eta.'^';
+      $vParam .= $bm_etd.'^';
+      $vParam .= $head->bm_voyin.'^';
+      $vParam .= $head->bm_voyout.'^';
+      $vParam .= $bm_closing_time.'^';
+      $vParam .= 'BONGKAR MUAT^'; // ?
+      $vParam .= 'CONSIGNEE^'; // ?
+      $vParam .= $oi.'^'; // ?
+      $vParam .= $podpol.'^'; // ?
+      $vParam .= $podpol.'^'; // ?
+      $vParam .= $movetype.'^'; // ?
+      $vParam .= $startenddate.'^'; // ?
+      $vParam .= $startenddate.'^'; // ?
+      $vParam .= '0^'; // ?
+      $vParam .= $blno.'^'; // ?
+      $vParam .= $startenddate.'^'; // ?
+      $vParam .= '0^'; // ?
+      $vParam .= $head->bm_vvd_id.'^'; // ?
+      $vParam .= $oi.'^'; // ?
+      $vParam .= $startenddate.'^'; // ?
+      $vParam .= '0'; // ?
+      $vParamH = $vParam;
+
+      $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
+      $string_json = '{
+        "createBookingHeaderInterfaceRequest": {
+          "esbHeader": {
+            "externalId": "2",
+            "timestamp": "2"
+          },
+          "esbBody": {
+            "vParam": "'.$vParamH.'",
+            "vId": "'.$head->bm_id.'",
+            "vReqNo": "'.$head->bm_no.'",
+            "vBlNo": "'.$blno.'"
+          }
+        }
+      }';
+      $username="npk_billing";
+      $password ="npk_billing";
+      $client = new Client();
+      $options= array(
+        'auth' => [
+          $username,
+          $password
+        ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        return $e->getResponse();
+      }
+
       $merk = '';
       $model = '';
       $hz = '';
@@ -310,7 +311,7 @@ class ConnectedExternalApps{
       $vParam .= $list->dtl_qty.'^';
       $vParam .= 'N^'; // ?
       $vParam .= '0'; // ?
-      
+      $vParamD = $vParam;
 
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
       $string_json = '{
@@ -320,7 +321,7 @@ class ConnectedExternalApps{
             "timestamp": "2"
             },
             "esbBody": {
-              "vParam": "'.$vParam.'",
+              "vParam": "'.$vParamD.'",
               "vId": "'.$list->dtl_bm_id.'",
               "vIdHeader": "'.$head->bm_no.'"
             }
