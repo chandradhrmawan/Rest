@@ -18,8 +18,8 @@ class ConnectedExternalApps{
           "timestamp": "YYYYMMDD HH:Mi:SS"
           },
           "esbBody": {
-            "vesselName": "'.$input['query'].'",
-            "ibisTerminalCode": "'.$input['ibis_terminal_code'].'"
+            "vesselName": "'.strtoupper($input['query']).'",
+            "ibisTerminalCode": "'.strtoupper($input['ibis_terminal_code']).'"
           }
         }
       }';
