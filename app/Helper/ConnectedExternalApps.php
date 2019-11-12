@@ -18,8 +18,8 @@ class ConnectedExternalApps{
           "timestamp": "YYYYMMDD HH:Mi:SS"
           },
           "esbBody": {
-            "vesselName": "'.$input['query'].'",
-            "ibisTerminalCode": "'.$input['ibis_terminal_code'].'"
+            "vesselName": "'.strtoupper($input['query']).'",
+            "ibisTerminalCode": "'.strtoupper($input['ibis_terminal_code']).'"
           }
         }
       }';
@@ -197,7 +197,7 @@ class ConnectedExternalApps{
   public static function sendRequestBooking($input){
     $header = TxHdrBm::where('bm_no',$input)->first();
     $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
-    static::sendRealBM($head, $detil);
+    static::sendRealBM($header, $detil);
   }
 
   private static function sendRealBM($head, $detil){
@@ -218,9 +218,9 @@ class ConnectedExternalApps{
         },
         "esbBody": {
           "vParam": "'.$vParam.'",
-          "vId": "-",
-          "vReqNo": "-",
-          "vBlNo": "-"
+          "vId": "'.$head->bm_no.'",
+          "vReqNo": "'.$head->bm_no.'",
+          "vBlNo": "'.$blno.'"
         }
       }
     }';
@@ -257,8 +257,8 @@ class ConnectedExternalApps{
             },
             "esbBody": {
               "vParam": "'.$vParam.'",
-              "vId": "",
-              "vIdHeader": ""
+              "vId": "'.$list->dtl_bm_id.'",
+              "vIdHeader": "'.$head->bm_no.'"
             }
           }
         }';

@@ -159,7 +159,7 @@ class UperRequest{
             'pay_file' => $response['link']
           ]);
         }
-
+        $pay = TxPayment::find($pay->pay_id);
         if ($input['pay_type'] == 1){
             if ($pay->pay_status == 1) {
               static::updateUperStatus([

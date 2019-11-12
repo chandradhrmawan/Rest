@@ -17,7 +17,7 @@ class UserAndRoleManagemnt{
       'user_nik' => $input['user_nik'],
       'user_branch_id' => $input['user_branch_id'],
       'user_full_name' => $input['user_full_name'],
-      'user_status' => 0
+      'user_status' => $input['user_status']
     ];
 
     if (isset($input['user_password']) and !empty($input['user_password'])) {
@@ -266,15 +266,16 @@ class UserAndRoleManagemnt{
       $estjs[] = $add;
     }
 
-    return [
-      "root" => [
-        "expanded" =>true,
-        "children" => $estjs
-      ]
-    ];
     // return [
+    //   "root" => [
+    //     "expanded" =>true,
     //     "children" => $estjs
+    //   ]
     // ];
+    return [
+      "expanded" =>true,
+      "children" => $estjs
+    ];
   }
 
 }
