@@ -75,9 +75,11 @@ class UserAndRoleManagemnt{
   }
 
 	public static function permissionGet($input){
-      $role = static::role_data($input['ROLE_ID'],'permission');
+      return $role = static::role_data($input['ROLE_ID'],'permission');
       if ($role == false) {
-        return ['response' => 'Fail, your role cant not found!'];
+        return ['Success' => false, 'response' => 'Fail, your role cant not found!'];
+      }else if(empty($role['role_service'])){
+        return ['Success' => false, 'response' => 'Fail, your role service is null!'];
       }
       return static::permission($role);
   }
