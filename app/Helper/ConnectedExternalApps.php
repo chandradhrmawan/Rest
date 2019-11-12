@@ -197,7 +197,7 @@ class ConnectedExternalApps{
   public static function sendRequestBooking($input){
     $header = TxHdrBm::where('bm_no',$input)->first();
     $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
-    static::sendRealBM($head, $detil);
+    static::sendRealBM($header, $detil);
   }
 
   private static function sendRealBM($head, $detil){
