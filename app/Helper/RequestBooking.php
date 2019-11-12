@@ -219,11 +219,7 @@ class RequestBooking{
 					$headU->uper_ppn = $uper['ppn_uper'];
 					// $headU->uper_paid // ? pasti null
 					// $headU->uper_paid_date // ? pasti null
-<<<<<<< HEAD
 					$headU->uper_percent = $uper['percent_uper'];
-=======
-					$headU->uper_percent = $uper['uper_percent'];
->>>>>>> 330e9803bfff32c0ac06d599efce95e6d3cda2ab
 					$headU->uper_dpp = $uper['dpp_uper'];
 					if ($config['head_pbm_id'] != null) {
 						$headU->uper_pbm_id = $find[$config['head_pbm_id']];
