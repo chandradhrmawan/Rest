@@ -218,9 +218,9 @@ class ConnectedExternalApps{
         },
         "esbBody": {
           "vParam": "'.$vParam.'",
-          "vId": "-",
-          "vReqNo": "-",
-          "vBlNo": "-"
+          "vId": "'.$head->bm_no.'",
+          "vReqNo": "'.$head->bm_no.'",
+          "vBlNo": "'.$blno.'"
         }
       }
     }';
@@ -257,8 +257,8 @@ class ConnectedExternalApps{
             },
             "esbBody": {
               "vParam": "'.$vParam.'",
-              "vId": "",
-              "vIdHeader": ""
+              "vId": "'.$head->bm_no.'",
+              "vIdHeader": "'.$head->bm_no.'"
             }
           }
         }';
