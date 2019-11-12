@@ -323,7 +323,7 @@ class ConnectedExternalApps{
             "esbBody": {
               "vParam": "'.$vParamD.'",
               "vId": "'.$list->dtl_bm_id.'",
-              "vIdHeader": "'.$head->bm_no.'"
+              "vIdHeader": "'.$head->bm_id.'"
             }
           }
         }';
@@ -345,7 +345,6 @@ class ConnectedExternalApps{
           return $e->getResponse();
         }
     }
-
     return ['Success' => true];
   }
 
