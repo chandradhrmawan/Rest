@@ -315,7 +315,7 @@ class ConnectedExternalApps{
       $TEST = "GANDUM^TIPE^SEGITIGA BIRU^MODEL^N^N^100^100^N^50";
 
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
-      return $string_json = '{
+      $string_json = '{
         "createBookingDetailInterfaceRequest": {
           "esbHeader": {
             "externalId": "2",
