@@ -257,7 +257,7 @@ class ConnectedExternalApps{
             },
             "esbBody": {
               "vParam": "'.$vParam.'",
-              "vId": "'.$head->bm_no.'",
+              "vId": "'.$list->dtl_bm_id.'",
               "vIdHeader": "'.$head->bm_no.'"
             }
           }
