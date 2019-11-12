@@ -16,14 +16,14 @@ class GlobalHelper {
         $val     = $input[$data];
         $connect  = DB::connection($val["DB"])->table($val["TABLE"]);
           if ($data == "HEADER") {
-             $header   = $connect->where($pk, "like", $pkVal)->get();
+             $header   = $connect->where(strtoupper($pk), "like", strtoupper($pkVal))->get();
              $header   = json_decode(json_encode($header), TRUE);
              $vwdata = ["HEADER" => $header];
           }
             else {
             $fk      = $val["FK"][0];
             $fkhdr   = $header[0][$val["FK"][1]];
-            $detail  = $connect->where($fk, "like", $fkhdr)->get();
+            $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
             $vwdata[$data] = $detail;
           }
       }
@@ -153,15 +153,15 @@ class GlobalHelper {
       $connect   = \DB::connection($input["db"])->table($input["table"]);
 
       for ($i=0; $i < count($data); $i++) {
-      $result[] = array($data[$i],$operator[$i],$value[$i]);
+      $result[] = array(strtoupper($data[$i]),$operator[$i],strtoupper($value[$i]));
 
       if ($type == "or") {
         if ($operator[$i] != "like") $connect->orWhere($result);
-        else $connect->orwhere($data[$i], 'like', '%'.$value[$i].'%');
+        else $connect->orwhere(strtoupper($data[$i]), 'like', '%'.strtoupper($value[$i]).'%');
       }
 
       else if($type == "and") $connect->Where($result);
-      else $connect->orwhere($data[$i], 'like', '%'.$value[$i].'%');
+      else $connect->orwhere(strtoupper($data[$i]), 'like', '%'.strtoupper($value[$i]).'%');
       }
 
       if (!empty($input['start']) && !empty($input['limit']))
@@ -195,7 +195,7 @@ class GlobalHelper {
 
     foreach ($search as $value) {
       if ($value["operator"] == "like")
-        $connect->Where($value["property"],$value["operator"],$value["value"]."%");
+        $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
       else if($value["operator"] == "eq")
         $connect->whereDate($value["property"],'=',$value["value"]);
       else if($value["operator"] == "gt")
@@ -213,7 +213,7 @@ class GlobalHelper {
 
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
-    $connect->orderby($in[0], $in[1]);
+    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
     $result   = $connect->get();
@@ -226,11 +226,11 @@ class GlobalHelper {
     $connect  = \DB::connection($input["db"])->table($input["table"]);
 
     if ($input['field'] != '' && $input['query'] != '') {
-      $connect->Where($input["field"],'like',$input["query"]."%");
+      $connect->Where(strtoupper($input["field"]),'like',"%".strtoupper($input["query"])."%");
     }
 
     if(!empty($input["groupby"])) {
-      $connect->groupBy($input["groupby"]);
+      $connect->groupBy(strtoupper($input["groupby"]));
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
@@ -242,7 +242,7 @@ class GlobalHelper {
 
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
-    $connect->orderby($in[0], $in[1]);
+    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
 
@@ -255,7 +255,7 @@ class GlobalHelper {
   public static function join($input) {
     $connect = DB::connection($input["db"])->table($input["table"]);
     foreach ($input["join"] as $list) {
-      $connect->join($list["table"], $list["field1"], '=', $list["field2"]);
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
@@ -267,7 +267,7 @@ class GlobalHelper {
 
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
-    $connect->orderby($in[0], $in[1]);
+    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
     if(!empty($input["where"][0])) {
@@ -276,21 +276,16 @@ class GlobalHelper {
 
     if(!empty($input["whereIn"][0])) {
     $in        = $input["whereIn"];
-    $connect->whereIn($in[0], $in[1]);
+    $connect->whereIn(strtoupper($in[0]), $in[1]);
     }
 
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
-    $connect->whereNotIn($in[0], $in[1]);
+    $connect->whereNotIn(strtoupper($in[0]), $in[1]);
     }
 
     if (!empty($input["query"]) && !empty($input["field"])) {
-      $connect->where($input["field"],"like", "%".$input["query"]."%");
-    }
-
-    if(!empty($input["orderBy"][0])) {
-    $in        = $input["orderBy"];
-    $connect->orderby($in[0], $in[1]);
+      $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
     }
 
     if (isset($input["changeKey"])) {
@@ -313,12 +308,12 @@ class GlobalHelper {
     }
 
     if (!empty($input["query"]) && !empty($input["field"])) {
-      $connect->where($input["field"],"like", "%".$input["query"]."%");
+      $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
     }
 
     if(!empty($input["whereIn"][0])) {
     $in        = $input["whereIn"];
-    $connect->whereIn($in[0], $in[1]);
+    $connect->whereIn(strtoupper($in[0]), $in[1]);
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
@@ -330,7 +325,7 @@ class GlobalHelper {
 
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
-    $connect->orderby($in[0], $in[1]);
+    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
     if (isset($input["changeKey"])) {
@@ -350,7 +345,7 @@ class GlobalHelper {
 
     if(!empty($input["whereIn"][0])) {
     $in        = $input["whereIn"];
-    $connect->whereIn($in[0], $in[1]);
+    $connect->whereIn(strtoupper($in[0]), $in[1]);
     }
 
     if(!empty($input["where"][0])) {
@@ -359,19 +354,19 @@ class GlobalHelper {
 
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
-    $connect->whereNotIn($in[0], $in[1]);
+    $connect->whereNotIn(strtoupper($in[0]), $in[1]);
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
       $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
-      $result  = $connect->select($input["selected"]);
+      $result  = $connect->select(strtoupper($input["selected"]));
     }
 
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
-    $connect->orderby($in[0], $in[1]);
+    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
     $data      = $connect->get();
