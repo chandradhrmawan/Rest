@@ -258,16 +258,17 @@ class ConnectedExternalApps{
     $vParam .= $oi.'^'; // ?
     $vParam .= $startenddate.'^'; // ?
     $vParam .= '0'; // ?
+    $vParamH = $vParam;
 
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
-    return $string_json = '{
+    $string_json = '{
       "createBookingHeaderInterfaceRequest": {
         "esbHeader": {
           "externalId": "2",
           "timestamp": "2"
         },
         "esbBody": {
-          "vParam": "'.$vParam.'",
+          "vParam": "'.$vParamH.'",
           "vId": "'.$head->bm_id.'",
           "vReqNo": "'.$head->bm_no.'",
           "vBlNo": "'.$blno.'"
