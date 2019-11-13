@@ -208,7 +208,7 @@ class ConnectedExternalApps{
 
   private static function sendRealBM($head, $detil){
     foreach ($detil as $list) {
-      if (strtoupper($list->dtl_pkg_name) == strtoupper('Curah Kering Pangan')) {
+      if ($list->dtl_pkg_id == 4) {
         // 
           $consignee = '';
           $oi = '';
@@ -272,7 +272,7 @@ class ConnectedExternalApps{
           $vParam .= '0'; // ?
           $vParamH = $vParam;
         // 
-        
+
         // 
           $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
           $string_json = '{
@@ -307,7 +307,7 @@ class ConnectedExternalApps{
             return $e->getResponse();
           }
         // 
-        
+
         // 
           $merk = '-';
           $model = '-';
@@ -340,24 +340,24 @@ class ConnectedExternalApps{
                   "vIdHeader": "'.$head->bm_id.'"
                 }
               }
-            }';
-            $username="npk_billing";
-            $password ="npk_billing";
-            $client = new Client();
-            $options= array(
-              'auth' => [
-                $username,
-                $password
-              ],
-              'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-              'body' => $string_json,
-              "debug" => false
-            );
-            try {
-              $res = $client->post($endpoint_url, $options);
-            } catch (ClientException $e) {
-              return $e->getResponse();
-            }
+          }';
+          $username="npk_billing";
+          $password ="npk_billing";
+          $client = new Client();
+          $options= array(
+            'auth' => [
+              $username,
+              $password
+            ],
+            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+            'body' => $string_json,
+            "debug" => false
+          );
+          try {
+            $res = $client->post($endpoint_url, $options);
+          } catch (ClientException $e) {
+            return $e->getResponse();
+          }
         // 
       }
     }
@@ -388,7 +388,7 @@ class ConnectedExternalApps{
                    "receiptNumber":"'.$uperH->uper_no.'",
                    "receiptMethod":"BANK",
                    "receiptAccount":"'.$pay->pay_dest_account_name.' '.$pay->pay_dest_bank_code.' '.$pay->pay_dest_account_no.'",
-                   "bankId":"-",
+                   "bankId":"",
                    "customerNumber":"'.$pay->pay_cust_id.'",
                    "receiptDate":"'.$pay->pay_date.'",
                    "currencyCode":"'.$pay->pay_currency.'",

@@ -202,12 +202,12 @@ class UperRequest{
 
     if ($input['approved'] == 'true') {
       $uper = TxHdrUper::where('uper_no',$pay->pay_no)->first();
-      ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
       static::updateUperStatus([
         'uper_id' => $uper->uper_id,
         'uper_req_no' => $uper->uper_req_no,
         'uper_paid' => 'Y'
       ]);
+      ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
     }
     return ["result" => "Success, confirm uper payment", 'pay_no' => $pay->pay_no];
   }
