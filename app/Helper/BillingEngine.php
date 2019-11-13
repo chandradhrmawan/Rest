@@ -60,7 +60,6 @@ class BillingEngine{
         }
 
         // store head
-
           if(empty($head['TARIFF_ID'])){
             $headS    = new TxProfileTariffHdr;
           }else{
@@ -138,7 +137,7 @@ class BillingEngine{
             $detilS->service_code       = $headS->service_code;
             $detilS->sub_iso_code       = $subisocode;
             $detilS->iso_code           = $isocode;
-            $detilS->branch_id          = 10; // SESSION LOGIN
+            $detilS->branch_id          = 12; // SESSION LOGIN
 
             $detilS->nota_id            = $list['LAYANAN'];
             $detilS->tariff_object      = $list['OBJECT_TARIFF'];
