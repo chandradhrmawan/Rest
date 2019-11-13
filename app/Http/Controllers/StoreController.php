@@ -143,6 +143,9 @@ class StoreController extends Controller
       $detil = [];
       foreach ($loop as $list) {
         $truck = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id', $list->tca_truck_id)->get();
+        if (count($truck) == 0) {
+          return ["Success"=>false, 'result_msg' => 'Fail, not found '.$list->tca_truck_id.' on mdm.tm_truck'];
+        }
         $truck = $truck[0];
         $detil[] = [
           "vNoRequest" => $head->tca_req_no,
