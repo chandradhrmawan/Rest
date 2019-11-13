@@ -367,7 +367,7 @@ class ConnectedExternalApps{
               "esbBody": {
                   "vTruckId": "'. str_replace(' ','',$input['truck_plat_no']).'",
                   "vTruckNumber": "'.$input['truck_plat_no'].'",
-                  "vRfidCode": "'.$input['truck_rfid_code'].'",
+                  "vRFIDCode": "'.$input['truck_rfid_code'].'",
                   "vCustomerName": "'.$input['customer_name'].'",
                   "vAddress": "'.$input['customer_address'].'",
                   "vCustomerId": "'.$input['cdm_customer_id'].'",
@@ -405,21 +405,25 @@ class ConnectedExternalApps{
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/updateTid";
 
     $string_json = '{
-          "terminalInsertUpdateRequest": {
+          "updateTidInterfaceRequest": {
               "esbHeader": {
-                  "externalId": "5275682735",
-                  "timestamp": "YYYYMMDD HH:Mi:SS"
+                "internalId": "", 
+                "externalId": "", 
+                "timestamp": "", 
+                "responseTimestamp": "", 
+                "responseCode": "", 
+                "responseMessage": ""
               },
               "esbBody": {
-                  "vTruckId": "'.$input['truck_plat_no'].'",
-                  "vTruckNumber": "'.$input['truck_plat_no'].'",
-                  "vRfidCode": "'.$input['truck_rfid_code'].'",
-                  "vCustomerName": "'.$input['customer_name'].'",
-                  "vAddress": "'.$input['customer_address'].'",
-                  "vCustomerId": "'.$input['cdm_customer_id'].'",
-                  "vKend": "'.$input['truck_type'].'",
-                  "vTgl": "'.$input['date'].'",
-                  "vTerminalCode": "201"
+                  "truckId": "'.$input['truck_plat_no'].'",
+                  "truckNumber": "'.$input['truck_plat_no'].'",
+                  "rfidCode": "'.$input['truck_rfid_code'].'",
+                  "customerName": "'.$input['customer_name'].'",
+                  "address": "'.$input['customer_address'].'",
+                  "customerId": "'.$input['cdm_customer_id'].'",
+                  "kend": "'.$input['truck_type'].'",
+                  "tgl": "'.$input['date'].'",
+                  "idTerminal": "201"
               }
           }
     }';
