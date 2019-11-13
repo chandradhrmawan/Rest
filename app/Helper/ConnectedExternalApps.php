@@ -366,9 +366,10 @@ class ConnectedExternalApps{
 
   public static function sendUperPutReceipt($uper_id, $pay){
     $uperH = TxHdrUper::find($uper_id);
-    $branchCode = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
-    $branch = $branchCode[0];
-    // $branchCode = $branchCode->branch_code;
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = $branch[0];
+    $bank = DB::connection('mdm')->table('TM_BANK')->where('account_no',$pay->pay_dest_account_no)->get();
+    $bank = $bank[0];
 
     $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
     $string_json= '{
@@ -388,7 +389,7 @@ class ConnectedExternalApps{
                    "receiptNumber":"'.$uperH->uper_no.'",
                    "receiptMethod":"BANK",
                    "receiptAccount":"'.$pay->pay_dest_account_name.' '.$pay->pay_dest_bank_code.' '.$pay->pay_dest_account_no.'",
-                   "bankId":"105006",
+                   "bankId":"'.$bank->bank_id.'",
                    "customerNumber":"'.$pay->pay_cust_id.'",
                    "receiptDate":"'.$pay->pay_date.'",
                    "currencyCode":"'.$pay->pay_currency.'",
