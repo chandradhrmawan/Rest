@@ -21,24 +21,24 @@ class GlobalHelper {
              $vwdata = ["HEADER" => $header];
           }
 
-          else if($data == "FILE") {
-            $fil     = [];
-            $fk      = $val["FK"][0];
-            $fkhdr   = $header[0][$val["FK"][1]];
-            $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
-            foreach ($detail as $list) {
-              $newDt = [];
-              foreach ($list as $key => $value) {
-                $newDt[$key] = $value;
-              }
-            }
-            $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
-            $url     = str_replace(" ", "%20", $dataUrl);
-            $file = file_get_contents($url);
-            $newDt["base64"]  =  base64_encode($file);
-            $fil[] = $newDt;
-            $vwdata[$data] = $fil[0];
-          }
+          // else if($data == "FILE") {
+          //   $fil     = [];
+          //   $fk      = $val["FK"][0];
+          //   $fkhdr   = $header[0][$val["FK"][1]];
+          //   $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
+          //   foreach ($detail as $list) {
+          //     $newDt = [];
+          //     foreach ($list as $key => $value) {
+          //       $newDt[$key] = $value;
+          //     }
+          //   }
+          //   $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
+          //   $url     = str_replace(" ", "%20", $dataUrl);
+          //   $file = file_get_contents($url);
+          //   $newDt["base64"]  =  base64_encode($file);
+          //   $fil[] = $newDt;
+          //   $vwdata[$data] = $fil[0];
+          // }
 
           else {
             $fk      = $val["FK"][0];
@@ -59,6 +59,8 @@ class GlobalHelper {
         if ($input["spesial"] == "TM_LUMPSUM") {
           $id       = $input["HEADER"]["PK"][1];
           $detail   = [];
+          $cust     = [];
+          $fil      = [];
           $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->where("LUMPSUM_ID", "=", $id)->get();
           foreach ($data_a as $list) {
             $newDt = [];
@@ -66,18 +68,18 @@ class GlobalHelper {
               $newDt[$key] = $value;
             }
 
-          $data_c = DB::connection("omcargo")->table('TM_REFF')->where("REFF_ID", "=", $list->lumpsum_stacking_type)->select("REFF_ID as lumpsum_stacking_type","REFF_NAME")->get();
-          foreach ($data_c as $listc) {
-            $newDt = [];
-            foreach ($listc as $key => $value) {
-              $newDt[$key] = $value;
+            $data_c = DB::connection("omcargo")->table('TM_REFF')->where([["REFF_TR_ID", "=", "11"],["REFF_ID", "=", $list->lumpsum_stacking_type]])->get();
+            foreach ($data_c as $listc) {
+              $newDt = [];
+              foreach ($listc as $key => $value) {
+                $newDt[$key] = $value;
+              }
             }
-          }
 
           if ($list->lumpsum_stacking_type == "2") {
-            $data_b = DB::connection("mdm")->table('TM_STORAGE')->where("storage_code", $list->lumpsum_area_code)->select("storage_code","storage_name","storage_branch_id")->get();
+            $data_b = DB::connection("mdm")->table('TM_STORAGE')->where("storage_code", $list->lumpsum_area_code)->get();
           } else {
-            $data_b = DB::connection("mdm")->table('TM_YARD')->where("yard_code", $list->lumpsum_area_code)->select("yard_name","yard_branch_id")->get();
+            $data_b = DB::connection("mdm")->table('TM_YARD')->where("yard_code", $list->lumpsum_area_code)->get();
           }
           foreach ($data_b as $listS) {
             foreach ($listS as $key => $value) {
@@ -86,7 +88,28 @@ class GlobalHelper {
           }
           $detail[] = $newDt;
          }
+
+         $data_d   = DB::connection("omcargo")->table('TS_LUMPSUM_CUST')->where("LUMPSUM_ID", "=", $id)->get();
+         foreach ($data_d as $listD) {
+           $custo = [];
+           foreach ($listD as $key => $value) {
+             $custo[$key] = $value;
+           }
+             $cust[] = $custo;
+         }
+
+         $no = $vwdata["HEADER"][0]["lumpsum_no"];
+         $data_e   = DB::connection("omcargo")->table('TX_DOCUMENT')->where("REQ_NO", "=", $no)->get();
+         foreach ($data_e as $listE) {
+           $file = [];
+           foreach ($listE as $key => $value) {
+             $file[$key] = $value;
+           }
+             $fil[] = $file;
+         }
          $vwdata["DETAIL"] = $detail;
+         $vwdata["CUSTOMER"] = $cust;
+         $vwdata["FILE"] = $fil;
         }
       }
 
@@ -152,6 +175,10 @@ class GlobalHelper {
 
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
+      }
+
+      if (!empty($input["rangeDate"])) {
+        $result  = $connect->where([$input["rangeDate"][0], ">", $input["rangeDate"][1]],[$input["rangeDate"][0], "<", $input["rangeDate"][2]]);
       }
 
       if(!empty($input["orderby"][0])) {
@@ -273,6 +300,16 @@ class GlobalHelper {
   }
 
   public static function join($input) {
+    if (!empty($input['special'])) {
+      if ($input['special'] == "roleReff") {
+        $a = "SELECT tr.*, tr2.REFF_NAME AS SERVICE, tr3.REFF_NAME AS STATUS FROM TR_ROLE tr, TM_REFF tr2, TM_REFF tr3 WHERE tr.ROLE_SERVICE = tr2.REFF_ID AND tr2.REFF_TR_ID = 1 AND tr.ROLE_STATUS = tr3.REFF_ID AND tr3.REFF_TR_ID = 3 ORDER BY tr.role_id DESC";
+        $data = DB::connection("omuster")->select(DB::raw($a));
+      }  else if($input['special'] == "bprpReff") {
+        $a = "SELECT tr.*, tr2.REFF_NAME AS req_type, tr3.REFF_NAME AS STATUS FROM TX_HDR_BPRP tr, TM_REFF tr2, TM_REFF tr3 WHERE tr.BPRP_REQ_TYPE = tr2.REFF_ID AND tr2.REFF_TR_ID = 12 AND tr.BPRP_STATUS = tr3.REFF_ID AND tr3.REFF_TR_ID = 8 AND tr.BPRP_BRANCH_ID = 12 AND tr.BPRP_REQ_TYPE IN (1,2) ORDER BY tr.BPRP_ID DESC";
+        $data = DB::connection("omcargo")->select(DB::raw($a));
+      }
+    }
+    else {
     $connect = DB::connection($input["db"])->table($input["table"]);
     foreach ($input["join"] as $list) {
       $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
@@ -299,6 +336,11 @@ class GlobalHelper {
     $connect->whereIn(strtoupper($in[0]), $in[1]);
     }
 
+    if(!empty($input["whereIn2"][0])) {
+    $in        = $input["whereIn2"];
+    $connect->whereIn(strtoupper($in[0]), $in[1]);
+    }
+
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
     $connect->whereNotIn(strtoupper($in[0]), $in[1]);
@@ -316,9 +358,9 @@ class GlobalHelper {
     } else {
       $data   = $connect->get();
 
+      }
     }
     return $data;
-
   }
 
   public static function whereQuery($input) {
@@ -460,7 +502,7 @@ class GlobalHelper {
           }
         }
       }
-    return ["result"=>"Save or Update Success"];
+    return ["result"=>"Save or Update Success", "header"=>$header];
   }
 
   public static function update($input){
