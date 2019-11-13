@@ -86,12 +86,12 @@ class StoreController extends Controller
         $input['truck_cust_id'] = $new->comp_id;
       }
       $set_data = [
-        "truck_plat_no" => $input['truck_plat_no'],
-        "truck_rfid_code" => $input['truck_rfid'],
-        "customer_name" => $input['truck_cust_name'],
-        "customer_address" => $input['truck_cust_address'],
-        "cdm_customer_id" => $input['truck_cust_id'],
-        "truck_type" => $input['truck_type'],
+        "truck_plat_no" => strtoupper($input['truck_plat_no']),
+        "truck_rfid_code" => strtoupper($input['truck_rfid']),
+        "customer_name" => strtoupper($input['truck_cust_name']),
+        "customer_address" => strtoupper($input['truck_cust_address']),
+        "cdm_customer_id" => strtoupper($input['truck_cust_id']),
+        "truck_type" => strtoupper($input['truck_type']),
         "date" => \Carbon\Carbon::createFromFormat("Y-m-d H:i", $input['truck_plat_exp'])->format('d-m-Y')
       ];
 
