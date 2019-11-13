@@ -22,7 +22,7 @@ class RealisasiHelper{
       $setH['P_NOTA_ID'] = 13;
       $setH['P_BRANCH_ID'] = $find->real_branch_id;
       $setH['P_CUSTOMER_ID'] = $find->bm_cust_id;
-      $setH['P_BOOKING_NUMBER'] = $find->bm_no;
+      $setH['P_BOOKING_NUMBER'] = $find->real_no;
       $setH['P_REALIZATION'] = 'Y';
       $setH['P_TRADE'] = $find->bm_trade_type;
       $setH['P_USER_ID'] = $find->real_create_by;
