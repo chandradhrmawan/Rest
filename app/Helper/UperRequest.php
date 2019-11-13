@@ -114,6 +114,10 @@ class UperRequest{
   }
 
 	public static function storePayment($input){
+        if (empty($input['pay_file'])) {
+          return ["Success"=>false, "result" => "Fail, file is required"];
+        }
+        
         if ($input['pay_type'] == 1) {
             $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
             if (empty($uper)) {
@@ -147,7 +151,7 @@ class UperRequest{
           $pay->pay_account_no = $input['pay_account_no'];
           $pay->pay_account_name = $input['pay_account_name'];
           $pay->pay_amount = $input['pay_amount'];
-          $pay->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD H:i')");
+          $pay->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:mi')");
           $pay->pay_note = $input['pay_note'];
           $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $pay->pay_type = $input['pay_type'];
