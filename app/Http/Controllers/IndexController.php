@@ -106,4 +106,26 @@ class IndexController extends Controller
     function joinMdmOrder($input) {
       return GlobalHelper::joinMdmOrder($input);
     }
+
+    function testjoin($input) {
+      $a = "SELECT tr.*, tr2.REFF_NAME AS SERVICE, tr3.REFF_NAME AS STATUS FROM TR_ROLE tr, TM_REFF tr2, TM_REFF tr3 WHERE tr.ROLE_SERVICE = tr2.REFF_ID AND tr2.REFF_TR_ID = 1 AND tr.ROLE_STATUS = tr3.REFF_ID AND tr3.REFF_TR_ID = 3";
+      $b = DB::connection("omuster")->select(DB::raw($a));
+      return $b;
+      // $detail   = [];
+      // $b = [];
+      // $data_a = DB::connection("omuster")->table('TR_ROLE as tr')
+      // ->join("TM_REFF as tr2", "tr2.REFF_ID", "=", "tr.ROLE_STATUS")
+      // ->join("TM_REFF as tr3", "tr3.REFF_ID", "=", "tr.ROLE_SERVICE")
+      // ->get();
+      //
+      // foreach ($data_a as $list) {
+      //   $newDt = [];
+      //   foreach ($list as $key => $value) {
+      //     $newDt[$key] = $value;
+      //   }
+      //   $detail[] = $newDt;
+      // }
+      //
+      // return $detail;
+    }
 }
