@@ -368,7 +368,7 @@ class ConnectedExternalApps{
     $uperH = TxHdrUper::find($uper_id);
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
     $branch = $branch[0];
-    $bank = DB::connection('mdm')->table('TM_BANK')->where('account_no',$pay->pay_dest_account_no)->get();
+    $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_dest_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
 
     $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
