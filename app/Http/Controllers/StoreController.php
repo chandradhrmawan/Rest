@@ -51,6 +51,10 @@ class StoreController extends Controller
       }
     }
 
+    public function testlain($input, $request){
+      return ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
+    }
+
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
       return base64_encode($file);
@@ -88,7 +92,7 @@ class StoreController extends Controller
         "customer_address" => $input['truck_cust_address'],
         "cdm_customer_id" => $input['truck_cust_id'],
         "truck_type" => $input['truck_type_name'],
-        "date" => $input['truck_date'],
+        "date" => \Carbon\Carbon::parse($input['truck_date'])->format('d-m-Y'),
       ];
 
       $set_data_self = [
@@ -98,13 +102,13 @@ class StoreController extends Controller
         "truck_cust_id" => $input['truck_cust_id'],
         "truck_cust_name" => $input['truck_cust_name'],
         "truck_branch_id" => $input['truck_branch_id'],
-        "truck_date" => $input['truck_date'],
+        "truck_date" => \Carbon\Carbon::parse($input['truck_date'])->format('Y-m-d'),
         "truck_cust_address" => $input['truck_cust_address'],
         "truck_type" => $input['truck_type'],
         "truck_terminal_code" => $input['truck_terminal_code'],
-        "truck_plat_exp" => $input['truck_plat_exp'],
+        "truck_plat_exp" => \Carbon\Carbon::parse($input['truck_plat_exp'])->format('Y-m-d'),
         "truck_stnk_no" => $input['truck_stnk_no'],
-        "truck_stnk_exp" => $input['truck_stnk_exp'],
+        "truck_stnk_exp" => \Carbon\Carbon::parse($input['truck_stnk_exp'])->format('Y-m-d'),
         "truck_rfid" => $input['truck_rfid'],
         "truck_type_name" => $input['truck_type_name']
       ];
