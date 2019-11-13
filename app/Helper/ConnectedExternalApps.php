@@ -355,10 +355,14 @@ class ConnectedExternalApps{
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/truckRegistration";
 
     $string_json = '{
-          "terminalInsertUpdateRequest": {
+          "truckRegistrationInterfaceRequest": {
               "esbHeader": {
-                  "externalId": "5275682735",
-                  "timestamp": "YYYYMMDD HH:Mi:SS"
+                "internalId": "", 
+                "externalId": "", 
+                "timestamp": "", 
+                "responseTimestamp": "", 
+                "responseCode": "", 
+                "responseMessage": ""
               },
               "esbBody": {
                   "vTruckId": "'. str_replace(' ','',$input['truck_plat_no']).'",
