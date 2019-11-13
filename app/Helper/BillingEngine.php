@@ -401,7 +401,8 @@ class BillingEngine{
 	    		$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
 	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
           if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
-            $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].';';
+            // $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].';';
+            $setD .= ' detail.DTL_TL := \'N\';';
           }else{
             $setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
           }
@@ -424,6 +425,9 @@ class BillingEngine{
 	    		$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
 	    		$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
 	    		$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
+          // if (isset($list['EQ_QTY_PKG']) and empty($list['EQ_QTY_PKG'])) {
+          //   // $setE .= ' equip.EQ_QTY_PKG := 20;';
+          // }
 	    		$setE .= ' list_equip('.$countE.') := equip; ';
 	    	}
 		// build eqpt
@@ -445,6 +449,9 @@ class BillingEngine{
 		// build paysplit
 
 		// build head
+        if (empty($head['P_USER_ID'])) {
+          return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, user created by is null'];
+        }
 	    	$head = $input['head'];
 	    	$setH = " P_SOURCE_ID => 'NPK_BILLING',";
 	    	$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
