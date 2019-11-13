@@ -117,7 +117,7 @@ class UperRequest{
         if (empty($input['pay_file'])) {
           return ["Success"=>false, "result" => "Fail, file is required"];
         }
-        
+
         if ($input['pay_type'] == 1) {
             $uper = TxHdrUper::where('uper_no',$input['pay_no'])->first();
             if (empty($uper)) {
@@ -139,6 +139,9 @@ class UperRequest{
           if (isset($input['encode']) and $input['encode'] == 'true') {
             $pay->pay_status = 2;
           }
+          if (isset($input['pay_currency'])) {
+            $pay->pay_currency = $input['pay_currency'];
+          }
           $pay->pay_no = $input['pay_no'];
           $pay->pay_req_no = $input['pay_req_no'];
           $pay->pay_method = $input['pay_method'];
@@ -151,9 +154,9 @@ class UperRequest{
           $pay->pay_account_no = $input['pay_account_no'];
           $pay->pay_account_name = $input['pay_account_name'];
           $pay->pay_amount = $input['pay_amount'];
-          $pay->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:mi')");
+          $pay->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:mi:s')");
           $pay->pay_note = $input['pay_note'];
-          $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+          $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:s')");
           $pay->pay_type = $input['pay_type'];
           $pay->pay_dest_bank_code = $input['pay_dest_bank_code'];
           $pay->pay_dest_bank_name = $input['pay_dest_bank_name'];
@@ -177,6 +180,7 @@ class UperRequest{
                 'uper_req_no' => $uper->uper_req_no,
                 'uper_paid' => 'Y'
               ]);
+              ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
             }
             return ["result" => "Success, paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
@@ -195,8 +199,10 @@ class UperRequest{
       $pay->pay_status = 3;
     }
     $pay->save();
+
     if ($input['approved'] == 'true') {
       $uper = TxHdrUper::where('uper_no',$pay->pay_no)->first();
+      ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
       static::updateUperStatus([
         'uper_id' => $uper->uper_id,
         'uper_req_no' => $uper->uper_req_no,

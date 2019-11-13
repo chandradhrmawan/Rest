@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\OmCargo\TxHdrBm;
 use Illuminate\Support\Facades\DB;
+use App\Models\OmCargo\TxHdrUper;
 
 class ConnectedExternalApps{
 
@@ -349,6 +350,111 @@ class ConnectedExternalApps{
         }
     }
     return ['Success' => true];
+  }
+
+  public static function sendUperPutReceipt($uper_id, $pay){
+    $uperH = TxHdrUper::find($uper_id);
+    $branchCode = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = $branchCode[0];
+    // $branchCode = $branchCode->branch_code;
+
+    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
+    $string_json= '{
+       "arRequestDoc":{
+          "esbHeader":{
+             "internalId":"",
+             "externalId":"",
+             "timestamp":"",
+             "responseTimestamp":"",
+             "responseCode":"",
+             "responseMessage":""
+          },
+          "esbBody":[
+             {
+                "header":{
+                   "orgId":"'.$uperH->uper_org_id.'",
+                   "receiptNumber":"'.$uperH->uper_no.'",
+                   "receiptMethod":"BANK",
+                   "receiptAccount":"'.$pay->pay_dest_account_name.' '.$pay->pay_dest_bank_code.' '.$pay->pay_dest_account_no.'",
+                   "bankId":"-",
+                   "customerNumber":"'.$pay->pay_cust_id.'",
+                   "receiptDate":"'.$pay->pay_date.'",
+                   "currencyCode":"'.$pay->pay_currency.'",
+                   "status":"P",
+                   "amount":"'.$pay->pay_amount.'",
+                   "processFlag":"",
+                   "errorMessage":"",
+                   "apiMessage":"",
+                   "attributeCategory":"",
+                   "referenceNum":"",
+                   "receiptType":"",
+                   "receiptSubType":"",
+                   "createdBy":"'.$pay->pay_create_by.'",
+                   "creationDate":"'.$pay->pay_create_date.'",
+                   "terminal":"",
+                   "attribute1":"",
+                   "attribute2":"",
+                   "attribute3":"",
+                   "attribute4":"",
+                   "attribute5":"",
+                   "attribute6":"",
+                   "attribute7":"",
+                   "attribute8":"",
+                   "attribute9":"",
+                   "attribute10":"",
+                   "attribute11":"",
+                   "attribute12":"",
+                   "attribute13":"",
+                   "attribute14":"",
+                   "attribute15":"",
+                   "statusReceipt":"N",
+                   "sourceInvoice":"NPKBILLING",
+                   "statusReceiptMsg":"",
+                   "invoiceNum":"",
+                   "amountOrig":null,
+                   "lastUpdateDate":"'.$pay->pay_create_date.'",
+                   "lastUpdateBy":"'.$pay->pay_create_by.'",
+                   "branchCode":"'.$branch->branch_code.'",
+                   "branchAccount":"'.$branch->branch_account.'",
+                   "sourceInvoiceType":"NPKBILLING",
+                   "remarkToBankId":"'.$pay->pay_dest_account_no.'",
+                   "sourceSystem":"NPKBILLING",
+                   "comments":"",
+                   "cmsYn":"N",
+                   "tanggalTerima":null,
+                   "norekKoran":""
+                }
+             }
+          ],
+          "esbSecurity":{
+             "orgId":"'.$uperH->uper_org_id.'",
+             "batchSourceId":"",
+             "lastUpdateLogin":"",
+             "userId":"",
+             "respId":"",
+             "ledgerId":"",
+             "respApplId":"",
+             "batchSourceName":""
+          }
+       }
+    }';
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
   }
 
   public static function truckRegistration($input){
