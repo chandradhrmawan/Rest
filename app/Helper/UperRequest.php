@@ -154,9 +154,9 @@ class UperRequest{
           $pay->pay_account_no = $input['pay_account_no'];
           $pay->pay_account_name = $input['pay_account_name'];
           $pay->pay_amount = $input['pay_amount'];
-          $pay->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:mi:s')");
+          $pay->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:mi:ss')");
           $pay->pay_note = $input['pay_note'];
-          $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:s')");
+          $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:ss')");
           $pay->pay_type = $input['pay_type'];
           $pay->pay_dest_bank_code = $input['pay_dest_bank_code'];
           $pay->pay_dest_bank_name = $input['pay_dest_bank_name'];
