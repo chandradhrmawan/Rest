@@ -178,7 +178,7 @@ class GlobalHelper {
       }
 
       if (!empty($input["rangeDate"])) {
-        $result  = $connect->where([$input["rangeDate"][0], ">", $input["rangeDate"][1]],[$input["rangeDate"][0], "<", $input["rangeDate"][2]]);
+        $result  = $connect->whereBetween($input["rangeDate"][0],[$input["rangeDate"][1],$input["rangeDate"][2]]);
       }
 
       if(!empty($input["orderby"][0])) {
