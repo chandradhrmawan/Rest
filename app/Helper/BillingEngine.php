@@ -449,10 +449,10 @@ class BillingEngine{
 		// build paysplit
 
 		// build head
+	    	$head = $input['head'];
         if (empty($head['P_USER_ID'])) {
           return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, user created by is null'];
         }
-	    	$head = $input['head'];
 	    	$setH = " P_SOURCE_ID => 'NPK_BILLING',";
 	    	$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
 	    	$setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
