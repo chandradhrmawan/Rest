@@ -200,7 +200,9 @@ class ConnectedExternalApps{
   public static function sendRequestBooking($input){
     $header = TxHdrBm::where('bm_no',$input)->first();
     $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
-    return static::sendRealBM($header, $detil);
+    if (!empty($header)) {
+      return static::sendRealBM($header, $detil);
+    }
   }
 
   private static function sendRealBM($head, $detil){
@@ -313,8 +315,6 @@ class ConnectedExternalApps{
       $vParamD .= $list->dtl_qty.'^';
       $vParamD .= 'N^'; // ?
       $vParamD .= '0'; // ?
-
-      $TEST = "GANDUM^TIPE^SEGITIGA BIRU^MODEL^N^N^100^100^N^50";
 
       $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
       $string_json = '{
