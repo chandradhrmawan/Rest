@@ -177,8 +177,8 @@ class GlobalHelper {
         $result  = $connect->select($input["selected"]);
       }
 
-      if (!empty($input["rangeDate"])) {
-        $result  = $connect->whereBetween($input["rangeDate"][0],[$input["rangeDate"][1],$input["rangeDate"][2]]);
+      if (!empty($input["range"])) {
+        $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
       }
 
       if(!empty($input["orderby"][0])) {
@@ -223,6 +223,10 @@ class GlobalHelper {
       $connect->orderby($in[0], $in[1]);
       }
 
+      if (!empty($input["range"])) {
+        $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+      }
+
       if (isset($input["changeKey"])) {
         $result  = $connect->get();
         $data    = json_encode($result);
@@ -258,6 +262,10 @@ class GlobalHelper {
       $result  = $connect->select($input["selected"]);
     }
 
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+    }
+
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
     $connect->orderby(strtoupper($in[0]), $in[1]);
@@ -285,6 +293,10 @@ class GlobalHelper {
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
+    }
+
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
     if(!empty($input["orderby"][0])) {
@@ -346,6 +358,10 @@ class GlobalHelper {
     $connect->whereNotIn(strtoupper($in[0]), $in[1]);
     }
 
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+    }
+
     if (!empty($input["query"]) && !empty($input["field"])) {
       $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
     }
@@ -390,6 +406,10 @@ class GlobalHelper {
     $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+    }
+
     if (isset($input["changeKey"])) {
       $result  = $connect->get();
       $data    = json_encode($result);
@@ -417,6 +437,10 @@ class GlobalHelper {
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
     $connect->whereNotIn(strtoupper($in[0]), $in[1]);
+    }
+
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
