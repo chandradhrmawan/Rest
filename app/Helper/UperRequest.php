@@ -125,7 +125,7 @@ class UperRequest{
         } else if ($input['pay_type'] == 2) {
             $nota = TxHdrNota::where('nota_no',$input['pay_no'])->first();
             if (empty($nota)) {
-              return ["Success"=>false, "result" => "Fail, uper not found"];
+              return ["Success"=>false, "result" => "Fail, nota not found"];
             }
         }
 
@@ -171,9 +171,9 @@ class UperRequest{
                 'uper_paid' => 'Y'
               ]);
             }
-            return ["result" => "Success, paid uper"];
+            return ["result" => "Success, paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
-            return ["result" => "Success, paid nota"];
+            return ["result" => "Success, paid nota", 'pay_no' => $pay->pay_no];
         }
 	}
 
@@ -193,7 +193,7 @@ class UperRequest{
         'uper_paid' => 'Y'
       ]);
     }
-    return ["result" => "Success, confirm uper payment"];
+    return ["result" => "Success, confirm uper payment", 'pay_no' => $pay->pay_no];
   }
 
   private static function updateUperStatus($input){

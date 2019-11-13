@@ -513,7 +513,7 @@ class BillingEngine{
 
   		$head = DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->get();
   		if (empty($head)) {
-    		return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, prosedur bug'];
+    		return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, prosedur bug', 'no_req' => $input['b_no']];
     	}else{
     		$head = $head[0];
     		$head = (array)$head;
@@ -521,7 +521,7 @@ class BillingEngine{
     		$result = $result[0];
     		$result = (array)$result;
 
-    		$response = ['result_flag' => $result['result_flag'], 'result_msg' => $result['result_msg']];
+    		$response = ['result_flag' => $result['result_flag'], 'result_msg' => $result['result_msg'], 'no_req' => $input['b_no']];
     		if ($result['result_flag'] != 'S') {
     			$response["Success"] = false;
     		}else{

@@ -291,7 +291,7 @@ class RequestBooking{
 			$config['head_mark'] => $input['msg']
 		]);
 
-		return ['result' => "Success, approved request!"];
+		return ['result' => "Success, approved request!", 'no_req' => $find[$config['head_no']]];
     }
 
     public static function config($input){

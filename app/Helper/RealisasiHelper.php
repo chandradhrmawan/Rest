@@ -156,7 +156,7 @@ class RealisasiHelper{
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
-    return ['result' => 'Success, Confirm RBM Data!'];
+    return ['result' => 'Success, Confirm RBM Data!', 'no_req' => $find->bm_no];
   }
 
   public static function confirmRealBPRP($input){
@@ -302,7 +302,7 @@ class RealisasiHelper{
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
-    return ['result' => 'Success, Confirm BPRP Data!'];
+    return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no];
   }
 
   public static function rejectedProformaNota($input){
@@ -312,7 +312,7 @@ class RealisasiHelper{
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_req_no',$input['req_no'])->udpate([
       "real_status"=>1
     ]);
-    return ['result' => 'Success, rejected proforma!'];
+    return ['result' => 'Success, rejected proforma!', 'no_req' => $input['req_no']];
   }
 
   public static function approvedProformaNota($input){
@@ -320,7 +320,7 @@ class RealisasiHelper{
     $nota->nota_status = 2;
     $nota->save();
     ConnectedExternalApps::sendNotaProforma($nota);
-    return ['result' => 'Success, approved proforma!'];
+    return ['result' => 'Success, approved proforma!', 'req_no' => $nota->nota_req_no, 'nota_no' => $nota->nota_no];
   }
 
 }
