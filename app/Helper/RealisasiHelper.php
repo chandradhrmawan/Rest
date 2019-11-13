@@ -45,10 +45,14 @@ class RealisasiHelper{
 
     // build detil
       $setD = [];
+      // return $detil = DB::connection('omcargo')->table('TX_DTL_REALISASI')->where('hdr_real_id', $find->real_id)->get();
       $detil = DB::connection('omcargo')->table('TX_DTL_REALISASI')->leftJoin('TX_DTL_BM', 'TX_DTL_REALISASI.DTL_BM_ID', '=', 'TX_DTL_BM.DTL_BM_ID')->where('hdr_real_id', $find->real_id)->get();
       foreach ($detil as $list) {
         $newD = [];
         $list = (array)$list;
+        if (empty($list['dtl_bm_id'])) {
+          return ['Success' => false, 'result' => 'Fail, not found detil bm on real detil id : '.$list['dtl_real_id']];
+        }
         $newD['DTL_BL'] = empty($list['dtl_bm_bl']) ? 'NULL' : $list['dtl_bm_bl'];
         $newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
         $newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
@@ -306,6 +310,9 @@ class RealisasiHelper{
   }
 
   public static function rejectedProformaNota($input){
+    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->udpate([
+      "nota_status"=>3
+    ]);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_req_no',$input['req_no'])->udpate([
       "bprp_status"=>1
     ]);
