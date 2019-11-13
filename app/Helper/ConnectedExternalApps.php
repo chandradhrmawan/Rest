@@ -4,9 +4,12 @@ namespace App\Helper;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use App\Models\OmCargo\TxHdrBm;
 use Illuminate\Support\Facades\DB;
 use App\Models\OmCargo\TxHdrUper;
+use App\Models\OmCargo\TxHdrBm;
+use App\Models\OmCargo\TxHdrDel;
+use App\Models\OmCargo\TxHdrRec;
+use App\Helper\RequestBooking;
 
 class ConnectedExternalApps{
 
@@ -199,60 +202,74 @@ class ConnectedExternalApps{
 	}
 
   public static function sendRequestBooking($input){
-    $header = TxHdrBm::where('bm_no',$input)->first();
+    $req_type = substr($input, 0,3);
+    if ($req_type == 'BM-') {
+      $header = TxHdrBm::where('bm_no',$input)->first();
+      $table = 'TX_HDR_BM';
+    }else if($req_type == 'REC') {
+      $header = TxHdrRec::where('rec_no',$input)->first();
+      $table = 'TX_HDR_REC';
+    }else if($req_type == 'DEL') {
+      $header = TxHdrDel::where('del_no',$input)->first();
+      $table = 'TX_HDR_DEL';
+    }
+
+    $config = RequestBooking::config($table);
+    $header = (array)$header;
     if (!empty($header)) {
-      $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
-      return static::sendRealBM($header, $detil);
+      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
+      return static::sendRealBM($header, $detil, $config);
     }
   }
 
-  private static function sendRealBM($head, $detil){
+  private static function sendRealBM($head, $detil, $config){
     foreach ($detil as $list) {
       if ($list->dtl_pkg_id == 4) {
+        $listA = (array)$list;
         // 
           $consignee = '';
           $oi = '';
           $podpol = '';
           $movetype = '';
           $startenddate = '';
-          $blno = $list->dtl_bm_bl;
+          $blno = $listA[$config['head_tab_detil_bl']];
           $bldate = $list->dtl_create_date;
         // 
 
         // 
-          if (empty($head->bm_eta)) {
+          if (empty($head[$config['head_eta']])) {
             $bm_eta = null;
           }else{
-            $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_eta)->format('m/d/Y');
+            $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_eta']])->format('m/d/Y');
           }
-          if (empty($head->bm_etd)) {
+          if (empty($head[$config['head_etd']])) {
             $bm_etd = null;
           }else{
-            $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_etd)->format('m/d/Y');
+            $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_etd']])->format('m/d/Y');
           }
-          if (empty($head->bm_open_stack)) {
+          if (empty($head[$config['head_open_stack']])) {
             $bm_open_stack = null;
           }else{
-            $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_open_stack)->format('m/d/Y');
+            $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_open_stack']])->format('m/d/Y');
           }
-          if (empty($head->bm_closing_time)) {
+          if (empty($head[$config['head_closing_time']])) {
             $bm_closing_time = null;
           }else{
-            $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_closing_time)->format('m/d/Y');
+            $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_closing_time']])->format('m/d/Y');
           }
         // 
 
         // 
           $vParam = '';
-          $vParam .= $head->bm_no.'^';
-          $vParam .= $head->bm_cust_name.'^';
-          $vParam .= $head->bm_cust_id.'^';
-          $vParam .= $head->bm_cust_npwp.'^';
-          $vParam .= $head->bm_vessel_name.'^';
+          $vParam .= $head[$config['head_no']].'^';
+          $vParam .= $head[$config['head_cust_name']].'^';
+          $vParam .= $head[$config['head_cust_id']].'^';
+          $vParam .= $head[$config['head_cust_npwp']].'^';
+          $vParam .= $head[$config['head_vessel_name']].'^';
           $vParam .= $bm_eta.'^';
           $vParam .= $bm_etd.'^';
-          $vParam .= $head->bm_voyin.'^';
-          $vParam .= $head->bm_voyout.'^';
+          $vParam .= $head[$config['head_voyin']].'^';
+          $vParam .= $head[$config['head_voyout']].'^';
           $vParam .= $bm_closing_time.'^'; // ?
           $vParam .= 'BONGKAR MUAT^'; // ?
           $vParam .= 'CONSIGNEE^'; // ?
@@ -266,7 +283,7 @@ class ConnectedExternalApps{
           $vParam .= $blno.'^'; // ?
           $vParam .= $startenddate.'^'; // ?
           $vParam .= '0^'; // ?
-          $vParam .= $head->bm_vvd_id.'^'; // ?
+          $vParam .= $head[$config['head_vvd_id']].'^'; // ?
           $vParam .= $oi.'^'; // ?
           $vParam .= $startenddate.'^'; // ?
           $vParam .= '0'; // ?
@@ -283,8 +300,8 @@ class ConnectedExternalApps{
               },
               "esbBody": {
                 "vParam": "'.$vParamH.'",
-                "vId": "'.$head->bm_id.'",
-                "vReqNo": "'.$head->bm_no.'",
+                "vId": "'.$head[$config['head_primery']].'",
+                "vReqNo": "'.$head[$config['head_no']].'",
                 "vBlNo": "'.$blno.'"
               }
             }
@@ -336,8 +353,8 @@ class ConnectedExternalApps{
                 },
                 "esbBody": {
                   "vParams": "'.$vParamD.'",
-                  "vId": "'.$list->dtl_bm_id.'",
-                  "vIdHeader": "'.$head->bm_id.'"
+                  "vId": "'.$listA[$config['head_tab_detil_id']].'",
+                  "vIdHeader": "'.$head[$config['head_primery']].'"
                 }
               }
           }';
