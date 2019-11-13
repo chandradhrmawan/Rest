@@ -253,7 +253,7 @@ class ConnectedExternalApps{
           $vParam .= $bm_etd.'^';
           $vParam .= $head->bm_voyin.'^';
           $vParam .= $head->bm_voyout.'^';
-          $vParam .= $bm_closing_time.'^';
+          $vParam .= $bm_closing_time.'^'; // ?
           $vParam .= 'BONGKAR MUAT^'; // ?
           $vParam .= 'CONSIGNEE^'; // ?
           $vParam .= $oi.'^'; // ?
@@ -388,7 +388,7 @@ class ConnectedExternalApps{
                    "receiptNumber":"'.$uperH->uper_no.'",
                    "receiptMethod":"BANK",
                    "receiptAccount":"'.$pay->pay_dest_account_name.' '.$pay->pay_dest_bank_code.' '.$pay->pay_dest_account_no.'",
-                   "bankId":"",
+                   "bankId":"105006",
                    "customerNumber":"'.$pay->pay_cust_id.'",
                    "receiptDate":"'.$pay->pay_date.'",
                    "currencyCode":"'.$pay->pay_currency.'",
