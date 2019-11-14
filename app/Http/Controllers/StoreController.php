@@ -124,6 +124,9 @@ class StoreController extends Controller
     function sendTCA($input){
       $head = DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $input['id'])->get();
       $head = $head[0];
+      if ($head->tca_status == 2) {
+        return ["Success"=>false, "result" => 'TCA already send!'];
+      }
       if ($head->tca_req_type  == 1) {
         $reques = DB::connection('omcargo')->table('TX_HDR_REC')->where('rec_no', $head->tca_req_no)->get();
         $reques = $reques[0];
