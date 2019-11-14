@@ -114,8 +114,13 @@ class UperRequest{
   }
 
 	public static function storePayment($input){
-        if (empty($input['pay_file']['PATH'])) {
+        if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
           return ["Success"=>false, "result" => "Fail, file is required"];
+        }
+
+        $cekPayment = TxPayment::where('pay_no', $input['pay_no'])->where('pay_req_no', $input['pay_req_no'])->count();
+        if ($cekPayment > 0) {
+          return ["Success"=>false, "result" => "Fail, payment already exist!"];
         }
 
         if ($input['pay_type'] == 1) {
