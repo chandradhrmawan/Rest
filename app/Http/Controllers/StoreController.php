@@ -192,7 +192,7 @@ class StoreController extends Controller
         "detail" => $detil
       ];
 
-      return ConnectedExternalApps::createTCA($set_data);
+      return ConnectedExternalApps::createTCA($set_data, $input['id']);
     }
 
     function save($input, $request) {

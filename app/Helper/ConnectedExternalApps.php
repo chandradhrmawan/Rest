@@ -587,7 +587,7 @@ class ConnectedExternalApps{
     return [json_decode($res->getBody()->getContents())];
   }
 
-  public static function createTCA($input){
+  public static function createTCA($input, $tca_id){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createTCA";
 
     $detail = '';
@@ -664,6 +664,9 @@ class ConnectedExternalApps{
       }
       return ["Success"=>false, "result" => $error];
     }
+    DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
+      "tca_status" => 2
+    ]);
     return ["Success"=>true, "result" => json_decode($res->getBody()->getContents(), true)];
   }
 
