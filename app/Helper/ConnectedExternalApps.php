@@ -172,11 +172,12 @@ class ConnectedExternalApps{
         $response = $response['esbBody']['results'][0];
 
         if (!empty($response['idVsbVoyage'])) {
-          $newreal = $response['esbBody']['results'][0];
+          // return $newreal = $response;
+          $newreal = $response;
           DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
              'idvsb'=> $newreal['idVsbVoyage'],
              'bl_no'=> $newreal['blNumber'],
-             'package'=> $newreal['packageName'],
+             // 'package'=> $newreal['packageName'], // gak tau knpa gak mau masuk
              'is_hz'=> $newreal['hz'],
              'is_disturb'=> $newreal['disturb'],
              'ei'=> $newreal['ei'],
