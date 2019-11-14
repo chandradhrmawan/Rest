@@ -226,13 +226,13 @@ class ConnectedExternalApps{
       if ($list->dtl_pkg_id == 4) {
         $listA = (array)$list;
         // 
-          $consignee = '';
-          $oi = '';
+          $consignee = 'consignee';
+          $oi = $listA[$config['head_trade']];
           $podpol = '';
-          $movetype = '';
+          $movetype = 'MOVETYPE';
           $startenddate = '';
           $blno = $listA[$config['head_tab_detil_bl']];
-          $bldate = $list->dtl_create_date;
+          $bldate = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $list->dtl_create_date)->format('m/d/Y');
         // 
 
         // 
