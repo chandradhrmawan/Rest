@@ -129,9 +129,6 @@ class ConnectedExternalApps{
 
 	public static function realTos($input){
 		$count = DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('REAL_REQ_NO', $input['req_no'])->count();
-    if ($count > 0) {
-      return ['result' => "Fail, realisation has been created!", "Success" => false];
-    }
     $req = TxHdrBm::where('BM_NO', $input['req_no'])->first();
     if (empty($req)) {
       return ['result' => "Fail, request not found!", "Success" => false];
@@ -197,6 +194,7 @@ class ConnectedExternalApps{
     return [
       'req_header' => $req,
       'req_detil' => DB::connection('omcargo')->select(DB::raw("select * from TX_DTL_BM A left join TX_REAL_TOS B on B.BL_NO = A.DTL_BM_BL where A.HDR_BM_ID = ".$req->bm_id)),
+      'eqpt' => DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $input['req_no'])->get(),
       'result' => "Success, get data real from tos!"
     ];
 	}
