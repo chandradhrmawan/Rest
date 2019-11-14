@@ -539,8 +539,22 @@ class GlobalHelper {
 
   public static function save($input) {
     $parameter   = $input['parameter'];
-    $connect    = \DB::connection($input["db"])->table($input["table"]);
-    foreach ($parameter as $value) $connect->insert($parameter);
-    return ["result"=>$parameter, "count"=>count($parameter)];
+    if (!empty($input["PK"])) {
+      $cek         = DB::connection($input["db"])->table($input["table"])->where($input["PK"][0], $input["PK"][1])->get();
+      if (!empty($cek)) {
+        $cek       = DB::connection($input["db"])->table($input["table"])->where($input["PK"][0], $input["PK"][1])->delete();
+        $connect   = \DB::connection($input["db"])->table($input["table"]);
+        foreach ($parameter as $value) $connect->insert($parameter);
+        return ["result"=>$parameter, "count"=>count($parameter)];
+      } else {
+        $connect   = \DB::connection($input["db"])->table($input["table"]);
+        foreach ($parameter as $value) $connect->insert($parameter);
+        return ["result"=>$parameter, "count"=>count($parameter)];
+      }
+    } else {
+      $connect   = \DB::connection($input["db"])->table($input["table"]);
+      foreach ($parameter as $value) $connect->insert($parameter);
+      return ["result"=>$parameter, "count"=>count($parameter)];
+    }
   }
 }

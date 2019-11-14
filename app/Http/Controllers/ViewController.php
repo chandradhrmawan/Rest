@@ -141,61 +141,51 @@ class ViewController extends Controller
       $header     = $connection->table("TX_HDR_UPER")->where("UPER_ID", "=", $id)->get();
       $jshead     = json_decode(json_encode($header), TRUE);
       $detail     = [];
-      foreach ($data_a as $list) {
-        $newDt = [];
-        foreach ($list as $key => $value) {
-          $newDt[$key] = $value;
+      $type       = DB::connection("eng")->table("TM_NOTA")->where('NOTA_ID', $header[0]->uper_nota_id)->get();
+      if ($type[0]->nota_service_code == "BM") {
+        $bl         = $connection->table("V_TX_DTL_UPER")
+                      ->where([['UPER_HDR_ID ', '=', $id],["dtl_group_tariff_name", "!=", "SEWA ALAT"],["dtl_group_tariff_name", "!=", "RETRIBUSI ALAT"]])
+                      ->select("dtl_bl")
+                      ->distinct()
+                      ->get();
+        for ($i=0; $i < count($bl); $i++) {
+          $data       = $connection->table("V_TX_DTL_UPER")
+                      ->where([['UPER_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[$i]->dtl_bl],["dtl_group_tariff_name", "!=", "SEWA ALAT"],["dtl_group_tariff_name", "!=", "RETRIBUSI ALAT"]])
+                      ->get();
+          $detail[$bl[$i]->dtl_bl] = $data;
         }
-
-      $bl         = $connection->table("TX_DTL_UPER")
-                    ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
-                    ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
-                    ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
-                    ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "!=", "SEWA ALAT"],["dtl_service_type", "!=", "RETRIBUSI ALAT"]])
-                    ->select("dtl_bl")
-                    ->distinct()
+      } else {
+        $detail       = $connection->table("V_TX_DTL_UPER")
+                    ->where([['UPER_HDR_ID ', '=', $id],["dtl_group_tariff_name", "!=", "SEWA ALAT"],["dtl_group_tariff_name", "!=", "RETRIBUSI ALAT"]])
                     ->get();
       }
-      $data       = $connection->table("TX_DTL_UPER")
-                    ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
-                    ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
-                    ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
-                    ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "!=", "SEWA ALAT"],["dtl_service_type", "!=", "RETRIBUSI ALAT"]])
+      $sewa        = $connection->table("V_TX_DTL_UPER")
+                    ->where([['UPER_HDR_ID', '=', $id],["dtl_group_tariff_name", "like","SEWA ALAT"]])
                     ->get();
-      // $angkutan    = $connection->table("TX_DTL_UPER")
-      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
-      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
-      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
-      //               ->where([['UPER_HDR_ID ', '=', $id],["dtl_service_type", "like","ANGKUTAN LANGSUNG"]])
-      //               ->get();
-      // $sewa        = $connection->table("TX_DTL_UPER")
-      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
-      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
-      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
-      //               ->where([['UPER_HDR_ID', '=', $id],["dtl_service_type", "like","SEWA ALAT"]])
-      //               ->get();
-      // $retribusi   = $connection->table("TX_DTL_UPER")
-      //               ->join('TX_HDR_UPER ', 'TX_DTL_UPER.UPER_HDR_ID', '=', 'TX_HDR_UPER.UPER_ID')
-      //               ->join('TX_HDR_BM', 'TX_HDR_UPER.UPER_REQ_NO', '=', 'TX_HDR_BM.BM_NO')
-      //               ->join('TX_DTL_BM', 'TX_HDR_BM.BM_ID', '=', 'TX_DTL_BM.HDR_BM_ID')
-      //               ->where([['UPER_HDR_ID', '=', $id],["dtl_service_type", "like","RETRIBUSI ALAT"]])
-      //               ->get();
-      // $dpp         = $connection->table("TX_DTL_UPER")->where('UPER_HDR_ID',$id)->sum("dtl_amount");
-      // $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->get();
-      // $ppn         = $dpp*10/100;
-      // $terbilang   = $this->terbilang($dpp+$ppn);
-      // if (!$sewa) $sewa   = 0;
-      // if (!$retribusi) $retribusi = 0;
-      // if (!$data) $data   = 0;
-      // $html       = view('print.uper2',["bl"=>$bl, "branch"=>$branch, "header"=>$header, "angkutan"=>$angkutan, "data"=>$data, "sewa"=>$sewa,"retribusi"=>$retribusi, "dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
-      // $filename   = "Test";
-      // $dompdf     = new Dompdf();
-      // $dompdf->set_option('isRemoteEnabled', true);
-      // $dompdf->loadHtml($html);
-      // $dompdf->setPaper('A4', 'potrait');
-      // $dompdf->render();
-      // $dompdf->stream($filename, array("Attachment" => false));
-      // return $bl;
+      $retribusi   = $connection->table("V_TX_DTL_UPER")
+                    ->where([['UPER_HDR_ID', '=', $id],["dtl_group_tariff_name", "like","RETRIBUSI ALAT"]])
+                    ->get();
+      $dpp         = $connection->table("V_TX_DTL_UPER")->where('UPER_HDR_ID',$id)->sum("dtl_amount");
+      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->get();
+      $ppn         = $dpp*10/100;
+      $terbilang   = $this->terbilang($dpp+$ppn);
+      if (!$sewa) $sewa   = 0;
+      if (!$retribusi) $retribusi = 0;
+      if ($type[0]->nota_service_code == "BM") {
+        $html       = view('print.uper2',["type"=>$type, "bl"=>$bl, "branch"=>$branch, "header"=>$header, "detail"=>$detail, "sewa"=>$sewa,"retribusi"=>$retribusi, "dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
+      } else {
+        $html       = view('print.uper2',["type"=>$type, "branch"=>$branch, "header"=>$header, "detail"=>$detail, "sewa"=>$sewa, "retribusi"=>$retribusi, "dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
+
+      }
+      $filename   = "Test";
+      $dompdf     = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+
+      // return $detail;
     }
 
     function penyebut($nilai) {
