@@ -170,15 +170,29 @@ class GlobalHelper {
   public static function index($input) {
       $connect  = \DB::connection($input["db"])->table($input["table"]);
 
+      if (!empty($input["range"])) {
+        $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+      }
+
+      if (!empty($input["filter"])) {
+      $search   = $input["filter"];
+      foreach ($search as $value) {
+        if ($value["operator"] == "like")
+          $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+        else if($value["operator"] == "eq")
+          $connect->whereDate($value["property"],'=',$value["value"]);
+        else if($value["operator"] == "gt")
+          $connect->whereDate($value["property"],'>=',$value["value"]);
+        else if($value["operator"] == "lt")
+          $connect->whereDate($value["property"],'<=',$value["value"]);
+        }
+      }
+
       if (!empty($input['start']) && !empty($input['limit']))
         $connect->skip($input['start']-1)->take($input['limit']);
 
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
-      }
-
-      if (!empty($input["range"])) {
-        $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
       }
 
       if(!empty($input["orderby"][0])) {
@@ -199,6 +213,20 @@ class GlobalHelper {
       $type      = $input['parameter']["type"];
       $connect   = \DB::connection($input["db"])->table($input["table"]);
 
+      if (!empty($input["filter"])) {
+      $search   = $input["filter"];
+      foreach ($search as $value) {
+        if ($value["operator"] == "like")
+          $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+        else if($value["operator"] == "eq")
+          $connect->whereDate($value["property"],'=',$value["value"]);
+        else if($value["operator"] == "gt")
+          $connect->whereDate($value["property"],'>=',$value["value"]);
+        else if($value["operator"] == "lt")
+          $connect->whereDate($value["property"],'<=',$value["value"]);
+        }
+      }
+
       for ($i=0; $i < count($data); $i++) {
       $result[] = array(strtoupper($data[$i]),$operator[$i],strtoupper($value[$i]));
 
@@ -211,13 +239,6 @@ class GlobalHelper {
       else $connect->orwhere(strtoupper($data[$i]), 'like', '%'.strtoupper($value[$i]).'%');
       }
 
-      if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start']-1)->take($input['limit']);
-
-      if (!empty($input["selected"])) {
-        $result  = $connect->select($input["selected"]);
-      }
-
       if(!empty($input["orderby"][0])) {
       $in        = $input["orderby"];
       $connect->orderby($in[0], $in[1]);
@@ -225,6 +246,13 @@ class GlobalHelper {
 
       if (!empty($input["range"])) {
         $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+      }
+
+      if (!empty($input['start']) && !empty($input['limit']))
+        $connect->skip($input['start']-1)->take($input['limit']);
+
+      if (!empty($input["selected"])) {
+        $result  = $connect->select($input["selected"]);
       }
 
       if (isset($input["changeKey"])) {
@@ -242,8 +270,8 @@ class GlobalHelper {
 
   public static function filterByGrid($input) {
     $connect  = \DB::connection($input["db"])->table($input["table"]);
+    if (!empty($input["filter"])) {
     $search   = $input["filter"];
-
     foreach ($search as $value) {
       if ($value["operator"] == "like")
         $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
@@ -253,6 +281,11 @@ class GlobalHelper {
         $connect->whereDate($value["property"],'>=',$value["value"]);
       else if($value["operator"] == "lt")
         $connect->whereDate($value["property"],'<=',$value["value"]);
+      }
+    }
+
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
@@ -260,10 +293,6 @@ class GlobalHelper {
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
-    }
-
-    if (!empty($input["range"])) {
-      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
     if(!empty($input["orderby"][0])) {
@@ -288,15 +317,15 @@ class GlobalHelper {
       $connect->groupBy(strtoupper($input["groupby"]));
     }
 
+    if (!empty($input["range"])) {
+      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+    }
+
     if (!empty($input['start']) && !empty($input['limit']))
       $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
-    }
-
-    if (!empty($input["range"])) {
-      $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
     if(!empty($input["orderby"][0])) {
@@ -326,9 +355,6 @@ class GlobalHelper {
     foreach ($input["join"] as $list) {
       $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
     }
-
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
@@ -366,6 +392,23 @@ class GlobalHelper {
       $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
     }
 
+    if (!empty($input["filter"])) {
+    $search   = $input["filter"];
+    foreach ($search as $value) {
+      if ($value["operator"] == "like")
+        $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+      else if($value["operator"] == "eq")
+        $connect->whereDate($value["property"],'=',$value["value"]);
+      else if($value["operator"] == "gt")
+        $connect->whereDate($value["property"],'>=',$value["value"]);
+      else if($value["operator"] == "lt")
+        $connect->whereDate($value["property"],'<=',$value["value"]);
+      }
+    }
+
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start']-1)->take($input['limit']);
+
     if (isset($input["changeKey"])) {
       $result  = $connect->get();;
       $data    = json_encode($result);
@@ -394,13 +437,6 @@ class GlobalHelper {
     $connect->whereIn(strtoupper($in[0]), $in[1]);
     }
 
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
-
-    if (!empty($input["selected"])) {
-      $result  = $connect->select($input["selected"]);
-    }
-
     if(!empty($input["orderby"][0])) {
     $in        = $input["orderby"];
     $connect->orderby(strtoupper($in[0]), $in[1]);
@@ -408,6 +444,27 @@ class GlobalHelper {
 
     if (!empty($input["range"])) {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+    }
+
+    if (!empty($input["filter"])) {
+    $search   = $input["filter"];
+    foreach ($search as $value) {
+      if ($value["operator"] == "like")
+        $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+      else if($value["operator"] == "eq")
+        $connect->whereDate($value["property"],'=',$value["value"]);
+      else if($value["operator"] == "gt")
+        $connect->whereDate($value["property"],'>=',$value["value"]);
+      else if($value["operator"] == "lt")
+        $connect->whereDate($value["property"],'<=',$value["value"]);
+      }
+    }
+
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start']-1)->take($input['limit']);
+
+    if (!empty($input["selected"])) {
+      $result  = $connect->select($input["selected"]);
     }
 
     if (isset($input["changeKey"])) {
@@ -441,6 +498,20 @@ class GlobalHelper {
 
     if (!empty($input["range"])) {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+    }
+
+    if (!empty($input["filter"])) {
+    $search   = $input["filter"];
+    foreach ($search as $value) {
+      if ($value["operator"] == "like")
+        $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+      else if($value["operator"] == "eq")
+        $connect->whereDate($value["property"],'=',$value["value"]);
+      else if($value["operator"] == "gt")
+        $connect->whereDate($value["property"],'>=',$value["value"]);
+      else if($value["operator"] == "lt")
+        $connect->whereDate($value["property"],'<=',$value["value"]);
+      }
     }
 
     if (!empty($input['start']) && !empty($input['limit']))
