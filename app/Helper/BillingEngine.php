@@ -394,10 +394,26 @@ class BillingEngine{
           }else{
             $setD .= ' detail.DTL_CHARACTER := \''.$list['DTL_CHARACTER'].'\';';
           }
-	    		$setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
-	    		$setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
-	    		$setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
-	    		$setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
+          if ($list['DTL_CONT_SIZE'] == NULL or $list['DTL_CONT_SIZE'] == 'NULL') {
+            $setD .= ' detail.DTL_CONT_SIZE := '.$list['DTL_CONT_SIZE'].';';
+          }else{
+            $setD .= ' detail.DTL_CONT_SIZE := \''.$list['DTL_CONT_SIZE'].'\';';
+          }
+          if ($list['DTL_CONT_TYPE'] == NULL or $list['DTL_CONT_TYPE'] == 'NULL') {
+            $setD .= ' detail.DTL_CONT_TYPE := '.$list['DTL_CONT_TYPE'].';';
+          }else{
+            $setD .= ' detail.DTL_CONT_TYPE := \''.$list['DTL_CONT_TYPE'].'\';';
+          }
+          if ($list['DTL_CONT_STATUS'] == NULL or $list['DTL_CONT_STATUS'] == 'NULL') {
+            $setD .= ' detail.DTL_CONT_STATUS := '.$list['DTL_CONT_STATUS'].';';
+          }else{
+            $setD .= ' detail.DTL_CONT_STATUS := \''.$list['DTL_CONT_STATUS'].'\';';
+          }
+          if ($list['DTL_UNIT_ID'] == NULL or $list['DTL_UNIT_ID'] == 'NULL') {
+            $setD .= ' detail.DTL_UNIT_ID := '.$list['DTL_UNIT_ID'].';';
+          }else{
+            $setD .= ' detail.DTL_UNIT_ID := \''.$list['DTL_UNIT_ID'].'\';';
+          }
 	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
           if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
             // $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].';';
