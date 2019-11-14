@@ -158,13 +158,17 @@ class RequestBooking{
     }
 
     public static function approvalRequest($input){
-    $input['table'] = strtoupper($input['table']);
+    	$input['table'] = strtoupper($input['table']);
 		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
 			return ['result' => "Fail, requst not found!", "Success" => false];
 		}
 		$find = (array)$find[0];
+		$uper = DB::connection('omcargo')->table('TX_HDR_UPER')->where('uper_req_no',$find[$config['head_no']])->get();
+		if (count($uper) > 0) {
+			return ['result' => "Fail, request already exist on uper!", "Success" => false];
+		}
 		if ($input['approved'] == 'false') {
 			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 4,
