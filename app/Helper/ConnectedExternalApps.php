@@ -217,11 +217,11 @@ class ConnectedExternalApps{
     $config = RequestBooking::config($table);
     if (!empty($header)) {
       $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
-      return static::sendRealBM($header, $detil, $config);
+      return static::sendRequestBookingExcute($header, $detil, $config);
     }
   }
 
-  private static function sendRealBM($head, $detil, $config){
+  private static function sendRequestBookingExcute($head, $detil, $config){
     foreach ($detil as $list) {
       if ($list->dtl_pkg_id == 4) {
         $listA = (array)$list;
@@ -437,7 +437,7 @@ class ConnectedExternalApps{
                    "attribute14":"'.$uperH->uper_nota_id.'",
                    "attribute15":"",
                    "statusReceipt":"N",
-                   "sourceInvoice":"NPKBILLING",
+                   "sourceInvoice":"BRG_UPER",
                    "statusReceiptMsg":"",
                    "invoiceNum":"",
                    "amountOrig":null,
@@ -445,8 +445,8 @@ class ConnectedExternalApps{
                    "lastUpdateBy":"-1",
                    "branchCode":"'.$branch->branch_code.'",
                    "branchAccount":"'.$branch->branch_account.'",
-                   "sourceInvoiceType":"NPKBILLING",
-                   "remarkToBankId":"'.$pay->pay_dest_account_no.'",
+                   "sourceInvoiceType":"UPER",
+                   "remarkToBankId":"",
                    "sourceSystem":"NPKBILLING",
                    "comments":"",
                    "cmsYn":"N",
