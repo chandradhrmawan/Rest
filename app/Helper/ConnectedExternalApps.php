@@ -4,8 +4,12 @@ namespace App\Helper;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use App\Models\OmCargo\TxHdrBm;
 use Illuminate\Support\Facades\DB;
+use App\Models\OmCargo\TxHdrUper;
+use App\Models\OmCargo\TxHdrBm;
+use App\Models\OmCargo\TxHdrDel;
+use App\Models\OmCargo\TxHdrRec;
+use App\Helper\RequestBooking;
 
 class ConnectedExternalApps{
 
@@ -198,157 +202,289 @@ class ConnectedExternalApps{
 	}
 
   public static function sendRequestBooking($input){
-    $header = TxHdrBm::where('bm_no',$input)->first();
-    $detil = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id',$header->bm_id)->get();
-    return static::sendRealBM($header, $detil);
+    $req_type = substr($input, 0,3);
+    if ($req_type == 'BM-') {
+      $header = TxHdrBm::where('bm_no',$input)->first();
+      $table = 'TX_HDR_BM';
+    }else if($req_type == 'REC') {
+      $header = TxHdrRec::where('rec_no',$input)->first();
+      $table = 'TX_HDR_REC';
+    }else if($req_type == 'DEL') {
+      $header = TxHdrDel::where('del_no',$input)->first();
+      $table = 'TX_HDR_DEL';
+    }
+
+    $config = RequestBooking::config($table);
+    $header = (array)$header;
+    if (!empty($header)) {
+      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
+      return static::sendRealBM($header, $detil, $config);
+    }
   }
 
-  private static function sendRealBM($head, $detil){
+  private static function sendRealBM($head, $detil, $config){
     foreach ($detil as $list) {
-      $consignee = '';
-      $oi = '';
-      $podpol = '';
-      $movetype = '';
-      $startenddate = '';
-      $blno = $list->dtl_bm_bl;
-      $bldate = $list->dtl_create_date;
+      if ($list->dtl_pkg_id == 4) {
+        $listA = (array)$list;
+        // 
+          $consignee = '';
+          $oi = '';
+          $podpol = '';
+          $movetype = '';
+          $startenddate = '';
+          $blno = $listA[$config['head_tab_detil_bl']];
+          $bldate = $list->dtl_create_date;
+        // 
 
-      if (empty($head->bm_eta)) {
-        $bm_eta = null;
-      }else{
-        $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_eta)->format('m/d/Y');
-      }
-      if (empty($head->bm_etd)) {
-        $bm_etd = null;
-      }else{
-        $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_etd)->format('m/d/Y');
-      }
-      if (empty($head->bm_open_stack)) {
-        $bm_open_stack = null;
-      }else{
-        $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_open_stack)->format('m/d/Y');
-      }
-      if (empty($head->bm_closing_time)) {
-        $bm_closing_time = null;
-      }else{
-        $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head->bm_closing_time)->format('m/d/Y');
-      }
-
-      $vParam = '';
-      $vParam .= $head->bm_no.'^';
-      $vParam .= $head->bm_cust_name.'^';
-      $vParam .= $head->bm_cust_id.'^';
-      $vParam .= $head->bm_cust_npwp.'^';
-      $vParam .= $head->bm_vessel_name.'^';
-      $vParam .= $bm_eta.'^';
-      $vParam .= $bm_etd.'^';
-      $vParam .= $head->bm_voyin.'^';
-      $vParam .= $head->bm_voyout.'^';
-      $vParam .= $bm_closing_time.'^';
-      $vParam .= 'BONGKAR MUAT^'; // ?
-      $vParam .= 'CONSIGNEE^'; // ?
-      $vParam .= $oi.'^'; // ?
-      $vParam .= $podpol.'^'; // ?
-      $vParam .= $podpol.'^'; // ?
-      $vParam .= $movetype.'^'; // ?
-      $vParam .= $startenddate.'^'; // ?
-      $vParam .= $startenddate.'^'; // ?
-      $vParam .= '0^'; // ?
-      $vParam .= $blno.'^'; // ?
-      $vParam .= $startenddate.'^'; // ?
-      $vParam .= '0^'; // ?
-      $vParam .= $head->bm_vvd_id.'^'; // ?
-      $vParam .= $oi.'^'; // ?
-      $vParam .= $startenddate.'^'; // ?
-      $vParam .= '0'; // ?
-      $vParamH = $vParam;
-
-      $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
-      $string_json = '{
-        "createBookingHeaderInterfaceRequest": {
-          "esbHeader": {
-            "externalId": "2",
-            "timestamp": "2"
-          },
-          "esbBody": {
-            "vParam": "'.$vParamH.'",
-            "vId": "'.$head->bm_id.'",
-            "vReqNo": "'.$head->bm_no.'",
-            "vBlNo": "'.$blno.'"
+        // 
+          if (empty($head[$config['head_eta']])) {
+            $bm_eta = null;
+          }else{
+            $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_eta']])->format('m/d/Y');
           }
-        }
-      }';
-      $username="npk_billing";
-      $password ="npk_billing";
-      $client = new Client();
-      $options= array(
-        'auth' => [
-          $username,
-          $password
-        ],
-        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-        'body' => $string_json,
-        "debug" => false
-      );
-      try {
-        $res = $client->post($endpoint_url, $options);
-      } catch (ClientException $e) {
-        return $e->getResponse();
-      }
+          if (empty($head[$config['head_etd']])) {
+            $bm_etd = null;
+          }else{
+            $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_etd']])->format('m/d/Y');
+          }
+          if (empty($head[$config['head_open_stack']])) {
+            $bm_open_stack = null;
+          }else{
+            $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_open_stack']])->format('m/d/Y');
+          }
+          if (empty($head[$config['head_closing_time']])) {
+            $bm_closing_time = null;
+          }else{
+            $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_closing_time']])->format('m/d/Y');
+          }
+        // 
 
-      $merk = '-';
-      $model = '-';
-      $hz = 'N';
-      $distrub = 'N';
-      $wight = '0';
+        // 
+          $vParam = '';
+          $vParam .= $head[$config['head_no']].'^';
+          $vParam .= $head[$config['head_cust_name']].'^';
+          $vParam .= $head[$config['head_cust_id']].'^';
+          $vParam .= $head[$config['head_cust_npwp']].'^';
+          $vParam .= $head[$config['head_vessel_name']].'^';
+          $vParam .= $bm_eta.'^';
+          $vParam .= $bm_etd.'^';
+          $vParam .= $head[$config['head_voyin']].'^';
+          $vParam .= $head[$config['head_voyout']].'^';
+          $vParam .= $bm_closing_time.'^'; // ?
+          $vParam .= 'BONGKAR MUAT^'; // ?
+          $vParam .= 'CONSIGNEE^'; // ?
+          $vParam .= $oi.'^'; // ?
+          $vParam .= $podpol.'^'; // ?
+          $vParam .= $podpol.'^'; // ?
+          $vParam .= $movetype.'^'; // ?
+          $vParam .= $startenddate.'^'; // ?
+          $vParam .= $startenddate.'^'; // ?
+          $vParam .= '0^'; // ?
+          $vParam .= $blno.'^'; // ?
+          $vParam .= $startenddate.'^'; // ?
+          $vParam .= '0^'; // ?
+          $vParam .= $head[$config['head_vvd_id']].'^'; // ?
+          $vParam .= $oi.'^'; // ?
+          $vParam .= $startenddate.'^'; // ?
+          $vParam .= '0'; // ?
+          $vParamH = $vParam;
+        // 
 
-      $vParamD = '';
-      $vParamD .= $list->dtl_cmdty_name.'^';
-      $vParamD .= $list->dtl_cont_type.'^';
-      $vParamD .= $merk.'^'; // ?
-      $vParamD .= $model.'^'; // ?
-      $vParamD .= $hz.'^'; // ?
-      $vParamD .= $distrub.'^'; // ?
-      $vParamD .= $wight.'^'; // ?
-      $vParamD .= $list->dtl_qty.'^';
-      $vParamD .= 'N^'; // ?
-      $vParamD .= '0'; // ?
-
-      $TEST = "GANDUM^TIPE^SEGITIGA BIRU^MODEL^N^N^100^100^N^50";
-
-      $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
-      $string_json = '{
-        "createBookingDetailInterfaceRequest": {
-          "esbHeader": {
-            "externalId": "2",
-            "timestamp": "2"
-            },
-            "esbBody": {
-              "vParams": "'.$vParamD.'",
-              "vId": "'.$list->dtl_bm_id.'",
-              "vIdHeader": "'.$head->bm_id.'"
+        // 
+          $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
+          $string_json = '{
+            "createBookingHeaderInterfaceRequest": {
+              "esbHeader": {
+                "externalId": "2",
+                "timestamp": "2"
+              },
+              "esbBody": {
+                "vParam": "'.$vParamH.'",
+                "vId": "'.$head[$config['head_primery']].'",
+                "vReqNo": "'.$head[$config['head_no']].'",
+                "vBlNo": "'.$blno.'"
+              }
             }
+          }';
+          $username="npk_billing";
+          $password ="npk_billing";
+          $client = new Client();
+          $options= array(
+            'auth' => [
+              $username,
+              $password
+            ],
+            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+            'body' => $string_json,
+            "debug" => false
+          );
+          try {
+            $res = $client->post($endpoint_url, $options);
+          } catch (ClientException $e) {
+            return $e->getResponse();
           }
-        }';
-        $username="npk_billing";
-        $password ="npk_billing";
-        $client = new Client();
-        $options= array(
-          'auth' => [
-            $username,
-            $password
-          ],
-          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-          'body' => $string_json,
-          "debug" => false
-        );
-        try {
-          $res = $client->post($endpoint_url, $options);
-        } catch (ClientException $e) {
-          return $e->getResponse();
-        }
+        // 
+
+        // 
+          $merk = '-';
+          $model = '-';
+          $hz = 'N';
+          $distrub = 'N';
+          $wight = '0';
+
+          $vParamD = '';
+          $vParamD .= $list->dtl_cmdty_name.'^';
+          $vParamD .= $list->dtl_cont_type.'^';
+          $vParamD .= $merk.'^'; // ?
+          $vParamD .= $model.'^'; // ?
+          $vParamD .= $hz.'^'; // ?
+          $vParamD .= $distrub.'^'; // ?
+          $vParamD .= $wight.'^'; // ?
+          $vParamD .= $list->dtl_qty.'^';
+          $vParamD .= 'N^'; // ?
+          $vParamD .= '0'; // ?
+
+          $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
+          $string_json = '{
+            "createBookingDetailInterfaceRequest": {
+              "esbHeader": {
+                "externalId": "2",
+                "timestamp": "2"
+                },
+                "esbBody": {
+                  "vParams": "'.$vParamD.'",
+                  "vId": "'.$listA[$config['head_tab_detil_id']].'",
+                  "vIdHeader": "'.$head[$config['head_primery']].'"
+                }
+              }
+          }';
+          $username="npk_billing";
+          $password ="npk_billing";
+          $client = new Client();
+          $options= array(
+            'auth' => [
+              $username,
+              $password
+            ],
+            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+            'body' => $string_json,
+            "debug" => false
+          );
+          try {
+            $res = $client->post($endpoint_url, $options);
+          } catch (ClientException $e) {
+            return $e->getResponse();
+          }
+        // 
+      }
     }
     return ['Success' => true];
+  }
+
+  public static function sendUperPutReceipt($uper_id, $pay){
+    $uperH = TxHdrUper::find($uper_id);
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = $branch[0];
+    $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_dest_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
+    $bank = $bank[0];
+
+    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
+    $string_json= '{
+       "arRequestDoc":{
+          "esbHeader":{
+             "internalId":"",
+             "externalId":"",
+             "timestamp":"",
+             "responseTimestamp":"",
+             "responseCode":"",
+             "responseMessage":""
+          },
+          "esbBody":[
+             {
+                "header":{
+                   "orgId":"'.$uperH->uper_org_id.'",
+                   "receiptNumber":"'.$uperH->uper_no.'",
+                   "receiptMethod":"BANK",
+                   "receiptAccount":"'.$pay->pay_dest_account_name.' '.$pay->pay_dest_bank_code.' '.$pay->pay_dest_account_no.'",
+                   "bankId":"'.$bank->bank_id.'",
+                   "customerNumber":"'.$pay->pay_cust_id.'",
+                   "receiptDate":"'.$pay->pay_date.'",
+                   "currencyCode":"'.$pay->pay_currency.'",
+                   "status":"P",
+                   "amount":"'.$pay->pay_amount.'",
+                   "processFlag":"",
+                   "errorMessage":"",
+                   "apiMessage":"",
+                   "attributeCategory":"",
+                   "referenceNum":"",
+                   "receiptType":"",
+                   "receiptSubType":"",
+                   "createdBy":"1",
+                   "creationDate":"'.$pay->pay_create_date.'",
+                   "terminal":"",
+                   "attribute1":"",
+                   "attribute2":"",
+                   "attribute3":"",
+                   "attribute4":"",
+                   "attribute5":"",
+                   "attribute6":"",
+                   "attribute7":"",
+                   "attribute8":"",
+                   "attribute9":"",
+                   "attribute10":"",
+                   "attribute11":"",
+                   "attribute12":"",
+                   "attribute13":"",
+                   "attribute14":"",
+                   "attribute15":"",
+                   "statusReceipt":"N",
+                   "sourceInvoice":"NPKBILLING",
+                   "statusReceiptMsg":"",
+                   "invoiceNum":"",
+                   "amountOrig":null,
+                   "lastUpdateDate":"'.$pay->pay_create_date.'",
+                   "lastUpdateBy":"1",
+                   "branchCode":"'.$branch->branch_code.'",
+                   "branchAccount":"'.$branch->branch_account.'",
+                   "sourceInvoiceType":"NPKBILLING",
+                   "remarkToBankId":"'.$pay->pay_dest_account_no.'",
+                   "sourceSystem":"NPKBILLING",
+                   "comments":"",
+                   "cmsYn":"N",
+                   "tanggalTerima":null,
+                   "norekKoran":""
+                }
+             }
+          ],
+          "esbSecurity":{
+             "orgId":"'.$uperH->uper_org_id.'",
+             "batchSourceId":"",
+             "lastUpdateLogin":"",
+             "userId":"",
+             "respId":"",
+             "ledgerId":"",
+             "respApplId":"",
+             "batchSourceName":""
+          }
+       }
+    }';
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
   }
 
   public static function truckRegistration($input){

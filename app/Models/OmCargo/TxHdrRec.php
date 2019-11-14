@@ -4,7 +4,7 @@ namespace App\Models\OmCargo;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TxHdrrec extends Model
+class TxHdrRec extends Model
 {
     protected $connection = 'omcargo';
     protected $table = 'TX_HDR_REC';
