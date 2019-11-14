@@ -138,6 +138,13 @@ class StoreController extends Controller
         $vvdName = $reques->del_vessel_name;
         $vvdVI = $reques->del_voyin;
         $vvdVO = $reques->del_voyout;
+      }else if ($head->tca_req_type  == 3) {
+        $reques = DB::connection('omcargo')->table('TX_HDR_BM')->where('bm_no', $head->tca_req_no)->get();
+        $reques = $reques[0];
+        $vvdID = $reques->bm_vvd_id;
+        $vvdName = $reques->bm_vessel_name;
+        $vvdVI = $reques->bm_voyin;
+        $vvdVO = $reques->bm_voyout;
       }
       $loop = DB::connection('omcargo')->table('TX_DTL_TCA')->where('tca_hdr_id', $input['id'])->get();
       $detil = [];
