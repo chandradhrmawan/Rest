@@ -215,7 +215,6 @@ class ConnectedExternalApps{
     }
 
     $config = RequestBooking::config($table);
-    $header = (array)$header;
     if (!empty($header)) {
       $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
       return static::sendRealBM($header, $detil, $config);
