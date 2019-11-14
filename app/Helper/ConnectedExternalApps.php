@@ -215,7 +215,6 @@ class ConnectedExternalApps{
     }
 
     $config = RequestBooking::config($table);
-    $header = (array)$header;
     if (!empty($header)) {
       $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
       return static::sendRealBM($header, $detil, $config);
@@ -227,13 +226,13 @@ class ConnectedExternalApps{
       if ($list->dtl_pkg_id == 4) {
         $listA = (array)$list;
         // 
-          $consignee = '';
-          $oi = '';
+          $consignee = 'consignee';
+          $oi = $listA[$config['head_trade']];
           $podpol = '';
-          $movetype = '';
+          $movetype = 'MOVETYPE';
           $startenddate = '';
           $blno = $listA[$config['head_tab_detil_bl']];
-          $bldate = $list->dtl_create_date;
+          $bldate = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $list->dtl_create_date)->format('m/d/Y');
         // 
 
         // 
@@ -404,7 +403,7 @@ class ConnectedExternalApps{
                 "header":{
                    "orgId":"'.$uperH->uper_org_id.'",
                    "receiptNumber":"'.$uperH->uper_no.'",
-                   "receiptMethod":"BANK",
+                   "receiptMethod":"UPER",
                    "receiptAccount":"'.$pay->pay_dest_account_name.' '.$pay->pay_dest_bank_code.' '.$pay->pay_dest_account_no.'",
                    "bankId":"'.$bank->bank_id.'",
                    "customerNumber":"'.$pay->pay_cust_id.'",
@@ -415,27 +414,27 @@ class ConnectedExternalApps{
                    "processFlag":"",
                    "errorMessage":"",
                    "apiMessage":"",
-                   "attributeCategory":"",
+                   "attributeCategory":"UPER",
                    "referenceNum":"",
                    "receiptType":"",
                    "receiptSubType":"",
-                   "createdBy":"1",
+                   "createdBy":"-1",
                    "creationDate":"'.$pay->pay_create_date.'",
                    "terminal":"",
-                   "attribute1":"",
-                   "attribute2":"",
-                   "attribute3":"",
-                   "attribute4":"",
-                   "attribute5":"",
+                   "attribute1":"'.$uperH->uper_no.'",
+                   "attribute2":"'.$uperH->uper_cust_id.'",
+                   "attribute3":"'.$uperH->uper_cust_name.'",
+                   "attribute4":"'.$uperH->uper_cust_address.'",
+                   "attribute5":"'.$uperH->uper_cust_npwp.'",
                    "attribute6":"",
-                   "attribute7":"",
-                   "attribute8":"",
+                   "attribute7":"'.$uperH->uper_currency_code.'",
+                   "attribute8":"'.$uperH->uper_vessel_name.'",
                    "attribute9":"",
                    "attribute10":"",
                    "attribute11":"",
                    "attribute12":"",
-                   "attribute13":"",
-                   "attribute14":"",
+                   "attribute13":"ID-001",
+                   "attribute14":"'.$uperH->uper_nota_id.'",
                    "attribute15":"",
                    "statusReceipt":"N",
                    "sourceInvoice":"NPKBILLING",
@@ -443,7 +442,7 @@ class ConnectedExternalApps{
                    "invoiceNum":"",
                    "amountOrig":null,
                    "lastUpdateDate":"'.$pay->pay_create_date.'",
-                   "lastUpdateBy":"1",
+                   "lastUpdateBy":"-1",
                    "branchCode":"'.$branch->branch_code.'",
                    "branchAccount":"'.$branch->branch_account.'",
                    "sourceInvoiceType":"NPKBILLING",
@@ -482,6 +481,7 @@ class ConnectedExternalApps{
     );
     try {
       $res = $client->post($endpoint_url, $options);
+      return json_decode($res->getBody()->getContents(), true);
     } catch (ClientException $e) {
       return $e->getResponse();
     }
