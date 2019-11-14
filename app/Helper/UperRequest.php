@@ -114,7 +114,7 @@ class UperRequest{
   }
 
 	public static function storePayment($input){
-        if (empty($input['pay_file'])) {
+        if (empty($input['pay_file']['PATH'])) {
           return ["Success"=>false, "result" => "Fail, file is required"];
         }
 
@@ -178,7 +178,7 @@ class UperRequest{
               $res = ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
               if ($res['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
                 TxPayment::where('pay_id',$pay->pay_id)->update(['pay_status'=>2]);
-                return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no];
+                return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
               }
               static::updateUperStatus([
                 'uper_id' => $uper->uper_id,
@@ -209,7 +209,7 @@ class UperRequest{
       $res = ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
       if ($res['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
         TxPayment::where('pay_id',$pay->pay_id)->update(['pay_status'=>2]);
-        return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no];
+        return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
       }
       static::updateUperStatus([
         'uper_id' => $uper->uper_id,
@@ -229,12 +229,8 @@ class UperRequest{
       }
   }
 
-  private static function updateNotaStatus($input){
-      // $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update(['uper_paid' => $input['uper_paid']]);
-      // $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->where('uper_paid', 'N')->count();
-
-      // if ($cekStatus == 0) {
-      //   ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
-      // }
+  private static function updateNotaStatus($nota){
+      TxHdrNota::where('nota_id',$nota->nota_id)->update(['nota_paid' => 'Y']);
+      ConnectedExternalApps::sendNotaProforma($nota);
   }
 }

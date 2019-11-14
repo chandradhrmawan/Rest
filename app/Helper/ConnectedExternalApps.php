@@ -227,7 +227,7 @@ class ConnectedExternalApps{
         $listA = (array)$list;
         // 
           $consignee = 'consignee';
-          $oi = $listA[$config['head_trade']];
+          $oi = $head[$config['head_trade']];
           $podpol = '';
           $movetype = 'MOVETYPE';
           $startenddate = '';
