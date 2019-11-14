@@ -664,10 +664,14 @@ class ConnectedExternalApps{
       }
       return ["Success"=>false, "result" => $error];
     }
-    DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
-      "tca_status" => 2
-    ]);
-    return ["Success"=>true, "result" => json_decode($res->getBody()->getContents(), true)];
+    $res = json_decode($res->getBody()->getContents(), true);
+    if ($res['esbBody']['statusCode'] == 'F') {
+      return ["Success"=>false, "result" => $res['esbBody']['statusMessage']];
+    }
+    // DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
+    //   "tca_status" => 2
+    // ]);
+    return ["Success"=>true, "result" => $res['esbBody']['statusMessage']];
   }
 
   public static function sendNotaProforma($input){

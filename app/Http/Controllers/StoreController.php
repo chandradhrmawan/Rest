@@ -182,7 +182,7 @@ class StoreController extends Controller
         "vQty" => $head->tca_qty,
         "vTon" => $head->tca_qty,
         "vBlNumber" => $head->tca_bl,
-        "vBlDate" => $head->tca_bl_date,
+        "vBlDate" => date('d-M-y', strtotime($head->tca_bl_date)),
         "vEi" => $head->tca_req_type == 1 ? 'I' : 'E',
         "vHsCode" => $head->tca_hs_code,
         "vIdServicetype" => $head->tca_req_type,
