@@ -602,7 +602,7 @@ class ConnectedExternalApps{
                   "vRfidCode": "'.$list['vRfidCode'].'",
                   "vIdServiceType": "'.$list['vIdServiceType'].'",
                   "vServiceType": "'.$list['vServiceType'].'",
-                  "vIdTruck": "'.$list['vIdTruck'].'",
+                  "vIdTruck": "",
                   "vIdVvd": "'.$list['vIdVvd'].'",
                   "vIdTerminal": "'.$list['vIdTerminal'].'"
                 },';
@@ -610,7 +610,7 @@ class ConnectedExternalApps{
     $detail = substr($detail, 0, -1);
 
     $string_json = '{
-     "createTCARequest": {
+     "createTCAInterfaceRequest": {
       "esbHeader": {
        "internalId": "",
        "externalId": "",
@@ -637,11 +637,75 @@ class ConnectedExternalApps{
          "vServiceType": "'.$input['vServiceType'].'",
          "vIdVvd": "'.$input['vIdVvd'].'",
          "vIdTerminal": "'.$input['vIdTerminal'].'",
-         "document": [],
+         "document": [{ "documentName": "test_api.pdf" }],
          "detail":['.$detail.']
         }
       }
     }';
+
+    // $string_json = '{
+    //    "createTCAInterfaceRequest": {
+    //       "esbHeader": {
+    //          "internalId": "",
+    //          "externalId": "",
+    //          "timestamp": "",
+    //          "responseTimestamp": "",
+    //          "responseCode": "",
+    //          "responseMessage": ""
+    //       },
+    //       "esbBody": {
+    //          "vVessel": "FIK02",
+    //          "vVin": "02",
+    //          "vVout": "03",
+    //          "vNoRequest": "REC-0000000002",
+    //          "vCustomerName": "MAJU JAYA BERSAMA",
+    //          "vCustomerId": "17401035",
+    //          "vPkgName": "Curah Kering Pangan",
+    //          "vQty": "100",
+    //          "vTon": "10",
+    //          "vBlNumber": "REC0101",
+    //          "vBlDate": "2019-08-30",
+    //          "vEi": "I",
+    //          "vHsCode": "8717",
+    //          "vIdServicetype": "02",
+    //          "vServiceType": "DELIVERY CARGO",
+    //          "vIdVvd": "111V",
+    //          "vIdTerminal": "803",
+    //          "document": [{
+    //             "documentName": "test_api.pdf"
+    //          }],
+    //          "detail":[{
+    //             "vNoRequest": "REC-0000000002",
+    //             "vTruckId": "B2010C",
+    //             "vTruckNumber": "B2010C",
+    //             "vBlNumber": "REC0101",
+    //             "vTcaCompany": "MAJU JAYA BERSAMA",
+    //             "vEi": "I",
+    //             "vRfidCode": "",
+    //             "vIdServiceType": "02",
+    //             "vServiceType": "DELIVERY CARGO",
+    //             "vIdTruck": "5939",
+    //             "vIdVvd": "111V",
+    //             "vIdTerminal": "803"
+    //          },
+    //          {
+    //             "vNoRequest": "REC-0000000002",
+    //             "vTruckId": "B2010C",
+    //             "vTruckNumber": "B2010C",
+    //             "vBlNumber": "REC0101",
+    //             "vTcaCompany": "MAJU JAYA BERSAMA",
+    //             "vEi": "I",
+    //             "vRfidCode": "",
+    //             "vIdServiceType": "02",
+    //             "vServiceType": "DELIVERY CARGO",
+    //             "vIdTruck": "5939",
+    //             "vIdVvd": "111V",
+    //             "vIdTerminal": "803"
+    //          }
+    //         ]
+    //       }
+    //    }
+    // }';
 
     $username="npk_billing";
     $password ="npk_billing";
@@ -668,9 +732,9 @@ class ConnectedExternalApps{
     if ($res['esbBody']['statusCode'] == 'F') {
       return ["Success"=>false, "result" => $res['esbBody']['statusMessage']];
     }
-    // DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
-    //   "tca_status" => 2
-    // ]);
+    DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
+      "tca_status" => 2
+    ]);
     return ["Success"=>true, "result" => $res['esbBody']['statusMessage']];
   }
 
