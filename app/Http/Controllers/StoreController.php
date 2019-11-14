@@ -154,6 +154,8 @@ class StoreController extends Controller
           return ["Success"=>false, 'result_msg' => 'Fail, not found '.$list->tca_truck_id.' on mdm.tm_truck'];
         }
         $truck = $truck[0];
+        $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where('terminal_code', $head->tca_terminal_code)->get();
+        $terminal = $terminal[0];
         $detil[] = [
           "vNoRequest" => $head->tca_req_no,
           "vTruckId" => $truck->truck_id,
@@ -166,7 +168,7 @@ class StoreController extends Controller
           "vServiceType" => $head->tca_req_type_name,
           "vIdTruck" => $truck->truck_id,
           "vIdVvd" => $vvdID,
-          "vIdTerminal" => $head->tca_terminal_code
+          "vIdTerminal" => $terminal->terminal_id
         ];
       }
       $set_data = [
@@ -186,7 +188,7 @@ class StoreController extends Controller
         "vIdServicetype" => $head->tca_req_type,
         "vServiceType" => $head->tca_req_type_name,
         "vIdVvd" => $vvdID,
-        "vIdTerminal" => $head->tca_terminal_code,
+        "vIdTerminal" => $terminal->terminal_id,
         "detail" => $detil
       ];
 
