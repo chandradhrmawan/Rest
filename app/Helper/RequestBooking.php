@@ -180,9 +180,9 @@ class RequestBooking{
 		$datenow    = Carbon::now()->format('Y-m-d');
 		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
 		$upers = DB::connection('eng')->select(DB::raw($query));
-		// if (empty($upers)) {
-		// 	return ['result' => "Fail, uper and tariff not found!", "Success" => false];
-		// }
+		if (count($upers) == 0) {
+			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
+		}
 		foreach ($upers as $uper) {
 			$uper = (array)$uper;
 
@@ -243,6 +243,8 @@ class RequestBooking{
 					}
 					$headU->uper_nota_id = $uper['nota_id'];
 					$headU->save();
+
+					$headU = TxHdrUper::find($headU->uper_id);
 				// store head
 
 				$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$uper['temp_hdr_id']."' AND CUSTOMER_ID = '".$uper['customer_id']."'";
@@ -295,7 +297,13 @@ class RequestBooking{
 			$config['head_mark'] => $input['msg']
 		]);
 
-		return ['result' => "Success, approved request!", 'no_req' => $find[$config['head_no']]];
+		if ($migrateTariff == true) {
+			$pesan = "Created Uper No : ".$headU->uper_no;
+		}else if($migrateTariff == false) {
+			$pesan = "Uper Not created, uper percent for this request is 0%";
+		}
+
+		return ['result' => "Success, approved request!", "note" => $pesan, 'no_req' => $find[$config['head_no']]];
     }
 
     public static function config($input){
