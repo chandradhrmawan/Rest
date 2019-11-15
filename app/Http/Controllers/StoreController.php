@@ -51,6 +51,18 @@ class StoreController extends Controller
       }
     }
 
+    public function store_cust($input, $request){
+      $set_data = $input['parameter'][0];
+      $cek = DB::connection('mdm')->table('TM_CUSTOMER')->where('CUSTOMER_ID', $input['parameter'][0]['CUSTOMER_ID'])->count();
+      if ($cek == 0) {
+        DB::connection('mdm')->table('TM_CUSTOMER')->insert($set_data);
+      }else{
+        DB::connection('mdm')->table('TM_CUSTOMER')->where('CUSTOMER_ID', $input['parameter'][0]['CUSTOMER_ID'])->update($set_data);
+      }
+
+      return ['Success' => true, 'result' => 'Success, store customer', 'data' => DB::connection('mdm')->table('TM_CUSTOMER')->where('CUSTOMER_ID', $input['parameter'][0]['CUSTOMER_ID'])->get()];
+    }
+
     public function testlain($input, $request){
       return ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
     }
