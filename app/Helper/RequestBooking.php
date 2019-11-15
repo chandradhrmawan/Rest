@@ -158,13 +158,17 @@ class RequestBooking{
     }
 
     public static function approvalRequest($input){
-    $input['table'] = strtoupper($input['table']);
+    	$input['table'] = strtoupper($input['table']);
 		$config = static::config($input['table']);
 		$find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
 		if (empty($find)) {
 			return ['result' => "Fail, requst not found!", "Success" => false];
 		}
 		$find = (array)$find[0];
+		$uper = DB::connection('omcargo')->table('TX_HDR_UPER')->where('uper_req_no',$find[$config['head_no']])->get();
+		if (count($uper) > 0) {
+			return ['result' => "Fail, request already exist on uper!", "Success" => false];
+		}
 		if ($input['approved'] == 'false') {
 			DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 4,
@@ -176,9 +180,9 @@ class RequestBooking{
 		$datenow    = Carbon::now()->format('Y-m-d');
 		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
 		$upers = DB::connection('eng')->select(DB::raw($query));
-		// if (empty($upers)) {
-		// 	return ['result' => "Fail, uper and tariff not found!", "Success" => false];
-		// }
+		if (count($upers) == 0) {
+			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
+		}
 		foreach ($upers as $uper) {
 			$uper = (array)$uper;
 
@@ -239,6 +243,8 @@ class RequestBooking{
 					}
 					$headU->uper_nota_id = $uper['nota_id'];
 					$headU->save();
+
+					$headU = TxHdrUper::find($headU->uper_id);
 				// store head
 
 				$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$uper['temp_hdr_id']."' AND CUSTOMER_ID = '".$uper['customer_id']."'";
@@ -291,7 +297,13 @@ class RequestBooking{
 			$config['head_mark'] => $input['msg']
 		]);
 
-		return ['result' => "Success, approved request!", 'no_req' => $find[$config['head_no']]];
+		if ($migrateTariff == true) {
+			$pesan = "Created Uper No : ".$headU->uper_no;
+		}else if($migrateTariff == false) {
+			$pesan = "Uper Not created, uper percent for this request is 0%";
+		}
+
+		return ['result' => "Success, approved request!", "note" => $pesan, 'no_req' => $find[$config['head_no']]];
     }
 
     public static function config($input){

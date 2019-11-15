@@ -143,6 +143,7 @@ class BillingEngine{
             $detilS->tariff_object      = $list['OBJECT_TARIFF'];
             $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
             $detilS->tariff             = $list['TARIFF'];
+            $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
             // $detilS->tariff_STATUS = $list['TARIFF_STATUS'];
             $detilS->tariff_status      = $headS->tariff_status;
             // $detilS->tariff_DI = $list['TARIFF_DI'];
@@ -231,6 +232,15 @@ class BillingEngine{
   		$newDt['commodity_unit_code'] = $commodity_unit_code;
   		$newDt['commodity_unit_name'] = $commodity_unit_name;
   		$newDt['commodity_unit_min'] = $commodity_unit_min;
+
+      $newDt['tariff_reference_name'] = '';
+      if (!empty($list->tariff_reference)) {
+        $name_tariff_reference = DB::connection('eng')->table('TM_REFF')->where('reff_id', $list->tariff_reference)->where('reff_tr_id', 2)->get();
+        if (count($name_tariff_reference) > 0) {
+          $name_tariff_reference = $name_tariff_reference[0];
+          $newDt['tariff_reference_name'] = $name_tariff_reference->reff_name;
+        }
+      }
 
   		foreach ($list as $key => $value) {
   			$newDt[$key] = $value;
@@ -440,9 +450,9 @@ class BillingEngine{
 	    		$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
 	    		$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
 	    		$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
-          // if (isset($list['EQ_QTY_PKG']) and empty($list['EQ_QTY_PKG'])) {
-          //   // $setE .= ' equip.EQ_QTY_PKG := 20;';
-          // }
+          if (isset($list['EQ_QTY_PKG']) and empty($list['EQ_QTY_PKG'])) {
+            $setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_QTY_PKG'].';';
+          }
 	    		$setE .= ' list_equip('.$countE.') := equip; ';
 	    	}
 		// build eqpt

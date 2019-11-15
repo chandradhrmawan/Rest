@@ -124,6 +124,9 @@ class StoreController extends Controller
     function sendTCA($input){
       $head = DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $input['id'])->get();
       $head = $head[0];
+      if ($head->tca_status == 2) {
+        return ["Success"=>false, "result" => 'TCA already send!'];
+      }
       if ($head->tca_req_type  == 1) {
         $reques = DB::connection('omcargo')->table('TX_HDR_REC')->where('rec_no', $head->tca_req_no)->get();
         $reques = $reques[0];
@@ -138,6 +141,13 @@ class StoreController extends Controller
         $vvdName = $reques->del_vessel_name;
         $vvdVI = $reques->del_voyin;
         $vvdVO = $reques->del_voyout;
+      }else if ($head->tca_req_type  == 3) {
+        $reques = DB::connection('omcargo')->table('TX_HDR_BM')->where('bm_no', $head->tca_req_no)->get();
+        $reques = $reques[0];
+        $vvdID = $reques->bm_vvd_id;
+        $vvdName = $reques->bm_vessel_name;
+        $vvdVI = $reques->bm_voyin;
+        $vvdVO = $reques->bm_voyout;
       }
       $loop = DB::connection('omcargo')->table('TX_DTL_TCA')->where('tca_hdr_id', $input['id'])->get();
       $detil = [];
@@ -147,6 +157,8 @@ class StoreController extends Controller
           return ["Success"=>false, 'result_msg' => 'Fail, not found '.$list->tca_truck_id.' on mdm.tm_truck'];
         }
         $truck = $truck[0];
+        $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where('terminal_code', $head->tca_terminal_code)->get();
+        $terminal = $terminal[0];
         $detil[] = [
           "vNoRequest" => $head->tca_req_no,
           "vTruckId" => $truck->truck_id,
@@ -159,7 +171,7 @@ class StoreController extends Controller
           "vServiceType" => $head->tca_req_type_name,
           "vIdTruck" => $truck->truck_id,
           "vIdVvd" => $vvdID,
-          "vIdTerminal" => $head->tca_terminal_code
+          "vIdTerminal" => $terminal->terminal_id
         ];
       }
       $set_data = [
@@ -173,17 +185,17 @@ class StoreController extends Controller
         "vQty" => $head->tca_qty,
         "vTon" => $head->tca_qty,
         "vBlNumber" => $head->tca_bl,
-        "vBlDate" => $head->tca_bl_date,
+        "vBlDate" => date('Y-m-d', strtotime($head->tca_bl_date)),
         "vEi" => $head->tca_req_type == 1 ? 'I' : 'E',
         "vHsCode" => $head->tca_hs_code,
         "vIdServicetype" => $head->tca_req_type,
         "vServiceType" => $head->tca_req_type_name,
         "vIdVvd" => $vvdID,
-        "vIdTerminal" => $head->tca_terminal_code,
+        "vIdTerminal" => $terminal->terminal_id,
         "detail" => $detil
       ];
 
-      return ConnectedExternalApps::createTCA($set_data);
+      return ConnectedExternalApps::createTCA($set_data, $input['id']);
     }
 
     function save($input, $request) {

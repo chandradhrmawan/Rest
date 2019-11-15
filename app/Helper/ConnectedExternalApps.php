@@ -129,9 +129,6 @@ class ConnectedExternalApps{
 
 	public static function realTos($input){
 		$count = DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('REAL_REQ_NO', $input['req_no'])->count();
-    if ($count > 0) {
-      return ['result' => "Fail, realisation has been created!", "Success" => false];
-    }
     $req = TxHdrBm::where('BM_NO', $input['req_no'])->first();
     if (empty($req)) {
       return ['result' => "Fail, request not found!", "Success" => false];
@@ -175,11 +172,12 @@ class ConnectedExternalApps{
         $response = $response['esbBody']['results'][0];
 
         if (!empty($response['idVsbVoyage'])) {
-          $newreal = $response['esbBody']['results'][0];
+          // return $newreal = $response;
+          $newreal = $response;
           DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
              'idvsb'=> $newreal['idVsbVoyage'],
              'bl_no'=> $newreal['blNumber'],
-             'package'=> $newreal['packageName'],
+             // 'package'=> $newreal['packageName'], // gak tau knpa gak mau masuk
              'is_hz'=> $newreal['hz'],
              'is_disturb'=> $newreal['disturb'],
              'ei'=> $newreal['ei'],
@@ -197,6 +195,7 @@ class ConnectedExternalApps{
     return [
       'req_header' => $req,
       'req_detil' => DB::connection('omcargo')->select(DB::raw("select * from TX_DTL_BM A left join TX_REAL_TOS B on B.BL_NO = A.DTL_BM_BL where A.HDR_BM_ID = ".$req->bm_id)),
+      'req_eqpt' => DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $input['req_no'])->get(),
       'result' => "Success, get data real from tos!"
     ];
 	}
@@ -217,17 +216,17 @@ class ConnectedExternalApps{
     $config = RequestBooking::config($table);
     if (!empty($header)) {
       $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
-      return static::sendRealBM($header, $detil, $config);
+      return static::sendRequestBookingExcute($header, $detil, $config);
     }
   }
 
-  private static function sendRealBM($head, $detil, $config){
+  private static function sendRequestBookingExcute($head, $detil, $config){
     foreach ($detil as $list) {
       if ($list->dtl_pkg_id == 4) {
         $listA = (array)$list;
         // 
           $consignee = 'consignee';
-          $oi = $listA[$config['head_trade']];
+          $oi = $head[$config['head_trade']];
           $podpol = '';
           $movetype = 'MOVETYPE';
           $startenddate = '';
@@ -437,7 +436,7 @@ class ConnectedExternalApps{
                    "attribute14":"'.$uperH->uper_nota_id.'",
                    "attribute15":"",
                    "statusReceipt":"N",
-                   "sourceInvoice":"NPKBILLING",
+                   "sourceInvoice":"BRG_UPER",
                    "statusReceiptMsg":"",
                    "invoiceNum":"",
                    "amountOrig":null,
@@ -445,8 +444,8 @@ class ConnectedExternalApps{
                    "lastUpdateBy":"-1",
                    "branchCode":"'.$branch->branch_code.'",
                    "branchAccount":"'.$branch->branch_account.'",
-                   "sourceInvoiceType":"NPKBILLING",
-                   "remarkToBankId":"'.$pay->pay_dest_account_no.'",
+                   "sourceInvoiceType":"UPER",
+                   "remarkToBankId":"",
                    "sourceSystem":"NPKBILLING",
                    "comments":"",
                    "cmsYn":"N",
@@ -587,7 +586,7 @@ class ConnectedExternalApps{
     return [json_decode($res->getBody()->getContents())];
   }
 
-  public static function createTCA($input){
+  public static function createTCA($input, $tca_id){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createTCA";
 
     $detail = '';
@@ -602,7 +601,7 @@ class ConnectedExternalApps{
                   "vRfidCode": "'.$list['vRfidCode'].'",
                   "vIdServiceType": "'.$list['vIdServiceType'].'",
                   "vServiceType": "'.$list['vServiceType'].'",
-                  "vIdTruck": "'.$list['vIdTruck'].'",
+                  "vIdTruck": "",
                   "vIdVvd": "'.$list['vIdVvd'].'",
                   "vIdTerminal": "'.$list['vIdTerminal'].'"
                 },';
@@ -610,7 +609,7 @@ class ConnectedExternalApps{
     $detail = substr($detail, 0, -1);
 
     $string_json = '{
-     "createTCARequest": {
+     "createTCAInterfaceRequest": {
       "esbHeader": {
        "internalId": "",
        "externalId": "",
@@ -637,7 +636,7 @@ class ConnectedExternalApps{
          "vServiceType": "'.$input['vServiceType'].'",
          "vIdVvd": "'.$input['vIdVvd'].'",
          "vIdTerminal": "'.$input['vIdTerminal'].'",
-         "document": [],
+         "document": [{ "documentName": "test_api.pdf" }],
          "detail":['.$detail.']
         }
       }
@@ -664,7 +663,14 @@ class ConnectedExternalApps{
       }
       return ["Success"=>false, "result" => $error];
     }
-    return ["Success"=>true, "result" => json_decode($res->getBody()->getContents(), true)];
+    $res = json_decode($res->getBody()->getContents(), true);
+    if ($res['esbBody']['statusCode'] == 'F') {
+      return ["Success"=>false, "result" => $res['esbBody']['statusMessage']];
+    }
+    DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
+      "tca_status" => 2
+    ]);
+    return ["Success"=>true, "result" => $res['esbBody']['statusMessage']];
   }
 
   public static function sendNotaProforma($input){
