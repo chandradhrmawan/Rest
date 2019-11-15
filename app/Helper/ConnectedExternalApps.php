@@ -236,14 +236,13 @@ class ConnectedExternalApps{
 
     $config = RequestBooking::config($table);
     if (!empty($header)) {
-      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->get();
+      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->where('dtl_pkg_id', 4)->get();
       return static::sendRequestBookingExcute($header, $detil, $config);
     }
   }
 
   private static function sendRequestBookingExcute($head, $detil, $config){
     foreach ($detil as $list) {
-      if ($list->dtl_pkg_id == 4) {
         $listA = (array)$list;
         // 
           $consignee = 'consignee';
@@ -395,7 +394,6 @@ class ConnectedExternalApps{
             return $e->getResponse();
           }
         // 
-      }
     }
     return ['Success' => true];
   }
