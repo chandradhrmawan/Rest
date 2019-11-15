@@ -21,24 +21,24 @@ class GlobalHelper {
              $vwdata = ["HEADER" => $header];
           }
 
-          // else if($data == "FILE") {
-          //   $fil     = [];
-          //   $fk      = $val["FK"][0];
-          //   $fkhdr   = $header[0][$val["FK"][1]];
-          //   $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
-          //   foreach ($detail as $list) {
-          //     $newDt = [];
-          //     foreach ($list as $key => $value) {
-          //       $newDt[$key] = $value;
-          //     }
-          //   }
-          //   $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
-          //   $url     = str_replace(" ", "%20", $dataUrl);
-          //   $file = file_get_contents($url);
-          //   $newDt["base64"]  =  base64_encode($file);
-          //   $fil[] = $newDt;
-          //   $vwdata[$data] = $fil[0];
-          // }
+          else if($data == "FILE") {
+            $fil     = [];
+            $fk      = $val["FK"][0];
+            $fkhdr   = $header[0][$val["FK"][1]];
+            $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
+            foreach ($detail as $list) {
+              $newDt = [];
+              foreach ($list as $key => $value) {
+                $newDt[$key] = $value;
+              }
+              $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
+              $url     = str_replace(" ", "%20", $dataUrl);
+              $file = file_get_contents($url);
+              $newDt["base64"]  =  base64_encode($file);
+              $fil[] = $newDt;
+              $vwdata[$data] = $fil;
+              }
+            }
 
           else {
             $fk      = $val["FK"][0];
@@ -112,7 +112,6 @@ class GlobalHelper {
          $vwdata["FILE"] = $fil;
         }
       }
-
       return $vwdata;
     }
 
@@ -439,7 +438,11 @@ class GlobalHelper {
 
       }
     }
-    return ["result"=>$data, "count"=>$count];
+    if (!empty($input['special'])) {
+      return ["result"=>$data];
+    } else {
+      return ["result"=>$data, "count"=>$count];
+    }
   }
 
   public static function whereQuery($input) {
