@@ -441,9 +441,9 @@ class BillingEngine{
 	    		$setE .= ' equip.EQ_UNIT_ID := '.$list['EQ_UNIT_ID'].';';
 	    		$setE .= ' equip.EQ_GTRF_ID := '.$list['EQ_GTRF_ID'].';';
 	    		$setE .= ' equip.EQ_PKG_ID := '.$list['EQ_PKG_ID'].';';
-          // if (isset($list['EQ_QTY_PKG']) and empty($list['EQ_QTY_PKG'])) {
-          //   // $setE .= ' equip.EQ_QTY_PKG := 20;';
-          // }
+          if (isset($list['EQ_QTY_PKG']) and empty($list['EQ_QTY_PKG'])) {
+            $setE .= ' equip.EQ_QTY_PKG := '.$list['EQ_QTY_PKG'].';';
+          }
 	    		$setE .= ' list_equip('.$countE.') := equip; ';
 	    	}
 		// build eqpt
