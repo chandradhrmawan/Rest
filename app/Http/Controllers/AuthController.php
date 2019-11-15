@@ -62,7 +62,7 @@ class AuthController extends BaseController
             // differents kind of responses. But let's return the
             // below respose for now.
             return response()->json([
-                'error' => 'Email does not exist.'
+                'error' => 'Invalid Username / Password'
             ], 400);
         }
         // Verify the password and generate the token
@@ -81,7 +81,7 @@ class AuthController extends BaseController
         }
         // Bad Request response
         return response()->json([
-            'error' => 'Email or password is wrong.'
+            'error' => 'Invalid Username / Password'
         ], 400);
 
         // return response($user);
