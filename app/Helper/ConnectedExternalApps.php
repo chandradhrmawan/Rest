@@ -137,59 +137,25 @@ class ConnectedExternalApps{
 
     if (count($ckp) > 0) {
       foreach ($ckp as $list) {
-        DB::connection('omcargo')->table('TX_REAL_TOS')->where('idvsb', $req->bm_vvd_id)->where('bl_no', $list->dtl_bm_bl)->delete();
-        $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/searchRealisasi";
-        $string_json = '{
-          "searchRealisasiRequest": {
-            "esbHeader": { },
-              "esbBody": {
-                "vvd": "'.$req->bm_vvd_id.'",
-                "noblss": "'.$list->dtl_bm_bl.'"
-              }
-            }
-          }';
-
-        $username="npk_billing";
-        $password ="npk_billing";
-        $client = new Client();
-        $options= array(
-          'auth' => [
-            $username,
-            $password
-          ],
-          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-          'body' => $string_json,
-          "debug" => false
-        );
-        try {
-          $res = $client->post($endpoint_url, $options);
-        } catch (ClientException $e) {
-          return $e->getResponse();
-        }
-
-        $response = json_decode(json_encode($res->getBody()->getContents()));
-        $response = json_decode($response, true);
-        $response = $response['esbBody']['results'][0];
-
-        if (!empty($response['idVsbVoyage'])) {
-          // return $newreal = $response;
-          $newreal = $response;
-          DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
-             'idvsb'=> $newreal['idVsbVoyage'],
-             'bl_no'=> $newreal['blNumber'],
-             // 'package'=> $newreal['packageName'], // gak tau knpa gak mau masuk
-             'is_hz'=> $newreal['hz'],
-             'is_disturb'=> $newreal['disturb'],
-             'ei'=> $newreal['ei'],
-             'tl'=> $newreal['tl'],
-             'total_ton'=> $newreal['ttlTon'],
-             'total_cubic'=> $newreal['ttlCubic'],
-             'oi'=> $newreal['oi'],
-             'rpact'=> $newreal['rpact'],
-             'omcargoid'=> $newreal['omCargoid']
-          ]);
-        }
+        static::realTosGet($req, $list);
       }
+    }
+
+    if (isset($input['reGet']) and $input['reGet'] == true) {
+      $head = DB::connection('omcargo')->select(DB::raw("select * from TX_HDR_BM A left join TX_HDR_REALISASI B on B.REAL_REQ_NO = A.BM_NO where A.BM_ID = ".$req->bm_id));
+      $head = $head[0];
+      $query_detil = "
+        select 
+          A.*, B.TOTAL_TON AS DTL_REAL_QTY_FROM_TOS, C.* 
+          from TX_DTL_BM A 
+          left join TX_REAL_TOS B on B.BL_NO = A.DTL_BM_BL 
+          left join TX_DTL_REALISASI C on C.DTL_BM_ID = A.DTL_BM_ID where A.HDR_BM_ID =".$req->bm_id;
+      return [
+        'req_header' => $head,
+        'req_detil' => DB::connection('omcargo')->select(DB::raw($query_detil)),
+        'req_eqpt' => DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $input['req_no'])->get(),
+        'result' => "Success, get data real from tos!"
+      ];
     }
 
     return [
@@ -199,6 +165,61 @@ class ConnectedExternalApps{
       'result' => "Success, get data real from tos!"
     ];
 	}
+
+  private static function realTosGet($req, $list){
+    DB::connection('omcargo')->table('TX_REAL_TOS')->where('idvsb', $req->bm_vvd_id)->where('bl_no', $list->dtl_bm_bl)->delete();
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/searchRealisasi";
+    $string_json = '{
+      "searchRealisasiRequest": {
+        "esbHeader": { },
+          "esbBody": {
+            "vvd": "'.$req->bm_vvd_id.'",
+            "noblss": "'.$list->dtl_bm_bl.'"
+          }
+        }
+      }';
+
+    $username="npk_billing";
+    $password ="npk_billing";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+
+    $response = json_decode(json_encode($res->getBody()->getContents()));
+    $response = json_decode($response, true);
+    $response = $response['esbBody']['results'][0];
+
+    if (!empty($response['idVsbVoyage'])) {
+      // return $newreal = $response;
+      $newreal = $response;
+      DB::connection('omcargo')->table('TX_REAL_TOS')->insert([
+         'idvsb'=> $newreal['idVsbVoyage'],
+         'bl_no'=> $newreal['blNumber'],
+         // 'package'=> $newreal['packageName'], // gak tau knpa gak mau masuk
+         'is_hz'=> $newreal['hz'],
+         'is_disturb'=> $newreal['disturb'],
+         'ei'=> $newreal['ei'],
+         'tl'=> $newreal['tl'],
+         'total_ton'=> $newreal['ttlTon'],
+         'total_cubic'=> $newreal['ttlCubic'],
+         'oi'=> $newreal['oi'],
+         'rpact'=> $newreal['rpact'],
+         'omcargoid'=> $newreal['omCargoid']
+      ]);
+    }
+  }
 
   public static function sendRequestBooking($input){
     $req_type = substr($input, 0,3);
