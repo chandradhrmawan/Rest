@@ -233,6 +233,15 @@ class BillingEngine{
   		$newDt['commodity_unit_name'] = $commodity_unit_name;
   		$newDt['commodity_unit_min'] = $commodity_unit_min;
 
+      $newDt['tariff_reference_name'] = '';
+      if (!empty($list->tariff_reference)) {
+        $name_tariff_reference = DB::connection('eng')->table('TM_REFF')->where('reff_id', $$list->tariff_reference)->where('reff_tr_id', 2)->get();
+        if (count($name_tariff_reference) > 0) {
+          $name_tariff_reference = $name_tariff_reference[0];
+          $newDt['tariff_reference_name'] = $name_tariff_reference->reff_name;
+        }
+      }
+
   		foreach ($list as $key => $value) {
   			$newDt[$key] = $value;
   			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
