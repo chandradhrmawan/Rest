@@ -17,82 +17,81 @@
 	</style>
 </head>
 <body>
-
-	@foreach($header as $header)
-	<?php if ($header->uper_paid == "N") { ?>
-		<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
-	<?php } else { ?>
-		<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:190px;transform: rotate(20deg); width:80%">
-	<?php } ?>
-	@foreach($branch as $branch)
-  <table width="100%" style="font-size:9px">
+		@foreach($header as $header)
+		<?php if ($header->nota_paid == "N") { ?>
+			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
+		<?php } else { ?>
+			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:190px;transform: rotate(20deg); width:80%">
+		<?php } ?>
+		@foreach($branch as $branch)
+  <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
-      <td width="55%">
-        <div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
-        </td>
+			<td width="55%">
+				<div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
+				</td>
       <td style="vertical-align:top;text-align:right">
         <table style="border-collapse:collapse; font-size:9px;">
           <tr>
-            <td>No. Uper</td>
-            <td>: {{$header->uper_no}}</td>
+            <td>No. Invoice</td>
+            <td>: {{$header->nota_no}}</td>
           </tr>
-					<tr>
-						<td>Tgl. Uper</td>
-						<td>: {{$header->uper_date}}</td>
-					</tr>
           <tr>
-            <td>No. Request</td>
-            <td>: {{$header->uper_req_no}}</td>
+            <td>Tanggal. Invoice</td>
+            <td>: {{$header->nota_date}}</td>
+          </tr>
+          <tr>
+            <td>No. Request </td>
+            <td>: {{$header->nota_req_no}}</td>
           </tr>
         </table>
       </td>
     </tr>
   </table>
-	@endforeach
 
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">NOTA UPER </center>
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Invoice</center>
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
       <table style="border-collapse:collapse; font-size:9px;">
         <tr>
           <td colspan="3">
-            <font style="font-size:9;text-align:left"><b>Pengguna Jasa</b></font><br><br>
+            <font style="font-size:9px;text-align:left"><b>Pengguna Jasa</b></font><br>
           </td>
         </tr>
         <tr>
           <td>Nama</td>
           <td>: </td>
-          <td>{{$header->uper_cust_name}}</td>
+          <td>{{$header->nota_cust_name}}</td>
         </tr>
         <tr>
           <td>Alamat</td>
           <td>: </td>
-          <td>{{$header->uper_cust_address}}</td>
+          <td>{{$header->nota_cust_address}}</td>
         </tr>
         <tr>
           <td>NPWP</td>
           <td>: </td>
-          <td>{{$header->uper_cust_npwp}}</td>
+          <td>{{$header->nota_cust_npwp}}</td>
         </tr>
       </table>
     </td>
 		<td>
       <table style="border-collapse:collapse; font-size:9px;">
         <tr>
-          <td>Nama kapal</td>
+          <td>No Faktur</td>
           <td>: </td>
-        <td>{{$header->uper_vessel_name}}</td>
+        <td>{{$header->nota_faktur_no}}</td>
         </tr>
         <tr>
-          <td>No.PBM </td>
+          <td>Nama Kapal</td>
           <td>: </td>
-          <td>{{$header->uper_pbm_id}}</td>
+          <td>{{$header->nota_vessel_name}}</td>
         </tr>
       </table>
     </td>
 	</tr>
+	@endforeach
 	@endforeach
 </table>
 
@@ -162,34 +161,19 @@
 <?php foreach ($handling[$bl] as $value) { ?>
 	<tr>
 		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:center">
-			<?php
-			if ($value["dtl_bm_tl"] == "Y") {
-				echo "TL";
-			} else {
-				echo "NON-TL";
-			}
-			 ?>
-		</td>
+		<td style="text-align:center"></td>
 		<td>{{$value["dtl_package"]}}</td>
 		<td>{{$value["dtl_commodity"]}}</td>
 		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-		<?php	if ($value["dtl_bm_type"] == "Bongkar") { ?>
-			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-			<td style="text-align:center">-</td>
-		<?php } else { ?>
-			<td style="text-align:center"></td>
-			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-		<?php } ?>
+		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
+		<td style="text-align:center">-</td>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_amount"])}}</td>
+		<td style="text-align:right">{{number_format($value["dtl_amout"])}}</td>
 	</tr>
 <?php } ?>
 	@endforeach
 <?php } ?>
-
 </table>
-
 
 <?php if ($alat != "0") { ?>
 <table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
@@ -249,5 +233,10 @@
 	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
 	<tr><td>NIPP. 287117773</td></tr>
 </table>
+</body>
+</html>
+
+
+
 </body>
 </html>

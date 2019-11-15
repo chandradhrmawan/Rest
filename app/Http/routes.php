@@ -36,4 +36,4 @@ $app->get('/print/proforma/{id}','ViewController@printProforma');
 $app->get('/print/getPass/{id}','ViewController@printGetPass');
 $app->get('/print/uper2/{id}','ViewController@printUper2');
 $app->get('/print/proforma2/{id}','ViewController@printProforma2');
-$app->get('/print/proformaReceiving/{id}','ViewController@printProformaReceiving');
+$app->get('/print/invoice/{id}','ViewController@printInvoice');

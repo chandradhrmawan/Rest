@@ -48,7 +48,7 @@ class GlobalHelper {
           }
       }
 
-      if (isset($input["changeKey"])) {
+      if (!empty($input["changeKey"])) {
         $result  = $vwdata;
         $data    = json_encode($result);
         $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
@@ -188,9 +188,6 @@ class GlobalHelper {
         }
       }
 
-      if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start']-1)->take($input['limit']);
-
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
       }
@@ -200,8 +197,19 @@ class GlobalHelper {
       $connect->orderby($in[0], $in[1]);
       }
 
-      $result   = $connect->get();
+      if(!empty($input["where"][0])) {
+        $connect->where($input["where"]);
+      }
+
+      if(!empty($input["whereIn"][0])) {
+      $in        = $input["whereIn"];
+      $connect->whereIn(strtoupper($in[0]), $in[1]);
+      }
+
       $count    = $connect->count();
+      if (!empty($input['start']) && !empty($input['limit']))
+        $connect->skip($input['start']-1)->take($input['limit']);
+      $result   = $connect->get();
 
       return ["result"=>$result, "count"=>$count];
     }
@@ -255,7 +263,12 @@ class GlobalHelper {
         $result  = $connect->select($input["selected"]);
       }
 
-      if (isset($input["changeKey"])) {
+      $count   = $connect->count();
+
+      if (!empty($input['start']) && !empty($input['limit']))
+        $connect->skip($input['start']-1)->take($input['limit']);
+
+      if (!empty($input["changeKey"])) {
         $result  = $connect->get();
         $data    = json_encode($result);
         $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
@@ -263,8 +276,6 @@ class GlobalHelper {
       } else {
         $result  = $connect->get();
       }
-
-      $count   = $connect->count();
       return ["result"=>$result, "count"=>$count];
     }
 
@@ -288,8 +299,6 @@ class GlobalHelper {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
@@ -300,8 +309,10 @@ class GlobalHelper {
     $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
-    $result   = $connect->get();
     $count    = $connect->count();
+    if (!empty($input['start']) && !empty($input['limit']))
+    $connect->skip($input['start']-1)->take($input['limit']);
+    $result   = $connect->get();
 
     return ["result"=>$result, "count"=>$count];
   }
@@ -321,9 +332,6 @@ class GlobalHelper {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
-
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
     }
@@ -333,9 +341,19 @@ class GlobalHelper {
     $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
+    if(!empty($input["where"][0])) {
+      $connect->where($input["where"]);
+    }
 
-    $result   = $connect->get();
+    if(!empty($input["whereIn"][0])) {
+    $in        = $input["whereIn"];
+    $connect->whereIn(strtoupper($in[0]), $in[1]);
+    }
+
     $count    = $connect->count();
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start']-1)->take($input['limit']);
+    $result   = $connect->get();
 
     return ["result"=>$result, "count"=>$count];
   }
@@ -393,7 +411,7 @@ class GlobalHelper {
     }
 
     if (!empty($input["filter"])) {
-    $search   = $input["filter"];
+    $search   = json_decode($input["filter"], TRUE);
     foreach ($search as $value) {
       if ($value["operator"] == "like")
         $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
@@ -406,11 +424,13 @@ class GlobalHelper {
       }
     }
 
+    $count    = $connect->count();
+
     if (!empty($input['start']) && !empty($input['limit']))
       $connect->skip($input['start']-1)->take($input['limit']);
 
-    if (isset($input["changeKey"])) {
-      $result  = $connect->get();;
+    if (!empty($input["changeKey"])) {
+      $result  = $connect->get();
       $data    = json_encode($result);
       $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
       $data    = json_decode($change);
@@ -419,7 +439,7 @@ class GlobalHelper {
 
       }
     }
-    return $data;
+    return ["result"=>$data, "count"=>$count];
   }
 
   public static function whereQuery($input) {
@@ -460,14 +480,16 @@ class GlobalHelper {
       }
     }
 
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
     }
 
-    if (isset($input["changeKey"])) {
+    $count     = $connect->count();
+    if (!empty($input['start']) && !empty($input['limit']))
+      $connect->skip($input['start']-1)->take($input['limit']);
+
+    if (!empty($input["changeKey"])) {
       $result  = $connect->get();
       $data    = json_encode($result);
       $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
@@ -475,7 +497,6 @@ class GlobalHelper {
     } else {
       $data  = $connect->get();
     }
-    $count     = $connect->count();
     return ["result"=>$data, "count"=>$count];
   }
 
@@ -514,9 +535,6 @@ class GlobalHelper {
       }
     }
 
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
-
     if (!empty($input["selected"])) {
       $result  = $connect->select(strtoupper($input["selected"]));
     }
@@ -526,8 +544,11 @@ class GlobalHelper {
     $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
+    $count    = $connect->count();
+    if (!empty($input['start']) && !empty($input['limit']))
+    $connect->skip($input['start']-1)->take($input['limit']);
     $data      = $connect->get();
-    return $data;
+    return ["result"=>$data, "count"=>$count];
   }
 
   public static function saveheaderdetail($input) {
@@ -605,7 +626,7 @@ class GlobalHelper {
     $connection->where($input["where"]);
     $connection->update($input["update"]);
     $data = $connection->get();
-    return $data;
+    return ["result"=>$data, "count"=>$count];
   }
 
   public static function save($input) {
