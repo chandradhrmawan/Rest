@@ -143,6 +143,7 @@ class BillingEngine{
             $detilS->tariff_object      = $list['OBJECT_TARIFF'];
             $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
             $detilS->tariff             = $list['TARIFF'];
+            $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
             // $detilS->tariff_STATUS = $list['TARIFF_STATUS'];
             $detilS->tariff_status      = $headS->tariff_status;
             // $detilS->tariff_DI = $list['TARIFF_DI'];
