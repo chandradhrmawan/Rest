@@ -163,10 +163,10 @@ class UperRequest{
           $pay->pay_note = $input['pay_note'];
           $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:ss')");
           $pay->pay_type = $input['pay_type'];
-          $pay->pay_dest_bank_code = $input['pay_dest_bank_code'];
-          $pay->pay_dest_bank_name = $input['pay_dest_bank_name'];
-          $pay->pay_dest_account_no = $input['pay_dest_account_no'];
-          $pay->pay_dest_account_name = $input['pay_dest_account_name'];
+          $pay->pay_sender_bank_code = $input['pay_sender_bank_code'];
+          $pay->pay_sender_bank_name = $input['pay_sender_bank_name'];
+          $pay->pay_sender_account_no = $input['pay_sender_account_no'];
+          $pay->pay_sender_account_name = $input['pay_sender_account_name'];
           $pay->save();
           $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
           $response   = FileUpload::upload_file($input['pay_file'], $directory);
@@ -202,6 +202,7 @@ class UperRequest{
 
   public static function confirmPaymentUper($input){
     $pay = TxPayment::find($input['id']);
+    $pay->pay_note = $input['pay_note'];
     if ($input['approved'] == 'true') {
       $pay->pay_status = 1;
     }else{

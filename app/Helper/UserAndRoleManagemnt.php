@@ -110,8 +110,8 @@ class UserAndRoleManagemnt{
   }
 
   private static function permission($role){
-    $menu = TmMenu::with(['menu_has_child' => function($query) {
-      return $query->orderBy('menu_order', 'asc');
+    $menu = TmMenu::with(['menu_has_child' => function($query) use ($role) {
+      return $query->where('menu_service', $role['role_service'])->orderBy('menu_order', 'asc');
     }])->whereNull('menu_parent_id')->where('menu_is_active', 1)->where('menu_service', $role['role_service'])->orderBy('menu_m_order', 'asc')->get();
 
     $estjs = [];
@@ -189,8 +189,8 @@ class UserAndRoleManagemnt{
     $menu_id_allow = DB::connection('omuster')->table('TS_ROLE_MENU')->where('ROLE_ID', $roll_id)->orderBy('menu_id', 'asc')->pluck('menu_id');
 
     $role = static::role_data($roll_id);
-    $menu = TmMenu::with(['menu_has_child' => function($query) use ($menu_id_allow) {
-      return $query->whereIn('menu_id',$menu_id_allow)->orderBy('menu_order', 'asc');
+    $menu = TmMenu::with(['menu_has_child' => function($query) use ($role,$menu_id_allow) {
+      return $query->where('menu_service', $role['role_service'])->whereIn('menu_id',$menu_id_allow)->orderBy('menu_order', 'asc');
     }])->whereNull('menu_parent_id')->where('menu_is_active', 1)->where('menu_service', $role['role_service'])->whereIn('menu_id',$menu_id_allow)->orderBy('menu_m_order', 'asc')->get();
 
     $estjs = [];
