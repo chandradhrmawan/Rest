@@ -167,6 +167,7 @@ class UperRequest{
           $pay->pay_sender_bank_name = $input['pay_sender_bank_name'];
           $pay->pay_sender_account_no = $input['pay_sender_account_no'];
           $pay->pay_sender_account_name = $input['pay_sender_account_name'];
+          $pay->pay_create_by = $input['pay_create_by'];
           $pay->save();
           $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
           $response   = FileUpload::upload_file($input['pay_file'], $directory);
