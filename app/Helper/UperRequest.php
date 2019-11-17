@@ -195,7 +195,7 @@ class UperRequest{
             return ["result" => "Success, paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
             static::updateNotaStatus([
-              'nota' => $nota
+              'nota_id' => $nota->nota_id
             ]);
             return ["result" => "Success, paid nota", 'pay_no' => $pay->pay_no];
         }
@@ -236,8 +236,8 @@ class UperRequest{
       }
   }
 
-  private static function updateNotaStatus($nota){
-      TxHdrNota::where('nota_id',$nota->nota_id)->update(['nota_paid' => 'Y']);
-      ConnectedExternalApps::sendNotaProforma($nota);
+  private static function updateNotaStatus($input){
+      TxHdrNota::where('nota_id',$input['nota_id'])->update(['nota_paid' => 'Y']);
+      // ConnectedExternalApps::sendNotaProforma($input);
   }
 }
