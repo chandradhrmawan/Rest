@@ -193,18 +193,26 @@ class UperRequest{
               $res = ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
               if ($res['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
                 TxPayment::where('pay_id',$pay->pay_id)->update(['pay_status'=>2]);
+                static::updateUperStatus([
+                  'uper_id' => $uper->uper_id,
+                  'uper_req_no' => $uper->uper_req_no,
+                  'uper_paid_date' => $input['pay_date'],
+                  'uper_paid' => 'W'
+                ]);
                 return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
               }
               static::updateUperStatus([
                 'uper_id' => $uper->uper_id,
                 'uper_req_no' => $uper->uper_req_no,
+                'uper_paid_date' => $input['pay_date'],
                 'uper_paid' => 'Y'
               ]);
             }
             return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
             static::updateNotaStatus([
-              'nota_id' => $nota->nota_id
+              'nota_id' => $nota->nota_id,
+              'nota_paid' => 'Y'
             ]);
             return ["result" => "Success, store paid nota", 'pay_no' => $pay->pay_no];
         }
@@ -237,8 +245,11 @@ class UperRequest{
   }
 
   private static function updateUperStatus($input){
-      $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update(['uper_paid' => $input['uper_paid']]);
-      $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->where('uper_paid', 'N')->count();
+      $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update([
+        'uper_paid_date' => \DB::raw("TO_DATE('".$input['uper_paid_date']."', 'YYYY-MM-DD HH24:mi:ss')"),
+        'uper_paid' => $input['uper_paid']
+      ]);
+      $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->whereIn('uper_paid', ['N', 'W'])->count();
 
       if ($cekStatus == 0) {
         ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
@@ -246,7 +257,7 @@ class UperRequest{
   }
 
   private static function updateNotaStatus($input){
-      TxHdrNota::where('nota_id',$input['nota_id'])->update(['nota_paid' => 'Y']);
+      TxHdrNota::where('nota_id',$input['nota_id'])->update(['nota_paid' => $input['nota_paid']]);
       // ConnectedExternalApps::sendNotaProforma($input);
   }
 }
