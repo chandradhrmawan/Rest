@@ -114,9 +114,11 @@ class UperRequest{
   }
 
 	public static function storePayment($input){
-        $cekPayment = TxPayment::where('pay_no', $input['pay_no'])->where('pay_req_no', $input['pay_req_no'])->count();
-        if ($cekPayment > 0) {
-          return ["Success"=>false, "result" => "Fail, payment already exist!"];
+        if (!isset($input['pay_id']) and empty($input['pay_id'])) {
+          $cekPayment = TxPayment::where('pay_no', $input['pay_no'])->where('pay_req_no', $input['pay_req_no'])->count();
+          if ($cekPayment > 0) {
+            return ["Success"=>false, "result" => "Fail, payment already exist!"];
+          }
         }
 
         if ($input['pay_type'] == 1) {
