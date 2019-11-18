@@ -178,7 +178,7 @@ class UperRequest{
           $pay->pay_create_by = $input['pay_create_by'];
           $pay->save();
 
-          if (!empty($input['pay_file']['PATH']) or !empty($input['pay_file']['BASE64']) or !empty($input['pay_file'])) {
+          if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
             $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
             $response   = FileUpload::upload_file($input['pay_file'], $directory);
             if ($response['response'] == true) {
