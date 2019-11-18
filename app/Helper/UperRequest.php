@@ -114,10 +114,6 @@ class UperRequest{
   }
 
 	public static function storePayment($input){
-        if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
-          return ["Success"=>false, "result" => "Fail, file is required"];
-        }
-
         $cekPayment = TxPayment::where('pay_no', $input['pay_no'])->where('pay_req_no', $input['pay_req_no'])->count();
         if ($cekPayment > 0) {
           return ["Success"=>false, "result" => "Fail, payment already exist!"];
@@ -142,8 +138,14 @@ class UperRequest{
           $datenow    = Carbon::now()->format('Y-m-d');
           if (isset($input['pay_id']) and !empty($input['pay_id'])) {
             $pay = TxPayment::find($input['pay_id']);
+            if (!empty($input['pay_file']['PATH']) or !empty($input['pay_file']['BASE64']) or !empty($input['pay_file'])) {
+              unlink($pay->pay_file);
+            }
           }else{
             $pay = new TxPayment;
+            if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
+              return ["Success"=>false, "result" => "Fail, file is required"];
+            }
           }
           if (isset($input['encode']) and $input['encode'] == 'true') {
             $pay->pay_status = 2;
@@ -173,12 +175,15 @@ class UperRequest{
           $pay->pay_sender_account_name = $input['pay_sender_account_name'];
           $pay->pay_create_by = $input['pay_create_by'];
           $pay->save();
-          $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
-          $response   = FileUpload::upload_file($input['pay_file'], $directory);
-          if ($response['response'] == true) {
-            TxPayment::where('pay_id',$pay->pay_id)->update([
-              'pay_file' => $response['link']
-            ]);
+
+          if (!empty($input['pay_file']['PATH']) or !empty($input['pay_file']['BASE64']) or !empty($input['pay_file'])) {
+            $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
+            $response   = FileUpload::upload_file($input['pay_file'], $directory);
+            if ($response['response'] == true) {
+              TxPayment::where('pay_id',$pay->pay_id)->update([
+                'pay_file' => $response['link']
+              ]);
+            }
           }
         // store pay
 
