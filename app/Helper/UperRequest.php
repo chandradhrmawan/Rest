@@ -140,7 +140,11 @@ class UperRequest{
 
         // store pay
           $datenow    = Carbon::now()->format('Y-m-d');
-          $pay = new TxPayment;
+          if (isset($input['pay_id']) and !empty($input['pay_id'])) {
+            $pay = TxPayment::find($input['pay_id']);
+          }else{
+            $pay = new TxPayment;
+          }
           if (isset($input['encode']) and $input['encode'] == 'true') {
             $pay->pay_status = 2;
           }
@@ -192,12 +196,12 @@ class UperRequest{
                 'uper_paid' => 'Y'
               ]);
             }
-            return ["result" => "Success, paid uper", 'pay_no' => $pay->pay_no];
+            return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
             static::updateNotaStatus([
               'nota_id' => $nota->nota_id
             ]);
-            return ["result" => "Success, paid nota", 'pay_no' => $pay->pay_no];
+            return ["result" => "Success, store paid nota", 'pay_no' => $pay->pay_no];
         }
 	}
 
