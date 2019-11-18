@@ -250,11 +250,11 @@ class RequestBooking{
 				$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$uper['temp_hdr_id']."' AND CUSTOMER_ID = '".$uper['customer_id']."'";
 				$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
 
+				$countLine = 0;
 				foreach ($group_tariff as $grpTrf) {
 					$grpTrf = (array)$grpTrf;
 					$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$uper['temp_hdr_id'])->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
 
-					$countLine = 0;
 					foreach ($uperD as $list) {
 						$countLine++;
 						$list = (array)$list;
