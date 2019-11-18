@@ -33,23 +33,27 @@
       <td style="vertical-align:top;text-align:right">
         <table style="border-collapse:collapse; font-size:9px;">
           <tr>
-            <td>No. Invoice</td>
+            <td>No. Nota</td>
             <td>: {{$header->nota_no}}</td>
           </tr>
           <tr>
-            <td>Tanggal. Invoice</td>
+            <td>Tanggal. Nota</td>
             <td>: {{$header->nota_date}}</td>
           </tr>
           <tr>
             <td>No. Request </td>
             <td>: {{$header->nota_req_no}}</td>
           </tr>
+					<tr>
+            <td> </td>
+            <td></td>
+          </tr>
         </table>
       </td>
     </tr>
   </table>
 
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Invoice</center>
+<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Nota</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
@@ -78,15 +82,25 @@
     </td>
 		<td>
       <table style="border-collapse:collapse; font-size:9px;">
-        <tr>
-          <td>No Faktur</td>
-          <td>: </td>
-        <td>{{$header->nota_faktur_no}}</td>
-        </tr>
-        <tr>
+				<tr>
           <td>Nama Kapal</td>
           <td>: </td>
           <td>{{$header->nota_vessel_name}}</td>
+        </tr>
+				<tr>
+          <td>Periode Kunjungan</td>
+          <td>: </td>
+        <td></td>
+        </tr>
+				<tr>
+          <td>Kade</td>
+          <td>: </td>
+        <td></td>
+        </tr>
+				<tr>
+          <td>Tipe Perdagangan</td>
+          <td>: </td>
+        <td></td>
         </tr>
       </table>
     </td>
