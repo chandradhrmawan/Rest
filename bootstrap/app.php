@@ -82,7 +82,11 @@ $app->routeMiddleware([
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
-// $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(Milon\Barcode\BarcodeServiceProvider::class);
+
+// Aliases
+class_alias(Milon\Barcode\Facades\DNS1DFacade::class, 'DNS1D');
+class_alias(Milon\Barcode\Facades\DNS2DFacade::class, 'DNS2D');
 
 /*
 |--------------------------------------------------------------------------

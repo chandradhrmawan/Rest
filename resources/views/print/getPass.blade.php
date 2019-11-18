@@ -32,12 +32,14 @@
 <table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9;margin-top:20px">
 	<tr style="text-align:center">
 		<td colspan="2">
-      <b>BL NUMBER</b><br>
-      <img src="{{ url('/other/b.jpg') }}" alt="" width="150px">
+      <b>BL NUMBER</b>
+		 <div style="padding-left:150px"><?php echo DNS1D::getBarcodeHTML("1234567", "C39",1,33);?></div>
     </td>
-		<td>
-      <b>TRUCK ID</b><br>
-      <img src="{{ url('/other/b.jpg') }}" alt="" width="150px">
+		<td style="text-align:left">
+      <div style="margin-left:40px"><b>TRUCK ID</b></div>
+			<?php echo DNS1D::getBarcodeHTML("1234567", "C39",1,33);?>
+
+      <!-- <img src="{{ url('/other/b.jpg') }}" alt="" width="150px"> -->
     </td>
 	</tr>
   <tr>
