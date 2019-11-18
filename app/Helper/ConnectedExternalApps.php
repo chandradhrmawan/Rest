@@ -222,22 +222,107 @@ class ConnectedExternalApps{
   }
 
   public static function sendRequestBooking($input){
-    $req_type = substr($input, 0,3);
+    $req_type = substr($input['req_no'], 0,3);
     if ($req_type == 'BM-') {
-      $header = TxHdrBm::where('bm_no',$input)->first();
+      $header = TxHdrBm::where('bm_no',$input['req_no'])->first();
       $table = 'TX_HDR_BM';
+      $req_type == 'BM';
     }else if($req_type == 'REC') {
-      $header = TxHdrRec::where('rec_no',$input)->first();
+      $header = TxHdrRec::where('rec_no',$input['req_no'])->first();
       $table = 'TX_HDR_REC';
+      if ($header->rec_extend_status == 'Y') {
+        $req_type = 'EXT';
+      }
     }else if($req_type == 'DEL') {
-      $header = TxHdrDel::where('del_no',$input)->first();
+      $header = TxHdrDel::where('del_no',$input['req_no'])->first();
       $table = 'TX_HDR_DEL';
+      if ($header->del_extend_status == 'Y') {
+        $req_type = 'EXT';
+      }
     }
 
     $config = RequestBooking::config($table);
     if (!empty($header)) {
       $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->where('dtl_pkg_id', 4)->get();
-      return static::sendRequestBookingExcute($header, $detil, $config);
+      return static::sendRequestBookingNew($req_type, $input['paid_date'] $header, $detil, $config);
+    }
+  }
+
+
+  private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
+    foreach ($detil as $list) {
+      $listA = (array)$list;
+      
+      $vparam = '';
+      $vparam .= $listA[$config['head_tab_detil_bl']];
+      $vparam .= '^'.$list->dtl_cmdty_name;
+      $vparam .= '^'.$head[$config['head_vvd_id']];
+      $vparam .= '^'.$req_type; // IF_FLAG
+      $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
+      $vparam .= '^'.$list->dtl_pkg_name; // PKG_NAME
+      $vparam .= '^'.$list->dtl_qty; // TON
+      $vparam .= '^'.$list->dtl_qty; // CUBIC
+      $vparam .= '^'.$list->dtl_qty; // QTY
+      $vparam .= '^INVOICE NUMBER'; // ID_INV
+      $vparam .= '^'.$head[$config['head_no']]; // ID_REQ
+      if ($req_type == 'BM') {
+        $vparam .= '^'.date('Ymd', strtotime($head[$config['head_open_stack']])).'235959'; // STACKOUT_DATE
+      }else{
+        $vparam .= '^'.date('Ymd', strtotime($head[$config['head_closing_time']])).'235959'; // STACKOUT_DATE
+      }
+      $vparam .= '^'.$listA[$config['head_tab_detil_tl']]; // TL_FLAG
+      $vparam .= '^'.$req_type; // IF_FLAG
+      if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
+      $vparam .= '^'; // OI
+      $vparam .= '^'; // HS_CODE
+      $vparam .= '^'; // CARGO_ID
+      if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
+      $vparam .= '^'; // EI
+      $vparam .= '^'.$head[$config['head_cust_name']]; // CUSTOMER_NAME
+      $vparam .= '^'.$head[$config['head_cust_addr']]; // CUSTOMER_ADDRESS
+      $vparam .= '^'.date('Ymd', strtotime($paid_date)).'235959'; // DATE_PAID
+      $vparam .= '^'; // DO_NUMBER
+      $vparam .= '^'; // POD
+      $vparam .= '^'; // POL
+      $vparam .= '^'; // POR
+      $vparam .= '^'; // SIZE_
+      $vparam .= '^'; // TYPE_
+      $vparam .= '^'; // STATUS_
+      $vparam .= '^'; // id_Port
+
+      $string_json = '{
+          "createBookingDetailInterfaceRequest": {
+              "esbHeader": {
+                  "externalId": "2",
+                  "timestamp": "2"
+              },
+              "esbBody": {
+                  "inBlNumber": "'.$listA[$config['head_tab_detil_bl']].'",
+                  "inCargoName": "'.$list->dtl_cmdty_name.'",
+                  "inVvdNumber": "'.$head[$config['head_vvd_id']].'",
+                  "insertdata": "'.$vparam.'"
+              }
+          }
+      }';
+
+      $username="npk_billing";
+      $password ="npk_billing";
+      $client = new Client();
+      $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        return $e->getResponse();
+      }
     }
   }
 

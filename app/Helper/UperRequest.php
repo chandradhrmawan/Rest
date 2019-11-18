@@ -141,7 +141,9 @@ class UperRequest{
           if (isset($input['pay_id']) and !empty($input['pay_id'])) {
             $pay = TxPayment::find($input['pay_id']);
             if (!empty($input['pay_file']['PATH']) or !empty($input['pay_file']['BASE64']) or !empty($input['pay_file'])) {
-              unlink($pay->pay_file);
+              if (file_exists($pay->pay_file)){
+                unlink($pay->pay_file);
+              }
             }
           }else{
             $pay = new TxPayment;
@@ -254,7 +256,7 @@ class UperRequest{
       $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->whereIn('uper_paid', ['N', 'W'])->count();
 
       if ($cekStatus == 0) {
-        ConnectedExternalApps::sendRequestBooking($input['uper_req_no']);
+        ConnectedExternalApps::sendRequestBooking(['req_no' => $input['uper_req_no'], 'paid_date' => $input['uper_paid_date']]);
       }
   }
 
