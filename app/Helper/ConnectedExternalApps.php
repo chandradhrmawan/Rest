@@ -244,7 +244,7 @@ class ConnectedExternalApps{
     $config = RequestBooking::config($table);
     if (!empty($header)) {
       $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->where('dtl_pkg_id', 4)->get();
-      return static::sendRequestBookingNew($req_type, $input['paid_date'] $header, $detil, $config);
+      return static::sendRequestBookingNewExcute($req_type, $input['paid_date'] $header, $detil, $config);
     }
   }
 
