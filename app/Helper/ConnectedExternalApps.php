@@ -250,7 +250,7 @@ class ConnectedExternalApps{
 
 
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/PRCSaveCargoNPK";
     $respn = [];
     foreach ($detil as $list) {
       $listA = (array)$list;
