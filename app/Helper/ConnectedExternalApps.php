@@ -13,6 +13,98 @@ use App\Helper\RequestBooking;
 
 class ConnectedExternalApps{
 
+  public static function getListTCA($input){
+    if (empty($input['idCustomer'])) {
+      return ['Success' => false, 'msg' => 'idCustomer is required!'];
+    }
+    $endpoint_url= "10.88.48.57:5555/restv2/npkBilling/getTCAHeader";
+    $string_json = '{
+         "getTCAHeaderInterfaceRequest": {
+            "esbHeader": {
+               "internalId": "",
+               "externalId": "",
+               "timestamp": "",
+               "responseTimestamp": "",
+               "responseCode": "",
+               "responseMessage": ""
+            },
+            "esbBody": {
+               "idPort": "201",
+               "noBL": "'.$input['noBL'].'",
+               "vessel": "'.$input['vessel'].'",
+               "idCustomer": "'.$input['idCustomer'].'"
+            }
+         }
+    }';
+
+    $username="npk_billing";
+    $password ="npk_billing";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      echo $e->getRequest() . "\n";
+      if ($e->hasResponse()) {
+        echo $e->getResponse() . "\n";
+      }
+    }
+
+    $res = json_decode($res->getBody()->getContents(), true);
+    $res = $res['esbBody']['results'];
+    
+    return ["result"=>$res, "count"=>count($res)];
+  }
+
+  public static function getViewDetilTCA($input){
+    if (empty($input['noRequest'])) {
+      return ['Success' => false, 'msg' => 'noRequest is required!'];
+    }
+    $endpoint_url= "10.88.48.57:5555/restv2/npkBilling/getTCADetail";
+    $string_json = '{
+        "getTCADetailInterfaceRequest": {
+            "esbHeader": {},
+            "esbBody": {
+                "noRequest": "'.$input['noRequest'].'"
+            }
+        }
+    }';
+
+    $username="npk_billing";
+    $password ="npk_billing";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      echo $e->getRequest() . "\n";
+      if ($e->hasResponse()) {
+        echo $e->getResponse() . "\n";
+      }
+    }
+
+    $res = json_decode($res->getBody()->getContents(), true);
+    $res = $res['esbBody']['results'];
+    
+    return ["result"=>$res, "count"=>count($res)];
+  }
+
   public static function vessel_index($input) {
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/trackingVessel";
     $string_json = '{
@@ -247,7 +339,6 @@ class ConnectedExternalApps{
       return static::sendRequestBookingNewExcute($req_type, $input['paid_date'], $header, $detil, $config);
     }
   }
-
 
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/PRCSaveCargoNPK";

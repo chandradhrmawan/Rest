@@ -35,6 +35,10 @@ class IndexController extends Controller
       }
     }
 
+    function getListTCA($input, $request){
+      return ConnectedExternalApps::getListTCA($input);
+    }
+
     function validasi($action, $request) {
       $latest   = DB::connection("mdm")->table('JS_VALIDATION')->where('action', 'like', $action."%")->select(["field", "mandatori"])->get();
       $decode   = json_decode(json_encode($latest), true);

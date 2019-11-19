@@ -10,6 +10,7 @@ use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
 use App\Helper\UperRequest;
 use Dompdf\Dompdf;
+use App\Helper\ConnectedExternalApps;
 
 class ViewController extends Controller
 {
@@ -39,6 +40,10 @@ class ViewController extends Controller
       }else{
         return response()->json($response);
       }
+    }
+
+    function getViewDetilTCA($input, $request){
+      return ConnectedExternalApps::getViewDetilTCA($input);
     }
 
     public function view($input, $request) {
