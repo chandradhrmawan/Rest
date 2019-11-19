@@ -127,10 +127,10 @@ class RealisasiHelper{
         $headN->save();
       // store head
 
+      $countLine = 0;
       DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $headN->nota_id)->delete();
       foreach ($group_tariff as $grpTrf){
         $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf->group_tariff_id)->get();
-        $countLine = 0;
         foreach ($getD as $list) {
           $countLine++;
           DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
@@ -276,9 +276,9 @@ class RealisasiHelper{
       $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
       $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
 
+      $countLine = 0;
       foreach ($group_tariff as $grpTrf){
         $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf->group_tariff_id)->get();
-        $countLine = 0;
         foreach ($getD as $list) {
           $countLine++;
           DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
@@ -328,7 +328,7 @@ class RealisasiHelper{
     $nota = TxHdrNota::find($input['id']);
     $nota->nota_status = 2;
     $nota->save();
-    ConnectedExternalApps::sendNotaProforma($nota);
+    ConnectedExternalApps::sendNotaProforma($nota->nota_id);
     return ['result' => 'Success, approved proforma!', 'req_no' => $nota->nota_req_no, 'nota_no' => $nota->nota_no];
   }
 
