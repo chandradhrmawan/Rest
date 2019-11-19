@@ -307,7 +307,7 @@ class ConnectedExternalApps{
       $vparam .= '^'; // STATUS_
       $vparam .= '^201'; // id_Port
 
-      return $string_json = '{
+      $string_json = '{
           "createBookingDetailInterfaceRequest": {
               "esbHeader": {
                   "externalId": "2",
