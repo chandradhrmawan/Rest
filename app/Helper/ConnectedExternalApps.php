@@ -230,15 +230,15 @@ class ConnectedExternalApps{
     }else if($req_type == 'REC') {
       $header = TxHdrRec::where('rec_no',$input['req_no'])->first();
       $table = 'TX_HDR_REC';
-      if ($header->rec_extend_status == 'Y') {
-        $req_type = 'EXT';
-      }
+      // if ($header->rec_extend_status == 'Y') {
+      //   $req_type = 'EXT';
+      // }
     }else if($req_type == 'DEL') {
       $header = TxHdrDel::where('del_no',$input['req_no'])->first();
       $table = 'TX_HDR_DEL';
-      if ($header->del_extend_status == 'Y') {
-        $req_type = 'EXT';
-      }
+      // if ($header->del_extend_status == 'Y') {
+      //   $req_type = 'EXT';
+      // }
     }
 
     $config = RequestBooking::config($table);
@@ -250,18 +250,18 @@ class ConnectedExternalApps{
 
 
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
     $respn = [];
     foreach ($detil as $list) {
       $listA = (array)$list;
       
       $vparam = '';
-      $vparam .= $listA[$config['head_tab_detil_bl']];
-      $vparam .= '^'.$list->dtl_cmdty_name;
-      $vparam .= '^'.$head[$config['head_vvd_id']];
-      $vparam .= '^'.$req_type; // IF_FLAG
+      $vparam .= $req_type; // IF_FLAG
       $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
-      $vparam .= '^'.$list->dtl_pkg_name; // PKG_NAME
+      $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT B.PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
+      $packageNameParent = $packageNameParent[0];
+      $packageNameParent = $packageNameParent->package_name;
+      $vparam .= '^'.$packageNameParent; // PKG_NAME
       $vparam .= '^'.$list->dtl_qty; // TON
       $vparam .= '^'.$list->dtl_qty; // CUBIC
       $vparam .= '^'.$list->dtl_qty; // QTY
@@ -272,14 +272,29 @@ class ConnectedExternalApps{
       }else{
         $vparam .= '^'.date('Ymd', strtotime($head[$config['head_closing_time']])).'235959'; // STACKOUT_DATE
       }
-      $vparam .= '^'.$listA[$config['head_tab_detil_tl']]; // TL_FLAG
+      if ($config['head_tab_detil_tl'] == null) {
+        $vparam .= '^N'; // TL_FLAG
+      }else{
+        $vparam .= '^'.$listA[$config['head_tab_detil_tl']]; // TL_FLAG
+
+      }
       $vparam .= '^'.$req_type; // IF_FLAG
       if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
       $vparam .= '^'; // OI
       $vparam .= '^'; // HS_CODE
       $vparam .= '^'; // CARGO_ID
       if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
-      $vparam .= '^'; // EI
+      if ($req_type == 'BM') {
+        if ($list->dtl_bm_type == 'Muat') {
+          $vparam .= '^E'; // EI
+        } else if ($list->dtl_bm_type == 'Bongkar'){
+          $vparam .= '^I'; // EI
+        }
+      } else if ($req_type == 'REC') {
+        $vparam .= '^E'; // EI
+      } else if ($req_type == 'DEL') {
+        $vparam .= '^I'; // EI
+      } 
       $vparam .= '^'.$head[$config['head_cust_name']]; // CUSTOMER_NAME
       $vparam .= '^'.$head[$config['head_cust_addr']]; // CUSTOMER_ADDRESS
       $vparam .= '^'.date('Ymd', strtotime($paid_date)).'235959'; // DATE_PAID
@@ -290,9 +305,9 @@ class ConnectedExternalApps{
       $vparam .= '^'; // SIZE_
       $vparam .= '^'; // TYPE_
       $vparam .= '^'; // STATUS_
-      $vparam .= '^'; // id_Port
+      $vparam .= '^201'; // id_Port
 
-      /*return*/ $string_json = '{
+      return $string_json = '{
           "createBookingDetailInterfaceRequest": {
               "esbHeader": {
                   "externalId": "2",
@@ -325,7 +340,7 @@ class ConnectedExternalApps{
         return $e->getResponse();
       }
 
-      /*return*/ $respn[] = json_decode($res->getBody()->getContents(), true);
+      $respn[] = json_decode($res->getBody()->getContents(), true);
     }
     return ['result' => 'Success', 'response' => $respn];
   }
