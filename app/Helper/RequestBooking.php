@@ -300,7 +300,7 @@ class RequestBooking{
 		if ($migrateTariff == true) {
 			$pesan = "Created Uper No : ".$headU->uper_no;
 		}else if($migrateTariff == false) {
-			ConnectedExternalApps::sendRequestBooking($find[$config['head_no']]);
+			ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
 			$pesan = "Uper Not created, uper percent for this request is 0%";
 		}
 
