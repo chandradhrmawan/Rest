@@ -341,7 +341,7 @@ class ConnectedExternalApps{
   }
 
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/PRCSaveCargoNPK";
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/saveCargoNPK";
     $respn = [];
     foreach ($detil as $list) {
       $listA = (array)$list;
@@ -399,7 +399,7 @@ class ConnectedExternalApps{
       $vparam .= '^201'; // id_Port
 
       $string_json = '{
-          "createBookingDetailInterfaceRequest": {
+          "savecargoNpkInterfaceRequest": {
               "esbHeader": {
                   "externalId": "2",
                   "timestamp": "2"
