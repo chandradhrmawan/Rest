@@ -226,7 +226,7 @@ class ConnectedExternalApps{
     if ($req_type == 'BM-') {
       $header = TxHdrBm::where('bm_no',$input['req_no'])->first();
       $table = 'TX_HDR_BM';
-      $req_type == 'BM';
+      $req_type = 'BM';
     }else if($req_type == 'REC') {
       $header = TxHdrRec::where('rec_no',$input['req_no'])->first();
       $table = 'TX_HDR_REC';
@@ -251,6 +251,7 @@ class ConnectedExternalApps{
 
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
+    $respn = [];
     foreach ($detil as $list) {
       $listA = (array)$list;
       
@@ -291,7 +292,7 @@ class ConnectedExternalApps{
       $vparam .= '^'; // STATUS_
       $vparam .= '^'; // id_Port
 
-      $string_json = '{
+      /*return*/ $string_json = '{
           "createBookingDetailInterfaceRequest": {
               "esbHeader": {
                   "externalId": "2",
@@ -323,7 +324,10 @@ class ConnectedExternalApps{
       } catch (ClientException $e) {
         return $e->getResponse();
       }
+
+      /*return*/ $respn[] = json_decode($res->getBody()->getContents(), true);
     }
+    return ['result' => 'Success', 'response' => $respn];
   }
 
   private static function sendRequestBookingExcute($head, $detil, $config){
