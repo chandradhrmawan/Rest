@@ -38,6 +38,9 @@ class GlobalHelper {
               $fil[] = $newDt;
               $vwdata[$data] = $fil;
               }
+              if (empty($detail)) {
+                $vwdata[$data] = [];
+              }
             }
 
           else {
@@ -98,18 +101,25 @@ class GlobalHelper {
              $cust[] = $custo;
          }
 
-         $no = $vwdata["HEADER"][0]["lumpsum_no"];
-         $data_e   = DB::connection("omcargo")->table('TX_DOCUMENT')->where("REQ_NO", "=", $no)->get();
-         foreach ($data_e as $listE) {
-           $file = [];
-           foreach ($listE as $key => $value) {
-             $file[$key] = $value;
-           }
-             $fil[] = $file;
-         }
          $vwdata["DETAIL"] = $detail;
          $vwdata["CUSTOMER"] = $cust;
-         $vwdata["FILE"] = $fil;
+         $no       = $vwdata["HEADER"][0]["lumpsum_no"];
+         $data_e   = DB::connection("omcargo")->table('TX_DOCUMENT')->where("REQ_NO", "=", $id)->get();
+         foreach ($data_e as $list) {
+           $newDt = [];
+           foreach ($list as $key => $value) {
+             $newDt[$key] = $value;
+           }
+           $dataUrl = "http://10.88.48.33/api/public/".$list->doc_path;
+           $url     = str_replace(" ", "%20", $dataUrl);
+           $file = file_get_contents($url);
+           $newDt["base64"]  =  base64_encode($file);
+           $fil[] = $newDt;
+           $vwdata["FILE"] = $fil;
+           }
+           if (empty($data_e)) {
+             $vwdata["FILE"] = [];
+           }
         }
       }
       return $vwdata;
@@ -206,8 +216,11 @@ class GlobalHelper {
       }
 
       $count    = $connect->count();
-      if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start']-1)->take($input['limit']);
+      if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['limit'])) {
+          $connect->skip($input['start'])->take($input['limit']);
+        }
+      }
       $result   = $connect->get();
 
       return ["result"=>$result, "count"=>$count];
@@ -255,17 +268,16 @@ class GlobalHelper {
         $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
       }
 
-      if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start']-1)->take($input['limit']);
-
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
       }
 
       $count   = $connect->count();
-
-      if (!empty($input['start']) && !empty($input['limit']))
-        $connect->skip($input['start']-1)->take($input['limit']);
+      if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['limit'])) {
+          $connect->skip($input['start'])->take($input['limit']);
+        }
+      }
 
       if (!empty($input["changeKey"])) {
         $result  = $connect->get();
@@ -309,8 +321,11 @@ class GlobalHelper {
     }
 
     $count    = $connect->count();
-    if (!empty($input['start']) && !empty($input['limit']))
-    $connect->skip($input['start']-1)->take($input['limit']);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $connect->skip($input['start'])->take($input['limit']);
+      }
+    }
     $result   = $connect->get();
 
     return ["result"=>$result, "count"=>$count];
@@ -350,8 +365,11 @@ class GlobalHelper {
     }
 
     $count    = $connect->count();
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $connect->skip($input['start'])->take($input['limit']);
+      }
+    }
     $result   = $connect->get();
 
     return ["result"=>$result, "count"=>$count];
@@ -425,8 +443,11 @@ class GlobalHelper {
 
     $count    = $connect->count();
 
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $connect->skip($input['start'])->take($input['limit']);
+      }
+    }
 
     if (!empty($input["changeKey"])) {
       $result  = $connect->get();
@@ -489,8 +510,11 @@ class GlobalHelper {
     }
 
     $count     = $connect->count();
-    if (!empty($input['start']) && !empty($input['limit']))
-      $connect->skip($input['start']-1)->take($input['limit']);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $connect->skip($input['start'])->take($input['limit']);
+      }
+    }
 
     if (!empty($input["changeKey"])) {
       $result  = $connect->get();
@@ -548,8 +572,11 @@ class GlobalHelper {
     }
 
     $count    = $connect->count();
-    if (!empty($input['start']) && !empty($input['limit']))
-    $connect->skip($input['start']-1)->take($input['limit']);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $connect->skip($input['start'])->take($input['limit']);
+      }
+    }
     $data      = $connect->get();
     return ["result"=>$data, "count"=>$count];
   }
@@ -629,7 +656,7 @@ class GlobalHelper {
     $connection->where($input["where"]);
     $connection->update($input["update"]);
     $data = $connection->get();
-    return ["result"=>$data, "count"=>$count];
+    return ["result"=>$data];
   }
 
   public static function save($input) {
@@ -649,7 +676,38 @@ class GlobalHelper {
     } else {
       $connect   = \DB::connection($input["db"])->table($input["table"]);
       foreach ($parameter as $value) $connect->insert($parameter);
-      return ["result"=>$parameter, "count"=>count($parameter)];
+      return ["result"=>$parameter];
     }
+  }
+
+  public static function delHeaderDetail($input) {
+    $data    = $input["data"];
+    $count   = count($input["data"]);
+    $pk      = $input["HEADER"]["PK"][0];
+    $pkVal   = $input["HEADER"]["PK"][1];
+    foreach ($data as $data) {
+      $val     = $input[$data];
+      $connect  = DB::connection($val["DB"])->table($val["TABLE"]);
+        if ($data == "HEADER") {
+           $header   = $connect->where(strtoupper($pk), "like", strtoupper($pkVal))->get();
+           $header   = json_decode(json_encode($header), TRUE);
+        }
+
+        else if($data == "FILE") {
+          $fil     = [];
+          $fk      = $val["FK"][0];
+          $fkhdr   = $header[0][$val["FK"][1]];
+          $detail  = $connect->where(strtoupper($fk), "like", "%".strtoupper($fkhdr)."%")->delete();
+          }
+
+        else {
+          $fk      = $val["FK"][0];
+          $fkhdr   = $header[0][$val["FK"][1]];
+          $detail  = $connect->where(strtoupper($fk), "like",  "%".strtoupper($fkhdr)."%")->delete();
+        }
+    }
+
+    $delHead = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where(strtoupper($pk), "like", strtoupper($pkVal))->delete();
+    return "Data Berhasil Dihapus";
   }
 }
