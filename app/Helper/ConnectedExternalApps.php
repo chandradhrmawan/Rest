@@ -9,6 +9,7 @@ use App\Models\OmCargo\TxHdrUper;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrDel;
 use App\Models\OmCargo\TxHdrRec;
+use App\Models\OmCargo\TxHdrNota;
 use App\Helper\RequestBooking;
 
 class ConnectedExternalApps{
@@ -887,7 +888,202 @@ class ConnectedExternalApps{
     return ["Success"=>true, "result" => $res['esbBody']['statusMessage']];
   }
 
-  public static function sendNotaProforma($input){
-    // buat funct send proforma nota ke invoice
+  public static function sendNotaProforma($nota_id){
+    $find = TxHdrNota::find($nota_id);
+    $detil = DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $nota_id)->get();
+
+    $head_json = '{
+       "billerRequestId":"'.$find->nota_id.'",
+       "orgId":"'.$find->nota_org_id.'",
+       "trxNumber":"'.$find->nota_no.'",
+       "trxNumberOrig":"",
+       "trxNumberPrev":"",
+       "trxTaxNumber":"",
+       "trxDate":"'.date('Y-m-d', strtotime($find->nota_date)).' 00:00:00",
+       "trxClass":"INV",
+       "trxTypeId":"-1",
+       "paymentReferenceNumber":"",
+       "referenceNumber":"",
+       "currencyCode":"'.$find->nota_currency_code.'",
+       "currencyType":"",
+       "currencyRate":"0",
+       "currencyDate":null,
+       "amount":"'.$find->nota_amount.'",
+       "customerNumber":"'.$find->nota_cust_id.'",
+       "customerClass":"",
+       "billToCustomerId":"-1",
+       "billToSiteUseId":"-1",
+       "termId":null,
+       "status":"P",
+       "headerContext":"'.$find->nota_context.'",
+       "headerSubContext":"'.$find->nota_sub_context.'",
+       "startDate":null,
+       "endDate":null,
+       "terminal":"-",
+       "vesselName":"'.$find->nota_vessel_name.'",
+       "branchCode":"'.$find->nota_branch_code.'",
+       "errorMessage":"",
+       "apiMessage":"",
+       "createdBy":"-1",
+       "creationDate":"'.date('Y-m-d', strtotime($find->nota_date)).' 00:00:00",
+       "lastUpdatedBy":"-1",
+       "lastUpdateDate":"'.date('Y-m-d', strtotime($find->nota_date)).' 00:00:00",
+       "lastUpdateLogin":"-1",
+       "customerTrxIdOut":null,
+       "processFlag":"",
+       "attribute1":"BRG10",
+       "attribute2":"'.$find->nota_cust_id.'",
+       "attribute3":"'.$find->nota_cust_name.'",
+       "attribute4":"'.$find->nota_cust_address.'",
+       "attribute5":"'.$find->nota_cust_npwp.'",
+       "attribute6":"LAUTAN LUAS PBM",
+       "attribute7":"BONGKAR MUAT",
+       "attribute8":"",
+       "attribute9":"",
+       "attribute10":"",
+       "attribute11":"",
+       "attribute12":"",
+       "attribute13":"",
+       "attribute14":"FAKTUR-0002",
+       "attribute15":"",
+       "interfaceHeaderAttribute1":"UPER-UPER-BTN-194160",
+       "interfaceHeaderAttribute2":"'.$find->nota_vessel_name.'",
+       "interfaceHeaderAttribute3":"MUAT/EXPORT",
+       "interfaceHeaderAttribute4":"GD01",
+       "interfaceHeaderAttribute5":"11/12",
+       "interfaceHeaderAttribute6":"",
+       "interfaceHeaderAttribute7":"5678",
+       "interfaceHeaderAttribute8":"",
+       "interfaceHeaderAttribute9":"DIM01A/DIM01B",
+       "interfaceHeaderAttribute10":"2019-11-14 08:00:00",
+       "interfaceHeaderAttribute11":"",
+       "interfaceHeaderAttribute12":"",
+       "interfaceHeaderAttribute13":"",
+       "interfaceHeaderAttribute14":"",
+       "interfaceHeaderAttribute15":"",
+       "customerAddress":"'.$find->nota_cust_address.'",
+       "customerName":"'.$find->nota_cust_name.'",
+       "sourceSystem":"NPKBILLING",
+       "arStatus":"N",
+       "sourceInvoice":"NPKBILLING",
+       "arMessage":"",
+       "customerNPWP":"'.$find->nota_cust_npwp.'",
+       "perKunjunganFrom":null,
+       "perKunjunganTo":null,
+       "jenisPerdagangan":"",
+       "docNum":"",
+       "statusLunas":"",
+       "tglPelunasan":"",
+       "amountTerbilang":"",
+       "ppnDipungutSendiri":"",
+       "ppnDipungutPemungut":"",
+       "ppnTidakDipungut":"",
+       "ppnDibebaskan":"",
+       "uangJaminan":"",
+       "piutang":"",
+       "sourceInvoiceType":"NPKBILLING",
+       "branchAccount":"91",
+       "statusCetak":"",
+       "statusKirimEmail":"",
+       "amountDasarPenghasilan":"'.$find->nota_amount.'",
+       "amountMaterai":null,
+       "ppn10Persen":"'.$find->nota_ppn.'",
+       "statusKoreksi":"",
+       "tanggalKoreksi":null,
+       "keteranganKoreksi":""
+    }';
+
+    $lines_json = '';
+    foreach ($detil as $list) {
+      $lines_json  .= '{
+          "billerRequestId":"'.$find->nota_id.'",
+          "trxNumber":"'.$find->nota_no.'",
+          "lineId":null,
+          "lineNumber":"'.$list->dtl_line.'",
+          "description":"'.$list->dtl_service_type.'",
+          "memoLineId":null,
+          "glRevId":null,
+          "lineContext":"",
+          "taxFlag":"Y",
+          "serviceType":"'.$list->dtl_service_type.'",
+          "eamCode":"BRG10",
+          "locationTerminal":"",
+          "amount":"'.$list->dtl_amout.'",
+          "taxAmount":"'.$list->dtl_ppn.'",
+          "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "createdBy":"-1",
+          "creationDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "lastUpdatedBy":"-1",
+          "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "interfaceLineAttribute1":"BRG10",
+          "interfaceLineAttribute2":"BONGKAT MUAT",
+          "interfaceLineAttribute3":null,
+          "interfaceLineAttribute4":null,
+          "interfaceLineAttribute5":"",
+          "interfaceLineAttribute6":"",
+          "interfaceLineAttribute7":"",
+          "interfaceLineAttribute8":"",
+          "interfaceLineAttribute9":"",
+          "interfaceLineAttribute10":"",
+          "interfaceLineAttribute11":"",
+          "interfaceLineAttribute12":null,
+          "interfaceLineAttribute13":"800",
+          "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
+          "interfaceLineAttribute15":"",
+          "lineDoc":""
+      }';
+    }
+    $lines_json = substr($lines_json, 0,-1)
+
+    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putInvoice";
+    $json = '{
+     "arRequestDoc":{
+        "esbHeader":{
+           "internalId":"",
+           "externalId":"EDI-2910201921570203666",
+           "timestamp":"2019-10-29 21:57:020.36665400",
+           "responseTimestamp":"",
+           "responseCode":"",
+           "responseMessage":""
+        },
+        "esbBody":[
+          { "header": '.$head_json.', "lines": ['.$lines_json.'] }
+        ],
+        "esbSecurity":{
+           "orgId":"'.$find->nota_org_id.'",
+           "batchSourceId":"",
+           "lastUpdateLogin":"",
+           "userId":"",
+           "respId":"",
+           "ledgerId":"",
+           "respApplId":"",
+           "batchSourceName":""
+        }
+      }
+    }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      echo $e->getRequest() . "\n";
+      if ($e->hasResponse()) {
+        echo $e->getResponse() . "\n";
+      }
+    }
+
+    return $res = json_decode($res->getBody()->getContents(), true);
   }
 }
