@@ -650,7 +650,7 @@ class ConnectedExternalApps{
                    "attribute11":"",
                    "attribute12":"",
                    "attribute13":"ID-001",
-                   "attribute14":"'.$uperH->uper_nota_id.'",
+                   "attribute14":"'.$uperH->uper_sub_context.'",
                    "attribute15":"",
                    "statusReceipt":"N",
                    "sourceInvoice":"BRG_UPER",
