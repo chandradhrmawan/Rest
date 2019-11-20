@@ -135,6 +135,13 @@ class RealisasiHelper{
         foreach ($getD as $list) {
           $countLine++;
           DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
+            "dtl_group_tariff_id" => $list->group_tariff_id,
+            "dtl_group_tariff_name" => $list->group_tariff_name,
+            "dtl_bl" => $list->no_bl,
+            "dtl_dpp" => $list->tariff_cal_uper,
+            "dtl_commodity" => $list->commodity_name,
+            "dtl_equipment" => $list->equipment_name,
+            "dtl_masa_reff" => $list->stack_combine,
             // "nota_dtl_id" => $list->, // dari triger
             "nota_hdr_id" => $headN->nota_id,
             "dtl_line" => $countLine,
@@ -284,6 +291,13 @@ class RealisasiHelper{
         foreach ($getD as $list) {
           $countLine++;
           DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
+            "dtl_group_tariff_id" => $list->group_tariff_id,
+            "dtl_group_tariff_name" => $list->group_tariff_name,
+            "dtl_bl" => $list->no_bl,
+            "dtl_dpp" => $list->tariff_cal_uper,
+            "dtl_commodity" => $list->commodity_name,
+            "dtl_equipment" => $list->equipment_name,
+            "dtl_masa_reff" => $list->stack_combine,
             // "nota_dtl_id" => $list->, // dari triger
             "nota_hdr_id" => $headN->nota_id,
             "dtl_line" => $countLine,
