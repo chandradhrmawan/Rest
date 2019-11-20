@@ -104,7 +104,7 @@ class StoreController extends Controller
         "customer_address" => strtoupper($input['truck_cust_address']),
         "cdm_customer_id" => strtoupper($input['truck_cust_id']),
         "truck_type" => strtoupper($input['truck_type']),
-        "date" => \Carbon\Carbon::createFromFormat("Y-m-d H:i", $input['truck_plat_exp'])->format('d-m-Y')
+        "date" => date('d-m-Y', strtotime($input['truck_plat_exp']))
       ];
 
       $set_data_self = [
