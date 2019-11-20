@@ -87,7 +87,7 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$findd->real_no."'";
+    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->real_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       
@@ -237,7 +237,7 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$findd->bprp_no."'";
+    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->bprp_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
