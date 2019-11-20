@@ -1010,7 +1010,7 @@ class ConnectedExternalApps{
           "serviceType":"'.$list->dtl_service_type.'",
           "eamCode":"BRG10",
           "locationTerminal":"",
-          "amount":"'.$list->dtl_amout.'",
+          "amount":"'.$list->dtl_amount.'",
           "taxAmount":"'.$list->dtl_ppn.'",
           "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
           "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
