@@ -1034,7 +1034,7 @@ class ConnectedExternalApps{
           "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
           "interfaceLineAttribute15":"",
           "lineDoc":""
-      }';
+      },';
     }
     $lines_json = substr($lines_json, 0,-1);
 

@@ -344,9 +344,23 @@ class RealisasiHelper{
   public static function approvedProformaNota($input){
     $nota = TxHdrNota::find($input['id']);
     $sendNota = ConnectedExternalApps::sendNotaProforma($nota->nota_id);
+    if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
+      return [ 
+        'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
+        'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
+        'Success'=> false, 
+        'result' => 'Fail, send proforma to invoice!'
+      ];
+    }
     $nota->nota_status = 2;
     $nota->save();
-    return ['result' => 'Success, approved proforma!', 'req_no' => $nota->nota_req_no, 'nota_no' => $nota->nota_no];
+    return [
+      'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
+      'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
+      'result' => 'Success, approved proforma!', 
+      'req_no' => $nota->nota_req_no, 
+      'nota_no' => $nota->nota_no
+    ];
   }
 
 }
