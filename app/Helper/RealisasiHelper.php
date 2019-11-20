@@ -328,7 +328,7 @@ class RealisasiHelper{
     $nota = TxHdrNota::find($input['id']);
     $nota->nota_status = 2;
     $nota->save();
-    ConnectedExternalApps::sendNotaProforma($nota->nota_id);
+    $sendNota = ConnectedExternalApps::sendNotaProforma($nota->nota_id);
     return ['result' => 'Success, approved proforma!', 'req_no' => $nota->nota_req_no, 'nota_no' => $nota->nota_no];
   }
 
