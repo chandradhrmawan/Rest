@@ -140,7 +140,7 @@ class RealisasiHelper{
             "dtl_line_desc" => $list->memoline,
             // "dtl_line_context" => $list->, // ?
             "dtl_service_type" => $list->group_tariff_name,
-            "dtl_amout" => $list->total,
+            "dtl_amount" => $list->total,
             "dtl_ppn" => $list->ppn,
             "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
@@ -288,7 +288,7 @@ class RealisasiHelper{
             "dtl_line_desc" => $list->memoline,
             // "dtl_line_context" => $list->, // ?
             "dtl_service_type" => $list->group_tariff_name,
-            "dtl_amout" => $list->total,
+            "dtl_amount" => $list->total,
             "dtl_ppn" => $list->ppn,
             "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
