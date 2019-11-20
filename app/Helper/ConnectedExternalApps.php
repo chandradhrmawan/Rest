@@ -352,7 +352,7 @@ class ConnectedExternalApps{
       $vparam = '';
       $vparam .= $req_type; // IF_FLAG
       $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
-      $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT B.PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
+      $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT (CASE WHEN B.PACKAGE_NAME IS NULL THEN A.PACKAGE_NAME ELSE B.PACKAGE_NAME END) PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
       $packageNameParent = $packageNameParent[0];
       $packageNameParent = $packageNameParent->package_name;
       $vparam .= '^'.$packageNameParent; // PKG_NAME
