@@ -101,6 +101,7 @@ class RealisasiHelper{
         }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
+        $headN->nota_group_id = $getH->nota_id;
         $headN->nota_org_id = $getH->branch_org_id;
         $headN->nota_cust_id = $getH->customer_id;
         $headN->nota_cust_name = $getH->alt_name;
@@ -247,6 +248,7 @@ class RealisasiHelper{
         }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
+        $headN->nota_group_id = $getH->nota_id;
         $headN->nota_org_id = $getH->branch_org_id;
         $headN->nota_cust_id = $getH->customer_id;
         $headN->nota_cust_name = $getH->alt_name;
