@@ -226,7 +226,8 @@ class ConnectedExternalApps{
     if (empty($req)) {
       return ['result' => "Fail, request not found!", "Success" => false];
     }
-    $ckp = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id', $req->bm_id)->where('dtl_pkg_id', 4)->get();
+    $condition = DB::connection('omcargo')->table('TS_SEND_TOS')->pluck('pkg_id');
+    $ckp = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id', $req->bm_id)->whereIn('dtl_pkg_id', $condition)->get();
 
     if (count($ckp) > 0) {
       foreach ($ckp as $list) {
@@ -336,7 +337,8 @@ class ConnectedExternalApps{
 
     $config = RequestBooking::config($table);
     if (!empty($header)) {
-      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->where('dtl_pkg_id', 4)->get();
+      $condition = DB::connection('omcargo')->table('TS_SEND_TOS')->pluck('pkg_id');
+      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->whereIn('dtl_pkg_id', $condition)->get();
       return static::sendRequestBookingNewExcute($req_type, $input['paid_date'], $header, $detil, $config);
     }
   }
