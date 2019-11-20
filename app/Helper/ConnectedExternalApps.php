@@ -1039,7 +1039,7 @@ class ConnectedExternalApps{
     $lines_json = substr($lines_json, 0,-1);
 
     $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putInvoice";
-    $json = '{
+    $string_json = '{
      "arRequestDoc":{
         "esbHeader":{
            "internalId":"",
