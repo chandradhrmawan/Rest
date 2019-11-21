@@ -226,7 +226,8 @@ class ConnectedExternalApps{
     if (empty($req)) {
       return ['result' => "Fail, request not found!", "Success" => false];
     }
-    $ckp = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id', $req->bm_id)->where('dtl_pkg_id', 4)->get();
+    $condition = DB::connection('omcargo')->table('TS_SEND_TOS')->pluck('pkg_id');
+    $ckp = DB::connection('omcargo')->table('TX_DTL_BM')->where('hdr_bm_id', $req->bm_id)->whereIn('dtl_pkg_id', $condition)->get();
 
     if (count($ckp) > 0) {
       foreach ($ckp as $list) {
@@ -336,7 +337,8 @@ class ConnectedExternalApps{
 
     $config = RequestBooking::config($table);
     if (!empty($header)) {
-      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->where('dtl_pkg_id', 4)->get();
+      $condition = DB::connection('omcargo')->table('TS_SEND_TOS')->pluck('pkg_id');
+      $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->whereIn('dtl_pkg_id', $condition)->get();
       return static::sendRequestBookingNewExcute($req_type, $input['paid_date'], $header, $detil, $config);
     }
   }
@@ -350,7 +352,7 @@ class ConnectedExternalApps{
       $vparam = '';
       $vparam .= $req_type; // IF_FLAG
       $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
-      $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT B.PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
+      $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT (CASE WHEN B.PACKAGE_NAME IS NULL THEN A.PACKAGE_NAME ELSE B.PACKAGE_NAME END) PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
       $packageNameParent = $packageNameParent[0];
       $packageNameParent = $packageNameParent->package_name;
       $vparam .= '^'.$packageNameParent; // PKG_NAME
@@ -648,7 +650,7 @@ class ConnectedExternalApps{
                    "attribute11":"",
                    "attribute12":"",
                    "attribute13":"ID-001",
-                   "attribute14":"'.$uperH->uper_nota_id.'",
+                   "attribute14":"'.$uperH->uper_sub_context.'",
                    "attribute15":"",
                    "statusReceipt":"N",
                    "sourceInvoice":"BRG_UPER",
@@ -1008,7 +1010,7 @@ class ConnectedExternalApps{
           "serviceType":"'.$list->dtl_service_type.'",
           "eamCode":"BRG10",
           "locationTerminal":"",
-          "amount":"'.$list->dtl_amout.'",
+          "amount":"'.$list->dtl_amount.'",
           "taxAmount":"'.$list->dtl_ppn.'",
           "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
           "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
@@ -1032,12 +1034,12 @@ class ConnectedExternalApps{
           "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
           "interfaceLineAttribute15":"",
           "lineDoc":""
-      }';
+      },';
     }
     $lines_json = substr($lines_json, 0,-1);
 
     $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putInvoice";
-    $json = '{
+    $string_json = '{
      "arRequestDoc":{
         "esbHeader":{
            "internalId":"",

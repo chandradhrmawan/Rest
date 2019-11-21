@@ -211,6 +211,13 @@ class UperRequest{
                 'uper_paid_date' => $input['pay_date'],
                 'uper_paid' => 'Y'
               ]);
+            } else if ($pay->pay_status == 2) {
+                static::updateUperStatus([
+                  'uper_id' => $uper->uper_id,
+                  'uper_req_no' => $uper->uper_req_no,
+                  'uper_paid_date' => $input['pay_date'],
+                  'uper_paid' => 'W'
+                ]);
             }
             return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
