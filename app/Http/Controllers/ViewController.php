@@ -88,9 +88,20 @@ class ViewController extends Controller
       $dompdf->stream($filename, array("Attachment" => false));
     }
 
-    function printGetPass($id) {
-      $html = view('print.getPass');
-      // return $html;
+    function printGetPass($data,$headId, $detailId) {
+      $dataup  = strtoupper($data);
+      $dataadd = $data."_";
+      $header  = DB::connection('omcargo')->table('TX_HDR_'.$dataup)->where($dataup."_ID", "=", $headId)->get();
+      $detail  = DB::connection('omcargo')->table('TX_DTL_'.$dataup)->where([["HDR_".$dataup."_ID", "=", $headId],["DTL_".$dataup."_ID", "=", $detailId]])->get();
+      $dat["header"]  = $header;
+      $dat["detail"]  = $detail;
+      $data    = json_encode($dat);
+      $change  = str_replace($dataadd, "req_", $data);
+      $all  = json_decode($change, TRUE);
+      $head = $all["header"];
+      $deta = $all["detail"];
+
+      $html       = view('print.getPass',["header"=>$head, "detail"=>$deta]);
       $filename = "Test";
       $dompdf = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
@@ -105,7 +116,7 @@ class ViewController extends Controller
       $det            = [];
       $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
       $data["header"] = $header;
-      $detail  = $connect->table("TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
+      $detail  = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
       foreach ($detail as $list) {
         $newDt = [];
         foreach ($list as $key => $value) {
@@ -133,7 +144,7 @@ class ViewController extends Controller
       }
 
       $all = ["header"=>$header]+$det;
-      $dpp         = DB::connection('omcargo')->table("TX_DTL_NOTA")->where('NOTA_HDR_ID',$id)->sum("dtl_amout");
+      $dpp         = DB::connection('omcargo')->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID',$id)->sum("dtl_amount");
       $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->get();
       $ppn         = $dpp*10/100;
       $terbilang   = $this->terbilang($dpp+$ppn);
@@ -155,8 +166,8 @@ class ViewController extends Controller
           }
         }
         for ($i=0; $i < count($bl); $i++) {
-          $data       = DB::connection('omcargo')->table("TX_DTL_NOTA")
-                      ->where([['NOTA_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[0]]])
+          $data       = DB::connection('omcargo')->table("V_TX_DTL_NOTA")
+                      ->where([['NOTA_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
                       ->get();
           $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
         }
@@ -182,7 +193,7 @@ class ViewController extends Controller
       $det            = [];
       $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
       $data["header"] = $header;
-      $detail  = $connect->table("TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
+      $detail  = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
       foreach ($detail as $list) {
         $newDt = [];
         foreach ($list as $key => $value) {
@@ -210,7 +221,7 @@ class ViewController extends Controller
       }
 
       $all = ["header"=>$header]+$det;
-      $dpp         = DB::connection('omcargo')->table("TX_DTL_NOTA")->where('NOTA_HDR_ID',$id)->sum("dtl_amout");
+      $dpp         = DB::connection('omcargo')->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID',$id)->sum("dtl_amount");
       $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->get();
       $ppn         = $dpp*10/100;
       $terbilang   = $this->terbilang($dpp+$ppn);
@@ -232,8 +243,8 @@ class ViewController extends Controller
           }
         }
         for ($i=0; $i < count($bl); $i++) {
-          $data       = DB::connection('omcargo')->table("TX_DTL_NOTA")
-                      ->where([['NOTA_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[0]]])
+          $data       = DB::connection('omcargo')->table("V_TX_DTL_NOTA")
+                      ->where([['NOTA_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
                       ->get();
           $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
         }
@@ -310,7 +321,7 @@ class ViewController extends Controller
         }
         for ($i=0; $i < count($bl); $i++) {
           $data       = DB::connection('omcargo')->table("V_TX_DTL_UPER")
-                      ->where([['UPER_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[0]]])
+                      ->where([['UPER_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
                       ->get();
           $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
         }
@@ -403,5 +414,18 @@ class ViewController extends Controller
 
       $all = ["header"=>$header]+$det;
       return $all;
+    }
+
+    function card($input) {
+      $dataup  = strtoupper($input['data']);
+      $dataadd = $input['data']."_";
+      $header  = DB::connection('omcargo')->table('TX_HDR_'.$dataup)->where($dataup."_ID", "=", $input["id"])->get();
+      $detail  = DB::connection('omcargo')->table('TX_DTL_'.$dataup)->where("HDR_".$dataup."_ID", "=", $input["id"])->get();
+      $dat["header"]  = $header;
+      $dat["detail"]  = $detail;
+      $data    = json_encode($dat);
+      $change  = str_replace($dataadd, "req_", $data);
+      $vwdata  = json_decode($change);
+      return $vwdata;
     }
 }

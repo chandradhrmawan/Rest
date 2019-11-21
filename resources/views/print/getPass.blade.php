@@ -29,22 +29,23 @@
     </tr>
   </table>
 
+
+@foreach($header as $header)
+@foreach($detail as $detail)
 <table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9;margin-top:20px">
 	<tr style="text-align:center">
 		<td colspan="2">
       <b>BL NUMBER</b>
-		 <div style="padding-left:150px"><?php echo DNS1D::getBarcodeHTML("1234567", "C39",1,33);?></div>
+		 <div style="padding-left:150px"><?php echo DNS1D::getBarcodeHTML($detail["dtl_req_bl"], "C39",1,33);?></div>
     </td>
 		<td style="text-align:left">
       <div style="margin-left:40px"><b>TRUCK ID</b></div>
 			<?php echo DNS1D::getBarcodeHTML("1234567", "C39",1,33);?>
-
-      <!-- <img src="{{ url('/other/b.jpg') }}" alt="" width="150px"> -->
     </td>
 	</tr>
   <tr>
     <td colspan="3">
-      <div style="margin-top:40px"><b>Cargo Name</b><br>Tebu, Gula, Gula Bit, Sukrosa Murni, dan Sejenisnya</div>
+      <div style="margin-top:40px"><b>Cargo Name</b><br>{{$detail["dtl_cmdty_name"]}}</div>
     </td>
   </tr>
 </table>
@@ -52,23 +53,25 @@
 <table width="100%" style="border-collapse:collapse; font-size:9;margin-top:20px">
   <tr>
     <td width="35%">HS Code<br>1701</td>
-    <td width="35%">Qty/Unit<br>0</td>
-    <td>Package<br>Curah Kering</td>
+    <td width="35%">Qty/Unit<br>{{$detail["dtl_qty"]}} {{$detail["dtl_unit_name"]}}</td>
+    <td>Package<br>{{$detail["dtl_pkg_name"]}}</td>
   </tr>
   <tr>
     <td>No Urut<br>1/1</td>
     <td>IMO Class<br></td>
-    <td>Status TL<br>Yes</td>
+    <td>Status TL<br>
+			<?php if ($detail["dtl_req_tl"] == 'Y') { echo "Yes"; } else { echo "No"; } ?>
+		</td>
   </tr>
   <tr>
-    <td>Vessel<br>OSTINA</td>
+    <td>Vessel<br>{{$header["req_vessel_name"]}}</td>
     <td>Voyage<br>04/05</td>
-    <td>Customer<br>PUTRA DAMAI BANTEN ABADI</td>
+    <td>Customer<br>{{$detail["dtl_cust_name"]}}</td>
   </tr>
   <tr>
     <td>No Do<br>1234</td>
-    <td>Tgl BL<br>24-JAN-18</td>
-    <td>No Request<br>2010218000010</td>
+    <td>Tgl BL<br>{{$detail["dtl_create_date"]}}</td>
+    <td>No Request<br>{{$detail["dtl_req_bl"]}}</td>
   </tr>
   <tr>
     <td>Paid Thru<br>28-JAN-18 23:59</td>
@@ -95,17 +98,17 @@
 <table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9;margin-top:20px">
 	<tr style="text-align:center">
 		<td colspan="2">
-      <b>BL NUMBER</b><br>
-      <img src="{{ url('/other/b.jpg') }}" alt="" width="150px">
+      <b>BL NUMBER</b>
+		 <div style="padding-left:150px"><?php echo DNS1D::getBarcodeHTML($detail["dtl_req_bl"], "C39",1,33);?></div>
     </td>
-		<td>
-      <b>TRUCK ID</b><br>
-      <img src="{{ url('/other/b.jpg') }}" alt="" width="150px">
+		<td style="text-align:left">
+      <div style="margin-left:40px"><b>TRUCK ID</b></div>
+			<?php echo DNS1D::getBarcodeHTML("1234567", "C39",1,33);?>
     </td>
 	</tr>
   <tr>
     <td colspan="3">
-      <div style="margin-top:40px"><b>Cargo Name</b><br>Tebu, Gula, Gula Bit, Sukrosa Murni, dan Sejenisnya</div>
+      <div style="margin-top:40px"><b>Cargo Name</b><br>{{$detail["dtl_cmdty_name"]}}</div>
     </td>
   </tr>
 </table>
@@ -113,23 +116,25 @@
 <table width="100%" style="border-collapse:collapse; font-size:9;margin-top:20px">
   <tr>
     <td width="35%">HS Code<br>1701</td>
-    <td width="35%">Qty/Unit<br>0</td>
-    <td>Package<br>Curah Kering</td>
+    <td width="35%">Qty/Unit<br>{{$detail["dtl_qty"]}} {{$detail["dtl_unit_name"]}}</td>
+    <td>Package<br>{{$detail["dtl_pkg_name"]}}</td>
   </tr>
   <tr>
     <td>No Urut<br>1/1</td>
     <td>IMO Class<br></td>
-    <td>Status TL<br>Yes</td>
+    <td>Status TL<br>
+			<?php if ($detail["dtl_req_tl"] == 'Y') { echo "Yes"; } else { echo "No"; } ?>
+		</td>
   </tr>
   <tr>
-    <td>Vessel<br>OSTINA</td>
+    <td>Vessel<br>{{$header["req_vessel_name"]}}</td>
     <td>Voyage<br>04/05</td>
-    <td>Customer<br>PUTRA DAMAI BANTEN ABADI</td>
+    <td>Customer<br>{{$detail["dtl_cust_name"]}}</td>
   </tr>
   <tr>
     <td>No Do<br>1234</td>
-    <td>Tgl BL<br>24-JAN-18</td>
-    <td>No Request<br>2010218000010</td>
+    <td>Tgl BL<br>{{$detail["dtl_create_date"]}}</td>
+    <td>No Request<br>{{$detail["dtl_req_bl"]}}</td>
   </tr>
   <tr>
     <td>Paid Thru<br>28-JAN-18 23:59</td>
@@ -137,5 +142,7 @@
     <td>Truck ID<br>5T627</td>
   </tr>
 </table>
+@endforeach
+@endforeach
 </body>
 </html>

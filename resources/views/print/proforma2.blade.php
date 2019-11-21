@@ -21,7 +21,7 @@
 		<?php if ($header->nota_paid == "N") { ?>
 			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
 		<?php } else { ?>
-			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:190px;transform: rotate(20deg); width:80%">
+			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
 		<?php } ?>
 		@foreach($branch as $branch)
   <table width="100%" style="font-size:10px">
@@ -105,8 +105,6 @@
       </table>
     </td>
 	</tr>
-	@endforeach
-	@endforeach
 </table>
 
 <?php if ($penumpukan != "0") { ?>
@@ -175,14 +173,27 @@
 <?php foreach ($handling[$bl] as $value) { ?>
 	<tr>
 		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:center"></td>
+		<td style="text-align:center">
+			<?php
+			if ($value["dtl_bm_tl"] == "Y") {
+				echo "TL";
+			} else {
+				echo "NON-TL";
+			}
+			 ?>
+		</td>
 		<td>{{$value["dtl_package"]}}</td>
 		<td>{{$value["dtl_commodity"]}}</td>
 		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-		<td style="text-align:center">-</td>
+		<?php	if ($value["dtl_bm_type"] == "Bongkar") { ?>
+			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
+			<td style="text-align:center">-</td>
+		<?php } else { ?>
+			<td style="text-align:center">-</td>
+			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
+		<?php } ?>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_amout"])}}</td>
+		<td style="text-align:right">{{number_format($value["dtl_amount"])}}</td>
 	</tr>
 <?php } ?>
 	@endforeach
@@ -247,6 +258,16 @@
 	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
 	<tr><td>NIPP. 287117773</td></tr>
 </table>
+
+<div style="position:absolute;bottom:20px;font-size:9px; width:100%">
+	{{$branch->branch_name}} <br>{{$branch->branch_address}}
+	<div style="margin-top:50px;font-size:8px">
+			{{$branch->branch_npwp}}
+	</div>
+</div>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+@endforeach
+@endforeach
 </body>
 </html>
 

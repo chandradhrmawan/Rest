@@ -87,13 +87,13 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->real_no."'";
+    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->real_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
-      
+
       $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
       $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
-      
+
       // store head
         $headN = TxHdrNota::where('nota_req_no',$getH->booking_number)->first();
         if (empty($headN)) {
@@ -101,6 +101,7 @@ class RealisasiHelper{
         }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
+        $headN->nota_group_id = $getH->nota_id;
         $headN->nota_org_id = $getH->branch_org_id;
         $headN->nota_cust_id = $getH->customer_id;
         $headN->nota_cust_name = $getH->alt_name;
@@ -110,8 +111,8 @@ class RealisasiHelper{
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
         // $headN->nota_status = $getH->; // ?
-        $headN->nota_context = 'BRG'; // sementara sampai ada info lebih lanjut
-        $headN->nota_sub_context = 'BRG03'; // sementara sampai ada info lebih lanjut
+        $headN->nota_context = $getH->nota_context;
+        $headN->nota_sub_context = $getH->nota_context;
         $headN->nota_terminal = $find->bm_terminal_name;
         $headN->nota_branch_id = $getH->branch_id;
         $headN->nota_vessel_name = $find->bm_vessel_name;
@@ -134,13 +135,20 @@ class RealisasiHelper{
         foreach ($getD as $list) {
           $countLine++;
           DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
+            "dtl_group_tariff_id" => $list->group_tariff_id,
+            "dtl_group_tariff_name" => $list->group_tariff_name,
+            "dtl_bl" => $list->no_bl,
+            "dtl_dpp" => $list->tariff_cal_uper,
+            "dtl_commodity" => $list->commodity_name,
+            "dtl_equipment" => $list->equipment_name,
+            "dtl_masa_reff" => $list->stack_combine,
             // "nota_dtl_id" => $list->, // dari triger
             "nota_hdr_id" => $headN->nota_id,
             "dtl_line" => $countLine,
             "dtl_line_desc" => $list->memoline,
             // "dtl_line_context" => $list->, // ?
             "dtl_service_type" => $list->group_tariff_name,
-            "dtl_amout" => $list->total,
+            "dtl_amount" => $list->total,
             "dtl_ppn" => $list->ppn,
             "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
@@ -237,7 +245,7 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->bprp_no."'";
+    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->bprp_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
@@ -247,6 +255,7 @@ class RealisasiHelper{
         }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
+        $headN->nota_group_id = $getH->nota_id;
         $headN->nota_org_id = $getH->branch_org_id;
         $headN->nota_cust_id = $getH->customer_id;
         $headN->nota_cust_name = $getH->alt_name;
@@ -256,8 +265,8 @@ class RealisasiHelper{
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
         // $headN->nota_status = $getH->; // ?
-        $headN->nota_context = 'BRG'; // sementara sampai ada info lebih lanjut
-        $headN->nota_sub_context = 'BRG03'; // sementara sampai ada info lebih lanjut
+        $headN->nota_context = $getH->nota_context;
+        $headN->nota_sub_context = $getH->nota_context;
         $headN->nota_terminal = $find->bprp_terminal_id;
         $headN->nota_branch_id = $getH->branch_id;
         $headN->nota_vessel_name = $find->bprp_vessel_name;
@@ -277,18 +286,26 @@ class RealisasiHelper{
       $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
 
       $countLine = 0;
+      DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $headN->nota_id)->delete();
       foreach ($group_tariff as $grpTrf){
         $getD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf->group_tariff_id)->get();
         foreach ($getD as $list) {
           $countLine++;
           DB::connection('omcargo')->table('TX_DTL_NOTA')->insert([
+            "dtl_group_tariff_id" => $list->group_tariff_id,
+            "dtl_group_tariff_name" => $list->group_tariff_name,
+            "dtl_bl" => $list->no_bl,
+            "dtl_dpp" => $list->tariff_cal_uper,
+            "dtl_commodity" => $list->commodity_name,
+            "dtl_equipment" => $list->equipment_name,
+            "dtl_masa_reff" => $list->stack_combine,
             // "nota_dtl_id" => $list->, // dari triger
             "nota_hdr_id" => $headN->nota_id,
             "dtl_line" => $countLine,
             "dtl_line_desc" => $list->memoline,
             // "dtl_line_context" => $list->, // ?
             "dtl_service_type" => $list->group_tariff_name,
-            "dtl_amout" => $list->total,
+            "dtl_amount" => $list->total,
             "dtl_ppn" => $list->ppn,
             "dtl_masa" => $list->day_period,
             // "dtl_masa1" => $list->, // ?
@@ -312,13 +329,13 @@ class RealisasiHelper{
   }
 
   public static function rejectedProformaNota($input){
-    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->update([
       "nota_status"=>3
     ]);
-    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_req_no',$input['req_no'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_req_no',$input['req_no'])->update([
       "bprp_status"=>1
     ]);
-    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_req_no',$input['req_no'])->udpate([
+    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_req_no',$input['req_no'])->update([
       "real_status"=>1
     ]);
     return ['result' => 'Success, rejected proforma!', 'no_req' => $input['req_no']];
@@ -326,10 +343,24 @@ class RealisasiHelper{
 
   public static function approvedProformaNota($input){
     $nota = TxHdrNota::find($input['id']);
+    $sendNota = ConnectedExternalApps::sendNotaProforma($nota->nota_id);
+    if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
+      return [
+        'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
+        'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
+        'Success'=> false,
+        'result' => 'Fail, send proforma to invoice!'
+      ];
+    }
     $nota->nota_status = 2;
     $nota->save();
-    ConnectedExternalApps::sendNotaProforma($nota->nota_id);
-    return ['result' => 'Success, approved proforma!', 'req_no' => $nota->nota_req_no, 'nota_no' => $nota->nota_no];
+    return [
+      'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
+      'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
+      'result' => 'Success, approved proforma!',
+      'req_no' => $nota->nota_req_no,
+      'nota_no' => $nota->nota_no
+    ];
   }
 
 }

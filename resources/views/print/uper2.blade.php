@@ -22,7 +22,7 @@
 	<?php if ($header->uper_paid == "N") { ?>
 		<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
 	<?php } else { ?>
-		<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:190px;transform: rotate(20deg); width:80%">
+		<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
 	<?php } ?>
 	@foreach($branch as $branch)
   <table width="100%" style="font-size:9px">
@@ -49,7 +49,6 @@
       </td>
     </tr>
   </table>
-	@endforeach
 
 <center style="width:100%;background-color:orange;color:#fff;margin-top:20px">NOTA UPER </center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
@@ -93,7 +92,6 @@
       </table>
     </td>
 	</tr>
-	@endforeach
 </table>
 
 <?php if ($penumpukan != "0") { ?>
@@ -249,5 +247,15 @@
 	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
 	<tr><td>NIPP. 287117773</td></tr>
 </table>
+
+<div style="position:absolute;bottom:20px;font-size:9px; width:100%">
+	{{$branch->branch_name}} <br>{{$branch->branch_address}}
+	<div style="margin-top:50px;font-size:8px">
+			{{$branch->branch_npwp}}
+	</div>
+</div>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+@endforeach
+@endforeach
 </body>
 </html>

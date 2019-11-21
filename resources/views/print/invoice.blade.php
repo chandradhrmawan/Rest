@@ -5,13 +5,13 @@
 		 body{
 			 width:100%;
 			 margin:0 auto;
-			 font-family: 'Courier';
+			 font-family: "Arial",Sans-serif;
 		 }
 		 @media print {
         body {
 					width:100%;
 					margin:0 auto;
-					font-family: 'Courier';
+					font-family: "Arial", Sans-serif;
 				}
       }
 	</style>
@@ -21,7 +21,7 @@
 		<?php if ($header->nota_paid == "N") { ?>
 			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
 		<?php } else { ?>
-			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:190px;transform: rotate(20deg); width:80%">
+			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
 		<?php } ?>
 		@foreach($branch as $branch)
   <table width="100%" style="font-size:10px">
@@ -53,7 +53,7 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Nota</center>
+<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px">Nota Penjualan Jasa Kepelabuhan</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
@@ -67,6 +67,11 @@
           <td>Nama</td>
           <td>: </td>
           <td>{{$header->nota_cust_name}}</td>
+        </tr>
+				<tr>
+          <td>Nomor</td>
+          <td>: </td>
+          <td>{{$header->nota_cust_id}}</td>
         </tr>
         <tr>
           <td>Alamat</td>
@@ -105,8 +110,6 @@
       </table>
     </td>
 	</tr>
-	@endforeach
-	@endforeach
 </table>
 
 <?php if ($penumpukan != "0") { ?>
@@ -161,28 +164,33 @@
     <th>Muat</th>
   </tr>
 	@foreach($bl as $bl)
-  <tr style="background:yellow;">
-    <td style="border-right: 0;padding-left:9px">{{$bl}}</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0;text-align:center"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-left:  0;"></td>
+  <tr style="background:#ff3030;color:white">
+    <td style="padding-left:9px" colspan="9">{{$bl}}</td>
   </tr>
 <?php foreach ($handling[$bl] as $value) { ?>
 	<tr>
 		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:center"></td>
+		<td style="text-align:center">
+			<?php
+			if ($value["dtl_bm_tl"] == "Y") {
+				echo "TL";
+			} else {
+				echo "NON-TL";
+			}
+			 ?>
+		</td>
 		<td>{{$value["dtl_package"]}}</td>
 		<td>{{$value["dtl_commodity"]}}</td>
 		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-		<td style="text-align:center">-</td>
+		<?php	if ($value["dtl_bm_type"] == "Bongkar") { ?>
+			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
+			<td style="text-align:center">-</td>
+		<?php } else { ?>
+			<td style="text-align:center">-</td>
+			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
+		<?php } ?>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_amout"])}}</td>
+		<td style="text-align:right">{{number_format($value["dtl_amount"])}}</td>
 	</tr>
 <?php } ?>
 	@endforeach
@@ -217,7 +225,7 @@
 <table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
   <tr>
     <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DPP</td>
+    <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DASAR PENGENAAN PAJAK</td>
     <td style="border-right: 0;border-bottom: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
     <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($dpp)}}</td>
   </tr>
@@ -225,20 +233,26 @@
     <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">PPN 10%</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($ppn)}}</td>
-  </tr>
-	<tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Administrasi</td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format(0)}}</td>
+    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($ppn)}}</td>
   </tr>
   <tr>
-    <td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-top: 0;border-left:0" colspan="2">Grand Total</td>
-    <td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($dpp+$ppn)}}</td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Jumlah Tagihan</td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
+    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($dpp+$ppn)}}</td>
   </tr>
+	<tr>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Uang Jaminan</td>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
+		<td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format(0)}}</td>
+	</tr>
+	<tr>
+		<td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
+		<td style="border-right: 0;border-top: 0;border-left:0" colspan="2"><b>Piutang</b></td>
+		<td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
+		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format(0)}}</td>
+	</tr>
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
 <table style="border-collapse:collapse; font-size:8px;margin-top:60px;float:right;text-align:center">
@@ -247,6 +261,16 @@
 	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
 	<tr><td>NIPP. 287117773</td></tr>
 </table>
+
+	<div style="position:absolute;bottom:20px;font-size:9px; width:100%">
+		{{$branch->branch_name}} <br>{{$branch->branch_address}}
+		<div style="margin-top:50px;font-size:8px">
+				{{$branch->branch_npwp}}
+		</div>
+	</div>
+	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+	@endforeach
+	@endforeach
 </body>
 </html>
 
