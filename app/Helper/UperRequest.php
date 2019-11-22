@@ -154,8 +154,11 @@ class UperRequest{
               return ["Success"=>false, "result" => "Fail, file is required"];
             }
           }
+          
           if (isset($input['encode']) and $input['encode'] == 'true') {
             $pay->pay_status = 2;
+          } else {
+            $pay->pay_status = 1;
           }
           if (isset($input['pay_currency'])) {
             $pay->pay_currency = $input['pay_currency'];
