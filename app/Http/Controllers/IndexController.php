@@ -132,4 +132,15 @@ class IndexController extends Controller
       //
       // return $detail;
     }
+
+    function other($input) {
+      $raw   = $input["raw"];
+      if (!empty($input['value'])) {
+        $param = $input["value"];
+        $table = DB::connection($input["db"])->select($raw, $param);
+      } else {
+        $table = DB::connection($input["db"])->select($raw);
+      }
+      return ["result" => $table];
+    }
 }

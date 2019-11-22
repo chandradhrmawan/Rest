@@ -88,25 +88,24 @@ class ViewController extends Controller
       $dompdf->stream($filename, array("Attachment" => false));
     }
 
-    function printGetPass($data,$headId, $detailId) {
-      $dataup  = strtoupper($data);
-      $dataadd = $data."_";
-      $header  = DB::connection('omcargo')->table('TX_HDR_'.$dataup)->where($dataup."_ID", "=", $headId)->get();
-      $detail  = DB::connection('omcargo')->table('TX_DTL_'.$dataup)->where([["HDR_".$dataup."_ID", "=", $headId],["DTL_".$dataup."_ID", "=", $detailId]])->get();
-      $dat["header"]  = $header;
-      $dat["detail"]  = $detail;
-      $data    = json_encode($dat);
-      $change  = str_replace($dataadd, "req_", $data);
-      $all  = json_decode($change, TRUE);
-      $head = $all["header"];
-      $deta = $all["detail"];
+    function printGetPass($id) {
+        $data = DB::connection("omcargo")
+                  ->table("TX_HDR_TCA")
+                  ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
+                  ->join("TM_REFF","TM_REFF.REFF_ID","=","TX_HDR_TCA.TCA_STATUS")
+                  ->where([
+                    ["TM_REFF.REFF_TR_ID", "=", "8"],
+                    ["TX_HDR_TCA.TCA_BRANCH_ID", "=", "12"],
+                    ["TX_DTL_TCA.DTL_ID", "=", $id]
+                    ])
+                  ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
+                  ->get();
 
-      $html       = view('print.getPass',["header"=>$head, "detail"=>$deta]);
+      $html = view('print.getPass', ["data"=>$data]);
       $filename = "Test";
       $dompdf = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
       $dompdf->loadHtml($html);
-      $dompdf->setPaper('A4', 'potrait');
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
     }
@@ -298,10 +297,8 @@ class ViewController extends Controller
       }
 
       $all = ["header"=>$header]+$det;
-      $dpp         = DB::connection('omcargo')->table("V_TX_DTL_UPER")->where('UPER_HDR_ID',$id)->sum("dtl_amount");
       $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->get();
-      $ppn         = $dpp*10/100;
-      $terbilang   = $this->terbilang($dpp+$ppn);
+      $terbilang   = $this->terbilang($header[0]->uper_amount);
       if (!array_key_exists("alat",$all)) {
         $alat = 0;
       } else {
@@ -333,7 +330,7 @@ class ViewController extends Controller
         $penumpukan = $all["penumpukan"];
       }
 
-      $html       = view('print.uper2',["bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat,"dpp"=>$dpp,"ppn"=>$ppn,"terbilang"=>$terbilang]);
+      $html       = view('print.uper2',["bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat,"terbilang"=>$terbilang]);
       $filename   = "uper";
       $dompdf     = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
@@ -341,7 +338,6 @@ class ViewController extends Controller
       $dompdf->setPaper('A4', 'potrait');
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
-
     }
 
     function penyebut($nilai) {
@@ -381,51 +377,4 @@ class ViewController extends Controller
       return $hasil;
     }
 
-    function invoiceUper($input) {
-      $connect = DB::connection("omcargo");
-      $det     = [];
-      $header  = $connect->table("TX_HDR_UPER")->where('UPER_ID', $input["id"])->get();
-      $data["header"] = $header;
-      $detail  = $connect->table("V_TX_DTL_UPER")->where('UPER_HDR_ID', $header[0]->uper_id)->get();
-      foreach ($detail as $list) {
-        $newDt = [];
-        foreach ($list as $key => $value) {
-                $newDt[$key] = $value;
-        }
-
-        $componen  = DB::connection("eng")
-                      ->table("TM_COMP_NOTA")
-                      ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID",'=', $header[0]->uper_nota_id]])
-                      ->get();
-        foreach ($componen as $listS) {
-          foreach ($listS as $key => $value) {
-                  $newDt[$key] = $value;
-          }
-        }
-        // $det[]=$newDt;
-        if ($newDt["comp_nota_view"] == "1") {
-          $det["penumpukan"][]=$newDt;
-        } if ($newDt["comp_nota_view"] == "2") {
-          $det["handling"][]=$newDt;
-        }  if ($newDt["comp_nota_view"] == "3") {
-          $det["alat"][]=$newDt;
-        }
-      }
-
-      $all = ["header"=>$header]+$det;
-      return $all;
-    }
-
-    function card($input) {
-      $dataup  = strtoupper($input['data']);
-      $dataadd = $input['data']."_";
-      $header  = DB::connection('omcargo')->table('TX_HDR_'.$dataup)->where($dataup."_ID", "=", $input["id"])->get();
-      $detail  = DB::connection('omcargo')->table('TX_DTL_'.$dataup)->where("HDR_".$dataup."_ID", "=", $input["id"])->get();
-      $dat["header"]  = $header;
-      $dat["detail"]  = $detail;
-      $data    = json_encode($dat);
-      $change  = str_replace($dataadd, "req_", $data);
-      $vwdata  = json_decode($change);
-      return $vwdata;
-    }
 }

@@ -18,11 +18,6 @@
 </head>
 <body>
 		@foreach($header as $header)
-		<?php if ($header->nota_paid == "N") { ?>
-			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
-		<?php } else { ?>
-			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
-		<?php } ?>
 		@foreach($branch as $branch)
   <table width="100%" style="font-size:10px">
     <tr>

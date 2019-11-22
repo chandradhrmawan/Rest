@@ -70,6 +70,7 @@ class BillingEngine{
           $headS->tariff_start  = \DB::raw("TO_DATE('".$head['TARIFF_START']."', 'YYYY-MM-DD HH24:MI')");
           $headS->tariff_end    = \DB::raw("TO_DATE('".$head['TARIFF_END']."', 'YYYY-MM-DD HH24:MI')");
           $headS->tariff_no     = $head['TARIFF_NO'];
+					$headS->tariff_name   = $head['TARIFF_NAME'];
           $headS->tariff_status = $head['TARIFF_STATUS'];
           $headS->service_code  = $head['SERVICE_CODE'];
           $headS->branch_id     = 12; // SESSION LOGIN
@@ -167,7 +168,8 @@ class BillingEngine{
           }
         }
 
-        return [ "result" => "Success, store profile tariff data"];
+				$listHeader = DB::connection('eng')->table('TX_PROFILE_TARIFF_HDR')->where('TARIFF_ID', $head["TARIFF_ID"])->get();
+        return [ "result" => "Success, store profile tariff data", "header"=>$listHeader];
 	}
 
 	public static function storeCustomerProfileTariffAndUper($input){
