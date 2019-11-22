@@ -178,7 +178,7 @@ class RequestBooking{
 		}
 
 		$datenow    = Carbon::now()->format('Y-m-d');
-		$query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number= '".$find[$config['head_no']]."'";
+		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
 		$upers = DB::connection('eng')->select(DB::raw($query));
 		if (count($upers) == 0) {
 			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
@@ -210,6 +210,9 @@ class RequestBooking{
 					$headU->uper_amount = $uper['total_uper'];
 					$headU->uper_currency_code = $uper['currency'];
 					$headU->uper_status = 'P'; // ? blm fix
+					// Tambahan Mas Adi
+					$headU->uper_service_code = $uper['nota_service_code'];
+					$headU->uper_branch_account = $uper['branch_account'];
 					$headU->uper_context = $uper['nota_context'];
 					$headU->uper_sub_context = $uper['nota_sub_context'];
 					$headU->uper_terminal_code = $find[$config['head_terminal_code']];

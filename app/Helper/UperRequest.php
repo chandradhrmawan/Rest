@@ -74,8 +74,11 @@ class UperRequest{
                 'uper_amount' => $getH->uper_total,
                 'uper_currency_code' => $getH->currency,
                 'uper_status' => 'P',
-                'uper_context' => 'BRG',
-                'uper_sub_context' => 'BRG03',
+                // Tambahan Mas Adi
+                'uper_service_code' => $getH->nota_service_code,
+                'uper_branch_account' => $getH->branch_account,
+                'uper_context' => $getH->nota_context,
+                'uper_sub_context' => $getH->nota_sub_context,
                 'uper_terminal_code' => $find[$config['head_terminal_code']],
                 'uper_branch_id' => $getH->branch_id,
                 'uper_branch_code' => $getH->branch_code,

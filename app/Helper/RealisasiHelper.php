@@ -87,7 +87,9 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->real_no."'";
+    $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$find->real_no."'";
+    // Edit Mas Adi
+    // $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->real_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
 
@@ -111,8 +113,12 @@ class RealisasiHelper{
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
         // $headN->nota_status = $getH->; // ?
+        // Tambahan Mas Adi
         $headN->nota_context = $getH->nota_context;
-        $headN->nota_sub_context = $getH->nota_context;
+        $headN->nota_sub_context = $getH->nota_sub_context;
+        $headN->nota_service_code = $getH->nota_service_code;
+        $headN->nota_branch_account = $getH->branch_account;
+        $headN->nota_tax_code = $getH->nota_tax_code;
         $headN->nota_terminal = $find->bm_terminal_name;
         $headN->nota_branch_id = $getH->branch_id;
         $headN->nota_vessel_name = $find->bm_vessel_name;
@@ -245,7 +251,8 @@ class RealisasiHelper{
       return $tariffResp;
     }
     $datenow    = Carbon::now()->format('Y-m-d');
-    $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->bprp_no."'";
+    // $query = "SELECT A.*, B.NOTA_CONTEXT, B.NOTA_SUB_CONTEXT FROM V_PAY_SPLIT A  LEFT JOIN TM_NOTA B ON A.NOTA_ID = B.NOTA_ID WHERE booking_number = '".$find->bprp_no."'";
+    $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$find->bprp_no."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
@@ -265,8 +272,12 @@ class RealisasiHelper{
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
         // $headN->nota_status = $getH->; // ?
+        // Tambahan Mas Adi
         $headN->nota_context = $getH->nota_context;
-        $headN->nota_sub_context = $getH->nota_context;
+        $headN->nota_sub_context = $getH->nota_sub_context;
+        $headN->nota_service_code = $getH->nota_service_code;
+        $headN->nota_branch_account = $getH->branch_account;
+        $headN->nota_tax_code = $getH->nota_tax_code;
         $headN->nota_terminal = $find->bprp_terminal_id;
         $headN->nota_branch_id = $getH->branch_id;
         $headN->nota_vessel_name = $find->bprp_vessel_name;
