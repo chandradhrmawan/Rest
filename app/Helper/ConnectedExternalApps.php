@@ -818,7 +818,7 @@ class ConnectedExternalApps{
                   "vRfidCode": "'.$list['vRfidCode'].'",
                   "vIdServiceType": "'.$list['vIdServiceType'].'",
                   "vServiceType": "'.$list['vServiceType'].'",
-                  "vIdTruck": "",
+                  "vIdTruck": "'.$list['vIdTruck'].'",
                   "vIdVvd": "'.$list['vIdVvd'].'",
                   "vIdTerminal": "'.$list['vIdTerminal'].'"
                 },';

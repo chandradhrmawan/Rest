@@ -181,7 +181,7 @@ class StoreController extends Controller
           "vRfidCode" => $truck->truck_rfid,
           "vIdServiceType" => $head->tca_req_type,
           "vServiceType" => $head->tca_req_type_name,
-          "vIdTruck" => $truck->truck_id,
+          "vIdTruck" => $truck->truck_id_seq,
           "vIdVvd" => $vvdID,
           "vIdTerminal" => $terminal->terminal_id
         ];
