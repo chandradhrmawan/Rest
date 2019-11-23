@@ -86,7 +86,7 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->real_no,$find->bm_vessel_name,$find->bm_terminal_code);
+    static::migrateNotaData($find->real_no,$find->bm_vessel_name,$find->bm_terminal_name);
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
@@ -165,7 +165,7 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->bprp_no,$find->bprp_vessel_name,$find->bprp_terminal_id);
+    static::migrateNotaData($find->bprp_no,$find->bprp_vessel_name,$find->bprp_terminal_name);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
