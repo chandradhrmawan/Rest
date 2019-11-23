@@ -86,7 +86,7 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->real_no);
+    static::migrateNotaData($find->real_no,$find->bm_vessel_name,$find->bm_terminal_code);
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);

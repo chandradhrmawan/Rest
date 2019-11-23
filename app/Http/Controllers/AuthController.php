@@ -36,7 +36,7 @@ class AuthController extends BaseController
         $payload = [
             'iss' => "bearer", // Issuer of the token
             'sub' => $user->user_id, // Subject of the token
-            'exp' => time() + 60*60 // Expiration time
+            'exp' => time() + 30 // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
@@ -73,7 +73,7 @@ class AuthController extends BaseController
             $detail   = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID','=',$brnc_id['user_branch_id'])->get();
 
             if ($cek["user_status"] == "1") {
-              return response()->json(["message"=>"You Already Login"]);
+              return response()->json(["message"=>"You Already Login","data"=>$brnc_id]);
             } else {
               $tes  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
               return response()->json(["message"=>"Login Success", "user"=>$brnc_id,"branch"=>$detail]);

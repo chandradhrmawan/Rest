@@ -5,7 +5,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
+use Firebase\JWT\ExpiredException;
+use App\Models\OmUster\TmUser;
 use App\Models\OmCargo\TsUnit;
+use Firebase\JWT\JWT;
 
 class IndexController extends Controller
 {
@@ -146,11 +149,18 @@ class IndexController extends Controller
 
     function cektoken($input) {
       $data = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->get();
-      if ($data == 0) {
-        return ["message"=>"Please Login"];
-      } else {
-        return ["message"=>"Already Login"];
+      $token = $data[0]->api_token;
+      try {
+      $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
+      } catch(ExpiredException $e) {
+          $tes  = TmUser::where('API_TOKEN', $token)->update(['USER_STATUS' => '0']);
+          return ['error' => 'Provided token is expired. Please Login'];
+      } catch(Exception $e) {
+          return ['error' => 'An error Token. Please Login'];
       }
+
+      return ["message" => "Login Success"];
+
     }
 
     function cleartoken($input) {
