@@ -165,14 +165,14 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->bprp_no);
+    static::migrateNotaData($find->bprp_no,$find->bprp_vessel_name,$find->bprp_terminal_id);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
     return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no];
   }
 
-  private static function migrateNotaData($booking_number){
+  private static function migrateNotaData($booking_number,$vessel_name,$terminal_id){
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
@@ -199,10 +199,10 @@ class RealisasiHelper{
         $headN->nota_sub_context = $getH->nota_sub_context;
         $headN->nota_service_code = $getH->nota_service_code;
         $headN->nota_branch_account = $getH->branch_account;
-        $headN->nota_tax_code = $getH->nota_tax_code;
-        $headN->nota_terminal = $find->bprp_terminal_id;
+        $headN->nota_tax_code = $getH->tax_code;
+        $headN->nota_terminal = $terminal_id;
         $headN->nota_branch_id = $getH->branch_id;
-        $headN->nota_vessel_name = $find->bprp_vessel_name;
+        $headN->nota_vessel_name = $vessel_name;
         // $headN->nota_faktur_no = $getH->; // ?
         $headN->nota_trade_type = $getH->trade_type;
         $headN->nota_req_no = $getH->booking_number;
