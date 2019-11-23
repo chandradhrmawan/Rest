@@ -14,7 +14,7 @@ class JwtMiddleware
         if(!$token) {
             // Unauthorized response if token not there
             return response()->json([
-                'error' => 'Token not provided.'
+                'error' => 'Token not provided. Please Login.'
             ], 401);
         }
         try {
@@ -26,7 +26,7 @@ class JwtMiddleware
             ], 400);
         } catch(Exception $e) {
             return response()->json([
-                'error' => 'An error while decoding token.'
+                'error' => 'An error Token. Please Login'
             ], 400);
         }
         $user = TmUser::where("USER_ID",$credentials->sub);

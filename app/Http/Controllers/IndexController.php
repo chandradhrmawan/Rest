@@ -143,4 +143,19 @@ class IndexController extends Controller
       }
       return ["result" => $table];
     }
+
+    function cektoken($input) {
+      $data = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->get();
+      if ($data == 0) {
+        return ["message"=>"Please Login"];
+      } else {
+        return ["message"=>"Already Login"];
+      }
+    }
+
+    function cleartoken($input) {
+      $update = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->update(["USER_STATUS"=>"0","API_TOKEN"=>""]);
+      $data   = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->get();
+      return $data;
+    }
 }

@@ -72,12 +72,12 @@ class AuthController extends BaseController
             $brnc_id  = json_decode(json_encode($header), TRUE);
             $detail   = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID','=',$brnc_id['user_branch_id'])->get();
 
-            // if ($cek["user_status"] == "1") {
-            //   return response()->json(["message"=>"You Already Login", "data"=>$result]);
-            // } else {
+            if ($cek["user_status"] == "1") {
+              return response()->json(["message"=>"You Already Login"]);
+            } else {
               $tes  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
               return response()->json(["message"=>"Login Success", "user"=>$brnc_id,"branch"=>$detail]);
-            // }
+            }
         }
         // Bad Request response
         return response()->json([

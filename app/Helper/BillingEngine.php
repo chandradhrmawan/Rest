@@ -517,7 +517,7 @@ class BillingEngine{
     		DB::connection('eng')->table('TX_TEMP_TARIFF_SPLIT')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
     		DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->delete();
     	}
-    	$link = oci_connect('BILLING_ENGINE', 'billing_engine', '10.88.48.124/NPKSBILD');
+    	$link = oci_connect('BILLING_ENGINE', 'billingengineEDII', '10.88.48.124/NPKSBILD');
     	$sql = " DECLARE
 		    detail PKG_TARIFF.BOOKING_DTL;
 		    equip PKG_TARIFF.BOOKING_EQUIP;
