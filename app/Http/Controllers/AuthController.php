@@ -36,7 +36,7 @@ class AuthController extends BaseController
         $payload = [
             'iss' => "bearer", // Issuer of the token
             'sub' => $user->user_id, // Subject of the token
-            'exp' => time() + 30 // Expiration time
+            'exp' => time() + 60*60 // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
