@@ -144,6 +144,7 @@ class BillingEngine{
             $detilS->tariff_object      = $list['OBJECT_TARIFF'];
             $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
             $detilS->tariff             = $list['TARIFF'];
+						$detilS->stacking_area  		= $list['AREA'];
             $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
             // $detilS->tariff_STATUS = $list['TARIFF_STATUS'];
             $detilS->tariff_status      = $headS->tariff_status;
@@ -197,7 +198,6 @@ class BillingEngine{
   	$header = TxProfileTariffHdr::find($input['TARIFF_ID']);
   	$detil = DB::connection('eng')->table('TS_TARIFF')->where('TARIFF_PROF_HDR_ID', $input['TARIFF_ID'])->orderBy('TARIFF_ID', 'DESC')->get();
   	$response_detil = [];
-  	foreach ($detil as $list) {
   		$equipment_type_name = "";
   		$equipment_unit_name = "";
   		$equipment_unit_min = "";
@@ -244,6 +244,7 @@ class BillingEngine{
         }
       }
 
+		foreach ($detil as $list) {
   		foreach ($list as $key => $value) {
   			$newDt[$key] = $value;
   			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
@@ -255,7 +256,7 @@ class BillingEngine{
   						}
   						if (strtoupper($keyS) == 'EQUIPMENT_TYPE_ID') {
   							$equipment_type_name = DB::connection('mdm')->table('TM_EQUIPMENT_TYPE')->where('EQUIPMENT_TYPE_ID',$valueS)->first()->equipment_type_name;
-  						}else if (strtoupper($keyS) == 'EQUIPMENT_UNIT') {
+  						} else if (strtoupper($keyS) == 'EQUIPMENT_UNIT') {
   							$get = DB::connection('mdm')->table('TM_UNIT')->where('UNIT_ID',$valueS)->first();
   							$equipment_unit_code = $get->unit_code;
   							$equipment_unit_name = $get->unit_name;
@@ -302,8 +303,8 @@ class BillingEngine{
   						}
   					}
   				}
-  			}else if(strtoupper($key) == 'SUB_ISO_CODE' and !empty($value)){
-  				$como = DB::connection('mdm')->table('TM_ISO_COMMODITY')->where('ISO_CODE',$value)->first();
+  			} else if(strtoupper($key) == 'SUB_ISO_CODE' and !empty($value)){
+  			 	$como = DB::connection('mdm')->table('TM_ISO_COMMODITY')->where('ISO_CODE',$value)->first();
   				if (!empty($como)) {
   					foreach ($como as $keyS => $valueS) {
   						if (strtoupper($keyS) != 'ISO_CODE') {
@@ -342,9 +343,9 @@ class BillingEngine{
   						}
   					}
   				}
-  			}else if(strtolower($key) == 'group_tariff_id' and !empty($value)){
+  			} else if(strtolower($key) == 'group_tariff_id' and !empty($value)){
 				$group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
-			}else if(strtolower($key) == 'nota_id' and !empty($value)){
+			} else if(strtolower($key) == 'nota_id' and !empty($value)){
   				$nota = DB::connection('eng')->table('TM_NOTA')->where('nota_id',$value)->first();
   				if (!empty($nota)) {
   					foreach ($nota as $keyS => $valueS) {
@@ -356,7 +357,18 @@ class BillingEngine{
   			}
   		}
 
-  		$newDt['equipment_type_name'] = $equipment_type_name;
+			$stacking = DB::connection('eng')->table('TM_REFF')->where([['reff_id','=', $list->stacking_area],['REFF_TR_ID','=', '11']])->select("reff_name as stacking_area_name")->get();
+			if (empty($stacking)) {
+				$newDt['stacking_area_name'] = '';
+			} else {
+				foreach ($stacking as $listS) {
+					foreach ($listS as $key => $value) {
+						$newDt[$key] = $value;
+						}
+					}
+			}
+
+			$newDt['equipment_type_name'] = $equipment_type_name;
   		$newDt['equipment_unit_code'] = $equipment_unit_code;
   		$newDt['equipment_unit_name'] = $equipment_unit_name;
   		$newDt['equipment_unit_min'] = $equipment_unit_min;

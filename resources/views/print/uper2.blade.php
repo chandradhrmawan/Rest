@@ -50,7 +50,9 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">NOTA UPER </center>
+@foreach($label as $label)
+<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">{{$label->nota_label}}</center>
+@endforeach
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
