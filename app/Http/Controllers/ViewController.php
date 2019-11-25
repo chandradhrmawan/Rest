@@ -89,17 +89,17 @@ class ViewController extends Controller
     }
 
     function printGetPass($id) {
-        $data = DB::connection("omcargo")
-                  ->table("TX_HDR_TCA")
-                  ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
-                  ->join("TM_REFF","TM_REFF.REFF_ID","=","TX_HDR_TCA.TCA_STATUS")
-                  ->where([
-                    ["TM_REFF.REFF_TR_ID", "=", "8"],
-                    ["TX_HDR_TCA.TCA_BRANCH_ID", "=", "12"],
-                    ["TX_DTL_TCA.DTL_ID", "=", $id]
-                    ])
-                  ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
-                  ->get();
+      $data = DB::connection("omcargo")
+                ->table("TX_HDR_TCA")
+                ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
+                ->join("TM_REFF","TM_REFF.REFF_ID","=","TX_HDR_TCA.TCA_STATUS")
+                ->where([
+                  ["TM_REFF.REFF_TR_ID", "=", "8"],
+                  ["TX_HDR_TCA.TCA_BRANCH_ID", "=", "12"],
+                  ["TX_DTL_TCA.DTL_ID", "=", $id]
+                  ])
+                ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
+                ->get();
 
       $html = view('print.getPass', ["data"=>$data]);
       $filename = "Test";
@@ -108,6 +108,8 @@ class ViewController extends Controller
       $dompdf->loadHtml($html);
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
+
+      // return $data[0]->tca_vessel_nam;
     }
 
     function printProforma2($id) {
@@ -122,7 +124,7 @@ class ViewController extends Controller
                 $newDt[$key] = $value;
         }
 
-        $componen  = DB::connection("eng")
+        $componen  = DB::connection("mdm")
                       ->table("TM_COMP_NOTA")
                       ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id]])
                       ->get();
@@ -199,7 +201,7 @@ class ViewController extends Controller
                 $newDt[$key] = $value;
         }
 
-        $componen  = DB::connection("eng")
+        $componen  = DB::connection("mdm")
                       ->table("TM_COMP_NOTA")
                       ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id]])
                       ->get();
@@ -276,7 +278,7 @@ class ViewController extends Controller
                 $newDt[$key] = $value;
         }
 
-        $componen  = DB::connection("eng")
+        $componen  = DB::connection("mdm")
                       ->table("TM_COMP_NOTA")
                       ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID",'=', $header[0]->uper_nota_id]])
                       ->get();

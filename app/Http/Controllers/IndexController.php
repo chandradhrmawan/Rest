@@ -170,4 +170,20 @@ class IndexController extends Controller
       $update = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->update(["USER_STATUS"=>"0","API_TOKEN"=>""]);
       return ["message" => "Logout"];
     }
+
+    function tes($input) {
+      $id   = $input['id'];
+      $data = DB::connection("omcargo")
+                ->table("TX_HDR_TCA")
+                ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
+                ->join("TM_REFF","TM_REFF.REFF_ID","=","TX_HDR_TCA.TCA_STATUS")
+                ->where([
+                  ["TM_REFF.REFF_TR_ID", "=", "8"],
+                  ["TX_HDR_TCA.TCA_BRANCH_ID", "=", "12"],
+                  ["TX_DTL_TCA.DTL_ID", "=", $id]
+                  ])
+                ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
+                ->get();
+      return $data;
+    }
 }
