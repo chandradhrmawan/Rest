@@ -29,13 +29,17 @@ class IndexController extends Controller
         $input['encode'] = 'true';
       }
       $action = $input["action"];
-      $response = $this->$action($input, $request);
-
-      if (isset($input['encode']) and $input['encode'] == 'true') {
-        return response()->json(['response' => json_encode($response)]);
-      }else{
-        return response()->json($response);
+      if ($action == "cektoken") {
+        return $this->$action($input);
+      } else {
+        $response = $this->$action($input, $request);
+        if (isset($input['encode']) and $input['encode'] == 'true') {
+          return response()->json(['response' => json_encode($response)]);
+        } else{
+          return response()->json($response);
+        }
       }
+
     }
 
     function getListTCA($input, $request){
@@ -148,24 +152,22 @@ class IndexController extends Controller
     }
 
     function cektoken($input) {
-      $data = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->get();
-      $token = $data[0]->api_token;
+      $token       = $input["token"];
       try {
       $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
       } catch(ExpiredException $e) {
           $tes  = TmUser::where('API_TOKEN', $token)->update(['USER_STATUS' => '0']);
-          return ['error' => 'Provided token is expired. Please Login'];
+          return response()->json(['error' => 'Provided token is expired. Please Login'],400);
       } catch(Exception $e) {
-          return ['error' => 'An error Token. Please Login'];
+          return response()->json(['error' => 'An error Token. Please Login'],400);
       }
 
-      return ["message" => "Login Success"];
+      return response()->json(["message" => "Login Success"]);
 
     }
 
     function cleartoken($input) {
       $update = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->update(["USER_STATUS"=>"0","API_TOKEN"=>""]);
-      $data   = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->get();
-      return $data;
+      return ["message" => "Logout"];
     }
 }

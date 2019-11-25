@@ -36,7 +36,7 @@ class AuthController extends BaseController
         $payload = [
             'iss' => "bearer", // Issuer of the token
             'sub' => $user->user_id, // Subject of the token
-            'exp' => time() + 30 // Expiration time
+            'exp' => time() + 20 // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
@@ -57,12 +57,8 @@ class AuthController extends BaseController
         // Find the user by email
         $user = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
         if (!$user) {
-            // You wil probably have some sort of helpers or whatever
-            // to make sure that you have the same response format for
-            // differents kind of responses. But let's return the
-            // below respose for now.
             return response()->json([
-                'error' => 'Invalid Username / Password'
+                'message' => 'Invalid Username / Password'
             ], 400);
         }
         // Verify the password and generate the token
@@ -72,19 +68,31 @@ class AuthController extends BaseController
             $brnc_id  = json_decode(json_encode($header), TRUE);
             $detail   = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID','=',$brnc_id['user_branch_id'])->get();
 
-            if ($cek["user_status"] == "1") {
-              return response()->json(["message"=>"You Already Login","data"=>$brnc_id]);
-            } else {
-              $tes  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
-              return response()->json(["message"=>"Login Success", "user"=>$brnc_id,"branch"=>$detail]);
+            $data = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $this->request->input('USER_NAME'))->get();
+            $token = $data[0]->api_token;
+            if (empty($token)) {
+              $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
+              $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+              return response()->json(["message"=>"Login Success", "user"=>$hdr,"branch"=>$detail]);
             }
-        }
-        // Bad Request response
-        return response()->json([
-            'error' => 'Invalid Username / Password'
-        ], 400);
+            try {
+            $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
+            } catch(ExpiredException $e) {
+                $a = TmUser::where('API_TOKEN', $token)->update(['USER_STATUS' => '0']);
+                $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
+                $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+                return response()->json(["message"=>"Login Success", "user"=>$hdr,"branch"=>$detail]);
+            } catch(Exception $e) {
+                return response()->json(["message"=>"Error Token"], 400);
+            }
+            return response()->json(["message"=>"User Already Login"],400);
 
-        // return response($user);
+          } else {
+          // Bad Request response
+          return response()->json([
+            'message' => 'Invalid Username / Password'
+          ], 400);
+        }
 
     }
 }
