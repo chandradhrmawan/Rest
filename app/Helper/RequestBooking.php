@@ -189,6 +189,17 @@ class RequestBooking{
 			$upPercent = DB::connection('eng')->table('TS_UPER')->where('UPER_NOTA', $config['head_nota_id'])->where('BRANCH_ID', $find[$config['head_branch']])->where('UPER_CUST_ID', $find[$config['head_cust']])->get();
 			if (count($upPercent) == 0) {
 				$migrateTariff = false;
+				$upPercent = DB::connection('eng')->table('TS_UPER')->where('UPER_NOTA', $config['head_nota_id'])->where('BRANCH_ID', $find[$config['head_branch']])->whereNull('UPER_CUST_ID')->get();
+				if (count($upPercent) == 0){
+					$migrateTariff = false;
+				}else{
+					$upPercent = $upPercent[0];
+					if ($upPercent->uper_presentase == 0) {
+						$migrateTariff = false;
+					}else{
+						$migrateTariff = true;
+					}
+				}
 			}else{
 				$upPercent = $upPercent[0];
 				if ($upPercent->uper_presentase == 0) {

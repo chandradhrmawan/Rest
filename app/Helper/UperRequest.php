@@ -227,6 +227,8 @@ class UperRequest{
             }
             return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no];
         } else if ($input['pay_type'] == 2) {
+            $res = ConnectedExternalApps::sendNotaPutReceipt($nota->nota_id, $pay);
+            ConnectedExternalApps::notaProformaPutApply($nota->nota_id, $pay);
             static::updateNotaStatus([
               'nota_id' => $nota->nota_id,
               'nota_paid' => 'Y'
