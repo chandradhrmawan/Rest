@@ -1000,7 +1000,7 @@ class ConnectedExternalApps{
   public static function sendNotaProforma($nota_id){
     $find = TxHdrNota::find($nota_id);
     $detil = DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $nota_id)->get();
-    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$find->nota_branch_id)->get();
     $branch = $branch[0];
 
     $findU_uper_no = null;
@@ -1070,12 +1070,12 @@ class ConnectedExternalApps{
        "attribute15":"",
        "interfaceHeaderAttribute1":"'.$findU_uper_no.'",
        "interfaceHeaderAttribute2":"'.$find->nota_vessel_name.'",
-       "interfaceHeaderAttribute3":"",'./*blm fix*/.'
-       "interfaceHeaderAttribute4":"",'./*blm fix*/.'
-       "interfaceHeaderAttribute5":"",'./*blm fix*/.'
+       "interfaceHeaderAttribute3":"",
+       "interfaceHeaderAttribute4":"",
+       "interfaceHeaderAttribute5":"",
        "interfaceHeaderAttribute6":"",
-       "interfaceHeaderAttribute7":"",'./*blm fix*/.'
-       "interfaceHeaderAttribute8":"",'./*blm fix*/.'
+       "interfaceHeaderAttribute7":"",
+       "interfaceHeaderAttribute8":"",
        "interfaceHeaderAttribute9":"",
        "interfaceHeaderAttribute10":"",
        "interfaceHeaderAttribute11":"",
@@ -1092,7 +1092,7 @@ class ConnectedExternalApps{
        "customerNPWP":"'.$find->nota_cust_npwp.'",
        "perKunjunganFrom":null,
        "perKunjunganTo":null,
-       "jenisPerdagangan":"",'./*blm fix*/.'
+       "jenisPerdagangan":"",
        "docNum":"",
        "statusLunas":"",
        "tglPelunasan":"'.date('Y-m-d', strtotime($find->nota_date)).'",
@@ -1102,7 +1102,7 @@ class ConnectedExternalApps{
        "ppnTidakDipungut":"",
        "ppnDibebaskan":"",
        "uangJaminan":"'.$findU_uper_amount.'",
-       "piutang":"'.$find->nota_amount-$findU_uper_amount.'",
+       "piutang":"'.($find->nota_amount-$findU_uper_amount).'",
        "sourceInvoiceType":"'.$find->nota_context.'",
        "branchAccount":"'.$branch->branch_account.'",
        "statusCetak":"",
