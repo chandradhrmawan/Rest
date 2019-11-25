@@ -193,7 +193,12 @@ class RequestBooking{
 				if (count($upPercent) == 0){
 					$migrateTariff = false;
 				}else{
-					$migrateTariff = true;
+					$upPercent = $upPercent[0];
+					if ($upPercent->uper_presentase == 0) {
+						$migrateTariff = false;
+					}else{
+						$migrateTariff = true;
+					}
 				}
 			}else{
 				$upPercent = $upPercent[0];
