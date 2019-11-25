@@ -86,7 +86,7 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->real_no,$find->bm_vessel_name,$find->bm_terminal_name);
+    static::migrateNotaData($find->real_no,$find->real_req_no,$find->bm_vessel_name,$find->bm_terminal_name);
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
@@ -165,14 +165,14 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->bprp_no,$find->bprp_vessel_name,$find->bprp_terminal_name);
+    static::migrateNotaData($find->bprp_no,$find->bprp_req_no,$find->bprp_vessel_name,$find->bprp_terminal_name);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
     return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no];
   }
 
-  private static function migrateNotaData($booking_number,$vessel_name,$terminal_id){
+  private static function migrateNotaData($booking_number,$req_no,$vessel_name,$terminal_id){
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
@@ -205,7 +205,8 @@ class RealisasiHelper{
         $headN->nota_vessel_name = $vessel_name;
         // $headN->nota_faktur_no = $getH->; // ?
         $headN->nota_trade_type = $getH->trade_type;
-        $headN->nota_req_no = $getH->booking_number;
+        $headN->nota_req_no = $req_no;
+        $headN->nota_real_no = $getH->booking_number;
         $headN->nota_ppn = $getH->ppn;
         // $headN->nota_paid = $getH->; // pasti null
         // $headN->nota_paid_date = $getH->; // pasti null
