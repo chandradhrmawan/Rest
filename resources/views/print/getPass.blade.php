@@ -34,13 +34,17 @@
 	<tr style="text-align:center">
 		<td>
       <b>BL NUMBER</b>
-		 <div style="padding:5px"><?php echo DNS1D::getBarcodeHTML($data->tca_bl, "C39",2,30);?></div>
+		 <div style="padding:5px;width:100%">
+			 <img src="data:image/png;base64,<?php echo DNS1D::getBarcodePNG($data->tca_bl, 'C128B'); ?>" alt="barcode" style="width:200px;height:30px"/>
+		 </div>
     </td>
 	</tr>
 	<tr style="text-align:center">
 		<td>
       <div><b>TRUCK ID</b></div>
-			<div style="padding:5px"><?php echo DNS1D::getBarcodeHTML($data->tca_truck_id, "C39",1.75,30);?></div>
+			<div style="padding:5px;width:100%">
+				<img src="data:image/png;base64,<?php echo DNS1D::getBarcodePNG($data->tca_truck_id, 'C128B'); ?>" alt="barcode" style="width:200px;height:30px" />
+			</div>
     </td>
 	</tr>
   <!-- <tr>
@@ -100,20 +104,24 @@
 	<tr style="text-align:center">
 		<td>
       <b>BL NUMBER</b>
-		 <div style="padding:5px"><?php echo DNS1D::getBarcodeHTML($data->tca_bl, "C39",2,30);?></div>
+		 <div style="padding:5px;width:100%">
+			 <img src="data:image/png;base64,<?php echo DNS1D::getBarcodePNG($data->tca_bl, 'C128B'); ?>" alt="barcode" style="width:200px;height:30px"/>
+		 </div>
     </td>
 	</tr>
 	<tr style="text-align:center">
 		<td>
       <div><b>TRUCK ID</b></div>
-			<div style="padding:5px"><?php echo DNS1D::getBarcodeHTML($data->tca_truck_id, "C39",1.75,30);?></div>
+			<div style="padding:5px;width:100%">
+				<img src="data:image/png;base64,<?php echo DNS1D::getBarcodePNG($data->tca_truck_id, 'C128B'); ?>" alt="barcode" style="width:200px;height:30px" />
+			</div>
     </td>
 	</tr>
-<!-- <tr>
-	<td colspan="3">
-		<div style="margin-top:40px"><b>Cargo Name</b><br>JAGUNG</div>
-	</td>
-</tr> -->
+  <!-- <tr>
+    <td colspan="3">
+      <div style="margin-top:40px"><b>Cargo Name</b><br>JAGUNG</div>
+    </td>
+  </tr> -->
 </table>
 
 <table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
