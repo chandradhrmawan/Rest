@@ -71,12 +71,25 @@ class RealisasiHelper{
       }
     // build detil
 
+    // build paysplit
+      $setP = [];
+      $paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find->real_req_no)->get();
+      $paysplit = (array)$paysplit;
+      foreach ($paysplit as $list) {
+        $newP = [];
+        $list = (array)$list;
+        $newP['PS_CUST_ID'] = $list['cust_id'];
+        $newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+        $setP[] = $newP;
+      }
+    // build paysplit
+
     // set data
       $set_data = [
         'head' => $setH,
         'detil' => $setD,
         'eqpt' => $setE,
-        'paysplit' => []
+        'paysplit' => $setP
       ];
     // set data
 
@@ -151,12 +164,25 @@ class RealisasiHelper{
       }
     // build detil
 
+    // build paysplit
+      $setP = [];
+      $paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find->bprp_req_no)->get();
+      $paysplit = (array)$paysplit;
+      foreach ($paysplit as $list) {
+        $newP = [];
+        $list = (array)$list;
+        $newP['PS_CUST_ID'] = $list['cust_id'];
+        $newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+        $setP[] = $newP;
+      }
+    // build paysplit
+
     // set data
       $set_data = [
         'head' => $setH,
         'detil' => $setD,
         'eqpt' => $setE,
-        'paysplit' => []
+        'paysplit' => $setP
       ];
     // set data
 
