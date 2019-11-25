@@ -346,6 +346,7 @@ class ConnectedExternalApps{
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/saveCargoNPK";
     $respn = [];
+    $string_json_arr = [];
     foreach ($detil as $list) {
       $listA = (array)$list;
       
@@ -359,7 +360,7 @@ class ConnectedExternalApps{
       $vparam .= '^'.$list->dtl_qty; // TON
       $vparam .= '^'.$list->dtl_qty; // CUBIC
       $vparam .= '^'.$list->dtl_qty; // QTY
-      $vparam .= '^INVOICE NUMBER'; // ID_INV
+      $vparam .= '^'; // ID_INV
       $vparam .= '^'.$head[$config['head_no']]; // ID_REQ
       if ($req_type == 'BM') {
         $vparam .= '^'.date('Ymd', strtotime($head[$config['head_open_stack']])).'235959'; // STACKOUT_DATE
@@ -376,8 +377,10 @@ class ConnectedExternalApps{
       if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
       $vparam .= '^'; // OI
       $vparam .= '^'; // HS_CODE
-      $vparam .= '^'; // CARGO_ID
+      $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
       if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
+
+      // $vparam .= '^E'; // EI
       if ($req_type == 'BM') {
         if ($list->dtl_bm_type == 'Muat') {
           $vparam .= '^E'; // EI
@@ -415,6 +418,7 @@ class ConnectedExternalApps{
               }
           }
       }';
+      $string_json_arr[] = $string_json;
 
       $username="npk_billing";
       $password ="npk_billing";
@@ -436,7 +440,8 @@ class ConnectedExternalApps{
 
       $respn[] = json_decode($res->getBody()->getContents(), true);
     }
-    return ['result' => 'Success', 'response' => $respn];
+    return ['result' => 'Success', 'response' => $respn, 'json' => $string_json_arr];
+    // return ['result' => 'Success', 'json' => $string_json_arr];
   }
 
   private static function sendRequestBookingExcute($head, $detil, $config){
