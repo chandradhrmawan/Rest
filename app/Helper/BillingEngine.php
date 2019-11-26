@@ -248,6 +248,15 @@ class BillingEngine{
   		foreach ($list as $key => $value) {
   			$newDt[$key] = $value;
   			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
+					$package_name = "";
+					$package_code = "";
+					$commodity_name = "";
+					$commodity_unit_code = "";
+					$commodity_unit_name = "";
+					$commodity_unit_min = "";
+					$cont_desc = "";
+					$cont_status_desc = "";
+					$cont_type_desc = "";
   				$equi = DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where('ISO_CODE',$value)->first();
   				if (!empty($equi)) {
   					foreach ($equi as $keyS => $valueS) {
@@ -295,6 +304,15 @@ class BillingEngine{
   							$get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
   							$cont_desc = $get->cont_desc;
   						}else if (strtoupper($keyS) == 'CONT_STATUS' and !empty($valueS)) {
+								$package_name = "";
+					  		$package_code = "";
+					  		$commodity_name = "";
+					  		$commodity_unit_code = "";
+					  		$commodity_unit_name = "";
+					  		$commodity_unit_min = "";
+					  		$cont_desc = "";
+					  		$cont_status_desc = "";
+					  		$cont_type_desc = "";
   							$get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
   							$cont_status_desc = $get->cont_status_desc;
   						}else if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
@@ -304,6 +322,16 @@ class BillingEngine{
   					}
   				}
   			} else if(strtoupper($key) == 'SUB_ISO_CODE' and !empty($value)){
+				$package_name = "";
+				$package_code = "";
+				$commodity_name = "";
+				$commodity_unit_code = "";
+				$commodity_unit_name = "";
+				$commodity_unit_min = "";
+				$cont_desc = "";
+				$cont_status_desc = "";
+				$cont_type_desc = "";
+
   			 	$como = DB::connection('mdm')->table('TM_ISO_COMMODITY')->where('ISO_CODE',$value)->first();
   				if (!empty($como)) {
   					foreach ($como as $keyS => $valueS) {

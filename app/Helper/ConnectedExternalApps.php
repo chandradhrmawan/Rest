@@ -61,7 +61,7 @@ class ConnectedExternalApps{
 
     $res = json_decode($res->getBody()->getContents(), true);
     $res = $res['esbBody']['results'];
-    
+
     return ["result"=>$res, "count"=>count($res)];
   }
 
@@ -102,7 +102,7 @@ class ConnectedExternalApps{
 
     $res = json_decode($res->getBody()->getContents(), true);
     $res = $res['esbBody']['results'];
-    
+
     return ["result"=>$res, "count"=>count($res)];
   }
 
@@ -116,7 +116,8 @@ class ConnectedExternalApps{
           },
           "esbBody": {
             "vesselName": "'.strtoupper($input['query']).'",
-            "ibisTerminalCode": "'.$input['ibis_terminal_code'].'"
+            "kadeName": "",
+            "terminalCode": "'.$input['ibis_terminal_code'].'"
           }
         }
       }';
@@ -239,10 +240,10 @@ class ConnectedExternalApps{
       $head = DB::connection('omcargo')->select(DB::raw("select * from TX_HDR_BM A left join TX_HDR_REALISASI B on B.REAL_REQ_NO = A.BM_NO where A.BM_ID = ".$req->bm_id));
       $head = $head[0];
       $query_detil = "
-        select 
-          A.*, B.TOTAL_TON AS DTL_REAL_QTY_FROM_TOS, C.* 
-          from TX_DTL_BM A 
-          left join TX_REAL_TOS B on B.BL_NO = A.DTL_BM_BL 
+        select
+          A.*, B.TOTAL_TON AS DTL_REAL_QTY_FROM_TOS, C.*
+          from TX_DTL_BM A
+          left join TX_REAL_TOS B on B.BL_NO = A.DTL_BM_BL
           left join TX_DTL_REALISASI C on C.DTL_BM_ID = A.DTL_BM_ID where A.HDR_BM_ID =".$req->bm_id;
       return [
         'req_header' => $head,
@@ -349,7 +350,7 @@ class ConnectedExternalApps{
     $string_json_arr = [];
     foreach ($detil as $list) {
       $listA = (array)$list;
-      
+
       $vparam = '';
       $vparam .= $req_type; // IF_FLAG
       $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
@@ -447,7 +448,7 @@ class ConnectedExternalApps{
   private static function sendRequestBookingExcute($head, $detil, $config){
     foreach ($detil as $list) {
         $listA = (array)$list;
-        // 
+        //
           $consignee = 'consignee';
           $oi = $head[$config['head_trade']];
           $podpol = '';
@@ -455,9 +456,9 @@ class ConnectedExternalApps{
           $startenddate = '';
           $blno = $listA[$config['head_tab_detil_bl']];
           $bldate = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $list->dtl_create_date)->format('m/d/Y');
-        // 
+        //
 
-        // 
+        //
           if (empty($head[$config['head_eta']])) {
             $bm_eta = null;
           }else{
@@ -478,9 +479,9 @@ class ConnectedExternalApps{
           }else{
             $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_closing_time']])->format('m/d/Y');
           }
-        // 
+        //
 
-        // 
+        //
           $vParam = '';
           $vParam .= $head[$config['head_no']].'^';
           $vParam .= $head[$config['head_cust_name']].'^';
@@ -509,9 +510,9 @@ class ConnectedExternalApps{
           $vParam .= $startenddate.'^'; // ?
           $vParam .= '0'; // ?
           $vParamH = $vParam;
-        // 
+        //
 
-        // 
+        //
           $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
           $string_json = '{
             "createBookingHeaderInterfaceRequest": {
@@ -544,9 +545,9 @@ class ConnectedExternalApps{
           } catch (ClientException $e) {
             return $e->getResponse();
           }
-        // 
+        //
 
-        // 
+        //
           $merk = '-';
           $model = '-';
           $hz = 'N';
@@ -596,7 +597,7 @@ class ConnectedExternalApps{
           } catch (ClientException $e) {
             return $e->getResponse();
           }
-        // 
+        //
     }
     return ['Success' => true];
   }
@@ -609,6 +610,7 @@ class ConnectedExternalApps{
     $bank = $bank[0];
 
     $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
+
     $string_json= '{
        "arRequestDoc":{
           "esbHeader":{
@@ -622,7 +624,7 @@ class ConnectedExternalApps{
           "esbBody":[
              {
                 "header":{
-                   "orgId":"'.$uperH->uper_org_id.'",
+                   "orgId":"1822",
                    "receiptNumber":"'.$uperH->uper_no.'",
                    "receiptMethod":"UPER",
                    "receiptAccount":"'.$pay->pay_account_name.' '.$pay->pay_bank_code.' '.$pay->pay_account_no.'",
@@ -677,7 +679,7 @@ class ConnectedExternalApps{
              }
           ],
           "esbSecurity":{
-             "orgId":"'.$uperH->uper_org_id.'",
+             "orgId":"1822",
              "batchSourceId":"",
              "lastUpdateLogin":"",
              "userId":"",
@@ -729,7 +731,7 @@ class ConnectedExternalApps{
           "esbBody":[
              {
                 "header":{
-                   "orgId":"'.$notaH->nota_org_id.'",
+                   "orgId":"1822",
                    "receiptNumber":"'.$notaH->nota_no.'",
                    "receiptMethod":"BANK",
                    "receiptAccount":"'.$pay->pay_account_name.' '.$pay->pay_bank_code.' '.$pay->pay_account_no.'",
@@ -761,20 +763,20 @@ class ConnectedExternalApps{
                    "attribute10":"",
                    "attribute11":"",
                    "attribute12":"",
-                   "attribute13":"ID-001",
+                   "attribute13":"",
                    "attribute14":"'.$notaH->nota_sub_context.'",
                    "attribute15":"",
                    "statusReceipt":"N",
                    "sourceInvoice":"BRG",
                    "statusReceiptMsg":"",
-                   "invoiceNum":"",
+                   "invoiceNum":"'.$notaH->nota_no.'",
                    "amountOrig":null,
                    "lastUpdateDate":"'.$pay->pay_create_date.'",
                    "lastUpdateBy":"-1",
                    "branchCode":"'.$branch->branch_code.'",
                    "branchAccount":"'.$branch->branch_account.'",
-                   "sourceInvoiceType":"BANK",
-                   "remarkToBankId":"",
+                   "sourceInvoiceType":"NPKBILLING",
+                   "remarkToBankId":"BANK_ACCOUNT_ID",
                    "sourceSystem":"NPKBILLING",
                    "comments":"",
                    "cmsYn":"N",
@@ -784,7 +786,7 @@ class ConnectedExternalApps{
              }
           ],
           "esbSecurity":{
-             "orgId":"'.$notaH->nota_org_id.'",
+             "orgId":"1822",
              "batchSourceId":"",
              "lastUpdateLogin":"",
              "userId":"",
@@ -821,11 +823,11 @@ class ConnectedExternalApps{
     $string_json = '{
           "truckRegistrationInterfaceRequest": {
               "esbHeader": {
-                "internalId": "", 
-                "externalId": "", 
-                "timestamp": "", 
-                "responseTimestamp": "", 
-                "responseCode": "", 
+                "internalId": "",
+                "externalId": "",
+                "timestamp": "",
+                "responseTimestamp": "",
+                "responseCode": "",
                 "responseMessage": ""
               },
               "esbBody": {
@@ -871,11 +873,11 @@ class ConnectedExternalApps{
     $string_json = '{
           "updateTidInterfaceRequest": {
               "esbHeader": {
-                "internalId": "", 
-                "externalId": "", 
-                "timestamp": "", 
-                "responseTimestamp": "", 
-                "responseCode": "", 
+                "internalId": "",
+                "externalId": "",
+                "timestamp": "",
+                "responseTimestamp": "",
+                "responseCode": "",
                 "responseMessage": ""
               },
               "esbBody": {
@@ -1021,7 +1023,7 @@ class ConnectedExternalApps{
 
     $head_json = '{
        "billerRequestId":"'.$find->nota_id.'",
-       "orgId":"'.$find->nota_org_id.'",
+       "orgId":"1822",
        "trxNumber":"'.$find->nota_no.'",
        "trxNumberOrig":"",
        "trxNumberPrev":"",
@@ -1178,7 +1180,7 @@ class ConnectedExternalApps{
           { "header": '.$head_json.', "lines": ['.$lines_json.'] }
         ],
         "esbSecurity":{
-           "orgId":"'.$find->nota_org_id.'",
+           "orgId":"1822",
            "batchSourceId":"",
            "lastUpdateLogin":"",
            "userId":"",
@@ -1237,12 +1239,12 @@ class ConnectedExternalApps{
                 "header":{
                    "paymentCode":"'.$notaH->nota_no.'",
                    "trxNumber":"'.$notaH->nota_no.'",
-                   "orgId":"'.$notaH->nota_org_id.'",
+                   "orgId":"1822",
                    "amountApplied":"'.$pay->pay_amount.'",
                    "cashReceiptId":null,
-                   "customerTrxId":"'.$pay->pay_cust_id.'", 
+                   "customerTrxId":"'.$pay->pay_cust_id.'",
                    "paymentScheduleId":null,
-                   "bankId":"'.$bank->bank_id.'", 
+                   "bankId":"'.$bank->bank_id.'",
                    "receiptSource":"ESB",
                    "legacySystem":"NPKBILLING",
                    "statusTransfer":"N",
@@ -1258,7 +1260,7 @@ class ConnectedExternalApps{
              }
           ],
           "esbSecurity":{
-             "orgId":"'.$notaH->nota_org_id.'",
+             "orgId":"1822",
              "batchSourceId":"",
              "lastUpdateLogin":"",
              "userId":"",
