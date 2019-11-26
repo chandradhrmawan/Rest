@@ -131,7 +131,7 @@
 			<td style="text-align:center">{{$penumpukan["masa2"]}}</td>
 			<td style="text-align:right">{{number_format($penumpukan["trf1up"])}}</td>
 			<td style="text-align:right">{{number_format($penumpukan["trf2up"])}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["dtl_amount"])}}</td>
+			<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
 		</tr>
 		@endforeach
 	</table>
@@ -188,7 +188,7 @@
 			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
 		<?php } ?>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_amount"])}}</td>
+		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
 <?php } ?>
 	@endforeach
@@ -215,7 +215,7 @@
 			<td style="text-align:center"><?php echo number_format($alat["dtl_eq_qty"]) ?></td>
 			<td style="text-align:center"><?php echo number_format($alat["dtl_qty"]); ?></td>
 			<td style="text-align:right"><?php echo number_format($alat["dtl_tariff"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_amount"]); ?></td>
+			<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
 		</tr>
 <?php }} ?>
 </table>
@@ -225,13 +225,13 @@
     <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DPP</td>
     <td style="border-right: 0;border-bottom: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($dpp)}}</td>
+    <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($header->nota_dpp)}}</td>
   </tr>
   <tr>
     <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">PPN 10%</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($ppn)}}</td>
+    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($header->nota_ppn)}}</td>
   </tr>
 	<tr>
     <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
@@ -243,7 +243,7 @@
     <td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-top: 0;border-left:0" colspan="2">Grand Total</td>
     <td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($dpp+$ppn)}}</td>
+    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->nota_amount)}}</td>
   </tr>
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>

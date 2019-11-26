@@ -145,10 +145,16 @@ class IndexController extends Controller
       if (!empty($input['value'])) {
         $param = $input["value"];
         $table = DB::connection($input["db"])->select($raw, $param);
+        $count = count($table);
       } else {
+        if (!empty($input['start']) || $input["start"] == '0') {
+            $data = $raw."ROWNUM <= ".$input['start']."+".$input['limit'].") WHERE R >= ".$input['start'];
+            $raw  = $data;
+        }
         $table = DB::connection($input["db"])->select($raw);
+        $count = count($table);
       }
-      return ["result" => $table];
+      return ["result" => $table, "count"=>$count];
     }
 
     function cektoken($input) {
@@ -172,18 +178,6 @@ class IndexController extends Controller
     }
 
     function tes($input) {
-      $id   = $input['id'];
-      $data = DB::connection("omcargo")
-                ->table("TX_HDR_TCA")
-                ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
-                ->join("TM_REFF","TM_REFF.REFF_ID","=","TX_HDR_TCA.TCA_STATUS")
-                ->where([
-                  ["TM_REFF.REFF_TR_ID", "=", "8"],
-                  ["TX_HDR_TCA.TCA_BRANCH_ID", "=", "12"],
-                  ["TX_DTL_TCA.DTL_ID", "=", $id]
-                  ])
-                ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
-                ->get();
-      return $data;
+
     }
 }
