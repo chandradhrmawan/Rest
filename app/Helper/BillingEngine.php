@@ -198,42 +198,43 @@ class BillingEngine{
   	$header = TxProfileTariffHdr::find($input['TARIFF_ID']);
   	$detil = DB::connection('eng')->table('TS_TARIFF')->where('TARIFF_PROF_HDR_ID', $input['TARIFF_ID'])->orderBy('TARIFF_ID', 'DESC')->get();
   	$response_detil = [];
-  		$equipment_type_name = "";
-  		$equipment_unit_name = "";
-  		$equipment_unit_min = "";
-  		$equipment_unit_code = "";
-  		$package_name = "";
-  		$package_code = "";
-  		$commodity_name = "";
-  		$commodity_unit_code = "";
-  		$commodity_unit_name = "";
-  		$commodity_unit_min = "";
-  		$cont_desc = "";
-  		$cont_status_desc = "";
-  		$cont_type_desc = "";
+		foreach ($detil as $list) {
+      $equipment_type_name = "";
+      $equipment_unit_name = "";
+      $equipment_unit_min = "";
+      $equipment_unit_code = "";
+      $package_name = "";
+      $package_code = "";
+      $commodity_name = "";
+      $commodity_unit_code = "";
+      $commodity_unit_name = "";
+      $commodity_unit_min = "";
+      $cont_desc = "";
+      $cont_status_desc = "";
+      $cont_type_desc = "";
 
-  		$newDt = [];
-  		$newDt['equipment_type_id'] = '';
-  		$newDt['equipment_unit'] = '';
-  		$newDt['equipment_type_name'] = $equipment_type_name;
-  		$newDt['equipment_unit_code'] = $equipment_unit_code;
-  		$newDt['equipment_unit_name'] = $equipment_unit_name;
-  		$newDt['equipment_unit_min'] = $equipment_unit_min;
-  		$newDt['cont_size'] = '';
-  		$newDt['cont_type'] = '';
-  		$newDt['cont_status'] = '';
-  		$newDt['cont_desc'] = $cont_desc;
-  		$newDt['cont_status_desc'] = $cont_status_desc;
-  		$newDt['cont_type_desc'] = $cont_type_desc;
-  		$newDt['package_id'] = '';
-  		$newDt['commodity_id'] = '';
-  		$newDt['commodity_unit_id'] = '';
-  		$newDt['package_name'] = $package_name;
-  		$newDt['package_code'] = $package_code;
-  		$newDt['commodity_name'] = $commodity_name;
-  		$newDt['commodity_unit_code'] = $commodity_unit_code;
-  		$newDt['commodity_unit_name'] = $commodity_unit_name;
-  		$newDt['commodity_unit_min'] = $commodity_unit_min;
+      $newDt = [];
+      $newDt['equipment_type_id'] = '';
+      $newDt['equipment_unit'] = '';
+      $newDt['equipment_type_name'] = $equipment_type_name;
+      $newDt['equipment_unit_code'] = $equipment_unit_code;
+      $newDt['equipment_unit_name'] = $equipment_unit_name;
+      $newDt['equipment_unit_min'] = $equipment_unit_min;
+      $newDt['cont_size'] = '';
+      $newDt['cont_type'] = '';
+      $newDt['cont_status'] = '';
+      $newDt['cont_desc'] = $cont_desc;
+      $newDt['cont_status_desc'] = $cont_status_desc;
+      $newDt['cont_type_desc'] = $cont_type_desc;
+      $newDt['package_id'] = '';
+      $newDt['commodity_id'] = '';
+      $newDt['commodity_unit_id'] = '';
+      $newDt['package_name'] = $package_name;
+      $newDt['package_code'] = $package_code;
+      $newDt['commodity_name'] = $commodity_name;
+      $newDt['commodity_unit_code'] = $commodity_unit_code;
+      $newDt['commodity_unit_name'] = $commodity_unit_name;
+      $newDt['commodity_unit_min'] = $commodity_unit_min;
 
       $newDt['tariff_reference_name'] = '';
       if (!empty($list->tariff_reference)) {
@@ -243,9 +244,6 @@ class BillingEngine{
           $newDt['tariff_reference_name'] = $name_tariff_reference->reff_name;
         }
       }
-
-
-		foreach ($detil as $list) {
   		foreach ($list as $key => $value) {
   			$newDt[$key] = $value;
   			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
@@ -364,8 +362,8 @@ class BillingEngine{
   					}
   				}
   			} else if(strtolower($key) == 'group_tariff_id' and !empty($value)){
-				$group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
-			} else if(strtolower($key) == 'nota_id' and !empty($value)){
+  				$group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
+  			} else if(strtolower($key) == 'nota_id' and !empty($value)){
   				$nota = DB::connection('eng')->table('TM_NOTA')->where('nota_id',$value)->first();
   				if (!empty($nota)) {
   					foreach ($nota as $keyS => $valueS) {
