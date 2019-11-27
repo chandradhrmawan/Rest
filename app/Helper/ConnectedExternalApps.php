@@ -514,7 +514,7 @@ class ConnectedExternalApps{
                    "sourceInvoiceType":"NPKBILLING",
                    "remarkToBankId":"BANK_ACCOUNT_ID",
                    "sourceSystem":"NPKBILLING",
-                   "comments":"",
+                   "comments":"'.$pay->pay_note.'",
                    "cmsYn":"N",
                    "tanggalTerima":null,
                    "norekKoran":""
@@ -621,7 +621,7 @@ class ConnectedExternalApps{
                    "sourceInvoiceType":"NPKBILLING",
                    "remarkToBankId":"BANK_ACCOUNT_ID",
                    "sourceSystem":"NPKBILLING",
-                   "comments":"",
+                   "comments":"'.$pay->pay_note.'",
                    "cmsYn":"N",
                    "tanggalTerima":null,
                    "norekKoran":""
