@@ -205,7 +205,7 @@ class RealisasiHelper{
     $hdr_id = TxHdrNota::where('nota_real_no',$booking_number)->pluck('nota_id');
     DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
     TxHdrNota::where('nota_real_no',$booking_number)->delete();
-    
+
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
@@ -288,7 +288,11 @@ class RealisasiHelper{
   }
 
   public static function rejectedProformaNota($input){
-    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->update([
+    $count = DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->count();
+    if ($count == 0) {
+      return ['result' => 'Fail, proforma not found!', 'no_req' => $input['req_no'], 'Success' => false];
+    }
+    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_real_no',$input['req_no'])->update([
       "nota_status"=>3
     ]);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_req_no',$input['req_no'])->update([
