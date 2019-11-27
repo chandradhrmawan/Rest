@@ -208,7 +208,7 @@ class UperRequest{
                   'uper_req_no' => $uper->uper_req_no,
                   'uper_paid_date' => $input['pay_date'],
                   'uper_no' => $uper->uper_no,
-                  'uper_paid' => 'W'
+                  'uper_paid' => 'F'
                 ]);
                 return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
               }
@@ -217,7 +217,7 @@ class UperRequest{
                 'uper_req_no' => $uper->uper_req_no,
                 'uper_paid_date' => $input['pay_date'],
                 'uper_no' => $uper->uper_no,
-                'uper_paid' => 'W'
+                'uper_paid' => 'Y'
               ]);
             } else if ($pay->pay_status == 2) {
                 static::updateUperStatus([
@@ -261,7 +261,7 @@ class UperRequest{
         'uper_id' => $uper->uper_id,
         'uper_req_no' => $uper->uper_req_no,
         'uper_no' => $uper->uper_no,
-        'uper_paid' => 'W'
+        'uper_paid' => 'Y'
       ]);
     }
     return ["result" => "Success, confirm uper payment", 'pay_no' => $pay->pay_no];
@@ -270,9 +270,13 @@ class UperRequest{
   public static function updateUperStatus($input){
     if (isset($input['uper_id'])) {
       TxHdrUper::where('uper_id',$input['uper_id'])->update([
-        'uper_paid' => $input['uper_paid'],
-        'uper_paid_date' => \DB::raw("TO_DATE('".$input['uper_paid_date']."', 'YYYY-MM-DD HH24:mi:ss')")
+        'uper_paid' => $input['uper_paid']
       ]);
+      if (isset($input['uper_paid_date'])) {
+        TxHdrUper::where('uper_id',$input['uper_id'])->update([
+          'uper_paid_date' => \DB::raw("TO_DATE('".$input['uper_paid_date']."', 'YYYY-MM-DD HH24:mi:ss')")
+        ]);
+      }
       $req_no = $input['uper_req_no'];
     }else if (isset($input['uper_no'])){
       TxHdrUper::where('uper_no',$input['uper_no'])->update([
@@ -286,7 +290,7 @@ class UperRequest{
   }
 
   private static function sendRequestBooking($input){
-    $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V'])->count();
+    $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V', 'F'])->count();
     if ($cekStatus == 0) {
       ConnectedExternalApps::sendRequestBooking(['req_no' => $input['uper_req_no'], 'paid_date' => $input['uper_paid_date']]);
     }
