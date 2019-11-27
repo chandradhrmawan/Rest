@@ -179,10 +179,10 @@ class UperRequest{
           $pay->pay_note = $input['pay_note'];
           $pay->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:ss')");
           $pay->pay_type = $input['pay_type'];
-          $pay->pay_sender_bank_code = $input['pay_sender_bank_code'];
-          $pay->pay_sender_bank_name = $input['pay_sender_bank_name'];
-          $pay->pay_sender_account_no = $input['pay_sender_account_no'];
-          $pay->pay_sender_account_name = $input['pay_sender_account_name'];
+          // $pay->pay_sender_bank_code = $input['pay_sender_bank_code'];
+          // $pay->pay_sender_bank_name = $input['pay_sender_bank_name'];
+          // $pay->pay_sender_account_no = $input['pay_sender_account_no'];
+          // $pay->pay_sender_account_name = $input['pay_sender_account_name'];
           $pay->pay_create_by = $input['pay_create_by'];
           $pay->save();
 
