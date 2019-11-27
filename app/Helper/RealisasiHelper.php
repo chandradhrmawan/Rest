@@ -288,17 +288,17 @@ class RealisasiHelper{
   }
 
   public static function rejectedProformaNota($input){
-    $count = DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->count();
+    $count = DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_real_no',$input['req_no'])->count();
     if ($count == 0) {
       return ['result' => 'Fail, proforma not found!', 'no_req' => $input['req_no'], 'Success' => false];
     }
     DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_real_no',$input['req_no'])->update([
       "nota_status"=>3
     ]);
-    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_req_no',$input['req_no'])->update([
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_no',$input['req_no'])->update([
       "bprp_status"=>1
     ]);
-    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_req_no',$input['req_no'])->update([
+    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_no',$input['req_no'])->update([
       "real_status"=>1
     ]);
     return ['result' => 'Success, rejected proforma!', 'no_req' => $input['req_no']];
