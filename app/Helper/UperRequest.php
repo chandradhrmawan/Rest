@@ -234,7 +234,8 @@ class UperRequest{
             ConnectedExternalApps::notaProformaPutApply($nota->nota_id, $pay);
             static::updateNotaStatus([
               'nota_id' => $nota->nota_id,
-              'nota_paid' => 'Y'
+              'nota_paid' => 'W',
+              'pay' => $pay
             ]);
             return ["result" => "Success, store paid nota", 'pay_no' => $pay->pay_no];
         }
@@ -298,6 +299,7 @@ class UperRequest{
 
   private static function updateNotaStatus($input){
       TxHdrNota::where('nota_id',$input['nota_id'])->update(['nota_paid' => $input['nota_paid']]);
-      // ConnectedExternalApps::sendNotaProforma($input);
+      ConnectedExternalApps::sendNotaPutReceipt($input['nota_id'], $input['pay']);
+      ConnectedExternalApps::notaProformaPutApply($input['nota_id'], $input['pay']);
   }
 }

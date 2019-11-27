@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
 use App\Helper\ConnectedExternalApps;
+use App\Models\OmCargo\TxPayment;
 
 class RealisasiHelper{
 
@@ -315,8 +316,15 @@ class RealisasiHelper{
         'result' => 'Fail, send proforma to invoice!'
       ];
     }
-    $nota->nota_status = 2;
-    $nota->save();
+    TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2]);
+
+    $pay = TxPayment::where('pay_req_no', $nota->nota_req_no)->where('pay_cust_id', $nota->nota_cust_id)->first();
+    ConnectedExternalApps::notaProformaPutApply($nota->nota_id, $pay);
+
+    if ($pay->pay_amount >= $nota->nota_amount) {
+      TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'W']);
+    }
+    
     return [
       'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
       'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
