@@ -24,6 +24,7 @@ class RealisasiHelper{
       $setH['P_CUSTOMER_ID'] = $find->bm_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->real_no;
       $setH['P_REALIZATION'] = 'Y';
+      // $setH['P_RESTITUTION'] = 'N';
       $setH['P_TRADE'] = $find->bm_trade_type;
       $setH['P_USER_ID'] = $find->real_create_by;
     // build head
@@ -63,6 +64,7 @@ class RealisasiHelper{
         $newD['DTL_CONT_STATUS'] = empty($list['dtl_cont_status']) ? 'NULL' : $list['dtl_cont_status'];
         $newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_real_qty']) ? 'NULL' : $list['dtl_real_qty'];
+        $newD['DTL_BM_TYPE'] = empty($list['dtl_bm_type']) ? 'NULL' : $list['dtl_bm_type'];
         $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_bm_tl'];
         $newD['DTL_DATE_IN'] = 'NULL';
         $newD['DTL_DATE_OUT'] = 'NULL';
@@ -120,6 +122,7 @@ class RealisasiHelper{
       $setH['P_CUSTOMER_ID'] = $find->bprp_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->bprp_no;
       $setH['P_REALIZATION'] = 'Y';
+      // $setH['P_RESTITUTION'] = 'N';
       $setH['P_TRADE'] = $find->bprp_trade_type;
       $setH['P_USER_ID'] = $find->bprp_create_by;
     // build head
@@ -199,15 +202,16 @@ class RealisasiHelper{
   }
 
   private static function migrateNotaData($booking_number,$req_no,$vessel_name,$terminal_id){
+    $hdr_id = TxHdrNota::where('nota_real_no',$booking_number)->pluck('nota_id');
+    DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
+    TxHdrNota::where('nota_real_no',$booking_number)->delete();
+    
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
-        $headN = TxHdrNota::where('nota_req_no',$getH->booking_number)->first();
-        if (empty($headN)) {
-          $headN = new TxHdrNota;
-        }
+        $headN = new TxHdrNota;
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
         $headN->nota_group_id = $getH->nota_id;
@@ -220,7 +224,6 @@ class RealisasiHelper{
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
         // $headN->nota_status = $getH->; // ?
-        // Tambahan Mas Adi
         $headN->nota_context = $getH->nota_context;
         $headN->nota_sub_context = $getH->nota_sub_context;
         $headN->nota_service_code = $getH->nota_service_code;

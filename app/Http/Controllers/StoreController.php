@@ -73,6 +73,10 @@ class StoreController extends Controller
       return base64_encode($file);
     }
 
+    function confirmUperFromEinvAndSimkue($input, $request){
+      return UperRequest::updateUperStatus($input);
+    }
+
     function rejectedProformaNota($input){
       return RealisasiHelper::rejectedProformaNota($input);
     }

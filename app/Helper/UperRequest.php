@@ -207,6 +207,7 @@ class UperRequest{
                   'uper_id' => $uper->uper_id,
                   'uper_req_no' => $uper->uper_req_no,
                   'uper_paid_date' => $input['pay_date'],
+                  'uper_no' => $uper->uper_no,
                   'uper_paid' => 'W'
                 ]);
                 return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
@@ -215,14 +216,16 @@ class UperRequest{
                 'uper_id' => $uper->uper_id,
                 'uper_req_no' => $uper->uper_req_no,
                 'uper_paid_date' => $input['pay_date'],
-                'uper_paid' => 'Y'
+                'uper_no' => $uper->uper_no,
+                'uper_paid' => 'W'
               ]);
             } else if ($pay->pay_status == 2) {
                 static::updateUperStatus([
                   'uper_id' => $uper->uper_id,
                   'uper_req_no' => $uper->uper_req_no,
                   'uper_paid_date' => $input['pay_date'],
-                  'uper_paid' => 'W'
+                  'uper_no' => $uper->uper_no,
+                  'uper_paid' => 'V'
                 ]);
             }
             return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no];
@@ -257,22 +260,36 @@ class UperRequest{
       static::updateUperStatus([
         'uper_id' => $uper->uper_id,
         'uper_req_no' => $uper->uper_req_no,
-        'uper_paid' => 'Y'
+        'uper_no' => $uper->uper_no,
+        'uper_paid' => 'W'
       ]);
     }
     return ["result" => "Success, confirm uper payment", 'pay_no' => $pay->pay_no];
   }
 
-  private static function updateUperStatus($input){
-      $uper = TxHdrUper::where('uper_id',$input['uper_id'])->update([
-        'uper_paid_date' => \DB::raw("TO_DATE('".$input['uper_paid_date']."', 'YYYY-MM-DD HH24:mi:ss')"),
+  public static function updateUperStatus($input){
+    if (isset($input['uper_id'])) {
+      TxHdrUper::where('uper_id',$input['uper_id'])->update([
+        'uper_paid' => $input['uper_paid'],
+        'uper_paid_date' => \DB::raw("TO_DATE('".$input['uper_paid_date']."', 'YYYY-MM-DD HH24:mi:ss')")
+      ]);
+      $req_no = $input['uper_req_no'];
+    }else if (isset($input['uper_no'])){
+      TxHdrUper::where('uper_no',$input['uper_no'])->update([
         'uper_paid' => $input['uper_paid']
       ]);
-      $cekStatus = TxHdrUper::where('uper_req_no',$input['uper_req_no'])->whereIn('uper_paid', ['N', 'W'])->count();
+      $req_no = TxHdrUper::where('uper_no',$input['uper_no'])->first();
+      $req_no = $req_no->uper_req_no;
+    }
+    static::sendRequestBooking(['req_no' => $req_no]);
+    return ["result" => "Success, confirm uper", "uper_no" => $input['uper_no'] ];
+  }
 
-      if ($cekStatus == 0) {
-        ConnectedExternalApps::sendRequestBooking(['req_no' => $input['uper_req_no'], 'paid_date' => $input['uper_paid_date']]);
-      }
+  private static function sendRequestBooking($input){
+    $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V'])->count();
+    if ($cekStatus == 0) {
+      ConnectedExternalApps::sendRequestBooking(['req_no' => $input['uper_req_no'], 'paid_date' => $input['uper_paid_date']]);
+    }
   }
 
   private static function updateNotaStatus($input){

@@ -25,6 +25,7 @@ class RequestBooking{
 			$setH['P_CUSTOMER_ID'] = $find[$config['head_cust']];
 			$setH['P_BOOKING_NUMBER'] = $find[$config['head_no']];
 			$setH['P_REALIZATION'] = 'N';
+			// $setH['P_RESTITUTION'] = 'N';
 			$setH['P_TRADE'] = $find[$config['head_trade']];
 			$setH['P_USER_ID'] = $find[$config['head_by']];
 		// build head
@@ -44,6 +45,12 @@ class RequestBooking{
 				$newD['DTL_CONT_STATUS'] = empty($list['dtl_cont_status']) ? 'NULL' : $list['dtl_cont_status'];
 				$newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
 				$newD['DTL_QTY'] = empty($list['dtl_qty']) ? 'NULL' : $list['dtl_qty'];
+
+				$DTL_BM_TYPE = 'NULL';
+				if ($config['head_nota_id'] == "13") {
+					$DTL_BM_TYPE = empty($list['dtl_bm_type']) ? 'NULL' : $list['dtl_bm_type'];
+				}
+				$newD['DTL_BM_TYPE'] = $DTL_BM_TYPE;
 
 				if ($config['head_tab_detil_tl'] != null) {
 					$newD['DTL_TL'] = empty($list[$config['head_tab_detil_tl']]) ? 'NULL' : $list[$config['head_tab_detil_tl']];
