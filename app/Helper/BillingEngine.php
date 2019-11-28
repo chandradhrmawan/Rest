@@ -73,8 +73,10 @@ class BillingEngine{
 					$headS->tariff_name   = $head['TARIFF_NAME'];
           $headS->tariff_status = $head['TARIFF_STATUS'];
           $headS->service_code  = $head['SERVICE_CODE'];
-          $headS->branch_id     = 12; // SESSION LOGIN
-          $headS->created_by    = 1; // SESSION LOGIN
+          $headS->branch_id     = 12;
+          $headS->created_by    = 1;
+          // $headS->branch_id     = $head['BRANCH_ID'];
+          // $headS->created_by    = $head['USER_ID'];
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
@@ -138,7 +140,8 @@ class BillingEngine{
             $detilS->service_code       = $headS->service_code;
             $detilS->sub_iso_code       = $subisocode;
             $detilS->iso_code           = $isocode;
-            $detilS->branch_id          = 12; // SESSION LOGIN
+            $detilS->branch_id          = 12;
+            // $detilS->branch_id          = $head['BRANCH_ID'];
 
             $detilS->nota_id            = $list['LAYANAN'];
             $detilS->tariff_object      = $list['OBJECT_TARIFF'];
