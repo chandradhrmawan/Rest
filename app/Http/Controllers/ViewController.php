@@ -177,7 +177,7 @@ class ViewController extends Controller
       $dompdf->setPaper('A4', 'potrait');
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
-      return $nota;
+
     }
 
     function printInvoice($id) {
