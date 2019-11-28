@@ -980,10 +980,10 @@ class ConnectedExternalApps{
           "glRevId":null,
           "lineContext":"",
           "taxFlag":"Y",
-          "serviceType":"'.$list->dtl_service_type.'",
+          "serviceType":"'.$list->dtl_line_desc.'",
           "eamCode":"`",
           "locationTerminal":"",
-          "amount":"'.$list->dtl_amount.'",
+          "amount":"'.$list->dtl_dpp.'",
           "taxAmount":"'.$list->dtl_ppn.'",
           "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
           "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
@@ -1224,10 +1224,10 @@ class ConnectedExternalApps{
     $results = json_decode($res->getBody()->getContents(), true);
     if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] != 1) {
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
-      return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage']];
+      return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage'], 'esbRes' => $results];
     }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
-      return ['result' => 'Proforma is paid', 'nota_no' => $input['nota_no']];
+      return ['result' => 'Proforma is paid', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
     }
   }
 }
