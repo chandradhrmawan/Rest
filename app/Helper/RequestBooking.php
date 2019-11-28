@@ -25,7 +25,7 @@ class RequestBooking{
 			$setH['P_CUSTOMER_ID'] = $find[$config['head_cust']];
 			$setH['P_BOOKING_NUMBER'] = $find[$config['head_no']];
 			$setH['P_REALIZATION'] = 'N';
-			// $setH['P_RESTITUTION'] = 'N';
+			$setH['P_RESTITUTION'] = 'N';
 			$setH['P_TRADE'] = $find[$config['head_trade']];
 			$setH['P_USER_ID'] = $find[$config['head_by']];
 		// build head

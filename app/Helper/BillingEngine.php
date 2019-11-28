@@ -458,11 +458,11 @@ class BillingEngine{
             $setD .= ' detail.DTL_UNIT_ID := \''.$list['DTL_UNIT_ID'].'\';';
           }
           $setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
-          // if (isset($list['DTL_BM_TYPE']) and $list['DTL_BM_TYPE'] != 'NULL' and $list['DTL_BM_TYPE'] != NULL) {
-          //   // $setD .= ' detail.DTL_BM_TYPE := '.$list['DTL_BM_TYPE'].';';
-          // }else{
-          //   // $setD .= ' detail.DTL_BM_TYPE := NULL;';
-          // }
+          if (isset($list['DTL_BM_TYPE']) and $list['DTL_BM_TYPE'] != 'NULL' and $list['DTL_BM_TYPE'] != NULL) {
+            $setD .= ' detail.DTL_BM_TYPE := '.$list['DTL_BM_TYPE'].';';
+          }else{
+            $setD .= ' detail.DTL_BM_TYPE := NULL;';
+          }
           // if (isset($list['DTL_STACK_AREA']) and $list['DTL_STACK_AREA'] != 'NULL' and $list['DTL_STACK_AREA'] != NULL) {
           //   // $setD .= ' detail.DTL_STACK_AREA := '.$list['DTL_STACK_AREA'].';';
           // }else{
@@ -525,7 +525,7 @@ class BillingEngine{
 	    	$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
 	    	$setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
 	    	$setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
-        // $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
+        $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
 	    	$setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
 	    	$setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
 	    	$setH .= " P_TRADE => '".$head['P_TRADE']."',";
