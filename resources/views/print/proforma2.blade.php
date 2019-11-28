@@ -272,7 +272,7 @@
 <div style="position:absolute;bottom:20px;font-size:9px; width:100%">
 	{{$branch->branch_name}} <br>{{$branch->branch_address}}
 	<div style="margin-top:50px;font-size:8px">
-			{{$branch->branch_npwp}}
+			{{$header->nota_no}}
 	</div>
 </div>
 <p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>

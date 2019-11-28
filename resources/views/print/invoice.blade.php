@@ -39,11 +39,13 @@
           </tr>
           <tr>
             <td>Tanggal. Nota</td>
-            <td>: {{$header->nota_date}}</td>
-          </tr>
-          <tr>
-            <td>No. Request </td>
-            <td>: {{$header->nota_req_no}}</td>
+            <td>:
+							<?php
+							$originalDate = $header->nota_date;
+							$newDate = date("d-M-y", strtotime($originalDate));
+							echo strtoupper($newDate);
+							?>
+						</td>
           </tr>
 					<tr>
             <td> </td>
@@ -57,7 +59,7 @@
 <center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px">Nota Penjualan Jasa Kepelabuhan</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
-		<td>
+		<td style="vertical-align:top">
       <table style="border-collapse:collapse; font-size:9px;">
         <tr>
           <td colspan="3">
@@ -115,6 +117,10 @@
 					} ?>
 				</td>
         </tr>
+				<tr>
+					<td>No. Request </td>
+					<td>: {{$header->nota_req_no}}</td>
+				</tr>
       </table>
     </td>
 	</tr>
@@ -273,7 +279,7 @@
 	<div style="position:absolute;bottom:20px;font-size:9px; width:100%">
 		{{$branch->branch_name}} <br>{{$branch->branch_address}}
 		<div style="margin-top:50px;font-size:8px">
-				{{$branch->branch_npwp}}
+				{{$header->nota_req_no}}
 		</div>
 	</div>
 	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
