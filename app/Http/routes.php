@@ -32,9 +32,8 @@ $app->post('/get-file', 'StoreController@testview_file');
 
 $app->post('/tree-menu/{roll_id}', 'ViewController@menuTree');
 
-$app->get('/print/uper/{id}','ViewController@printUper');
-$app->get('/print/proforma/{id}','ViewController@printProforma');
 $app->get('/print/getPass/{id}','ViewController@printGetPass');
 $app->get('/print/uper2/{id}','ViewController@printUper2');
 $app->get('/print/proforma2/{id}','ViewController@printProforma2');
 $app->get('/print/invoice2/{id}','ViewController@printInvoice');
+$app->get('/print/uperPaid2/{id}','ViewController@printUperPaid');

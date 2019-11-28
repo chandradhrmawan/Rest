@@ -607,6 +607,7 @@ class BillingEngine{
 				$setH['P_NOTA_ID'] 					= $head['P_NOTA_ID'];
 				$setH['P_BRANCH_ID'] 				= $head['P_BRANCH_ID'];
 				$setH['P_CUSTOMER_ID'] 			= $head['P_CUSTOMER_ID'];
+				// $setH['P_RESTITUTION'] 			= 'N'; // ( N / Y ) DEFAULT N
 				$setH['P_BOOKING_NUMBER'] 	= $head['P_BOOKING_NUMBER'];
 				$setH['P_REALIZATION'] 			= $head['P_REALIZATION'];
 				$setH['P_TRADE'] 						= $head['P_TRADE'];
@@ -625,6 +626,8 @@ class BillingEngine{
 					$newD['DTL_PKG_ID'] 			= $list['DTL_PKG_ID'];
 					$newD['DTL_CMDTY_ID'] 		= $list['DTL_CMDTY_ID'];
 					$newD['DTL_CHARACTER'] 		= $list['DTL_CHARACTER'];
+					//$newD['DTL_BM_TYPE'] 		= $list['DTL_BM_TYPE ']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
+					//$newD['DTL_STACK_AREA'] = $list['DTL_STACK_AREA  ']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
 					$newD['DTL_CONT_SIZE'] 		= 'NULL';
 					$newD['DTL_CONT_TYPE'] 		= 'NULL';
 					$newD['DTL_CONT_STATUS'] 	= 'NULL';
@@ -686,7 +689,7 @@ class BillingEngine{
 											"dtl_service_type" => $list['group_tariff_name'],
 											// Tambahan Mas Adi
 											"dtl_total_tariff" => $list["tariff_uper"],
-											"dtl_amount" => $list['uper'], // blm fix
+											// "dtl_amount" => $list['uper'], // blm fix
 											"dtl_ppn" => $list["ppn"],
 											// "dtl_masa1" => , // cooming soon
 											// "dtl_masa12" => , // cooming soon
