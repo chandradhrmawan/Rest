@@ -626,8 +626,8 @@ class BillingEngine{
 					$newD['DTL_PKG_ID'] 			= $list['DTL_PKG_ID'];
 					$newD['DTL_CMDTY_ID'] 		= $list['DTL_CMDTY_ID'];
 					$newD['DTL_CHARACTER'] 		= $list['DTL_CHARACTER'];
-					$newD['DTL_BM_TYPE'] 			= $list['DTL_BM_TYPE ']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
-					//$newD['DTL_STACK_AREA'] = $list['DTL_STACK_AREA  ']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
+					$newD['DTL_BM_TYPE'] 			= $list['DTL_BM_TYPE']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
+					//$newD['DTL_STACK_AREA'] = $list['DTL_STACK_AREA']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
 					$newD['DTL_CONT_SIZE'] 		= 'NULL';
 					$newD['DTL_CONT_TYPE'] 		= 'NULL';
 					$newD['DTL_CONT_STATUS'] 	= 'NULL';
