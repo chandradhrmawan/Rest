@@ -289,11 +289,11 @@ class RealisasiHelper{
   }
 
   public static function rejectedProformaNota($input){
-    $count = DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_real_no',$input['req_no'])->count();
+    $count = TxHdrNota::where('nota_real_no',$input['req_no'])->count();
     if ($count == 0) {
       return ['result' => 'Fail, proforma not found!', 'no_req' => $input['req_no'], 'Success' => false];
     }
-    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_real_no',$input['req_no'])->update([
+    TxHdrNota::where('nota_real_no',$input['req_no'])->update([
       "nota_status"=>3
     ]);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_no',$input['req_no'])->update([
@@ -307,27 +307,32 @@ class RealisasiHelper{
 
   public static function approvedProformaNota($input){
     $nota = TxHdrNota::find($input['id']);
-    $sendNota = ConnectedExternalApps::sendNotaProforma($nota->nota_id);
-    if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
-      return [
-        'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
-        'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
-        'Success'=> false,
-        'result' => 'Fail, send proforma to invoice!'
-      ];
-    }
     TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2]);
+    $count = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->whereIn('nota_status', [1,3])->count();
 
-    $pay = TxPayment::where('pay_req_no', $nota->nota_req_no)->where('pay_cust_id', $nota->nota_cust_id)->first();
-    ConnectedExternalApps::notaProformaPutApply($nota->nota_id, $pay);
-
-    if ($pay->pay_amount >= $nota->nota_amount) {
-      TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'W']);
+    if ($count == 0) {
+      $loop = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->get();
+      foreach ($loop as $list) {
+        $sendNota = ConnectedExternalApps::sendNotaProforma($list->nota_id);
+        // if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
+        //   return [
+        //     'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
+        //     'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
+        //     'Success'=> false,
+        //     'result' => 'Fail, send proforma to invoice!'
+        //   ];
+        // }
+        $pay = TxPayment::where('pay_req_no', $list->nota_req_no)->where('pay_cust_id', $list->nota_cust_id)->first();
+        if (!empty($pay)) {
+          ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
+          if ($pay->pay_amount >= $list->nota_amount) {
+            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'W']);
+          }
+        }
+      }
     }
-    
+
     return [
-      'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
-      'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
       'result' => 'Success, approved proforma!',
       'req_no' => $nota->nota_req_no,
       'nota_no' => $nota->nota_no
