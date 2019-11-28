@@ -198,42 +198,43 @@ class BillingEngine{
   	$header = TxProfileTariffHdr::find($input['TARIFF_ID']);
   	$detil = DB::connection('eng')->table('TS_TARIFF')->where('TARIFF_PROF_HDR_ID', $input['TARIFF_ID'])->orderBy('TARIFF_ID', 'DESC')->get();
   	$response_detil = [];
-  		$equipment_type_name = "";
-  		$equipment_unit_name = "";
-  		$equipment_unit_min = "";
-  		$equipment_unit_code = "";
-  		$package_name = "";
-  		$package_code = "";
-  		$commodity_name = "";
-  		$commodity_unit_code = "";
-  		$commodity_unit_name = "";
-  		$commodity_unit_min = "";
-  		$cont_desc = "";
-  		$cont_status_desc = "";
-  		$cont_type_desc = "";
+		foreach ($detil as $list) {
+      $equipment_type_name = "";
+      $equipment_unit_name = "";
+      $equipment_unit_min = "";
+      $equipment_unit_code = "";
+      $package_name = "";
+      $package_code = "";
+      $commodity_name = "";
+      $commodity_unit_code = "";
+      $commodity_unit_name = "";
+      $commodity_unit_min = "";
+      $cont_desc = "";
+      $cont_status_desc = "";
+      $cont_type_desc = "";
 
-  		$newDt = [];
-  		$newDt['equipment_type_id'] = '';
-  		$newDt['equipment_unit'] = '';
-  		$newDt['equipment_type_name'] = $equipment_type_name;
-  		$newDt['equipment_unit_code'] = $equipment_unit_code;
-  		$newDt['equipment_unit_name'] = $equipment_unit_name;
-  		$newDt['equipment_unit_min'] = $equipment_unit_min;
-  		$newDt['cont_size'] = '';
-  		$newDt['cont_type'] = '';
-  		$newDt['cont_status'] = '';
-  		$newDt['cont_desc'] = $cont_desc;
-  		$newDt['cont_status_desc'] = $cont_status_desc;
-  		$newDt['cont_type_desc'] = $cont_type_desc;
-  		$newDt['package_id'] = '';
-  		$newDt['commodity_id'] = '';
-  		$newDt['commodity_unit_id'] = '';
-  		$newDt['package_name'] = $package_name;
-  		$newDt['package_code'] = $package_code;
-  		$newDt['commodity_name'] = $commodity_name;
-  		$newDt['commodity_unit_code'] = $commodity_unit_code;
-  		$newDt['commodity_unit_name'] = $commodity_unit_name;
-  		$newDt['commodity_unit_min'] = $commodity_unit_min;
+      $newDt = [];
+      $newDt['equipment_type_id'] = '';
+      $newDt['equipment_unit'] = '';
+      $newDt['equipment_type_name'] = $equipment_type_name;
+      $newDt['equipment_unit_code'] = $equipment_unit_code;
+      $newDt['equipment_unit_name'] = $equipment_unit_name;
+      $newDt['equipment_unit_min'] = $equipment_unit_min;
+      $newDt['cont_size'] = '';
+      $newDt['cont_type'] = '';
+      $newDt['cont_status'] = '';
+      $newDt['cont_desc'] = $cont_desc;
+      $newDt['cont_status_desc'] = $cont_status_desc;
+      $newDt['cont_type_desc'] = $cont_type_desc;
+      $newDt['package_id'] = '';
+      $newDt['commodity_id'] = '';
+      $newDt['commodity_unit_id'] = '';
+      $newDt['package_name'] = $package_name;
+      $newDt['package_code'] = $package_code;
+      $newDt['commodity_name'] = $commodity_name;
+      $newDt['commodity_unit_code'] = $commodity_unit_code;
+      $newDt['commodity_unit_name'] = $commodity_unit_name;
+      $newDt['commodity_unit_min'] = $commodity_unit_min;
 
       $newDt['tariff_reference_name'] = '';
       if (!empty($list->tariff_reference)) {
@@ -243,9 +244,6 @@ class BillingEngine{
           $newDt['tariff_reference_name'] = $name_tariff_reference->reff_name;
         }
       }
-
-
-		foreach ($detil as $list) {
   		foreach ($list as $key => $value) {
   			$newDt[$key] = $value;
   			if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
@@ -364,8 +362,8 @@ class BillingEngine{
   					}
   				}
   			} else if(strtolower($key) == 'group_tariff_id' and !empty($value)){
-				$group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
-			} else if(strtolower($key) == 'nota_id' and !empty($value)){
+  				$group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
+  			} else if(strtolower($key) == 'nota_id' and !empty($value)){
   				$nota = DB::connection('eng')->table('TM_NOTA')->where('nota_id',$value)->first();
   				if (!empty($nota)) {
   					foreach ($nota as $keyS => $valueS) {
@@ -450,7 +448,17 @@ class BillingEngine{
           }else{
             $setD .= ' detail.DTL_UNIT_ID := \''.$list['DTL_UNIT_ID'].'\';';
           }
-	    		$setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
+          $setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
+          // if (isset($list['DTL_BM_TYPE']) and $list['DTL_BM_TYPE'] != 'NULL' and $list['DTL_BM_TYPE'] != NULL) {
+          //   // $setD .= ' detail.DTL_BM_TYPE := '.$list['DTL_BM_TYPE'].';';
+          // }else{
+          //   // $setD .= ' detail.DTL_BM_TYPE := NULL;';
+          // }
+          // if (isset($list['DTL_STACK_AREA']) and $list['DTL_STACK_AREA'] != 'NULL' and $list['DTL_STACK_AREA'] != NULL) {
+          //   // $setD .= ' detail.DTL_STACK_AREA := '.$list['DTL_STACK_AREA'].';';
+          // }else{
+          //   // $setD .= ' detail.DTL_STACK_AREA := NULL;';
+          // }
           if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
             // $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].';';
             $setD .= ' detail.DTL_TL := \'N\';';
@@ -508,6 +516,7 @@ class BillingEngine{
 	    	$setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
 	    	$setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
 	    	$setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
+        // $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
 	    	$setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
 	    	$setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
 	    	$setH .= " P_TRADE => '".$head['P_TRADE']."',";
@@ -589,6 +598,7 @@ class BillingEngine{
 				$setH['P_NOTA_ID'] 					= $head['P_NOTA_ID'];
 				$setH['P_BRANCH_ID'] 				= $head['P_BRANCH_ID'];
 				$setH['P_CUSTOMER_ID'] 			= $head['P_CUSTOMER_ID'];
+				// $setH['P_RESTITUTION'] 			= 'N'; // ( N / Y ) DEFAULT N
 				$setH['P_BOOKING_NUMBER'] 	= $head['P_BOOKING_NUMBER'];
 				$setH['P_REALIZATION'] 			= $head['P_REALIZATION'];
 				$setH['P_TRADE'] 						= $head['P_TRADE'];
@@ -607,6 +617,8 @@ class BillingEngine{
 					$newD['DTL_PKG_ID'] 			= $list['DTL_PKG_ID'];
 					$newD['DTL_CMDTY_ID'] 		= $list['DTL_CMDTY_ID'];
 					$newD['DTL_CHARACTER'] 		= $list['DTL_CHARACTER'];
+					//$newD['DTL_BM_TYPE'] 		= $list['DTL_BM_TYPE ']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
+					//$newD['DTL_STACK_AREA'] = $list['DTL_STACK_AREA  ']; //( BONGKAR / MUAT ) SESUAI INPUTAN DI OM
 					$newD['DTL_CONT_SIZE'] 		= 'NULL';
 					$newD['DTL_CONT_TYPE'] 		= 'NULL';
 					$newD['DTL_CONT_STATUS'] 	= 'NULL';
@@ -668,7 +680,7 @@ class BillingEngine{
 											"dtl_service_type" => $list['group_tariff_name'],
 											// Tambahan Mas Adi
 											"dtl_total_tariff" => $list["tariff_uper"],
-											"dtl_amount" => $list['uper'], // blm fix
+											// "dtl_amount" => $list['uper'], // blm fix
 											"dtl_ppn" => $list["ppn"],
 											// "dtl_masa1" => , // cooming soon
 											// "dtl_masa12" => , // cooming soon
