@@ -1179,8 +1179,15 @@ class ConnectedExternalApps{
       TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
       return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbHeader']['responseMessage']];
     }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
-      TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
-      return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
+      if ($results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceipt'] == 'S') {
+        TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
+        return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
+      }else if($results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceipt'] == 'F'){
+        TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
+        return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
+      }else{
+        return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
+      }
     }
   }
 
@@ -1226,8 +1233,15 @@ class ConnectedExternalApps{
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
       return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage'], 'esbRes' => $results];
     }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
-      TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
-      return ['result' => 'Proforma is paid', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
+      if ($results['inquiryStatusLunasResponse']['esbBody']['details'][0]['statusLunas'] == 'S') {
+        TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
+        return ['result' => 'Nota is paid', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
+      }else if ($results['inquiryStatusLunasResponse']['esbBody']['details'][0]['statusLunas'] == 'F') {
+        TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
+        return ['Success' => false, 'result' => 'Nota is failed', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
+      }else{
+        return ['Success' => false, 'result' => 'Nota sending to simkeu!', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
+      }
     }
   }
 }
