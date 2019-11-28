@@ -459,7 +459,7 @@ class BillingEngine{
           }
           $setD .= ' detail.DTL_QTY := '.$list['DTL_QTY'].';';
           if (isset($list['DTL_BM_TYPE']) and $list['DTL_BM_TYPE'] != 'NULL' and $list['DTL_BM_TYPE'] != NULL) {
-            $setD .= ' detail.DTL_BM_TYPE := '.$list['DTL_BM_TYPE'].';';
+            $setD .= ' detail.DTL_BM_TYPE := \''.$list['DTL_BM_TYPE'].'\';';
           }else{
             $setD .= ' detail.DTL_BM_TYPE := NULL;';
           }
