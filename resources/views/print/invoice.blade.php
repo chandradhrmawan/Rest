@@ -18,6 +18,7 @@
 </head>
 <body>
 		@foreach($header as $header)
+		@foreach($kapal as $kapal)
 		<?php if ($header->nota_paid == "N") { ?>
 			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
 		<?php } else { ?>
@@ -86,7 +87,7 @@
       </table>
     </td>
 		<td>
-      <table style="border-collapse:collapse; font-size:9px;">
+			<table style="border-collapse:collapse; font-size:9px;">
 				<tr>
           <td>Nama Kapal</td>
           <td>: </td>
@@ -95,17 +96,24 @@
 				<tr>
           <td>Periode Kunjungan</td>
           <td>: </td>
-        <td></td>
+        <td>{{$kapal->periode}}</td>
         </tr>
 				<tr>
           <td>Kade</td>
           <td>: </td>
-        <td></td>
+        <td>{{$kapal->kade}}</td>
         </tr>
 				<tr>
           <td>Tipe Perdagangan</td>
           <td>: </td>
-        <td></td>
+        <td>
+					<?php
+					if ($kapal->nota_trade_type == "D") {
+						echo "Domestik";
+					} else {
+						echo "International";
+					} ?>
+				</td>
         </tr>
       </table>
     </td>
@@ -227,19 +235,19 @@
     <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DASAR PENGENAAN PAJAK</td>
     <td style="border-right: 0;border-bottom: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($dpp)}}</td>
+    <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($header->nota_dpp)}}</td>
   </tr>
   <tr>
     <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">PPN 10%</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($ppn)}}</td>
+    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->nota_ppn)}}</td>
   </tr>
   <tr>
     <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Jumlah Tagihan</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($dpp+$ppn)}}</td>
+    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($header->nota_amount)}}</td>
   </tr>
 	<tr>
 		<td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
@@ -269,6 +277,7 @@
 		</div>
 	</div>
 	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+	@endforeach
 	@endforeach
 	@endforeach
 </body>
