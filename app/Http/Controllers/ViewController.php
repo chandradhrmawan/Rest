@@ -227,7 +227,7 @@ class ViewController extends Controller
           }
         }
 
-        // $det[]=$newDt;
+        $det[]=$newDt;
         if ($newDt["comp_nota_view"] == "1") {
           $det["penumpukan"][]=$newDt;
         } if ($newDt["comp_nota_view"] == "2") {
