@@ -114,7 +114,7 @@ class ViewController extends Controller
 
         $componen  = DB::connection("mdm")
                       ->table("TM_COMP_NOTA")
-                      ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id]])
+                      ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id]])
                       ->get();
         foreach ($componen as $listS) {
           foreach ($listS as $key => $value) {
@@ -122,7 +122,7 @@ class ViewController extends Controller
           }
         }
 
-        // $det[]=$newDt;
+        $det[]=$newDt;
         if ($newDt["comp_nota_view"] == "1") {
           $det["penumpukan"][]=$newDt;
         } if ($newDt["comp_nota_view"] == "2") {
@@ -219,7 +219,7 @@ class ViewController extends Controller
 
         $componen  = DB::connection("mdm")
                       ->table("TM_COMP_NOTA")
-                      ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id]])
+                      ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id]])
                       ->get();
         foreach ($componen as $listS) {
           foreach ($listS as $key => $value) {
