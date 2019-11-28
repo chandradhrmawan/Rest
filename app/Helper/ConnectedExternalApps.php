@@ -1221,7 +1221,7 @@ class ConnectedExternalApps{
     } catch (ClientException $e) {
       return $e->getResponse();
     }
-    return $results = json_decode($res->getBody()->getContents(), true);
+    $results = json_decode($res->getBody()->getContents(), true);
     if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] != 1) {
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
       return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage']];
