@@ -259,7 +259,7 @@ class RealisasiHelper{
             "dtl_group_tariff_id" => $list->group_tariff_id,
             "dtl_group_tariff_name" => $list->group_tariff_name,
             "dtl_bl" => $list->no_bl,
-            "dtl_dpp" => $list->tariff_cal_uper,
+            "dtl_dpp" => $list->tariff_cal,
             "dtl_commodity" => $list->commodity_name,
             "dtl_equipment" => $list->equipment_name,
             "dtl_masa_reff" => $list->stack_combine,
