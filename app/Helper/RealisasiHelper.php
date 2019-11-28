@@ -32,7 +32,7 @@ class RealisasiHelper{
 
     // build eqpt
       $setE = [];
-      $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find->bm_no)->get();
+      $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find->real_no)->get();
       foreach ($eqpt as $list) {
         $newE = [];
         $list = (array)$list;
@@ -130,7 +130,7 @@ class RealisasiHelper{
 
     // build eqpt
       $setE = [];
-      $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find->bprp_req_no)->get();
+      $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find->bprp_no)->get();
       foreach ($eqpt as $list) {
         $newE = [];
         $list = (array)$list;
