@@ -264,8 +264,12 @@ class StoreController extends Controller
         return UperRequest::confirmPaymentUper($input);
       }
 
-      function uperSimkueCek($input, $request){
+      function uperSimkeuCek($input, $request){
         return ConnectedExternalApps::uperSimkueCek($input);
+      }
+
+      function notaProformaSimkeuCek($input, $request){
+        return ConnectedExternalApps::notaProformaSimkueCek($input);
       }
     // UperRequest
 

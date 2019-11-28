@@ -1137,7 +1137,7 @@ class ConnectedExternalApps{
     }
   }
 
-  public static function uperSimkueCek($input){
+  public static function uperSimkeuCek($input){
     $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusReceipt";
     $string_json = '{
        "inquiryStatusReceiptRequest":{
@@ -1176,10 +1176,58 @@ class ConnectedExternalApps{
     }
     $results = json_decode($res->getBody()->getContents(), true);
     if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] != 1) {
+      TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
       return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbHeader']['responseMessage']];
     }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
       TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
       return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg']];
+    }
+  }
+
+  public static function notaProformaSimkeuCek($input){
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusLunas";
+    $string_json = '{
+       "inquiryStatusLusnasRequest":{
+          "esbHeader":{
+             "internalId":"",
+             "externalId":"EDI-2910201921570203666",
+             "timestamp":"2019-10-29 21:57:020.36665400",
+             "responseTimestamp":"",
+             "responseCode":"",
+             "responseMessage":""
+          },
+          "esbBody":[
+             {
+                "trxNumber":"'.$input['nota_no'].'"
+             }
+          ]
+       }
+    }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    return $results = json_decode($res->getBody()->getContents(), true);
+    if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] != 1) {
+      TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
+      return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage']];
+    }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
+      TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
+      return ['result' => 'Proforma is paid'];
     }
   }
 }
