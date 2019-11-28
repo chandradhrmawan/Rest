@@ -33,12 +33,14 @@
             <td>: {{$header->nota_no}}</td>
           </tr>
           <tr>
-            <td>Tanggal. Proforma</td>
-            <td>: {{$header->nota_date}}</td>
-          </tr>
-          <tr>
-            <td>No. Request </td>
-            <td>: {{$header->nota_req_no}}</td>
+            <td>Tanggal</td>
+            <td>:
+							<?php
+							$originalDate = $header->nota_date;
+							$newDate = date("d-M-y", strtotime($originalDate));
+							echo strtoupper($newDate);
+							?>
+						</td>
           </tr>
 					<tr>
             <td> </td>
@@ -52,7 +54,7 @@
 <center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Proforma</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
-		<td>
+		<td style="vertical-align:top">
       <table style="border-collapse:collapse; font-size:9px;">
         <tr>
           <td colspan="3">
@@ -105,6 +107,11 @@
 					} ?>
 				</td>
         </tr>
+				<tr>
+					<td>No. Request </td>
+					<td>:</td>
+					<td>{{$header->nota_req_no}}</td>
+				</tr>
       </table>
     </td>
 	</tr>
