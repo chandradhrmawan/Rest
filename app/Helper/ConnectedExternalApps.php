@@ -177,7 +177,8 @@ class ConnectedExternalApps{
   }
 
   public static function peb_index($input) {
-    $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
+    // $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
+    $date = date('dmY', strtotime($input['date_peb']));
     $endpoint_url="http://10.88.48.57:5555/restv2/tpsOnline/searchPEB";
     $string_json = '{
       "searchPEBRequest": {
