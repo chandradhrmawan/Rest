@@ -265,11 +265,11 @@ class StoreController extends Controller
       }
 
       function uperSimkeuCek($input, $request){
-        return ConnectedExternalApps::uperSimkueCek($input);
+        return ConnectedExternalApps::uperSimkeuCek($input);
       }
 
       function notaProformaSimkeuCek($input, $request){
-        return ConnectedExternalApps::notaProformaSimkueCek($input);
+        return ConnectedExternalApps::notaProformaSimkeuCek($input);
       }
     // UperRequest
 
