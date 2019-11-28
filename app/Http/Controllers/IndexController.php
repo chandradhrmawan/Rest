@@ -147,7 +147,7 @@ class IndexController extends Controller
         $table = DB::connection($input["db"])->select($raw, $param);
         $count = count($table);
       } else {
-        if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['start'])) {
             $data = $raw."ROWNUM <= ".$input['start']."+".$input['limit'].") WHERE R >= ".$input['start'];
             $raw  = $data;
         }

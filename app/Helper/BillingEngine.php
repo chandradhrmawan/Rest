@@ -701,6 +701,7 @@ class BillingEngine{
 											"dtl_package" => $list["package_name"],
 											"dtl_qty" => $list["qty"],
 											"dtl_unit" => $list["unit_id"],
+											"dtl_unit_name" => $list["unit_name"],
 											"dtl_group_tariff_id" => $list["group_tariff_id"],
 											"dtl_group_tariff_name" => $list["group_tariff_name"],
 											"dtl_bl" => $list["no_bl"],

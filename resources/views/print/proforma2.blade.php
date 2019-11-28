@@ -19,6 +19,7 @@
 <body>
 		@foreach($header as $header)
 		@foreach($branch as $branch)
+		@foreach($kapal as $kapal)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
@@ -85,17 +86,24 @@
 				<tr>
           <td>Periode Kunjungan</td>
           <td>: </td>
-        <td></td>
+        <td>{{$kapal->periode}}</td>
         </tr>
 				<tr>
           <td>Kade</td>
           <td>: </td>
-        <td></td>
+        <td>{{$kapal->kade}}</td>
         </tr>
 				<tr>
           <td>Tipe Perdagangan</td>
           <td>: </td>
-        <td></td>
+        <td>
+					<?php
+					if ($kapal->nota_trade_type == "D") {
+						echo "Domestik";
+					} else {
+						echo "International";
+					} ?>
+				</td>
         </tr>
       </table>
     </td>
@@ -261,6 +269,7 @@
 	</div>
 </div>
 <p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+@endforeach
 @endforeach
 @endforeach
 </body>
