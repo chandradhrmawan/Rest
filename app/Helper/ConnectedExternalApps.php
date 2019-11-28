@@ -217,9 +217,11 @@ class ConnectedExternalApps{
       }
     }
 
-    $body = json_decode($res->getBody()->getContents());
-
-    return ['pebListResponse' => $body->searchPEBInterfaceResponse];
+    $body = json_decode($res->getBody()->getContents(), true);
+    if(strpos($body['searchPEBInterfaceResponse']['esbBody']['response'], 'Data tidak ditemukan')){
+      return ['Success' => false, 'result' => 'Data tidak ditemukan'];
+    }
+    return ['pebListResponse' => $body['searchPEBInterfaceResponse']];
   }
 
 	public static function realTos($input){

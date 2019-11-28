@@ -38,7 +38,12 @@ class ViewController extends Controller
       if (isset($input['encode']) and $input['encode'] == 'true') {
         return response()->json(['response' => json_encode($response)]);
       }else{
-        return response()->json($response);
+        if (isset($response['Success']) and $response['Success'] == false) {
+          return response()->json($response, 401);
+        }else{
+          return response()->json($response);
+        }
+        // return response()->json($response);
       }
     }
 
