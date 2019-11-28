@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
 use App\Helper\ConnectedExternalApps;
+use App\Models\OmCargo\TxPayment;
 
 class RealisasiHelper{
 
@@ -24,6 +25,7 @@ class RealisasiHelper{
       $setH['P_CUSTOMER_ID'] = $find->bm_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->real_no;
       $setH['P_REALIZATION'] = 'Y';
+      // $setH['P_RESTITUTION'] = 'N';
       $setH['P_TRADE'] = $find->bm_trade_type;
       $setH['P_USER_ID'] = $find->real_create_by;
     // build head
@@ -63,6 +65,7 @@ class RealisasiHelper{
         $newD['DTL_CONT_STATUS'] = empty($list['dtl_cont_status']) ? 'NULL' : $list['dtl_cont_status'];
         $newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_real_qty']) ? 'NULL' : $list['dtl_real_qty'];
+        $newD['DTL_BM_TYPE'] = empty($list['dtl_bm_type']) ? 'NULL' : $list['dtl_bm_type'];
         $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_bm_tl'];
         $newD['DTL_DATE_IN'] = 'NULL';
         $newD['DTL_DATE_OUT'] = 'NULL';
@@ -120,6 +123,7 @@ class RealisasiHelper{
       $setH['P_CUSTOMER_ID'] = $find->bprp_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->bprp_no;
       $setH['P_REALIZATION'] = 'Y';
+      // $setH['P_RESTITUTION'] = 'N';
       $setH['P_TRADE'] = $find->bprp_trade_type;
       $setH['P_USER_ID'] = $find->bprp_create_by;
     // build head
@@ -199,15 +203,16 @@ class RealisasiHelper{
   }
 
   private static function migrateNotaData($booking_number,$req_no,$vessel_name,$terminal_id){
+    $hdr_id = TxHdrNota::where('nota_real_no',$booking_number)->pluck('nota_id');
+    DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
+    TxHdrNota::where('nota_real_no',$booking_number)->delete();
+
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
-        $headN = TxHdrNota::where('nota_req_no',$getH->booking_number)->first();
-        if (empty($headN)) {
-          $headN = new TxHdrNota;
-        }
+        $headN = new TxHdrNota;
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
         $headN->nota_group_id = $getH->nota_id;
@@ -220,7 +225,6 @@ class RealisasiHelper{
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
         // $headN->nota_status = $getH->; // ?
-        // Tambahan Mas Adi
         $headN->nota_context = $getH->nota_context;
         $headN->nota_sub_context = $getH->nota_sub_context;
         $headN->nota_service_code = $getH->nota_service_code;
@@ -255,7 +259,7 @@ class RealisasiHelper{
             "dtl_group_tariff_id" => $list->group_tariff_id,
             "dtl_group_tariff_name" => $list->group_tariff_name,
             "dtl_bl" => $list->no_bl,
-            "dtl_dpp" => $list->tariff_cal_uper,
+            "dtl_dpp" => $list->tariff_cal,
             "dtl_commodity" => $list->commodity_name,
             "dtl_equipment" => $list->equipment_name,
             "dtl_masa_reff" => $list->stack_combine,
@@ -285,13 +289,17 @@ class RealisasiHelper{
   }
 
   public static function rejectedProformaNota($input){
-    DB::connection('omcargo')->table('TX_HDR_NOTA')->where('nota_req_no',$input['req_no'])->update([
+    $count = TxHdrNota::where('nota_real_no',$input['req_no'])->count();
+    if ($count == 0) {
+      return ['result' => 'Fail, proforma not found!', 'no_req' => $input['req_no'], 'Success' => false];
+    }
+    TxHdrNota::where('nota_real_no',$input['req_no'])->update([
       "nota_status"=>3
     ]);
-    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_req_no',$input['req_no'])->update([
+    DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_no',$input['req_no'])->update([
       "bprp_status"=>1
     ]);
-    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_req_no',$input['req_no'])->update([
+    DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_no',$input['req_no'])->update([
       "real_status"=>1
     ]);
     return ['result' => 'Success, rejected proforma!', 'no_req' => $input['req_no']];
@@ -299,20 +307,32 @@ class RealisasiHelper{
 
   public static function approvedProformaNota($input){
     $nota = TxHdrNota::find($input['id']);
-    $sendNota = ConnectedExternalApps::sendNotaProforma($nota->nota_id);
-    if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
-      return [
-        'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
-        'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
-        'Success'=> false,
-        'result' => 'Fail, send proforma to invoice!'
-      ];
+    TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2]);
+    $count = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->whereIn('nota_status', [1,3])->count();
+
+    if ($count == 0) {
+      $loop = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->get();
+      foreach ($loop as $list) {
+        $sendNota = ConnectedExternalApps::sendNotaProforma($list->nota_id);
+        // if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
+        //   return [
+        //     'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
+        //     'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
+        //     'Success'=> false,
+        //     'result' => 'Fail, send proforma to invoice!'
+        //   ];
+        // }
+        $pay = TxPayment::where('pay_req_no', $list->nota_req_no)->where('pay_cust_id', $list->nota_cust_id)->first();
+        if (!empty($pay)) {
+          ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
+          if ($pay->pay_amount >= $list->nota_amount) {
+            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'W']);
+          }
+        }
+      }
     }
-    $nota->nota_status = 2;
-    $nota->save();
+
     return [
-      'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
-      'sendNotaErrMsg' => $sendNota['arResponseDoc']['esbBody'][0]['errorMessage'],
       'result' => 'Success, approved proforma!',
       'req_no' => $nota->nota_req_no,
       'nota_no' => $nota->nota_no

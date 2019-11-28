@@ -177,7 +177,8 @@ class ConnectedExternalApps{
   }
 
   public static function peb_index($input) {
-    $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
+    // $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
+    $date = date('dmY', strtotime($input['date_peb']));
     $endpoint_url="http://10.88.48.57:5555/restv2/tpsOnline/searchPEB";
     $string_json = '{
       "searchPEBRequest": {
@@ -216,9 +217,11 @@ class ConnectedExternalApps{
       }
     }
 
-    $body = json_decode($res->getBody()->getContents());
-
-    return ['pebListResponse' => $body->searchPEBInterfaceResponse];
+    $body = json_decode($res->getBody()->getContents(), true);
+    if(strpos($body['searchPEBInterfaceResponse']['esbBody']['response'], 'Data tidak ditemukan')){
+      return ['Success' => false, 'result' => 'Data tidak ditemukan'];
+    }
+    return ['pebListResponse' => $body['searchPEBInterfaceResponse']];
   }
 
 	public static function realTos($input){
@@ -445,163 +448,6 @@ class ConnectedExternalApps{
     // return ['result' => 'Success', 'json' => $string_json_arr];
   }
 
-  private static function sendRequestBookingExcute($head, $detil, $config){
-    foreach ($detil as $list) {
-        $listA = (array)$list;
-        //
-          $consignee = 'consignee';
-          $oi = $head[$config['head_trade']];
-          $podpol = '';
-          $movetype = 'MOVETYPE';
-          $startenddate = '';
-          $blno = $listA[$config['head_tab_detil_bl']];
-          $bldate = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $list->dtl_create_date)->format('m/d/Y');
-        //
-
-        //
-          if (empty($head[$config['head_eta']])) {
-            $bm_eta = null;
-          }else{
-            $bm_eta = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_eta']])->format('m/d/Y');
-          }
-          if (empty($head[$config['head_etd']])) {
-            $bm_etd = null;
-          }else{
-            $bm_etd = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_etd']])->format('m/d/Y');
-          }
-          if (empty($head[$config['head_open_stack']])) {
-            $bm_open_stack = null;
-          }else{
-            $bm_open_stack = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_open_stack']])->format('m/d/Y');
-          }
-          if (empty($head[$config['head_closing_time']])) {
-            $bm_closing_time = null;
-          }else{
-            $bm_closing_time = \Carbon\Carbon::createFromFormat("Y-m-d H:i:s", $head[$config['head_closing_time']])->format('m/d/Y');
-          }
-        //
-
-        //
-          $vParam = '';
-          $vParam .= $head[$config['head_no']].'^';
-          $vParam .= $head[$config['head_cust_name']].'^';
-          $vParam .= $head[$config['head_cust_id']].'^';
-          $vParam .= $head[$config['head_cust_npwp']].'^';
-          $vParam .= $head[$config['head_vessel_name']].'^';
-          $vParam .= $bm_eta.'^';
-          $vParam .= $bm_etd.'^';
-          $vParam .= $head[$config['head_voyin']].'^';
-          $vParam .= $head[$config['head_voyout']].'^';
-          $vParam .= $bm_closing_time.'^'; // ?
-          $vParam .= 'BONGKAR MUAT^'; // ?
-          $vParam .= 'CONSIGNEE^'; // ?
-          $vParam .= $oi.'^'; // ?
-          $vParam .= $podpol.'^'; // ?
-          $vParam .= $podpol.'^'; // ?
-          $vParam .= $movetype.'^'; // ?
-          $vParam .= $startenddate.'^'; // ?
-          $vParam .= $startenddate.'^'; // ?
-          $vParam .= '0^'; // ?
-          $vParam .= $blno.'^'; // ?
-          $vParam .= $startenddate.'^'; // ?
-          $vParam .= '0^'; // ?
-          $vParam .= $head[$config['head_vvd_id']].'^'; // ?
-          $vParam .= $oi.'^'; // ?
-          $vParam .= $startenddate.'^'; // ?
-          $vParam .= '0'; // ?
-          $vParamH = $vParam;
-        //
-
-        //
-          $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingHeader";
-          $string_json = '{
-            "createBookingHeaderInterfaceRequest": {
-              "esbHeader": {
-                "externalId": "2",
-                "timestamp": "2"
-              },
-              "esbBody": {
-                "vParam": "'.$vParamH.'",
-                "vId": "'.$head[$config['head_primery']].'",
-                "vReqNo": "'.$head[$config['head_no']].'",
-                "vBlNo": "'.$blno.'"
-              }
-            }
-          }';
-          $username="npk_billing";
-          $password ="npk_billing";
-          $client = new Client();
-          $options= array(
-            'auth' => [
-              $username,
-              $password
-            ],
-            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-            'body' => $string_json,
-            "debug" => false
-          );
-          try {
-            $res = $client->post($endpoint_url, $options);
-          } catch (ClientException $e) {
-            return $e->getResponse();
-          }
-        //
-
-        //
-          $merk = '-';
-          $model = '-';
-          $hz = 'N';
-          $distrub = 'N';
-          $wight = '0';
-
-          $vParamD = '';
-          $vParamD .= $list->dtl_cmdty_name.'^';
-          $vParamD .= $list->dtl_cont_type.'^';
-          $vParamD .= $merk.'^'; // ?
-          $vParamD .= $model.'^'; // ?
-          $vParamD .= $hz.'^'; // ?
-          $vParamD .= $distrub.'^'; // ?
-          $vParamD .= $wight.'^'; // ?
-          $vParamD .= $list->dtl_qty.'^';
-          $vParamD .= 'N^'; // ?
-          $vParamD .= '0'; // ?
-
-          $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createBookingDetail";
-          $string_json = '{
-            "createBookingDetailInterfaceRequest": {
-              "esbHeader": {
-                "externalId": "2",
-                "timestamp": "2"
-                },
-                "esbBody": {
-                  "vParams": "'.$vParamD.'",
-                  "vId": "'.$listA[$config['head_tab_detil_id']].'",
-                  "vIdHeader": "'.$head[$config['head_primery']].'"
-                }
-              }
-          }';
-          $username="npk_billing";
-          $password ="npk_billing";
-          $client = new Client();
-          $options= array(
-            'auth' => [
-              $username,
-              $password
-            ],
-            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-            'body' => $string_json,
-            "debug" => false
-          );
-          try {
-            $res = $client->post($endpoint_url, $options);
-          } catch (ClientException $e) {
-            return $e->getResponse();
-          }
-        //
-    }
-    return ['Success' => true];
-  }
-
   public static function sendUperPutReceipt($uper_id, $pay){
     $uperH = TxHdrUper::find($uper_id);
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
@@ -630,7 +476,7 @@ class ConnectedExternalApps{
                    "receiptAccount":"'.$pay->pay_account_name.' '.$pay->pay_bank_code.' '.$pay->pay_account_no.'",
                    "bankId":"'.$bank->bank_id.'",
                    "customerNumber":"'.$pay->pay_cust_id.'",
-                   "receiptDate":"'.$pay->pay_date.'",
+                   "receiptDate":"'.date('Y-m-d H:i:s', strtotime($pay->pay_date)).'",
                    "currencyCode":"'.$pay->pay_currency.'",
                    "status":"P",
                    "amount":"'.$pay->pay_amount.'",
@@ -671,7 +517,7 @@ class ConnectedExternalApps{
                    "sourceInvoiceType":"NPKBILLING",
                    "remarkToBankId":"BANK_ACCOUNT_ID",
                    "sourceSystem":"NPKBILLING",
-                   "comments":"",
+                   "comments":"'.$pay->pay_note.'",
                    "cmsYn":"N",
                    "tanggalTerima":null,
                    "norekKoran":""
@@ -778,7 +624,7 @@ class ConnectedExternalApps{
                    "sourceInvoiceType":"NPKBILLING",
                    "remarkToBankId":"BANK_ACCOUNT_ID",
                    "sourceSystem":"NPKBILLING",
-                   "comments":"",
+                   "comments":"'.$pay->pay_note.'",
                    "cmsYn":"N",
                    "tanggalTerima":null,
                    "norekKoran":""
@@ -1288,6 +1134,100 @@ class ConnectedExternalApps{
       return json_decode($res->getBody()->getContents(), true);
     } catch (ClientException $e) {
       return $e->getResponse();
+    }
+  }
+
+  public static function uperSimkeuCek($input){
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusReceipt";
+    $string_json = '{
+       "inquiryStatusReceiptRequest":{
+          "esbHeader":{
+             "internalId":"",
+             "externalId":"EDI-2910201921570203666",
+             "timestamp":"2019-10-29 21:57:020.36665400",
+             "responseTimestamp":"",
+             "responseCode":"",
+             "responseMessage":""
+          },
+          "esbBody":[
+             {
+                "receiptNumber":"'.$input['uper_no'].'"
+             }
+          ]
+       }
+    }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    $results = json_decode($res->getBody()->getContents(), true);
+    if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] != 1) {
+      TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
+      return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbHeader']['responseMessage']];
+    }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
+      TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
+      return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg']];
+    }
+  }
+
+  public static function notaProformaSimkeuCek($input){
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusLunas";
+    $string_json = '{
+       "inquiryStatusLusnasRequest":{
+          "esbHeader":{
+             "internalId":"",
+             "externalId":"EDI-2910201921570203666",
+             "timestamp":"2019-10-29 21:57:020.36665400",
+             "responseTimestamp":"",
+             "responseCode":"",
+             "responseMessage":""
+          },
+          "esbBody":[
+             {
+                "trxNumber":"'.$input['nota_no'].'"
+             }
+          ]
+       }
+    }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    return $results = json_decode($res->getBody()->getContents(), true);
+    if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] != 1) {
+      TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
+      return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage']];
+    }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
+      TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
+      return ['result' => 'Proforma is paid'];
     }
   }
 }

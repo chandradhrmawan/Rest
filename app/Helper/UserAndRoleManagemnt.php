@@ -11,10 +11,26 @@ use Illuminate\Support\Facades\Hash;
 class UserAndRoleManagemnt{
 
   public static function storeUser($input){
+    if (!empty($input['user_id'])){
+      $cek = DB::connection('omuster')->table('TM_USER')->where('user_name',$input['user_name'])->count();
+      if ($cek > 0) {
+        return [
+          "Success" => false,
+          "result" => "fail, user_name already exists"
+        ];
+      }
+      $cek = DB::connection('omuster')->table('TM_USER')->where('user_nik',$input['user_nik'])->count();
+      if ($cek > 0) {
+        return [
+          "Success" => false,
+          "result" => "fail, user_nik already exists"
+        ];
+      }
+    }
     $set_data = [
       'user_name' => $input['user_name'],
-      'user_role' => $input['user_role'],
       'user_nik' => $input['user_nik'],
+      'user_role' => $input['user_role'],
       'user_branch_id' => $input['user_branch_id'],
       'user_full_name' => $input['user_full_name'],
       'user_status' => $input['user_status']

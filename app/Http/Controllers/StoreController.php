@@ -64,13 +64,17 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
-      // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['uper_req_no'], 'paid_date' => $input['paid_date']]);
+      return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
       return ConnectedExternalApps::sendNotaProforma(30);
     }
 
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
       return base64_encode($file);
+    }
+
+    function confirmUperFromEinvAndSimkue($input, $request){
+      return UperRequest::updateUperStatus($input);
     }
 
     function rejectedProformaNota($input){
@@ -258,6 +262,14 @@ class StoreController extends Controller
 
       function confirmPaymentUper($input, $request){
         return UperRequest::confirmPaymentUper($input);
+      }
+
+      function uperSimkeuCek($input, $request){
+        return ConnectedExternalApps::uperSimkeuCek($input);
+      }
+
+      function notaProformaSimkeuCek($input, $request){
+        return ConnectedExternalApps::notaProformaSimkeuCek($input);
       }
     // UperRequest
 
