@@ -263,6 +263,10 @@ class StoreController extends Controller
       function confirmPaymentUper($input, $request){
         return UperRequest::confirmPaymentUper($input);
       }
+
+      function uperSimkueCek($input, $request){
+        return ConnectedExternalApps::uperSimkueCek($input);
+      }
     // UperRequest
 
     // UserAndRoleManagemnt

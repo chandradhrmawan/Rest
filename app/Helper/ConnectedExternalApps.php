@@ -1136,4 +1136,50 @@ class ConnectedExternalApps{
       return $e->getResponse();
     }
   }
+
+  public static function uperSimkueCek($input){
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusReceipt";
+    $string_json = '{
+       "inquiryStatusReceiptRequest":{
+          "esbHeader":{
+             "internalId":"",
+             "externalId":"EDI-2910201921570203666",
+             "timestamp":"2019-10-29 21:57:020.36665400",
+             "responseTimestamp":"",
+             "responseCode":"",
+             "responseMessage":""
+          },
+          "esbBody":[
+             {
+                "receiptNumber":"'.$input['uper_no'].'"
+             }
+          ]
+       }
+    }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    $results = json_decode($res->getBody()->getContents(), true);
+    if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] != 1) {
+      return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbHeader']['responseMessage']];
+    }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
+      TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
+      return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg']];
+    }
+  }
 }
