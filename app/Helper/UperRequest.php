@@ -279,21 +279,23 @@ class UperRequest{
         ]);
       }
       $req_no = $input['uper_req_no'];
+      $uper_paid_date = $input['uper_paid_date'];
     }else if (isset($input['uper_no'])){
       TxHdrUper::where('uper_no',$input['uper_no'])->update([
         'uper_paid' => $input['uper_paid']
       ]);
       $req_no = TxHdrUper::where('uper_no',$input['uper_no'])->first();
       $req_no = $req_no->uper_req_no;
+      $uper_paid_date = $req_no->uper_paid_date;
     }
-    static::sendRequestBooking(['req_no' => $req_no]);
+    static::sendRequestBooking(['req_no' => $req_no, 'uper_paid_date' => $uper_paid_date]);
     return ["result" => "Success, confirm uper", "uper_no" => $input['uper_no'] ];
   }
 
   private static function sendRequestBooking($input){
     $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V', 'F'])->count();
     if ($cekStatus == 0) {
-      ConnectedExternalApps::sendRequestBooking(['req_no' => $input['uper_req_no'], 'paid_date' => $input['uper_paid_date']]);
+      ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['uper_paid_date']]);
     }
   }
 
