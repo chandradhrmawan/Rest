@@ -1224,10 +1224,10 @@ class ConnectedExternalApps{
     $results = json_decode($res->getBody()->getContents(), true);
     if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] != 1) {
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
-      return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage']];
+      return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage'], 'esbRes' => $results];
     }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
-      return ['result' => 'Proforma is paid', 'nota_no' => $input['nota_no']];
+      return ['result' => 'Proforma is paid', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
     }
   }
 }
