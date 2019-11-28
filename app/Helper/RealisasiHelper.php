@@ -25,7 +25,7 @@ class RealisasiHelper{
       $setH['P_CUSTOMER_ID'] = $find->bm_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->real_no;
       $setH['P_REALIZATION'] = 'Y';
-      // $setH['P_RESTITUTION'] = 'N';
+      $setH['P_RESTITUTION'] = 'N';
       $setH['P_TRADE'] = $find->bm_trade_type;
       $setH['P_USER_ID'] = $find->real_create_by;
     // build head
@@ -123,7 +123,7 @@ class RealisasiHelper{
       $setH['P_CUSTOMER_ID'] = $find->bprp_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->bprp_no;
       $setH['P_REALIZATION'] = 'Y';
-      // $setH['P_RESTITUTION'] = 'N';
+      $setH['P_RESTITUTION'] = 'N';
       $setH['P_TRADE'] = $find->bprp_trade_type;
       $setH['P_USER_ID'] = $find->bprp_create_by;
     // build head
@@ -159,6 +159,7 @@ class RealisasiHelper{
         $newD['DTL_CONT_STATUS'] = 'NULL';
         $newD['DTL_UNIT_ID'] = empty($list['dtl_req_unit_id']) ? 'NULL' : $list['dtl_req_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_in_qty']) ? 'NULL' : $list['dtl_in_qty'];
+        $newD['DTL_BM_TYPE'] = 'NULL';
         $newD['DTL_TL'] = 'NULL';
         $newD['DTL_DATE_IN'] = empty($list['dtl_datein']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_datein'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
         $newD['DTL_DATE_OUT'] = empty($list['dtl_dateout']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_dateout'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';

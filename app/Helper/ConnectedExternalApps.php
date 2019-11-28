@@ -1180,7 +1180,7 @@ class ConnectedExternalApps{
       return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbHeader']['responseMessage']];
     }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
       TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
-      return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg']];
+      return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
     }
   }
 
@@ -1227,7 +1227,7 @@ class ConnectedExternalApps{
       return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage']];
     }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
       TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
-      return ['result' => 'Proforma is paid'];
+      return ['result' => 'Proforma is paid', 'nota_no' => $input['nota_no']];
     }
   }
 }
