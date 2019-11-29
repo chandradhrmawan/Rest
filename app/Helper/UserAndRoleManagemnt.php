@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 class UserAndRoleManagemnt{
 
   public static function storeUser($input){
-    if (!empty($input['user_id'])){
+    if (empty($input['user_id'])){
       $cek = DB::connection('omuster')->table('TM_USER')->where('user_name',$input['user_name'])->count();
       if ($cek > 0) {
         return [

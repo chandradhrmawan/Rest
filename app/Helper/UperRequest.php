@@ -208,7 +208,7 @@ class UperRequest{
                   'uper_req_no' => $uper->uper_req_no,
                   'uper_paid_date' => $input['pay_date'],
                   'uper_no' => $uper->uper_no,
-                  'uper_paid' => 'F'
+                  'uper_paid' => 'R'
                 ]);
                 return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
               }
