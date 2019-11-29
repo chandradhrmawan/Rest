@@ -310,6 +310,14 @@ class RealisasiHelper{
 
   public static function approvedProformaNota($input){
     $nota = TxHdrNota::find($input['id']);
+    if ($nota->nota_status == 2) {
+      return [
+        'Success' => false,
+        'result' => 'Fail, approved proforma, proforma already approved!',
+        'req_no' => $nota->nota_req_no,
+        'nota_no' => $nota->nota_no
+      ];
+    }
     TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2]);
     $count = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->whereIn('nota_status', [1,3])->count();
 
