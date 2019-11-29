@@ -154,7 +154,7 @@ class UperRequest{
               return ["Success"=>false, "result" => "Fail, file is required"];
             }
           }
-          
+
           if (isset($input['encode']) and $input['encode'] == 'true') {
             $pay->pay_status = 2;
           } else {

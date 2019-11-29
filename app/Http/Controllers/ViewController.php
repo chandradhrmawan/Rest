@@ -194,8 +194,8 @@ class ViewController extends Controller
                 A.NOTA_ID = '$id'
               ";
       $kapal       = DB::connection('omcargo')->select($query);
-      $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_id)->get();
-      $html       = view('print.proforma2',["bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
+      $html       = view('print.proforma2',["bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
       $filename   = $all["header"][0]->nota_no.rand(10,100000);
       $dompdf     = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);

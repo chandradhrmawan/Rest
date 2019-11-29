@@ -51,7 +51,9 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Proforma</center>
+	@foreach($label as $label)
+	<center style="width:100%;background-color:orange;color:#fff;margin-top:20px"> PROFORMA {{$label->nota_name}}</center>
+	@endforeach
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
 		<td style="vertical-align:top">
@@ -66,6 +68,11 @@
           <td>: </td>
           <td>{{$header->nota_cust_name}}</td>
         </tr>
+				<tr>
+					<td>Customer ID</td>
+					<td>: </td>
+					<td>{{$header->nota_cust_id}}</td>
+				</tr>
         <tr>
           <td>Alamat</td>
           <td>: </td>
@@ -84,6 +91,11 @@
           <td>Nama Kapal</td>
           <td>: </td>
           <td>{{$header->nota_vessel_name}}</td>
+        </tr>
+				<tr>
+          <td>Nama.PBM </td>
+          <td>: </td>
+          <td></td>
         </tr>
 				<tr>
           <td>Periode Kunjungan</td>

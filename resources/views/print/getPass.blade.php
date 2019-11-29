@@ -25,7 +25,7 @@
 @foreach($data as $data)
   <table width="100%" style="font-size:10px">
     <tr>
-      <td style="width:10%"><img src="{{ url('/other/logo.jpg') }}" style="height:50px"></td>
+      <td style="width:10%"><img src="{{ url('/other/logo_ptp.png') }}" style="height:50px"></td>
       <td style="vertical-align:top"><b>PT. PELABUHAN INDONESIA II <br> TERMINAL BANTEN</b><hr><b>GET PASS DELIVERY CARGO</b></td>
     </tr>
   </table>
