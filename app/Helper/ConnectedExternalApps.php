@@ -321,11 +321,7 @@ class ConnectedExternalApps{
 
   public static function sendRequestBooking($input){
     $req_type = substr($input['req_no'], 0,3);
-    if ($req_type == 'BM-') {
-      $header = TxHdrBm::where('bm_no',$input['req_no'])->first();
-      $table = 'TX_HDR_BM';
-      $req_type = 'BM';
-    }else if($req_type == 'REC') {
+    if($req_type == 'REC') {
       $header = TxHdrRec::where('rec_no',$input['req_no'])->first();
       $table = 'TX_HDR_REC';
       // if ($header->rec_extend_status == 'Y') {
@@ -337,6 +333,13 @@ class ConnectedExternalApps{
       // if ($header->del_extend_status == 'Y') {
       //   $req_type = 'EXT';
       // }
+    }else{
+      $req_type = substr($input['req_no'], 0,2);
+      if ($req_type == 'BM') {
+        $header = TxHdrBm::where('bm_no',$input['req_no'])->first();
+        $table = 'TX_HDR_BM';
+        $req_type = 'BM';
+      }
     }
 
     $config = RequestBooking::config($table);
