@@ -684,7 +684,7 @@ class BillingEngine{
 					$resultD = [];
 					foreach ($group_tariff as $grpTrf){
 							$grpTrf = (array)$grpTrf;
-							$uperD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+							$uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
 							$countLine = 0;
 							foreach ($uperD as $list){
 									$list = (array)$list;
@@ -704,12 +704,12 @@ class BillingEngine{
 											"dtl_tariff" => $list["tariff"],
 											"dtl_package" => $list["package_name"],
 											"dtl_qty" => $list["qty"],
-											"dtl_unit" => $list["unit_id"],
+											// "dtl_unit" => $list["unit_id"],
 											"dtl_unit_name" => $list["unit_name"],
 											"dtl_group_tariff_id" => $list["group_tariff_id"],
 											"dtl_group_tariff_name" => $list["group_tariff_name"],
 											"dtl_bl" => $list["no_bl"],
-											"dtl_dpp" => $list["tariff_cal"],
+											"dtl_dpp" => $list["dpp"],
 											"dtl_commodity" => $list["commodity_name"],
 											"dtl_equipment" => $list["equipment_name"]
 									];
