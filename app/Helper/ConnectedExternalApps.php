@@ -217,7 +217,7 @@ class ConnectedExternalApps{
       }
     }
 
-    return $body = json_decode($res->getBody()->getContents(), true);
+    $body = json_decode($res->getBody()->getContents(), true);
     if (isset($body['searchPEBInterfaceResponse']['esbBody']['response'])) {
       if(strpos($body['searchPEBInterfaceResponse']['esbBody']['response'], 'Data tidak ditemukan')){
         return ['Success' => false, 'result' => 'Data tidak ditemukan'];
