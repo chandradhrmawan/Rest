@@ -52,6 +52,12 @@ class RequestBooking{
 				}
 				$newD['DTL_BM_TYPE'] = $DTL_BM_TYPE;
 
+				$DTL_STACK_AREA = 'NULL';
+				if (in_array($config['head_nota_id'], ["14", "15", 14, 15])) {
+					$DTL_STACK_AREA = empty($list['dtl_stacking_type_id']) ? 'NULL' : $list['dtl_stacking_type_id'];
+				}
+				$newD['DTL_STACK_AREA'] = $DTL_STACK_AREA;
+
 				if ($config['head_tab_detil_tl'] != null) {
 					$newD['DTL_TL'] = empty($list[$config['head_tab_detil_tl']]) ? 'NULL' : $list[$config['head_tab_detil_tl']];
 				}else{

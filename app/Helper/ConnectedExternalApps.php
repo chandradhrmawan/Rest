@@ -1176,7 +1176,6 @@ class ConnectedExternalApps{
     }
     $results = json_decode($res->getBody()->getContents(), true);
     if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] != 1) {
-      TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
       return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbHeader']['responseMessage']];
     }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
       if ($results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceipt'] == 'S') {
@@ -1230,7 +1229,6 @@ class ConnectedExternalApps{
     }
     $results = json_decode($res->getBody()->getContents(), true);
     if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] != 1) {
-      TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
       return ['Success' => false, 'result' => $results['inquiryStatusLunasResponse']['esbHeader']['responseMessage'], 'esbRes' => $results];
     }else if ($results['inquiryStatusLunasResponse']['esbHeader']['responseCode'] == 1) {
       if ($results['inquiryStatusLunasResponse']['esbBody']['details'][0]['statusLunas'] == 'S') {

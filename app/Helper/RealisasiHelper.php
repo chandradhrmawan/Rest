@@ -66,6 +66,7 @@ class RealisasiHelper{
         $newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_real_qty']) ? 'NULL' : $list['dtl_real_qty'];
         $newD['DTL_BM_TYPE'] = empty($list['dtl_bm_type']) ? 'NULL' : $list['dtl_bm_type'];
+        $newD['DTL_STACK_AREA'] = 'NULL';
         $newD['DTL_TL'] = empty($list['dtl_bm_tl']) ? 'NULL' : $list['dtl_bm_tl'];
         $newD['DTL_DATE_IN'] = 'NULL';
         $newD['DTL_DATE_OUT'] = 'NULL';
@@ -160,6 +161,7 @@ class RealisasiHelper{
         $newD['DTL_UNIT_ID'] = empty($list['dtl_req_unit_id']) ? 'NULL' : $list['dtl_req_unit_id'];
         $newD['DTL_QTY'] = empty($list['dtl_in_qty']) ? 'NULL' : $list['dtl_in_qty'];
         $newD['DTL_BM_TYPE'] = 'NULL';
+        $newD['DTL_STACK_AREA'] = empty($list['dtl_stacking_type_id']) ? 'NULL' : $list['dtl_stacking_type_id'];
         $newD['DTL_TL'] = 'NULL';
         $newD['DTL_DATE_IN'] = empty($list['dtl_datein']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_datein'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
         $newD['DTL_DATE_OUT'] = empty($list['dtl_dateout']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_dateout'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
