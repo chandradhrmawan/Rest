@@ -154,7 +154,7 @@ class UperRequest{
               return ["Success"=>false, "result" => "Fail, file is required"];
             }
           }
-          
+
           if (isset($input['encode']) and $input['encode'] == 'true') {
             $pay->pay_status = 2;
           } else {
@@ -217,7 +217,7 @@ class UperRequest{
                 'uper_req_no' => $uper->uper_req_no,
                 'uper_paid_date' => $input['pay_date'],
                 'uper_no' => $uper->uper_no,
-                'uper_paid' => 'Y'
+                'uper_paid' => 'W'
               ]);
             } else if ($pay->pay_status == 2) {
                 static::updateUperStatus([
@@ -262,7 +262,7 @@ class UperRequest{
         'uper_id' => $uper->uper_id,
         'uper_req_no' => $uper->uper_req_no,
         'uper_no' => $uper->uper_no,
-        'uper_paid' => 'Y'
+        'uper_paid' => 'W'
       ]);
     }
     return ["result" => "Success, confirm uper payment", 'pay_no' => $pay->pay_no];

@@ -69,6 +69,11 @@
           <td>: </td>
           <td>{{$header->uper_cust_name}}</td>
         </tr>
+				<tr>
+          <td>Customer ID</td>
+          <td>: </td>
+          <td>{{$header->uper_cust_id}}</td>
+        </tr>
         <tr>
           <td>Alamat</td>
           <td>: </td>
@@ -92,6 +97,11 @@
           <td>No.PBM </td>
           <td>: </td>
           <td>{{$header->uper_pbm_id}}</td>
+        </tr>
+				<tr>
+          <td>Nama.PBM </td>
+          <td>: </td>
+          <td>{{$header->nota_pbm_name}}</td>
         </tr>
       </table>
     </td>

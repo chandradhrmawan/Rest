@@ -1182,7 +1182,7 @@ class ConnectedExternalApps{
         TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
         return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
       }else if($results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceipt'] == 'F'){
-        TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
+        TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'E']);
         return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
       }else{
         return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
