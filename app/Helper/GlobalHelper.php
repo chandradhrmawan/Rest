@@ -334,10 +334,6 @@ class GlobalHelper {
   public static function autoComplete($input) {
     $connect  = \DB::connection($input["db"])->table($input["table"]);
 
-    if ($input['field'] != '' && $input['query'] != '') {
-      $connect->Where(strtoupper($input["field"]),'like',"%".strtoupper($input["query"])."%");
-    }
-
     if(!empty($input["groupby"])) {
       $connect->groupBy(strtoupper($input["groupby"]));
     }
@@ -362,6 +358,20 @@ class GlobalHelper {
     if(!empty($input["whereIn"][0])) {
     $in        = $input["whereIn"];
     $connect->whereIn(strtoupper($in[0]), $in[1]);
+    }
+
+    if (!empty($input["query"]) && !empty($input["field"])) {
+      if (is_array($input["field"])) {
+        foreach ($input["field"] as $field) {
+          $connect->orwhere(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
+          $connect->orwhere(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
+          $connect->orwhere(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+        }
+      } else {
+        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
+        $connect->orwhere(strtoupper($input["field"]),"like", "%".ucwords($input["query"])."%");
+        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+      }
     }
 
     $count    = $connect->count();
@@ -423,9 +433,6 @@ class GlobalHelper {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
-    if (!empty($input["query"]) && !empty($input["field"])) {
-      $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
-    }
 
     if (!empty($input["filter"])) {
     $search   = json_decode($input["filter"], TRUE);
@@ -438,6 +445,20 @@ class GlobalHelper {
         $connect->whereDate($value["property"],'>=',$value["value"]);
       else if($value["operator"] == "lt")
         $connect->whereDate($value["property"],'<=',$value["value"]);
+      }
+    }
+
+    if (!empty($input["query"]) && !empty($input["field"])) {
+      if (is_array($input["field"])) {
+        foreach ($input["field"] as $field) {
+          $connect->orwhere(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
+          $connect->orwhere(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
+          $connect->orwhere(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+        }
+      } else {
+        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
+        $connect->orwhere(strtoupper($input["field"]),"like", "%".ucwords($input["query"])."%");
+        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
       }
     }
 
