@@ -29,7 +29,8 @@
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
       <td width="55%">
-        <div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
+				<div<b>PT. Pelabuhan Indonesia II (Persero)<br> Jl. Pasoso No.1, Tanjung Priok, Jakarta Utara 1430 </b><div style="margin-top:5px;font-size:8px">NPWP. 01.061.005.3-093.000</div></div>
+        <!-- <div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div> -->
         </td>
       <td style="vertical-align:top;text-align:right">
         <table style="border-collapse:collapse; font-size:9px;">
@@ -101,7 +102,7 @@
 				<tr>
           <td>Nama.PBM </td>
           <td>: </td>
-          <td>{{$header->nota_pbm_name}}</td>
+          <td>{{$header->uper_pbm_name}}</td>
         </tr>
       </table>
     </td>
@@ -256,7 +257,12 @@
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
 <table style="border-collapse:collapse; font-size:8px;margin-top:60px;float:right;text-align:center">
-	<tr><td>Palembang, 29 Agustus 2019</td></tr>
+	<tr><td>Palembang,
+		<?php
+		$originalDate = $header->uper_date;
+		$newDate = date("d-m-y", strtotime($originalDate));
+		echo strtoupper($newDate);
+		?></td></tr>
 	<tr><td>DGM Keuangan & Administrasi</td></tr>
 	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
 	<tr><td>NIPP. 287117773</td></tr>
