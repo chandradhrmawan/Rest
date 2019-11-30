@@ -373,15 +373,14 @@ class ViewController extends Controller
           foreach ($listS as $key => $value) {
                   $newDt[$key] = $value;
           }
-        }
-
-        // $det[]=$newDt;
-        if ($newDt["comp_nota_view"] == "1") {
-          $det["penumpukan"][]=$newDt;
-        } if ($newDt["comp_nota_view"] == "2") {
-          $det["handling"][]=$newDt;
-        }  if ($newDt["comp_nota_view"] == "3") {
-          $det["alat"][]=$newDt;
+          $det[]=$newDt;
+          if ($newDt["comp_nota_view"] == "1") {
+            $det["penumpukan"][]=$newDt;
+          } if ($newDt["comp_nota_view"] == "2") {
+            $det["handling"][]=$newDt;
+          }  if ($newDt["comp_nota_view"] == "3") {
+            $det["alat"][]=$newDt;
+          }
         }
       }
 
@@ -422,13 +421,14 @@ class ViewController extends Controller
       $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->uper_nota_id)->get();
       $html       = view('print.uper2',["bl"=>$bl,"branch"=>$branch,"label"=>$nota,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat,"terbilang"=>$terbilang]);
 
-      $filename   = $all["header"][0]->uper_no.rand(10,100000);
-      $dompdf     = new Dompdf();
-      $dompdf->set_option('isRemoteEnabled', true);
-      $dompdf->loadHtml($html);
-      $dompdf->setPaper('A4', 'potrait');
-      $dompdf->render();
-      $dompdf->stream($filename, array("Attachment" => false));
+      // $filename   = $all["header"][0]->uper_no.rand(10,100000);
+      // $dompdf     = new Dompdf();
+      // $dompdf->set_option('isRemoteEnabled', true);
+      // $dompdf->loadHtml($html);
+      // $dompdf->setPaper('A4', 'potrait');
+      // $dompdf->render();
+      // $dompdf->stream($filename, array("Attachment" => false));
+      return $all;
     }
 
     function penyebut($nilai) {

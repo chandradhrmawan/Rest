@@ -25,7 +25,7 @@
 		<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
 	<?php } ?>
 	@foreach($branch as $branch)
-  <table width="100%" style="font-size:9px">
+  <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
       <td width="55%">
@@ -33,33 +33,19 @@
         <!-- <div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div> -->
         </td>
       <td style="vertical-align:top;text-align:right">
-        <table style="border-collapse:collapse; font-size:9px;">
-          <tr>
-            <td>No. Uper</td>
-            <td>: {{$header->uper_no}}</td>
-          </tr>
-					<tr>
-						<td>Tgl. Uper</td>
-						<td>: {{$header->uper_date}}</td>
-					</tr>
-          <tr>
-            <td>No. Request</td>
-            <td>: {{$header->uper_req_no}}</td>
-          </tr>
-        </table>
       </td>
     </tr>
   </table>
 
-@foreach($label as $label)
-<center style="width:100%;background-color:orange;color:#fff;margin-top:20px">Perhitungan Sementara</center>
 
-<!-- <center style="width:100%;background-color:orange;color:#fff;margin-top:20px">{{$label->nota_label}}</center> -->
+@foreach($label as $label)
+<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800"> PERHITUNGAN SEMENTARA {{$label->nota_name}}</center>
 @endforeach
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
-      <table style="border-collapse:collapse; font-size:9px;">
+      <table style="border-collapse:collapse; font-size:10px;">
         <tr>
           <td colspan="3">
             <font style="font-size:9;text-align:left"><b>Pengguna Jasa</b></font><br><br>
@@ -88,7 +74,17 @@
       </table>
     </td>
 		<td>
-      <table style="border-collapse:collapse; font-size:9px;">
+      <table style="border-collapse:collapse; font-size:10px;">
+				<tr>
+					<td>No. Uper</td>
+					<td>:</td>
+					<td>{{$header->uper_no}}</td>
+				</tr>
+				<tr>
+					<td>No. Request</td>
+					<td>: </td>
+					<td>{{$header->uper_req_no}}</td>
+				</tr>
         <tr>
           <td>Nama kapal</td>
           <td>: </td>
@@ -110,22 +106,17 @@
 </table>
 
 <?php if ($penumpukan != "0") { ?>
-	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 		<tr style="text-align:center">
-			<th rowspan="2" width="15%">NO BL</th>
-			<th rowspan="2" width="15%">Kemasan</th>
-			<th rowspan="2" width="15%">BARANG</th>
-			<th rowspan="2" width="5%">Qty</th>
-			<th rowspan="2" width="5%">Satuan</th>
-			<th colspan="2" width="15%">Hari</th>
-			<th colspan="2" width="15%">Tarif</th>
-			<th rowspan="2" width="10%">Total</th>
-		</tr>
-		<tr style="text-align:center">
-			<th>Massa 1</th>
-			<th>Massa 2</th>
-			<th>Massa 1</th>
-			<th>Massa 2</th>
+			<th width="15%">NO BL</th>
+			<th width="15%">Kemasan</th>
+			<th width="15%">BARANG</th>
+			<th width="5%">Qty</th>
+			<th width="15%">Tgl Masuk<br>Tgl Keluar<br>Jml Hari</th>
+			<th width="15%">Hari Masa 1 <br> Hari Masa 2</th>
+			<th width="15%">Tarif Masa 1<br>Tarif Masa 2</th>
+			<th width="15%">Sewa Masa 1<br>Sewa Masa 2</th>
+			<th width="10%">Jumlah</th>
 		</tr>
 		@foreach($penumpukan as $penumpukan)
 		<tr>
@@ -133,11 +124,21 @@
 			<td style="padding-left:9px">{{$penumpukan["dtl_package"]}}</td>
 			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
 			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_unit_name"]}}</td>
-			<td style="text-align:center">{{$penumpukan["masa1"]}}</td>
-			<td style="text-align:center">{{$penumpukan["masa2"]}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["trf1up"])}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["trf2up"])}}</td>
+			<td style="text-align:center">
+				
+			</td>
+			<td style="text-align:center">
+				<?php if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
+				<?php if(!empty($penumpukan["masa2"])) { echo $penumpukan["masa2"]; } else { echo "0"; } ?>
+			</td>
+			<td style="text-align:right">
+				<?php if(!empty($penumpukan["trf1up"])) { echo number_format($penumpukan["trf1up"]); } else { echo "0"; } ?><br>
+				<?php if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
+			</td>
+			<td style="text-align:right">
+				<?php if(!empty($penumpukan["trf1up"])) { echo number_format($penumpukan["trf1up"]); } else { echo "0"; } ?><br>
+			<?php if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
+		</td>
 			<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
 		</tr>
 		@endforeach
@@ -145,7 +146,7 @@
 <?php } ?>
 
 <?php if ($bl != "0") { ?>
-<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
 		<th rowspan="2" width="15%">NO BL</th>
 		<th rowspan="2" width="15%">TL</th>
@@ -161,7 +162,7 @@
     <th>Muat</th>
   </tr>
 	@foreach($bl as $bl)
-  <tr style="background:yellow;">
+  <tr style="background-color:#ff3030;color:#fff">
     <td style="border-right: 0;padding-left:9px">{{$bl}}</td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0"></td>
@@ -205,7 +206,7 @@
 
 
 <?php if ($alat != "0") { ?>
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
 		<th width="15%">Layanan</th>
 		<th width="15%">Nama Alat</th>
@@ -229,7 +230,7 @@
 <?php }} ?>
 </table>
 
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
   <tr>
     <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DPP</td>
@@ -255,8 +256,8 @@
     <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->uper_amount)}}</td>
   </tr>
 </table>
-<p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
-<table style="border-collapse:collapse; font-size:8px;margin-top:60px;float:right;text-align:center">
+<p style="font-size:10px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
+<table style="border-collapse:collapse; font-size:10px;margin-top:60px;float:right;text-align:center">
 	<tr><td>Palembang,
 		<?php
 		$originalDate = $header->uper_date;
@@ -268,7 +269,7 @@
 	<tr><td>NIPP. 287117773</td></tr>
 </table>
 
-<div style="position:absolute;bottom:20px;font-size:9px; width:100%">
+<div style="position:absolute;bottom:20px;font-size:10px; width:100%">
 	{{$branch->branch_name}} <br>{{$branch->branch_address}}
 	<div style="margin-top:50px;font-size:8px">
 			{{$branch->branch_npwp}}
