@@ -24,16 +24,42 @@ class UperRequest{
       $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
       $getHS = DB::connection('eng')->select(DB::raw($query));
       foreach ($getHS as $getH){
-          $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
-          $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
-          $resultD = [];
-          foreach ($group_tariff as $grpTrf){
-              $grpTrf = (array)$grpTrf;
-              $uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
-              $countLine = 0;
-              foreach ($uperD as $list){
-                  $resultD[] = $list;
+          $comp_notas = DB::connection('mdm')->table('TM_REFF')->where([
+            'reff_tr_id' => 10
+          ])->get();
+          $nota_view = [];
+
+          foreach ($comp_notas as $comp_nota) {
+            $cekGR = DB::connection('mdm')->table('TM_COMP_NOTA')->where([
+              'branch_id' => $getH->branch_id,
+              'nota_id' => $getH->nota_id,
+              'comp_nota_view' => $comp_nota->reff_id
+            ])->get();
+
+            $grArr = [];
+            foreach ($cekGR as $loop) {
+              $grArr[] = $loop->group_tariff_id;
+            }
+            $nv = [];
+            if (count($grArr) > 0) {
+              $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
+              $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+              $resultD = [];
+              foreach ($group_tariff as $grpTrf){
+                  $grpTrf = (array)$grpTrf;
+                  if (in_array($grpTrf['group_tariff_id'], $grArr)) {
+                    $uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+                    $countLine = 0;
+                    foreach ($uperD as $list){
+                        $resultD[] = $list;
+                    }
+                  }
               }
+              $nv[$comp_nota->reff_name] = $resultD;
+            }
+            if (!empty($nv)) {
+              $nota_view[] = $nv;
+            }
           }
 
           // build head
@@ -79,7 +105,7 @@ class UperRequest{
               if ($config['head_terminal_name'] != null) {
                   $head['uper_terminal_name'] = $find[$config['head_terminal_name']];
               }
-              $head['detil'] = $resultD;
+              $head['nota_view'] = $nota_view;
           // build head
 
           $result[] = $head;
