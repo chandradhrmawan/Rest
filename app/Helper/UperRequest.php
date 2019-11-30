@@ -29,7 +29,7 @@ class UperRequest{
       foreach ($getHS as $getH){
           $comp_notas = DB::connection('mdm')->table('TM_REFF')->where([
             'reff_tr_id' => 10
-          ])->get();
+          ])orderBy('reff_order', 'asc')->get();
           $nota_view = [];
 
           foreach ($comp_notas as $comp_nota) {
