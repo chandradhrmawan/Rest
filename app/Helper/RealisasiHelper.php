@@ -339,10 +339,10 @@ class RealisasiHelper{
           if ($pay->pay_amount >= $list->nota_amount) {
             TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'Y']);
           }else{
-            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'U']);
+            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'I']);
           }
         }else{
-          TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'U']);
+          TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'I']);
         }
       }
     }
