@@ -33,16 +33,12 @@ class UperRequest{
           $nota_view = [];
 
           foreach ($comp_notas as $comp_nota) {
-            $cekGR = DB::connection('mdm')->table('TM_COMP_NOTA')->where([
+            $grArr = DB::connection('mdm')->table('TM_COMP_NOTA')->where([
               'branch_id' => $getH->branch_id,
               'nota_id' => $getH->nota_id,
               'comp_nota_view' => $comp_nota->reff_id
-            ])->get();
+            ])->pluck('group_tariff_id');
 
-            $grArr = [];
-            foreach ($cekGR as $loop) {
-              $grArr[] = $loop->group_tariff_id;
-            }
             $nv = [];
             if (count($grArr) > 0) {
               $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
