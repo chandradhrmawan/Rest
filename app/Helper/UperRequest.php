@@ -17,6 +17,9 @@ class UperRequest{
       $input['table'] = strtoupper($input['table']);
       $config = RequestBooking::config($input['table']);
       $find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+      if (count($find) == 0) {
+        return ['Success' => false, 'result' => 'fail, not found data!'];
+      }
       $find = (array)$find[0];
 
       $result = [];
