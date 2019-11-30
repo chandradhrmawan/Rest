@@ -335,10 +335,14 @@ class RealisasiHelper{
         // }
         $pay = TxPayment::where('pay_req_no', $list->nota_req_no)->where('pay_cust_id', $list->nota_cust_id)->first();
         if (!empty($pay)) {
-          ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
+          // ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
           if ($pay->pay_amount >= $list->nota_amount) {
-            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'W']);
+            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'Y']);
+          }else{
+            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'U']);
           }
+        }else{
+          TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'U']);
         }
       }
     }
