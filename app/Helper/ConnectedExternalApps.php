@@ -768,6 +768,53 @@ class ConnectedExternalApps{
     return [json_decode($res->getBody()->getContents())];
   }
 
+  public static function closeTCA($input){
+    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/closeTCA";
+    
+    $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where('terminal_code', $input['tca_terminal_code'])->get();
+    $terminal = $terminal[0];
+    $truck = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id', $input['tca_truck_id'])->get();
+    if (count($truck) == 0) {
+      return ["Success"=>false, 'result_msg' => 'Fail, not found '.$input['tca_truck_id'].' on mdm.tm_truck'];
+    }
+    $truck = $truck[0];
+
+    $string_json = '{
+            "closeTCAInterfaceRequest": {
+               "esbHeader": { 
+            },
+              "esbBody": {
+                "vTid": "'.$truck->truck_id_seq.'",
+                "vNoRequest": "'.$input['tca_req_no'].'",
+                "vBlNumber": "'.$input['tca_bl'].'",
+                "vIdTerminal": "'.$terminal->terminal_id.'"
+                    }
+          }
+    }';
+
+    $username="npk_billing";
+    $password ="npk_billing";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      echo $e->getRequest() . "\n";
+      if ($e->hasResponse()) {
+        echo $e->getResponse() . "\n";
+      }
+    }
+    return [json_decode($res->getBody()->getContents())];
+  }
+
   public static function createTCA($input, $tca_id){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createTCA";
 

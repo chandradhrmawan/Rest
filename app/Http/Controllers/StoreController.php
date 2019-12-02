@@ -138,7 +138,7 @@ class StoreController extends Controller
       }
     }
 
-    function sendTCA($input){
+    function sendTCA($input, $request){
       $head = DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $input['id'])->get();
       $head = $head[0];
       if ($head->tca_status == 2) {
@@ -213,6 +213,10 @@ class StoreController extends Controller
       ];
 
       return ConnectedExternalApps::createTCA($set_data, $input['id']);
+    }
+
+    function closeTCA($input, $request){
+      return ConnectedExternalApps::closeTCA($input);
     }
 
     function save($input, $request) {
