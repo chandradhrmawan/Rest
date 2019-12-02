@@ -120,16 +120,16 @@ class ViewController extends Controller
           foreach ($listS as $key => $value) {
                   $newDt[$key] = $value;
           }
+          $det[]=$newDt;
+          if ($newDt["comp_nota_view"] == "1") {
+            $det["penumpukan"][]=$newDt;
+          } if ($newDt["comp_nota_view"] == "2") {
+            $det["handling"][]=$newDt;
+          }  if ($newDt["comp_nota_view"] == "3") {
+            $det["alat"][]=$newDt;
+          }
         }
 
-        $det[]=$newDt;
-        if ($newDt["comp_nota_view"] == "1") {
-          $det["penumpukan"][]=$newDt;
-        } if ($newDt["comp_nota_view"] == "2") {
-          $det["handling"][]=$newDt;
-        }  if ($newDt["comp_nota_view"] == "3") {
-          $det["alat"][]=$newDt;
-        }
       }
 
       $all = ["header"=>$header]+$det;

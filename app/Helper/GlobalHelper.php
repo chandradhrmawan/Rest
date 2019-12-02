@@ -754,23 +754,20 @@ class GlobalHelper {
 
   public static function tanggalMasukKeluar($service, $req_no, $no) {
     if ($service == "DEL") {
-        $dtlIn  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
-        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn[0]->del_id)->get();
-        $date2  =date_create($dtlOut[$no]->dtl_out);
-        $date1  =date_create($dtlIn[0]->del_eta);
+        $header  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
+        $dtl      = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header[0]->del_id)->get();
+        $date2  =date_create($dtl[$no]->dtl_out);
+        $date1  =date_create($dtl[$no]->dtl_in);
         $count = date_diff($date1,$date2);
-        echo date("d-m-y", strtotime($dtlIn[0]->del_eta))."<br>".date("d-m-y", strtotime($dtlOut[$no]->dtl_out))."<br>".$count->format("%d Hari");
+        echo date("d-m-y", strtotime($dtl[$no]->dtl_in))."<br>".date("d-m-y", strtotime($dtl[$no]->dtl_out))."<br>".$count->format("%d Hari");
     }
-  }
-
-  public static function countDate($service, $req_no, $no) {
-    if ($service == "DEL") {
+    else if ($service == "REC") {
         $dtlIn  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
-        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn[0]->del_id)->get();
-        $date2  =date_create($dtlOut[$no]->dtl_out);
-        $date1  =date_create($dtlIn[0]->del_eta);
-        $countDate = date_diff($date1,$date2);
-        return $countDate->d;
+        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn[0]->rec_id)->get();
+        $date1  =date_create($dtlOut[$no]->dtl_in);
+        $date2  =date_create($dtlIn[0]->rec_etd);
+        $count = date_diff($date1,$date2);
+        echo date("d-m-y", strtotime($dtlOut[$no]->dtl_in))."<br>".date("d-m-y", strtotime($dtlIn[0]->rec_etd))."<br>".$count->format("%d Hari");
     }
   }
 }
