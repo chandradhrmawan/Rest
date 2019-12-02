@@ -421,14 +421,13 @@ class ViewController extends Controller
       $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->uper_nota_id)->get();
       $html       = view('print.uper2',["bl"=>$bl,"branch"=>$branch,"label"=>$nota,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat,"terbilang"=>$terbilang]);
 
-      // $filename   = $all["header"][0]->uper_no.rand(10,100000);
-      // $dompdf     = new Dompdf();
-      // $dompdf->set_option('isRemoteEnabled', true);
-      // $dompdf->loadHtml($html);
-      // $dompdf->setPaper('A4', 'potrait');
-      // $dompdf->render();
-      // $dompdf->stream($filename, array("Attachment" => false));
-      return $all;
+      $filename   = $all["header"][0]->uper_no.rand(10,100000);
+      $dompdf     = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
     }
 
     function penyebut($nilai) {

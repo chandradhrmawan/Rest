@@ -332,7 +332,7 @@ class GlobalHelper {
   }
 
   public static function autoComplete($input) {
-    $connect  = \DB::connection($input["db"])->table($input["table"]);
+    $connect  = DB::connection($input["db"])->table($input["table"]);
 
     if(!empty($input["groupby"])) {
       $connect->groupBy(strtoupper($input["groupby"]));
@@ -363,14 +363,30 @@ class GlobalHelper {
     if (!empty($input["query"]) && !empty($input["field"])) {
       if (is_array($input["field"])) {
         foreach ($input["field"] as $field) {
-          $connect->orwhere(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
-          $connect->orwhere(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
-          $connect->orwhere(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+          $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%")->get();
+          $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
+          $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtolower($input["query"])."%")->get();
+
+          if (!empty($upper)) {
+            $connect->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
+          } else if(!empty($capit)) {
+            $connect->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
+          } else if(!empty($lower)) {
+            $connect->where(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+          }
         }
       } else {
-        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
-        $connect->orwhere(strtoupper($input["field"]),"like", "%".ucwords($input["query"])."%");
-        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+        $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%")->get();
+        $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
+        $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%")->get();
+
+        if (!empty($upper)) {
+          $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
+        } else if(!empty($capit)) {
+          $connect->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%");
+        } else if(!empty($lower)) {
+          $connect->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+        }
       }
     }
 
@@ -734,5 +750,27 @@ class GlobalHelper {
 
     $delHead = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where(strtoupper($pk), "like", strtoupper($pkVal))->delete();
     return "Data Berhasil Dihapus";
+  }
+
+  public static function tanggalMasukKeluar($service, $req_no, $no) {
+    if ($service == "DEL") {
+        $dtlIn  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
+        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn[0]->del_id)->get();
+        $date2  =date_create($dtlOut[$no]->dtl_out);
+        $date1  =date_create($dtlIn[0]->del_eta);
+        $count = date_diff($date1,$date2);
+        echo date("d-m-y", strtotime($dtlIn[0]->del_eta))."<br>".date("d-m-y", strtotime($dtlOut[$no]->dtl_out))."<br>".$count->format("%d Hari");
+    }
+  }
+
+  public static function countDate($service, $req_no, $no) {
+    if ($service == "DEL") {
+        $dtlIn  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
+        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn[0]->del_id)->get();
+        $date2  =date_create($dtlOut[$no]->dtl_out);
+        $date1  =date_create($dtlIn[0]->del_eta);
+        $countDate = date_diff($date1,$date2);
+        return $countDate->d;
+    }
   }
 }

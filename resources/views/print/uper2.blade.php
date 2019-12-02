@@ -29,7 +29,7 @@
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
       <td width="55%">
-				<div<b>PT. Pelabuhan Indonesia II (Persero)<br> Jl. Pasoso No.1, Tanjung Priok, Jakarta Utara 1430 </b><div style="margin-top:5px;font-size:8px">NPWP. 01.061.005.3-093.000</div></div>
+				<div><b>PT. Pelabuhan Indonesia II (Persero)<br> Jl. Pasoso No.1, Tanjung Priok, Jakarta Utara 1430 </b><div style="margin-top:5px;font-size:8px">NPWP. 01.061.005.3-093.000</div></div>
         <!-- <div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div> -->
         </td>
       <td style="vertical-align:top;text-align:right">
@@ -40,7 +40,6 @@
 
 @foreach($label as $label)
 <center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800"> PERHITUNGAN SEMENTARA {{$label->nota_name}}</center>
-@endforeach
 
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
@@ -118,6 +117,9 @@
 			<th width="15%">Sewa Masa 1<br>Sewa Masa 2</th>
 			<th width="10%">Jumlah</th>
 		</tr>
+		<?php
+			$no = 0;
+		 ?>
 		@foreach($penumpukan as $penumpukan)
 		<tr>
 			<td style="padding-left:9px">{{$penumpukan["dtl_bl"]}}</td>
@@ -125,7 +127,7 @@
 			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
 			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
 			<td style="text-align:center">
-				
+				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label->nota_service_om_code, $header->uper_req_no, $no)}}
 			</td>
 			<td style="text-align:center">
 				<?php if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
@@ -136,9 +138,16 @@
 				<?php if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
 			</td>
 			<td style="text-align:right">
-				<?php if(!empty($penumpukan["trf1up"])) { echo number_format($penumpukan["trf1up"]); } else { echo "0"; } ?><br>
-			<?php if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
-		</td>
+				<?php
+					$jumlah = $penumpukan["masa1"]*$penumpukan["trf1up"]*$penumpukan["dtl_qty"];
+					echo number_format($jumlah)."<br>";
+				 ?>
+				 <?php
+	 				$jumlah = $penumpukan["masa2"]*$penumpukan["trf2up"]*$penumpukan["dtl_qty"];
+	 				echo number_format($jumlah);
+					$no++;
+	 			 ?>
+			 </td>
 			<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
 		</tr>
 		@endforeach
@@ -276,6 +285,7 @@
 	</div>
 </div>
 <p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+@endforeach
 @endforeach
 @endforeach
 </body>
