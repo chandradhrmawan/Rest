@@ -1287,7 +1287,7 @@ class ConnectedExternalApps{
         TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'Y']);
         return ['result' => 'Nota is paid', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
       }else if ($results['inquiryStatusLunasResponse']['esbBody']['details'][0]['statusLunas'] == 'F') {
-        TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
+        // TxHdrNota::where('nota_no',$input['nota_no'])->update(['nota_paid' => 'F']);
         return ['Success' => false, 'result' => 'Nota is failed', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
       }else{
         return ['Success' => false, 'result' => 'Nota sending to simkeu!', 'nota_no' => $input['nota_no'], 'esbRes' => $results];
