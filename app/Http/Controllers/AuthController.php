@@ -36,7 +36,7 @@ class AuthController extends BaseController
         $payload = [
             'iss' => "bearer", // Issuer of the token
             'sub' => $user->user_id, // Subject of the token
-            'exp' => time() + 60*60 // Expiration time
+            'exp' => time() + 360*100 // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
@@ -62,24 +62,26 @@ class AuthController extends BaseController
             ], 400);
         }
         // Verify the password and generate the token
+        date_default_timezone_set('GMT');
+        $time = date('H:i:s',strtotime('+7 hour',strtotime(date("h:i:s"))));
         if (Hash::check($this->request->input('USER_PASSWD'), $user["user_passwd"])) {
             $cek      = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
-            $header   = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+            $header   = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token", "user_active")->first();
             $brnc_id  = json_decode(json_encode($header), TRUE);
             $detail   = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID','=',$brnc_id['user_branch_id'])->get();
 
             $data = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $this->request->input('USER_NAME'))->get();
             $token = $data[0]->api_token;
             if (empty($token)) {
-              $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
-              $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
+              $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1','USER_ACTIVE' => $time]);
+              $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token", "user_active")->first();
               return response()->json(["message"=>"Login Success", "user"=>$hdr,"branch"=>$detail]);
             }
             try {
             $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
             } catch(ExpiredException $e) {
                 $a = TmUser::where('API_TOKEN', $token)->update(['USER_STATUS' => '0']);
-                $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1']);
+                $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_STATUS' => '1','USER_ACTIVE' => $time]);
                 $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
                 return response()->json(["message"=>"Login Success", "user"=>$hdr,"branch"=>$detail]);
             } catch(Exception $e) {

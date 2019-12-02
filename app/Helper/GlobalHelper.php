@@ -413,8 +413,14 @@ class GlobalHelper {
     }
     else {
     $connect = DB::connection($input["db"])->table($input["table"]);
-    foreach ($input["join"] as $list) {
-      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    if ($input["type"] == "left") {
+      foreach ($input["join"] as $list) {
+        $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+      }
+    } else {
+      foreach ($input["join"] as $list) {
+        $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+      }
     }
 
     if (!empty($input["selected"])) {
