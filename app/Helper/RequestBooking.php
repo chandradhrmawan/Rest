@@ -223,6 +223,7 @@ class RequestBooking{
 				}
 			}
 			if ($migrateTariff == true) {
+				$createdUperNo = '';
 				// store head
 					$headU = new TxHdrUper;
 					// $headU->uper_no // dari triger
@@ -273,6 +274,7 @@ class RequestBooking{
 					$headU->save();
 
 					$headU = TxHdrUper::find($headU->uper_id);
+					$createdUperNo .= $headU->uper_no.', ';
 				// store head
 
 				$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$uper['temp_hdr_id']."' AND CUSTOMER_ID = '".$uper['customer_id']."'";
@@ -326,7 +328,7 @@ class RequestBooking{
 		]);
 
 		if ($migrateTariff == true) {
-			$pesan = "Created Uper No : ".$headU->uper_no;
+			$pesan = "Created Uper No : ".$createdUperNo;
 		}else if($migrateTariff == false) {
 			ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
 			$pesan = "Uper Not created, uper percent for this request is 0%";
