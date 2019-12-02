@@ -1294,4 +1294,12 @@ class ConnectedExternalApps{
       }
     }
   }
+
+  public static function getLinkCodeQR($input){
+    $endpoint_url="http://10.88.48.33/ibis_qa/index.php/eservice/test_api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
+
+    $client = new Client();
+    $request = $client->get($endpoint_url);
+    return $request->getBody()->getContents();
+  }
 }
