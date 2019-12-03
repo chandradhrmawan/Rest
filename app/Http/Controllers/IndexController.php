@@ -9,6 +9,7 @@ use Firebase\JWT\ExpiredException;
 use App\Models\OmUster\TmUser;
 use App\Models\OmCargo\TsUnit;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Hash;
 
 class IndexController extends Controller
 {
@@ -29,7 +30,7 @@ class IndexController extends Controller
         $input['encode'] = 'true';
       }
       $action = $input["action"];
-      if ($action == "cektoken") {
+      if ($action == "cektoken" || $action == "clearlogin") {
         return $this->$action($input);
       } else {
         $response = $this->$action($input, $request);
@@ -192,7 +193,23 @@ class IndexController extends Controller
       return ["message" => "Logout"];
     }
 
-    function tes($input) {
+    function clearlogin($input) {
+      $username = $input["USER_NAME"];
+      $password = $input["USER_PASSWD"];
+      $user = TmUser::where('USER_NAME',$username)->first();
+      if (!$user) {
+          return response()->json([
+              'message' => 'Invalid Username / Password'
+          ], 400);
+      }
 
+      if (Hash::check($password, $user["user_passwd"])) {
+        $update = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $username)->update(["USER_STATUS"=>"0","API_TOKEN"=>"", "USER_ACTIVE"=>""]);
+        return response()->json(["message"=> "Clear Token Success, Login Again"]);
+      } else {
+        return response()->json([
+            'message' => 'Invalid Username / Password'
+        ], 400);
+      }
     }
 }

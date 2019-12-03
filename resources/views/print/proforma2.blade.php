@@ -69,7 +69,7 @@
           <td>{{$header->nota_cust_name}}</td>
         </tr>
 				<tr>
-					<td>Customer ID</td>
+					<td>No Account</td>
 					<td>: </td>
 					<td>{{$header->nota_cust_id}}</td>
 				</tr>
@@ -83,20 +83,17 @@
           <td>: </td>
           <td>{{$header->nota_cust_npwp}}</td>
         </tr>
-				<tr>
-          <td>No Account</td>
-          <td>: </td>
-          <td>-</td>
-        </tr>
       </table>
     </td>
 		<td>
       <table style="border-collapse:collapse; font-size:11px;">
-				<tr>
-					<td>Nama.PBM </td>
-					<td>: </td>
-					<td>-</td>
-				</tr>
+				<?php if (!empty($kapal->pbm_name)) { ?>
+					<tr>
+						<td>Nama.PBM </td>
+						<td>: </td>
+						<td>{{$kapal->pbm_name}}</td>
+					</tr>
+					<?php } ?>
 				<tr>
           <td>Nama Kapal</td>
           <td>: </td>

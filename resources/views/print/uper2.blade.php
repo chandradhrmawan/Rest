@@ -19,11 +19,6 @@
 <body>
 
 	@foreach($header as $header)
-	<?php if ($header->uper_paid == "N") { ?>
-		<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
-	<?php } else { ?>
-		<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
-	<?php } ?>
 	@foreach($branch as $branch)
   <table width="100%" style="font-size:10px">
     <tr>
@@ -89,16 +84,18 @@
           <td>: </td>
         <td>{{$header->uper_vessel_name}}</td>
         </tr>
-        <tr>
-          <td>No.PBM </td>
-          <td>: </td>
-          <td>{{$header->uper_pbm_id}}</td>
-        </tr>
-				<tr>
-          <td>Nama.PBM </td>
-          <td>: </td>
-          <td>{{$header->uper_pbm_name}}</td>
-        </tr>
+				<?php if (!empty($header->uper_pbm_id)) { ?>
+					<tr>
+						<td>No.PBM </td>
+						<td>: </td>
+						<td>{{$header->uper_pbm_id}}</td>
+					</tr>
+					<tr>
+						<td>Nama.PBM </td>
+						<td>: </td>
+						<td>{{$header->uper_pbm_name}}</td>
+					</tr>
+				<?php	} ?>
       </table>
     </td>
 	</tr>

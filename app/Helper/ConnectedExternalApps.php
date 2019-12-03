@@ -770,7 +770,7 @@ class ConnectedExternalApps{
 
   public static function closeTCA($input){
     $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/closeTCA";
-    
+
     $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where('terminal_code', $input['tca_terminal_code'])->get();
     $terminal = $terminal[0];
     $truck = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id', $input['tca_truck_id'])->get();
@@ -781,7 +781,7 @@ class ConnectedExternalApps{
 
     $string_json = '{
             "closeTCAInterfaceRequest": {
-               "esbHeader": { 
+               "esbHeader": {
             },
               "esbBody": {
                 "vTid": "'.$truck->truck_id_seq.'",
@@ -1296,7 +1296,7 @@ class ConnectedExternalApps{
   }
 
   public static function getLinkCodeQR($input){
-    $endpoint_url="http://10.88.48.33/ibis_qa/index.php/eservice/test_api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
+    $endpoint_url="http://10.88.48.33/ibis_qa/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
 
     $client = new Client();
     $request = $client->get($endpoint_url);

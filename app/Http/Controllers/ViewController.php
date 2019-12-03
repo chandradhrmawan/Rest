@@ -180,6 +180,11 @@ class ViewController extends Controller
               	THEN
               		(SELECT Z.DEL_KADE FROM TX_HDR_DEL Z WHERE Z.DEL_NO = A.NOTA_REQ_NO)
               	END AS KADE,
+                CASE
+              	WHEN A.NOTA_GROUP_ID = 13
+              	THEN
+              		(SELECT Y.BM_PBM_NAME FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
+              	END AS PBM_NAME,
               	CASE
                     	WHEN A.NOTA_GROUP_ID = 13
                     		THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
@@ -225,16 +230,16 @@ class ViewController extends Controller
           foreach ($listS as $key => $value) {
                   $newDt[$key] = $value;
           }
+          $det[]=$newDt;
+          if ($newDt["comp_nota_view"] == "1") {
+            $det["penumpukan"][]=$newDt;
+          } if ($newDt["comp_nota_view"] == "2") {
+            $det["handling"][]=$newDt;
+          }  if ($newDt["comp_nota_view"] == "3") {
+            $det["alat"][]=$newDt;
+          }
         }
 
-        $det[]=$newDt;
-        if ($newDt["comp_nota_view"] == "1") {
-          $det["penumpukan"][]=$newDt;
-        } if ($newDt["comp_nota_view"] == "2") {
-          $det["handling"][]=$newDt;
-        }  if ($newDt["comp_nota_view"] == "3") {
-          $det["alat"][]=$newDt;
-        }
       }
 
       $all = ["header"=>$header]+$det;
