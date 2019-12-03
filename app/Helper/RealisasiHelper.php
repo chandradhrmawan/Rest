@@ -103,7 +103,7 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->real_no,$find->real_req_no,$find->bm_vessel_name,$find->bm_terminal_name);
+    static::migrateNotaData($find->real_no,$find->real_req_no,$find->bm_vessel_name,$find->bm_ukk,$find->bm_terminal_name);
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
@@ -198,14 +198,14 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->bprp_no,$find->bprp_req_no,$find->bprp_vessel_name,$find->bprp_terminal_name);
+    static::migrateNotaData($find->bprp_no,$find->bprp_req_no,$find->bprp_vessel_name,$find->bprp_ukk,$find->bprp_terminal_name);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
     return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no];
   }
 
-  private static function migrateNotaData($booking_number,$req_no,$vessel_name,$terminal_id){
+  private static function migrateNotaData($booking_number,$req_no,$vessel_name,$ukk,$terminal_id){
     $hdr_id = TxHdrNota::where('nota_real_no',$booking_number)->pluck('nota_id');
     DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
     TxHdrNota::where('nota_real_no',$booking_number)->delete();
@@ -236,6 +236,7 @@ class RealisasiHelper{
         $headN->nota_terminal = $terminal_id;
         $headN->nota_branch_id = $getH->branch_id;
         $headN->nota_vessel_name = $vessel_name;
+        $headN->nota_ukk = $ukk;
         // $headN->nota_faktur_no = $getH->; // ?
         $headN->nota_trade_type = $getH->trade_type;
         $headN->nota_req_no = $req_no;
