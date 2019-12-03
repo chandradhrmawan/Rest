@@ -1295,10 +1295,46 @@ class ConnectedExternalApps{
     }
   }
 
-  public static function getLinkCodeQR($input){
-    $endpoint_url="http://10.88.48.33/ibis_qa/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
+  // public static function getLinkCodeQR($input){
+  //   $endpoint_url="http://10.88.48.33/ibis_qa/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
+  //
+  //   $client = new Client();
+  //   $request = $client->get($endpoint_url);
+  //   return $request->getBody()->getContents();
+  // }
 
+  public static function getLinkCodeQR($input){
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+    $string_json = '{
+                   "getDataCetakRequest":{
+                      "esbHeader":{
+                         "internalId":"",
+                         "externalId":"EDI-2910201921570203666",
+                         "timestamp":"2019-10-29 21:57:020.36665400",
+                         "responseTimestamp":"",
+                         "responseCode":"",
+                         "responseMessage":""
+                      },
+                      "esbBody":{
+                         "kode":"billingedii",
+                         "tipe":"'.$input['type'].'",
+                         "nota":"'.$input['no'].'"
+                      }
+                   }
+                }';
+
+    $username="billing";
+    $password ="b1Llin9";
     $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
     $request = $client->get($endpoint_url);
     return $request->getBody()->getContents();
   }
