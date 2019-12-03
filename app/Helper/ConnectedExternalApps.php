@@ -1335,7 +1335,13 @@ class ConnectedExternalApps{
       'body' => $string_json,
       "debug" => false
     );
-    $request = $client->get($endpoint_url);
-    return $request->getBody()->getContents();
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    $results = json_decode($res->getBody()->getContents(), true);
+
+    return $results['getDataCetakResponse']['esbBody']['url'];
   }
 }
