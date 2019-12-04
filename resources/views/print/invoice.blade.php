@@ -56,7 +56,7 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px">Nota Penjualan Jasa Kepelabuhan</center>
+<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800">Nota Penjualan Jasa Kepelabuhan</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	<tr style="text-align:center">
 		<td style="vertical-align:top">
@@ -119,7 +119,8 @@
         </tr>
 				<tr>
 					<td>No. Request </td>
-					<td>: {{$header->nota_req_no}}</td>
+					<td>: </td>
+					<td>{{$header->nota_req_no}}</td>
 				</tr>
       </table>
     </td>
@@ -155,7 +156,7 @@
 			<td style="text-align:center">{{$penumpukan["masa2"]}}</td>
 			<td style="text-align:right">{{number_format($penumpukan["trf1up"])}}</td>
 			<td style="text-align:right">{{number_format($penumpukan["trf2up"])}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["dtl_amount"])}}</td>
+			<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
 		</tr>
 		@endforeach
 	</table>
@@ -204,7 +205,7 @@
 			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
 		<?php } ?>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_amount"])}}</td>
+		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
 <?php } ?>
 	@endforeach
@@ -225,13 +226,13 @@
 
 <?php foreach ($alat as $alat) { ?>
 		<tr>
-			<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_equipment"]; ?></td>
 			<td style="padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
+			<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_equipment"]; ?></td>
 			<td style="text-align:center"><?php echo $alat["dtl_unit_name"]; ?></td>
 			<td style="text-align:center"><?php echo number_format($alat["dtl_eq_qty"]) ?></td>
 			<td style="text-align:center"><?php echo number_format($alat["dtl_qty"]); ?></td>
 			<td style="text-align:right"><?php echo number_format($alat["dtl_tariff"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_amount"]); ?></td>
+			<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
 		</tr>
 <?php }} ?>
 </table>
@@ -276,15 +277,15 @@
 		</td>
 		<td style="vertical-align:top">
 			<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
-				<tr><td>Palembang,
+				<tr><td>Banten,
         <?php
         $originalDate = $header->nota_date;
         $newDate = date("d-M-y", strtotime($originalDate));
         echo strtoupper($newDate);
         ?></td></tr>
-				<tr><td>DGM Keuangan & Administrasi</td></tr>
-				<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
-				<tr><td>NIPP. 287117773</td></tr>
+				<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
+				<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
+				<tr><td>NIPP. 285047354</td></tr>
 			</table>
 		</td>
 	</tr>

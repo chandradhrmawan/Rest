@@ -32,7 +32,7 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px">Uang Untuk Diperhitungkan (UPER)</center>
+<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800">Uang Untuk Diperhitungkan (UPER)</center>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
 	<tr style="text-align:center">
 		<td>
@@ -115,10 +115,15 @@
 		</td>
 		<td style="vertical-align:top">
 			<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
-				<tr><td>Palembang, 29 Agustus 2019</td></tr>
-				<tr><td>DGM Keuangan & Administrasi</td></tr>
-				<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
-				<tr><td>NIPP. 287117773</td></tr>
+				<tr><td>Banten,
+        <?php
+        $originalDate = $header->uper_date;
+        $newDate = date("d-M-y", strtotime($originalDate));
+        echo strtoupper($newDate);
+        ?></td></tr>
+				<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
+				<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
+				<tr><td>NIPP. 285047354</td></tr>
 			</table>
 		</td>
 	</tr>

@@ -263,16 +263,16 @@
   </tr>
 </table>
 <p style="font-size:10px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
-<table style="border-collapse:collapse; font-size:10px;margin-top:60px;float:right;text-align:center">
-	<tr><td>Palembang,
-		<?php
-		$originalDate = $header->uper_date;
-		$newDate = date("d-m-y", strtotime($originalDate));
-		echo strtoupper($newDate);
-		?></td></tr>
-	<tr><td>DGM Keuangan & Administrasi</td></tr>
-	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
-	<tr><td>NIPP. 287117773</td></tr>
+<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
+	<tr><td>Banten,
+	<?php
+	$originalDate = $header->uper_date;
+	$newDate = date("d-M-y", strtotime($originalDate));
+	echo strtoupper($newDate);
+	?></td></tr>
+	<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
+	<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
+	<tr><td>NIPP. 285047354</td></tr>
 </table>
 
 <div style="position:absolute;bottom:20px;font-size:10px; width:100%">

@@ -53,31 +53,31 @@
           <td>{{$header->bprp_create_date}}</td>
         </tr>
         <tr>
-          <td>3.a.</td>
+          <td>2.a.</td>
           <td>Penerima / Pengirim</td>
           <td>:</td>
           <td>{{$request->req_cust_name}}</td>
         </tr>
         <tr>
-          <td>3.b.</td>
+          <td>2.b.</td>
           <td>NPWP</td>
           <td>:</td>
           <td>{{$request->req_cust_npwp}}</td>
         </tr>
 				<tr>
-					<td>3.c.</td>
+					<td>2.c.</td>
 					<td>Customer ID</td>
 					<td>:</td>
 					<td>{{$request->req_cust_id}}</td>
 				</tr>
 				<tr>
-					<td>3.d</td>
+					<td>2.d</td>
 					<td>Customer Address</td>
 					<td>:</td>
 					<td>{{$request->req_cust_address}}</td>
 				</tr>
         <tr>
-          <td>4.a.</td>
+          <td>3.a.</td>
           <td>No. Resi Muat / No. PEB</td>
           <td>:</td>
           <td>{{$request->req_pib_peb_no}}</td>
@@ -99,7 +99,7 @@
 		<td>
 			<table style="border-collapse:collapse; font-size:12px;">
         <tr>
-          <td>6.</td>
+          <td>4.</td>
           <td>Alih Lokasi (Overbrangen)</td>
         </tr>
         <tr>
@@ -115,19 +115,19 @@
           <td>{{$header->bprp_voyout}}</td>
         </tr>
         <tr>
-          <td>7.</td>
+          <td>5.</td>
           <td>Jenis Perdagangan</td>
           <td>:</td>
           <td>{{$header->bprp_trade_name}}</td>
         </tr>
         <tr>
-          <td>8.</td>
+          <td>6.</td>
           <td>Vessel / Voyage</td>
           <td>:</td>
           <td>{{$header->bprp_vessel_name}}</td>
         </tr>
         <tr>
-          <td>9.</td>
+          <td>7.</td>
           <td>Tgl. Tiba / Berangkat</td>
           <td>:</td>
           <td>
@@ -137,7 +137,7 @@
           </td>
         </tr>
         <tr>
-          <td>10.</td>
+          <td>8.</td>
           <td>Agen Kapal</td>
           <td>:</td>
           <td>{{$header->bprp_kade_name}}</td>
