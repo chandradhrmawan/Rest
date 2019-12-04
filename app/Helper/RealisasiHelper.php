@@ -56,6 +56,12 @@ class RealisasiHelper{
         if (empty($list['dtl_bm_id'])) {
           return ['Success' => false, 'result' => 'Fail, not found detil bm on real detil id : '.$list['dtl_real_id']];
         }
+        $getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', 13)->where('BRANCH_ID',$find['bm_branch_id'])->where('GROUP_TARIFF_ID', 12)->count();
+        if ($getPFS > 0) {
+          $newD['DTL_PFS'] = 'Y';
+        }else{
+          $newD['DTL_PFS'] = 'N';
+        }
         $newD['DTL_BL'] = empty($list['dtl_bm_bl']) ? 'NULL' : $list['dtl_bm_bl'];
         $newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
         $newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
@@ -116,10 +122,10 @@ class RealisasiHelper{
       return ['Success' => false, 'result' => 'Fail, not found data!'];
     }
     $find = $find[0];
-
+    $nota_id = $find->bprp_req_type == 1 ? 14 : 15;
     // build head
       $setH = [];
-      $setH['P_NOTA_ID'] = $find->bprp_req_type == 1 ? 14 : 15;
+      $setH['P_NOTA_ID'] = $nota_id;
       $setH['P_BRANCH_ID'] = $find->bprp_branch_id;
       $setH['P_CUSTOMER_ID'] = $find->bprp_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->bprp_no;
@@ -151,6 +157,12 @@ class RealisasiHelper{
       foreach ($detil as $list) {
         $newD = [];
         $list = (array)$list;
+        $getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', $nota_id)->where('BRANCH_ID',$find['bprp_branch_id'])->where('GROUP_TARIFF_ID', 12)->count();
+        if ($getPFS > 0) {
+          $newD['DTL_PFS'] = 'Y';
+        }else{
+          $newD['DTL_PFS'] = 'N';
+        }
         $newD['DTL_BL'] = empty($list['dtl_bl']) ? 'NULL' : $list['dtl_bl'];
         $newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
         $newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
