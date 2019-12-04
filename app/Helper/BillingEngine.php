@@ -480,7 +480,7 @@ class BillingEngine{
 	    		$setD .= ' detail.DTL_DATE_IN := '.$list['DTL_DATE_IN'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT_OLD := '.$list['DTL_DATE_OUT_OLD'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT := '.$list['DTL_DATE_OUT'].';';
-					$setD .= ' detail.DTL_PFS := \'Y\';' ;
+					$setD .= ' detail.DTL_PFS := \''.$list['DTL_PFS'].'\';' ;
 	    		$setD .= ' list_detail('.$countD.') := detail; ';
 	    	}
 		// build detil
@@ -627,7 +627,7 @@ class BillingEngine{
 					$list 										= (array)$list;
 					$newD['DTL_BL'] 					= $list['DTL_BL'];
 					$newD['DTL_PKG_ID'] 			= $list['DTL_PKG_ID'];
-					if ($list['DTL_CMDTY_ID'] == NULL or $list['DTL_CMDTY_ID'] == 'null') {
+          if ($list['DTL_CMDTY_ID'] == NULL or $list['DTL_CMDTY_ID'] == 'null') {
 					$newD['DTL_CMDTY_ID'] 		= 'null';
 					} else {
 					$newD['DTL_CMDTY_ID'] 		= $list['DTL_CMDTY_ID'];
@@ -644,7 +644,7 @@ class BillingEngine{
 					$newD['DTL_DATE_IN'] 			= empty($datein) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($datein)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT'] 		= empty($dateout) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
-					// $newD['DTL_PFS'] = 'Y';
+					$newD['DTL_PFS'] 					= $list['DTL_PFS'];
 					$setD[] = $newD;
 				}
 		// build detil

@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
 use App\Helper\UperRequest;
@@ -302,9 +303,50 @@ class ViewController extends Controller
               WHERE
                 A.NOTA_ID = '$id'
               ";
+
+      $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+      $string_json = '{
+                     "getDataCetakRequest":{
+                        "esbHeader":{
+                           "internalId":"",
+                           "externalId":"EDI-2910201921570203666",
+                           "timestamp":"2019-10-29 21:57:020.36665400",
+                           "responseTimestamp":"",
+                           "responseCode":"",
+                           "responseMessage":""
+                        },
+                        "esbBody":{
+                           "kode":"billingedii",
+                           "tipe":"nota",
+                           "nota":"'.$all["header"][0]->nota_no.'"
+                        }
+                     }
+                  }';
+
+      $username="billing";
+      $password ="b1Llin9";
+      $client = new Client();
+      $options= array(
+        'auth' => [
+          $username,
+          $password
+        ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        return $e->getResponse();
+      }
+      $results = json_decode($res->getBody()->getContents(), true);
+
+      $qrcode = $results['getDataCetakResponse']['esbBody']['url'];
+
       $kapal       = DB::connection('omcargo')->select($query);
       $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_id)->get();
-      $html       = view('print.invoice',["bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      $html       = view('print.invoice',["qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
       $filename   = "Test";
       $dompdf     = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
@@ -347,8 +389,47 @@ class ViewController extends Controller
                   	AND B.PAY_TYPE = 1
                   	AND A.UPER_PAID = 'Y'
                     AND A.UPER_NO = '$id'";
+      $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+      $string_json = '{
+                     "getDataCetakRequest":{
+                        "esbHeader":{
+                           "internalId":"",
+                           "externalId":"EDI-2910201921570203666",
+                           "timestamp":"2019-10-29 21:57:020.36665400",
+                           "responseTimestamp":"",
+                           "responseCode":"",
+                           "responseMessage":""
+                        },
+                        "esbBody":{
+                           "kode":"billingedii",
+                           "tipe":"uper",
+                           "nota":"'.$header[0]->uper_no.'"
+                        }
+                     }
+                  }';
+
+      $username="billing";
+      $password ="b1Llin9";
+      $client = new Client();
+      $options= array(
+        'auth' => [
+          $username,
+          $password
+        ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        return $e->getResponse();
+      }
+      $results = json_decode($res->getBody()->getContents(), true);
+
+      $qrcode = $results['getDataCetakResponse']['esbBody']['url'];
       $data       = DB::connection('omcargo')->select($query);
-      $html       = view('print.uperPaid',["branch"=>$branch,"header"=>$header,"data"=>$data,"terbilang"=>$terbilang]);
+      $html       = view('print.uperPaid',["qrcode"=>$qrcode, "branch"=>$branch,"header"=>$header,"data"=>$data,"terbilang"=>$terbilang]);
       $filename   = $header[0]->uper_no.rand(10,100000);
       $dompdf     = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
@@ -476,7 +557,7 @@ class ViewController extends Controller
         $b       = json_decode($change);
         $all["request"] = $b;
         $html       = view('print.bprp',["header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
-        
+
       }
 
       $filename   = $all["header"][0]->bprp_id.rand(10,100000);
