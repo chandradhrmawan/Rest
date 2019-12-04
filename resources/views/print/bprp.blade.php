@@ -21,6 +21,7 @@
 <body>
 		@foreach($header as $header)
     @foreach($request as $request)
+		@foreach($branch as $branch)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="10%"><img src="{{ url('/other/logo.jpg') }}" height="110"></td>
@@ -51,12 +52,6 @@
           <td>:</td>
           <td>{{$header->bprp_create_date}}</td>
         </tr>
-          <tr>
-            <td>2.</td>
-            <td>PBM</td>
-            <td>:</td>
-            <td></td>
-          </tr>
         <tr>
           <td>3.a.</td>
           <td>Penerima / Pengirim</td>
@@ -69,19 +64,25 @@
           <td>:</td>
           <td>{{$request->req_cust_npwp}}</td>
         </tr>
+				<tr>
+					<td>3.c.</td>
+					<td>Customer ID</td>
+					<td>:</td>
+					<td>{{$request->req_cust_id}}</td>
+				</tr>
+				<tr>
+					<td>3.d</td>
+					<td>Customer Address</td>
+					<td>:</td>
+					<td>{{$request->req_cust_address}}</td>
+				</tr>
         <tr>
           <td>4.a.</td>
-          <td>No. BL / No. DO</td>
-          <td>:</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>4.b.</td>
           <td>No. Resi Muat / No. PEB</td>
           <td>:</td>
           <td>{{$request->req_pib_peb_no}}</td>
         </tr>
-        <tr>
+        <!-- <tr>
           <td>5.a.</td>
           <td>Pelabuhan Asal</td>
           <td>:</td>
@@ -92,7 +93,7 @@
           <td>Pelabuhan Tujuan</td>
           <td>:</td>
           <td></td>
-        </tr>
+        </tr> -->
       </table>
     </td>
 		<td>
@@ -139,9 +140,9 @@
           <td>10.</td>
           <td>Agen Kapal</td>
           <td>:</td>
-          <td></td>
+          <td>{{$header->bprp_kade_name}}</td>
         </tr>
-        <tr>
+        <!-- <tr>
           <td>11.</td>
           <td>No. BPRP Lanjutan</td>
           <td>:</td>
@@ -152,7 +153,7 @@
           <td>Keterangan Lain</td>
           <td>:</td>
           <td></td>
-        </tr>
+        </tr> -->
       </table>
     </td>
 	</tr>
@@ -189,9 +190,9 @@
     <td>{{$detail->dtl_stacking_area_name}}</td>
     <td>{{$detail->dtl_req_qty}}</td>
     <td>{{$detail->dtl_req_unit_name}}</td>
-    <td>{{$detail->dtl_datein}}</td>
+    <td><?php  echo strtoupper(date("d-M-y", strtotime($detail->dtl_datein))); ?></td>
     <td>{{$detail->dtl_in_qty}}</td>
-    <td>{{$detail->dtl_dateout}}</td>
+    <td><?php  echo strtoupper(date("d-M-y", strtotime($detail->dtl_dateout))); ?></td>
     <td>{{$detail->dtl_out_qty}}</td>
   </tr>
   {{$no++}}
@@ -205,7 +206,7 @@
 </table>
 
 	<div style="position:absolute;bottom:20px;font-size:12px; width:100%">
-		branch name <br> branch address
+		{{$branch->branch_name}} <br>{{$branch->branch_address}}
 		<div style="margin-top:50px;font-size:11px">
 				{{$header->bprp_no}}
 		</div>
@@ -213,6 +214,7 @@
 	<p style="position:absolute;right:20px;bottom:0px;font-size:11px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
 	@endforeach
   @endforeach
+	@endforeach
 </body>
 </html>
 

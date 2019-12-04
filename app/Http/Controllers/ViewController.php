@@ -517,46 +517,48 @@ class ViewController extends Controller
     }
 
     function printBprp($id) {
-      $all           = [];
-      $header        = DB::connection('omcargo')->table('TX_HDR_BPRP')->where("BPRP_NO","=",$id)->get();
-      $detail        = DB::connection('omcargo')->table('TX_DTL_BPRP')->where("HDR_BPRP_ID","=",$header[0]->bprp_id)->get();
-      $all["header"] = $header;
-      $all["detail"] = $detail;
-      $querya        = "
-                        SELECT
-                        B.*
-                        FROM
-                        TX_HDR_BPRP A
-                        LEFT JOIN TX_HDR_REC B ON A.BPRP_REQ_NO = B.REC_NO
-                        LEFT JOIN TX_HDR_DEL C ON A.BPRP_REQ_NO = C.DEL_NO
-                        WHERE
-                        A.BPRP_NO = '$id'
-                       ";
-     $queryb        = "
-                       SELECT
-                       C.*
-                       FROM
-                       TX_HDR_BPRP A
-                       LEFT JOIN TX_HDR_REC B ON A.BPRP_REQ_NO = B.REC_NO
-                       LEFT JOIN TX_HDR_DEL C ON A.BPRP_REQ_NO = C.DEL_NO
-                       WHERE
-                       A.BPRP_NO = '$id'
-                      ";
-      $a             = DB::connection('omcargo')->select($querya);
-      $b             = DB::connection('omcargo')->select($queryb);
+      $all               = [];
+      $header            = DB::connection('omcargo')->table('TX_HDR_BPRP')->where("BPRP_NO","=",$id)->get();
+      $detail            = DB::connection('omcargo')->table('TX_DTL_BPRP')->where("HDR_BPRP_ID","=",$header[0]->bprp_id)->get();
+      $all["header"]     = $header;
+      $all["detail"]     = $detail;
+      $querya            = "
+                            SELECT
+                            B.*
+                            FROM
+                            TX_HDR_BPRP A
+                            LEFT JOIN TX_HDR_REC B ON A.BPRP_REQ_NO = B.REC_NO
+                            LEFT JOIN TX_HDR_DEL C ON A.BPRP_REQ_NO = C.DEL_NO
+                            WHERE
+                            A.BPRP_NO = '$id'
+                           ";
+      $queryb            = "
+                           SELECT
+                           C.*
+                           FROM
+                           TX_HDR_BPRP A
+                           LEFT JOIN TX_HDR_REC B ON A.BPRP_REQ_NO = B.REC_NO
+                           LEFT JOIN TX_HDR_DEL C ON A.BPRP_REQ_NO = C.DEL_NO
+                           WHERE
+                           A.BPRP_NO = '$id'
+                          ";
+      $a                 = DB::connection('omcargo')->select($querya);
+      $b                 = DB::connection('omcargo')->select($queryb);
       if (!empty($a[0]->rec_id)) {
-        $data    = json_encode($a);
-        $change  = str_replace("rec", "req", $data);
-        $a       = json_decode($change);
-        $all["request"] = $a;
-        $html       = view('print.bprp',["header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
+        $data            = json_encode($a);
+        $change          = str_replace("rec", "req", $data);
+        $a               = json_decode($change);
+        $all["request"]  = $a;
+        $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $a[0]->req_branch_id)->get();
+        $html            = view('print.bprp',["branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
       } else if (!empty($b[0]->del_id)) {
-        $data    = json_encode($b);
-        $change  = str_replace("del", "req", $data);
-        $b       = json_decode($change);
-        $all["request"] = $b;
-        $html       = view('print.bprp',["header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
+        $data            = json_encode($b);
+        $change          = str_replace("del", "req", $data);
+        $b               = json_decode($change);
+        $all["request"]  = $b;
+        $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $b[0]->req_branch_id)->get();
+        $html            = view('print.bprp',["branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
       }
 
@@ -567,7 +569,6 @@ class ViewController extends Controller
       $dompdf->setPaper('A4', 'landscape');
       $dompdf->render();
       $dompdf->stream($filename, array("Attachment" => false));
-      // return $all;
     }
 
     function penyebut($nilai) {
