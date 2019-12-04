@@ -480,7 +480,8 @@ class BillingEngine{
 	    		$setD .= ' detail.DTL_DATE_IN := '.$list['DTL_DATE_IN'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT_OLD := '.$list['DTL_DATE_OUT_OLD'].';';
 	    		$setD .= ' detail.DTL_DATE_OUT := '.$list['DTL_DATE_OUT'].';';
-					$setD .= ' detail.DTL_PFS := \'Y\';' ;
+          $setD .= ' detail.DTL_PFS := \''.$list['DTL_PFS'].'\';' ;
+					// $setD .= ' detail.DTL_PFS := \'Y\';' ;
 	    		$setD .= ' list_detail('.$countD.') := detail; ';
 	    	}
 		// build detil

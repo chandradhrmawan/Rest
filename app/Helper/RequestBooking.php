@@ -46,6 +46,13 @@ class RequestBooking{
 				$newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
 				$newD['DTL_QTY'] = empty($list['dtl_qty']) ? 'NULL' : $list['dtl_qty'];
 
+				$getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', $config['head_nota_id'])->where('BRANCH_ID',$find[$config['head_branch']])->where('GROUP_TARIFF_ID', 12)->where('COMP_FORM_SHOW', 'Y')->count();
+				if ($getPFS > 0) {
+					$newD['DTL_PFS'] = 'Y';
+				}else{
+					$newD['DTL_PFS'] = 'N';
+				}
+
 				$DTL_BM_TYPE = 'NULL';
 				if ($config['head_nota_id'] == "13") {
 					$DTL_BM_TYPE = empty($list['dtl_bm_type']) ? 'NULL' : $list['dtl_bm_type'];
@@ -75,35 +82,36 @@ class RequestBooking{
 				}
 
 				if ($config['head_tab_detil_date_out_old'] != null and ($input['table'] == 'TX_HDR_DEL' and $find['del_ext_status'] != 'N') ) {
-					$findEx = DB::connection('omcargo')->select(DB::raw("
-						SELECT
-						X.DTL_OUT AS date_out_old,
-						Y.DTL_OUT AS date_out
-						FROM (
-						SELECT
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
-						FROM
-						TX_HDR_DEL A
-						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
-						) X
-						JOIN (
-						SELECT
-						DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
-						FROM
-						TX_HDR_DEL A
-						JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
-						) Y
-						ON X.DTL_OUT=Y.DEL_EXT_FROM_DATE WHERE Y.DEL_NO='".$find[$config['head_no']]."'
-						"));
-					if (empty($findEx)) {
-						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
-						$newD['DTL_DATE_OUT'] = 'NULL';
-					}else{
-						$findEx = $findEx[0];
-						$findEx = (array)$findEx;
-						$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($findEx['date_out_old'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-						$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($findEx['date_out'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-					}
+					$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					// $findEx = DB::connection('omcargo')->select(DB::raw("
+					// 	SELECT
+					// 	X.DTL_OUT AS date_out_old,
+					// 	Y.DTL_OUT AS date_out
+					// 	FROM (
+					// 	SELECT
+					// 	DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
+					// 	FROM
+					// 	TX_HDR_DEL A
+					// 	JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+					// 	) X
+					// 	JOIN (
+					// 	SELECT
+					// 	DEL_ID,DEL_NO,DTL_OUT,DEL_EXT_FROM_DATE
+					// 	FROM
+					// 	TX_HDR_DEL A
+					// 	JOIN TX_DTL_DEL B ON A.DEL_ID=B.HDR_DEL_ID
+					// 	) Y
+					// 	ON X.DTL_OUT=Y.DEL_EXT_FROM_DATE WHERE Y.DEL_NO='".$find[$config['head_no']]."'
+					// 	"));
+					// if (empty($findEx)) {
+					// 	$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+					// 	$newD['DTL_DATE_OUT'] = 'NULL';
+					// }else{
+					// 	$findEx = $findEx[0];
+					// 	$findEx = (array)$findEx;
+					// 	$newD['DTL_DATE_OUT_OLD'] = empty($findEx['date_out_old']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($findEx['date_out_old'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					// 	$newD['DTL_DATE_OUT'] = empty($findEx['date_out']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($findEx['date_out'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					// }
 				}else{
 					$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 
@@ -440,7 +448,7 @@ class RequestBooking{
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'dtl_in',
         		"head_tab_detil_date_out" => 'dtl_out',
-        		"head_tab_detil_date_out_old" => 'extension',
+        		"head_tab_detil_date_out_old" => 'del_ext_from_date',
         		"head_status" => "del_status",
         		"head_primery" => "del_id",
         		"head_forigen" => "hdr_del_id",
