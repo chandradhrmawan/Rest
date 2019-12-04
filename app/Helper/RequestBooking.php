@@ -46,7 +46,7 @@ class RequestBooking{
 				$newD['DTL_UNIT_ID'] = empty($list['dtl_unit_id']) ? 'NULL' : $list['dtl_unit_id'];
 				$newD['DTL_QTY'] = empty($list['dtl_qty']) ? 'NULL' : $list['dtl_qty'];
 
-				$getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', $config['head_nota_id'])->where('BRANCH_ID',$find[$config['head_branch']])->where('GROUP_TARIFF_ID', 12)->count();
+				$getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', $config['head_nota_id'])->where('BRANCH_ID',$find[$config['head_branch']])->where('GROUP_TARIFF_ID', 15)->count();
 				if ($getPFS > 0) {
 					$newD['DTL_PFS'] = 'Y';
 				}else{
