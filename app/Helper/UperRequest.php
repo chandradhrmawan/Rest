@@ -47,7 +47,7 @@ class UperRequest{
               foreach ($group_tariff as $grpTrf){
                   $grpTrf = (array)$grpTrf;
                   if (in_array($grpTrf['group_tariff_id'], $grArr)) {
-                    $uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+                    $uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL_2')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
                     $countLine = 0;
                     foreach ($uperD as $list){
                         $resultD[] = $list;
