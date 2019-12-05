@@ -219,7 +219,7 @@
 		<th width="15%">Nama Alat</th>
 		<th width="15%">Satuan Alat</th>
 		<th width="15%">Jumlah Alat</th>
-    <th width="15%">Qty</th>
+    <th width="15%">Jumlah/Durasi</th>
     <th width="10%">Tarif Dasar</th>
     <th width="10%">Total</th>
 	</tr>
@@ -260,7 +260,7 @@
 		<td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
 		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Uang Jaminan</td>
 		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-		<td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format(0)}}</td>
+		<td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no))}}</td>
 	</tr>
 	<tr>
 		<td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>

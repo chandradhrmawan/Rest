@@ -22,6 +22,25 @@ class GlobalHelper {
           }
 
           else if($data == "FILE") {
+            if (isset($input[$data]["BASE64"])) {
+              if ($input[$data]["BASE64"] == "N" || $input[$data]["BASE64"] == "n" ) {
+                $fil     = [];
+                $fk      = $val["FK"][0];
+                $fkhdr   = $header[0][$val["FK"][1]];
+                $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
+                foreach ($detail as $list) {
+                  $newDt = [];
+                  foreach ($list as $key => $value) {
+                    $newDt[$key] = $value;
+                  }
+                  $fil[] = $newDt;
+                  $vwdata[$data] = $fil;
+                  }
+                  if (empty($detail)) {
+                    $vwdata[$data] = [];
+                    }
+              }
+            } else {
             $fil     = [];
             $fk      = $val["FK"][0];
             $fkhdr   = $header[0][$val["FK"][1]];
@@ -40,6 +59,7 @@ class GlobalHelper {
               }
               if (empty($detail)) {
                 $vwdata[$data] = [];
+                }
               }
             }
 
@@ -413,9 +433,11 @@ class GlobalHelper {
     }
     else {
     $connect = DB::connection($input["db"])->table($input["table"]);
-    if ($input["type"] == "left") {
-      foreach ($input["join"] as $list) {
-        $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    if (isset($input["type"])) {
+      if ($input["type"] == "left") {
+        foreach ($input["join"] as $list) {
+          $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+        }
       }
     } else {
       foreach ($input["join"] as $list) {
@@ -425,11 +447,6 @@ class GlobalHelper {
 
     if (!empty($input["selected"])) {
       $result  = $connect->select($input["selected"]);
-    }
-
-    if(!empty($input["orderby"][0])) {
-    $in        = $input["orderby"];
-    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
     if(!empty($input["where"][0])) {
@@ -449,6 +466,11 @@ class GlobalHelper {
     if(!empty($input["whereNotIn"][0])) {
     $in        = $input["whereNotIn"];
     $connect->whereNotIn(strtoupper($in[0]), $in[1]);
+    }
+
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby(strtoupper($in[0]), $in[1]);
     }
 
     if (!empty($input["range"])) {
@@ -775,5 +797,10 @@ class GlobalHelper {
         $count = date_diff($date1,$date2);
         echo date("d-m-y", strtotime($dtlOut[$no]->dtl_in))."<br>".date("d-m-y", strtotime($dtlIn[0]->rec_etd))."<br>".$count->format("%d Hari");
     }
+  }
+
+  public static function getUper($req_no) {
+    $data = DB::connection('omcargo')->table('TX_HDR_UPER')->where('UPER_REQ_NO', $req_no)->get();
+    return $data[0]->uper_amount;
   }
 }
