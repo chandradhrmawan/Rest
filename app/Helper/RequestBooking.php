@@ -196,7 +196,7 @@ class RequestBooking{
 				$config['head_status'] => 4,
 				$config['head_mark'] => $input['msg']
 			]);
-			return ['result' => "Success, rejected requst"];
+			return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
 		}
 
 		$datenow    = Carbon::now()->format('Y-m-d');
