@@ -346,14 +346,14 @@ class ViewController extends Controller
 
       $kapal       = DB::connection('omcargo')->select($query);
       $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_id)->get();
-      $html       = view('print.invoice',["qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
-      $filename   = "Test";
-      $dompdf     = new Dompdf();
-      $dompdf->set_option('isRemoteEnabled', true);
-      $dompdf->loadHtml($html);
-      $dompdf->setPaper('A4', 'potrait');
-      $dompdf->render();
-      $dompdf->stream($filename, array("Attachment" => false));
+      return $html       = view('print.invoice',["qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      // $filename   = "Test";
+      // $dompdf     = new Dompdf();
+      // $dompdf->set_option('isRemoteEnabled', true);
+      // $dompdf->loadHtml($html);
+      // $dompdf->setPaper('A4', 'potrait');
+      // $dompdf->render();
+      // $dompdf->stream($filename, array("Attachment" => false));
     }
 
     function printUperPaid($id) {

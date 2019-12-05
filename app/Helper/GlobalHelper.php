@@ -468,15 +468,14 @@ class GlobalHelper {
     $connect->whereNotIn(strtoupper($in[0]), $in[1]);
     }
 
-    if(!empty($input["orderby"][0])) {
-    $in        = $input["orderby"];
-    $connect->orderby(strtoupper($in[0]), $in[1]);
-    }
-
     if (!empty($input["range"])) {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
+    if(!empty($input["orderby"][0])) {
+    $in        = $input["orderby"];
+    $connect->orderby(strtoupper($in[0]), $in[1]);
+    }
 
     if (!empty($input["filter"])) {
     $search   = json_decode($input["filter"], TRUE);
@@ -801,6 +800,10 @@ class GlobalHelper {
 
   public static function getUper($req_no) {
     $data = DB::connection('omcargo')->table('TX_HDR_UPER')->where('UPER_REQ_NO', $req_no)->get();
-    return $data[0]->uper_amount;
+    if (!empty($data)) {
+      return $data[0]->uper_amount;
+    } else {
+      return 0;
+    }
   }
 }
