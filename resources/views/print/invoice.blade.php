@@ -56,7 +56,11 @@
   </table>
 
 <center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800;text-transform:uppercase">Nota Penjualan Jasa Kepelabuhan</center>
+<?php if ($label[0]->nota_service_om_code != "BM") { ?>
 <center style="width:100%;;margin-top:5px;font-size:11px;text-transform:uppercase">Dermaga Penumpukan</center>
+<?php } else { ?>
+<center style="width:100%;;margin-top:5px;font-size:11px;text-transform:uppercase">Usaha Terminal</center>
+<?php } ?>
 
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr style="text-align:center">
@@ -96,39 +100,17 @@
           <td>: </td>
           <td>{{$header->nota_vessel_name}}</td>
         </tr>
-				<!-- <tr>
-          <td>Periode Kunjungan</td>
-          <td>: </td>
-        <td>{{$kapal->periode}}</td>
-        </tr>
-				<tr>
-          <td>Kade</td>
-          <td>: </td>
-        <td>{{$kapal->kade}}</td>
-        </tr>
-				<tr>
-          <td>Tipe Perdagangan</td>
-          <td>: </td>
-        <td>
-					<?php
-					// if ($kapal->nota_trade_type == "D") {
-					// 	echo "Domestik";
-					// } else {
-					// 	echo "International";
-					//} ?>
-				</td>
-        </tr> -->
 				<tr>
 					<td>No. Request </td>
 					<td>: </td>
 					<td>{{$header->nota_id}}</td>
-					<!-- <td>{{$header->nota_req_no}}</td> -->
 				</tr>
       </table>
     </td>
 	</tr>
 </table>
 
+	<?php if ($label[0]->nota_service_om_code != "BM") { ?>
 	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 		<tr style="text-align:center;text-transform:uppercase;font-weight:800">
 			<th style="border-bottom:solid 1px">No</th>
@@ -140,40 +122,32 @@
 			<th style="border-bottom:solid 1px"></th>
 			<th style="border-bottom:solid 1px">Jumlah</th>
 		</tr>
-		<?php $no = 0;$nomor = 0;  if ($penumpukan != "0") { $total = count($penumpukan);?>
+		<?php
+			$noa = 0;
+			$nomor = 0;
+			if ($penumpukan != "0") {
+				$total = count($penumpukan);
+		?>
 			@foreach($penumpukan as $penumpukan)
 			<tr>
 				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
 				<td style="padding-left:9px">{{$penumpukan["dtl_group_tariff_name"]}}</td>
-				<?php if ($no < 1) { ?>
+				<?php if ($noa == 0) { ?>
 					<td rowspan="<?php echo $total; ?>" style="padding-left:9px;text-align:center">
 						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, 0)}}
+						<?php $noa++; ?>
 					</td>
 				<?php } else { ?>
 
 				<?php } ?>
 				<td style="text-align:center">
 					{{number_format($penumpukan["dtl_masa"])}}
-					<?php //if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
-					<?php //if(!empty($penumpukan["masa2"])) { echo $penumpukan["masa2"]; } else { echo "0"; } ?></td>
-				<td style="text-align:center">
-					{{number_format($penumpukan["dtl_tariff"])}}
-					<?php //if(!empty($penumpukan["trf1up"])) { echo number_format($penumpukan["trf1up"]); } else { echo "0"; } ?><br>
-					<?php //if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
 				</td>
 				<td style="text-align:center">
-					{{number_format($penumpukan["dtl_dpp"])}}
-
-					<?php
-						// $sewa1 = $penumpukan["masa1"]*$penumpukan["trf1up"]*$penumpukan["dtl_qty"];
-						// echo number_format($sewa1)."<br>";
-					 ?>
-					 <?php
-		 				// $sewa2 = $penumpukan["masa2"]*$penumpukan["trf2up"]*$penumpukan["dtl_qty"];
-		 				// echo number_format($sewa2);
-						$no++;
-						$dpp = 0;
-		 			 ?></td>
+					{{number_format($penumpukan["dtl_tariff"])}}
+				</td>
+				<td style="text-align:center">
+					{{number_format($penumpukan["dtl_dpp"])}}</td>
 				<td style="text-align:left">IDR</td>
 				<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
 			</tr>
@@ -182,7 +156,7 @@
 	<?php if ($alat != "0") {?>
 		<?php foreach ($alat as $alat) { ?>
 				<tr>
-					<td style="padding-left:9px"><?php $no++;echo $no; ?></td>
+					<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
 					<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
 					<td style="text-align:center"></td>
 					<td style="text-align:center"></td>
@@ -193,57 +167,37 @@
 				</tr>
 		<?php }} ?>
 	</table>
-
-<?php if ($bl != "0") { ?>
-<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
-	<tr style="text-align:center">
-		<th rowspan="2" width="15%">NO BL</th>
-		<th rowspan="2" width="15%">TL</th>
-		<th rowspan="2" width="15%">Kemasan</th>
-		<th rowspan="2" width="15%">BARANG</th>
-    <th rowspan="2" width="5%">Satuan</th>
-    <th colspan="2" width="15%">Qty</th>
-    <th rowspan="2" width="10%">Tarif Dasar</th>
-    <th rowspan="2" width="10%">Total</th>
+<?php	} else { ?>
+<?php
+ 	$no = 1;
+	if ($bl != "0") {
+?>
+<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
+	<tr>
+		<td colspan="4"><b>Jenis Jasa</b></td>
 	</tr>
-  <tr style="text-align:center">
-    <th>Bongkar</th>
-    <th>Muat</th>
-  </tr>
 	@foreach($bl as $bl)
-  <tr style="background:#ff3030;color:white">
-    <td style="padding-left:9px" colspan="9">{{$bl}}</td>
-  </tr>
 <?php foreach ($handling[$bl] as $value) { ?>
 	<tr>
-		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:center">
-			<?php
-			if ($value["dtl_bm_tl"] == "Y") {
-				echo "TL";
-			} else {
-				echo "NON-TL";
-			}
-			 ?>
-		</td>
-		<td>{{$value["dtl_package"]}}</td>
-		<td>{{$value["dtl_commodity"]}}</td>
-		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-		<?php	if ($value["dtl_bm_type"] == "Bongkar") { ?>
-			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-			<td style="text-align:center">-</td>
-		<?php } else { ?>
-			<td style="text-align:center">-</td>
-			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-		<?php } ?>
-		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
+		<td width="5%"><?php echo $no; $no++; ?></td>
+		<td width="59%" style="text-align:left">{{$value["dtl_group_tariff_name"]}}</td>
+		<td style="text-align:left">IDR</td>
 		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
 <?php } ?>
 	@endforeach
 <?php } ?>
+<?php if ($alat != "0") {?>
+	<?php foreach ($alat as $alat) { ?>
+			<tr>
+				<td><?php echo $no;$no++; ?></td>
+				<td><?php echo $alat["dtl_group_tariff_name"]; ?></td>
+				<td style="text-align:left">IDR</td>
+				<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
+			</tr>
+	<?php }} ?>
 </table>
-
+<?php } ?>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
   <tr>
     <td colspan="7">DASAR PENGENAAN PAJAK</td>
