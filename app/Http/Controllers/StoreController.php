@@ -39,7 +39,7 @@ class StoreController extends Controller
       $action = $input["action"];
       $request = $request;
       $response = $this->$action($input, $request);
-      $this->saveLogs($input,$response);
+      $this->saveLogs($action,$input,$response);
       if (isset($input['encode']) and $input['encode'] == 'true') {
         return response()->json(['response' => json_encode($response)]);
       }else{
@@ -51,9 +51,10 @@ class StoreController extends Controller
       }
     }
 
-    function saveLogs($input, $response){
+    function saveLogs($action,$input, $response){
       DB::connection('omcargo')->table('TH_LOGS_API_STORE')->insert([
         "create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
+        "action" => $action,
         "json_request" => json_encode($input),
         "json_response" => json_encode($response)
       ]);
