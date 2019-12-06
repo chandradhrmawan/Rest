@@ -141,7 +141,7 @@ class RequestBooking{
 				$newE['EQ_UNIT_ID'] = empty($list['eq_unit_id']) ? 'NULL' : $list['eq_unit_id'];
 				$newE['EQ_GTRF_ID'] = empty($list['group_tariff_id']) ? 'NULL' : $list['group_tariff_id'];
 				$newE['EQ_PKG_ID'] = empty($list['package_id']) ? 'NULL' : $list['package_id'];
-				// $newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
+				$newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
 				$setE[] = $newE;
 			}
 		// build eqpt
@@ -322,6 +322,7 @@ class RequestBooking{
 							"dtl_dpp" => $list["tariff_cal_uper"],
 							"dtl_commodity" => $list["commodity_name"],
 							"dtl_equipment" => $list["equipment_name"],
+							"dtl_sub_tariff" => $list["sub_tariff"],
 							"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 						];
 						DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);

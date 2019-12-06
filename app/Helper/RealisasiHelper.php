@@ -297,6 +297,7 @@ class RealisasiHelper{
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
             "dtl_unit_name" => $list->unit_name,
+            "dtl_sub_tariff" => $list->sub_tariff,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
           ]);
         }
