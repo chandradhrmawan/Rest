@@ -216,7 +216,7 @@ class ViewController extends Controller
       $det            = [];
       $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
       $data["header"] = $header;
-      $detail  = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
+      $detail  = $connect->table("TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
       foreach ($detail as $list) {
         $newDt = [];
         foreach ($list as $key => $value) {
@@ -264,7 +264,7 @@ class ViewController extends Controller
           }
         }
         for ($i=0; $i < count($bl); $i++) {
-          $data       = DB::connection('omcargo')->table("V_TX_DTL_NOTA")
+          $data       = DB::connection('omcargo')->table("TX_DTL_NOTA")
                       ->where([['NOTA_HDR_ID ', '=', $id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
                       ->get();
           $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
@@ -341,19 +341,17 @@ class ViewController extends Controller
         return $e->getResponse();
       }
       $results = json_decode($res->getBody()->getContents(), true);
-
       $qrcode = $results['getDataCetakResponse']['esbBody']['url'];
-
       $kapal       = DB::connection('omcargo')->select($query);
-      $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_id)->get();
-      return $html       = view('print.invoice',["qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
-      // $filename   = "Test";
-      // $dompdf     = new Dompdf();
-      // $dompdf->set_option('isRemoteEnabled', true);
-      // $dompdf->loadHtml($html);
-      // $dompdf->setPaper('A4', 'potrait');
-      // $dompdf->render();
-      // $dompdf->stream($filename, array("Attachment" => false));
+      $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
+      $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      $filename   = "Test";
+      $dompdf     = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
     }
 
     function printUperPaid($id) {

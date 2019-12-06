@@ -781,8 +781,8 @@ class GlobalHelper {
 
   public static function tanggalMasukKeluar($service, $req_no, $no) {
     if ($service == "DEL") {
-        $header  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
-        $dtl      = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header[0]->del_id)->get();
+        $header = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
+        $dtl    = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header[0]->del_id)->get();
         $date2  =date_create($dtl[$no]->dtl_out);
         $date1  =date_create($dtl[$no]->dtl_in);
         $count = date_diff($date1,$date2);

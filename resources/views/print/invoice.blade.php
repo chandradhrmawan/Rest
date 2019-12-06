@@ -19,26 +19,24 @@
 <body>
 		@foreach($header as $header)
 		@foreach($kapal as $kapal)
-		<?php if ($header->nota_paid == "N") { ?>
-			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(20deg);margin-top:190px;width:80%">
-		<?php } else { ?>
-			<img src="{{ url('/other/lunas.png') }}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;margin-top:250px;transform: rotate(-20deg); width:70%;height:100px">
+		<?php if ($header->nota_paid == "I") { ?>
+			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(-30deg);margin-top:300px;width:80%">
 		<?php } ?>
 		@foreach($branch as $branch)
   <table width="100%" style="font-size:10px">
     <tr>
-      <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
-			<td width="55%">
-				<div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
+      <td width="13%"><img src="{{ url('/other/logo_ptp.png') }}" height="70"></td>
+			<td width="45%" style="vertical-align:top;font-size:12px">
+				<div>PT. Pelabuhan Tanjung Priok <br>Jln. Raya Pelabuhan No.9 Tanjung Priok <div style="margin-top:3px;font-size:10px">NPWP. 03.276.305.4-093.000</div></div>
 				</td>
       <td style="vertical-align:top;text-align:right">
-        <table style="border-collapse:collapse; font-size:9px;">
+        <table style="border-collapse:collapse; font-size:11px;width:70%">
           <tr>
             <td>No. Nota</td>
             <td>: {{$header->nota_no}}</td>
           </tr>
           <tr>
-            <td>Tanggal. Nota</td>
+            <td>Tanggal</td>
             <td>:
 							<?php
 							$originalDate = $header->nota_date;
@@ -48,22 +46,25 @@
 						</td>
           </tr>
 					<tr>
-            <td> </td>
-            <td></td>
+            <td colspan="2">
+							<!-- Nota sebagai faktur pajak berdasarkan Peraturan Dirjen Pajak Nomor PER-13/PJ/2019 tanggal 2 Juli 2019 -->
+						</td>
           </tr>
         </table>
       </td>
     </tr>
   </table>
 
-<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800">Nota Penjualan Jasa Kepelabuhan</center>
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:9px;margin-top:20px">
+<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800;text-transform:uppercase">Nota Penjualan Jasa Kepelabuhan</center>
+<center style="width:100%;;margin-top:5px;font-size:11px;text-transform:uppercase">Dermaga Penumpukan</center>
+
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr style="text-align:center">
-		<td style="vertical-align:top">
-      <table style="border-collapse:collapse; font-size:9px;">
+		<td style="vertical-align:top;width:60%" >
+      <table style="border-collapse:collapse; font-size:11px;">
         <tr>
           <td colspan="3">
-            <font style="font-size:9px;text-align:left"><b>Pengguna Jasa</b></font><br>
+            <font style="font-size:11px;text-align:left;font-weight:800"><b>Penerima Jasa</b></font><br>
           </td>
         </tr>
         <tr>
@@ -89,13 +90,13 @@
       </table>
     </td>
 		<td>
-			<table style="border-collapse:collapse; font-size:9px;">
+			<table style="border-collapse:collapse; font-size:11px;">
 				<tr>
           <td>Nama Kapal</td>
           <td>: </td>
           <td>{{$header->nota_vessel_name}}</td>
         </tr>
-				<tr>
+				<!-- <tr>
           <td>Periode Kunjungan</td>
           <td>: </td>
         <td>{{$kapal->periode}}</td>
@@ -110,60 +111,91 @@
           <td>: </td>
         <td>
 					<?php
-					if ($kapal->nota_trade_type == "D") {
-						echo "Domestik";
-					} else {
-						echo "International";
-					} ?>
+					// if ($kapal->nota_trade_type == "D") {
+					// 	echo "Domestik";
+					// } else {
+					// 	echo "International";
+					//} ?>
 				</td>
-        </tr>
+        </tr> -->
 				<tr>
 					<td>No. Request </td>
 					<td>: </td>
-					<td>{{$header->nota_req_no}}</td>
+					<td>{{$header->nota_id}}</td>
+					<!-- <td>{{$header->nota_req_no}}</td> -->
 				</tr>
       </table>
     </td>
 	</tr>
 </table>
 
-<?php if ($penumpukan != "0") { ?>
-	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:8px;margin-top:20px">
-		<tr style="text-align:center">
-			<th rowspan="2" width="15%">NO BL</th>
-			<th rowspan="2" width="15%">Kemasan</th>
-			<th rowspan="2" width="15%">BARANG</th>
-			<th rowspan="2" width="5%">Qty</th>
-			<th rowspan="2" width="5%">Satuan</th>
-			<th colspan="2" width="15%">Hari</th>
-			<th colspan="2" width="15%">Tarif</th>
-			<th rowspan="2" width="10%">Total</th>
+	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
+		<tr style="text-align:center;text-transform:uppercase;font-weight:800">
+			<th style="border-bottom:solid 1px">No</th>
+			<th style="border-bottom:solid 1px">Jenis Barang<br> Jumlah Barang</th>
+			<th style="border-bottom:solid 1px">Tanggal<br>-Masuk<br>-Keluar<br>-Jumlah Hari</th>
+			<th style="border-bottom:solid 1px">Hari<br>-Masa 1<br>-Masa 2</th>
+			<th style="border-bottom:solid 1px">Tarif<br>-Penumpukan<br>-Dermaga</th>
+			<th style="border-bottom:solid 1px">Sewa<br>-Masa 1<br>-Masa 2</th>
+			<th style="border-bottom:solid 1px"></th>
+			<th style="border-bottom:solid 1px">Jumlah</th>
 		</tr>
-		<tr style="text-align:center">
-			<th>Massa 1</th>
-			<th>Massa 2</th>
-			<th>Massa 1</th>
-			<th>Massa 2</th>
-		</tr>
-		@foreach($penumpukan as $penumpukan)
-		<tr>
-			<td style="padding-left:9px">{{$penumpukan["dtl_bl"]}}</td>
-			<td style="padding-left:9px">{{$penumpukan["dtl_package"]}}</td>
-			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_unit_name"]}}</td>
-			<td style="text-align:center">{{$penumpukan["masa1"]}}</td>
-			<td style="text-align:center">{{$penumpukan["masa2"]}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["trf1up"])}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["trf2up"])}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
-		</tr>
-		@endforeach
+		<?php $no = 0;$nomor = 0;  if ($penumpukan != "0") { $total = count($penumpukan);?>
+			@foreach($penumpukan as $penumpukan)
+			<tr>
+				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
+				<td style="padding-left:9px">{{$penumpukan["dtl_group_tariff_name"]}}</td>
+				<?php if ($no < 1) { ?>
+					<td rowspan="<?php echo $total; ?>" style="padding-left:9px;text-align:center">
+						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, 0)}}
+					</td>
+				<?php } else { ?>
+
+				<?php } ?>
+				<td style="text-align:center">
+					{{number_format($penumpukan["dtl_masa"])}}
+					<?php //if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
+					<?php //if(!empty($penumpukan["masa2"])) { echo $penumpukan["masa2"]; } else { echo "0"; } ?></td>
+				<td style="text-align:center">
+					{{number_format($penumpukan["dtl_tariff"])}}
+					<?php //if(!empty($penumpukan["trf1up"])) { echo number_format($penumpukan["trf1up"]); } else { echo "0"; } ?><br>
+					<?php //if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
+				</td>
+				<td style="text-align:center">
+					{{number_format($penumpukan["dtl_dpp"])}}
+
+					<?php
+						// $sewa1 = $penumpukan["masa1"]*$penumpukan["trf1up"]*$penumpukan["dtl_qty"];
+						// echo number_format($sewa1)."<br>";
+					 ?>
+					 <?php
+		 				// $sewa2 = $penumpukan["masa2"]*$penumpukan["trf2up"]*$penumpukan["dtl_qty"];
+		 				// echo number_format($sewa2);
+						$no++;
+						$dpp = 0;
+		 			 ?></td>
+				<td style="text-align:left">IDR</td>
+				<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
+			</tr>
+			@endforeach
+		<?php } ?>
+	<?php if ($alat != "0") {?>
+		<?php foreach ($alat as $alat) { ?>
+				<tr>
+					<td style="padding-left:9px"><?php $no++;echo $no; ?></td>
+					<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
+					<td style="text-align:center"></td>
+					<td style="text-align:center"></td>
+					<td style="text-align:center"></td>
+					<td style="text-align:right"></td>
+					<td style="text-align:left">IDR</td>
+					<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
+				</tr>
+		<?php }} ?>
 	</table>
-<?php } ?>
 
 <?php if ($bl != "0") { ?>
-<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr style="text-align:center">
 		<th rowspan="2" width="15%">NO BL</th>
 		<th rowspan="2" width="15%">TL</th>
@@ -212,71 +244,48 @@
 <?php } ?>
 </table>
 
-<?php if ($alat != "0") { ?>
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
-	<tr style="text-align:center">
-		<th width="15%">Layanan</th>
-		<th width="15%">Nama Alat</th>
-		<th width="15%">Satuan Alat</th>
-		<th width="15%">Jumlah Alat</th>
-    <th width="15%">Jumlah/Durasi</th>
-    <th width="10%">Tarif Dasar</th>
-    <th width="10%">Total</th>
-	</tr>
-
-<?php foreach ($alat as $alat) { ?>
-		<tr>
-			<td style="padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
-			<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_equipment"]; ?></td>
-			<td style="text-align:center"><?php echo $alat["dtl_unit_name"]; ?></td>
-			<td style="text-align:center"><?php echo number_format($alat["dtl_eq_qty"]) ?></td>
-			<td style="text-align:center"><?php echo number_format($alat["dtl_qty"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_tariff"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
-		</tr>
-<?php }} ?>
-</table>
-
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:8px;margin-top:20px">
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
   <tr>
-    <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DASAR PENGENAAN PAJAK</td>
-    <td style="border-right: 0;border-bottom: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($header->nota_dpp)}}</td>
+    <td colspan="7">DASAR PENGENAAN PAJAK</td>
+    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td style="text-align:right">{{number_format($header->nota_dpp)}}</td>
   </tr>
   <tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">PPN 10%</td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->nota_ppn)}}</td>
+    <td colspan="7">PPN 10%</td>
+    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td style="text-align:right;border-bottom:solid 1px">{{number_format($header->nota_ppn)}}</td>
   </tr>
   <tr>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Jumlah Tagihan</td>
-    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($header->nota_amount)}}</td>
+    <td style="" colspan="7">Jumlah Tagihan</td>
+    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td style="text-align:right;">{{number_format($header->nota_amount)}}</td>
   </tr>
 	<tr>
-		<td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
-		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Uang Jaminan</td>
-		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-		<td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no))}}</td>
+		<td style="" colspan="7">Uang Jaminan</td>
+		<td style="text-align:right;padding-right:9px">IDR</td>
+		<td style="text-align:right">{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no))}}</td>
 	</tr>
 	<tr>
-		<td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
-		<td style="border-right: 0;border-top: 0;border-left:0" colspan="2"><b>Piutang</b></td>
-		<td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format(0)}}</td>
+		<td style="" colspan="7">
+			<b><?php
+			if((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount > 0) {
+				echo "<b>Sisa Uper</b>";
+			} else {
+				echo "<b>Piutang</b>";
+			} ?></b>
+		</td>
+		<td style="text-align:right;padding-right:9px"><b>IDR</b></td>
+		<td style="text-align:right"><b>{{number_format(abs((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount))}}</b></td>
 	</tr>
 </table>
-<p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
+<p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
 <table style="width:100%">
 	<tr>
 		<td>
-			<div><?php echo DNS2D::getBarcodeHTML($qrcode, "QRCODE", 1.5,1.5); ?></div>
+			<div><?php echo DNS2D::getBarcodeHTML($qrcode, "QRCODE", 2,2); ?></div>
 		</td>
 		<td style="vertical-align:top">
-			<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
+			<table style="border-collapse:collapse; font-size:11px;float:right;text-align:center">
 				<tr><td>Banten,
         <?php
         $originalDate = $header->nota_date;
@@ -291,7 +300,7 @@
 	</tr>
 </table>
 
-	<div style="position:absolute;bottom:20px;font-size:9px; width:100%">
+	<div style="position:absolute;bottom:20px;font-size:11px; width:100%">
 		{{$branch->branch_name}} <br>{{$branch->branch_address}}
 		<div style="margin-top:50px;font-size:8px">
 				{{$header->nota_req_no}}
