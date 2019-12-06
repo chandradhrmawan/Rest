@@ -148,14 +148,16 @@ class RequestBooking{
 
 		// build paysplit
 			$setP = [];
-			$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
-			$paysplit = (array)$paysplit;
-			foreach ($paysplit as $list) {
-				$newP = [];
-				$list = (array)$list;
-				$newP['PS_CUST_ID'] = $list['cust_id'];
-				$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
-				$setP[] = $newP;
+			if ($find[$config['head_split']] == 'Y') {
+				$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
+				$paysplit = (array)$paysplit;
+				foreach ($paysplit as $list) {
+					$newP = [];
+					$list = (array)$list;
+					$newP['PS_CUST_ID'] = $list['cust_id'];
+					$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+					$setP[] = $newP;
+				}
 			}
 		// build paysplit
 
@@ -374,6 +376,7 @@ class RequestBooking{
         		"head_primery" => "bm_id",
         		"head_forigen" => "hdr_bm_id",
         		"head_no" => "bm_no",
+        		"head_split" => "bm_split",
         		"head_by" => "bm_create_by",
         		"head_date" => "bm_date",
         		"head_branch" => "bm_branch_id",
@@ -414,6 +417,7 @@ class RequestBooking{
         		"head_primery" => "rec_id",
         		"head_forigen" => "hdr_rec_id",
         		"head_no" => "rec_no",
+        		"head_split" => "rec_split",
         		"head_by" => "rec_create_by",
         		"head_date" => "rec_date",
         		"head_branch" => "rec_branch_id",
@@ -454,6 +458,7 @@ class RequestBooking{
         		"head_primery" => "del_id",
         		"head_forigen" => "hdr_del_id",
         		"head_no" => "del_no",
+        		"head_split" => "del_split",
         		"head_by" => "del_create_by",
         		"head_date" => "del_date",
         		"head_branch" => "del_branch_id",
