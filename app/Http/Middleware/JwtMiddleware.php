@@ -18,7 +18,8 @@ class JwtMiddleware
                 'error' => 'Token not provided. Please Login.'
             ], 401);
         }
-        if ($token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiZWFyZXIiLCJzdWIiOiIzNCIsImV4cCI6Mjg3MDY1OTgzMn0.gSWsv4ZvKbEUWSRT41ECtUND_k3vFCfR4R8DuY6DYLk") {
+        if ($token == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiZWFyZXIiLCJzdWIiOiIzNCIsImV4cCI6Mjg3MDY1OTgzMn0.gSWsv4ZvKbEUWSRT41ECtUND_k3vFCfR4R8DuY6DYLk") {
+          $request->request->add(['user' => 'esb']);
           return $next($request);
         } else {
           $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
@@ -45,6 +46,7 @@ class JwtMiddleware
             $update  = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->update(["USER_ACTIVE" => $time]);
             $user    = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->get();
             $request->auth = $user;
+            $request->request->add(['user' => $data[0]]);
             return $next($request);
             // return $user;
           }

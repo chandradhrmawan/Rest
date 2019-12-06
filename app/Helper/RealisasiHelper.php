@@ -83,14 +83,16 @@ class RealisasiHelper{
 
     // build paysplit
       $setP = [];
-      $paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find->real_req_no)->get();
-      $paysplit = (array)$paysplit;
-      foreach ($paysplit as $list) {
-        $newP = [];
-        $list = (array)$list;
-        $newP['PS_CUST_ID'] = $list['cust_id'];
-        $newP['PS_GTRF_ID'] = $list['group_tarif_id'];
-        $setP[] = $newP;
+      if ($find->bm_split == 'Y') {
+        $paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find->real_req_no)->get();
+        $paysplit = (array)$paysplit;
+        foreach ($paysplit as $list) {
+          $newP = [];
+          $list = (array)$list;
+          $newP['PS_CUST_ID'] = $list['cust_id'];
+          $newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+          $setP[] = $newP;
+        }
       }
     // build paysplit
 
@@ -185,14 +187,18 @@ class RealisasiHelper{
 
     // build paysplit
       $setP = [];
-      $paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find->bprp_req_no)->get();
-      $paysplit = (array)$paysplit;
-      foreach ($paysplit as $list) {
-        $newP = [];
-        $list = (array)$list;
-        $newP['PS_CUST_ID'] = $list['cust_id'];
-        $newP['PS_GTRF_ID'] = $list['group_tarif_id'];
-        $setP[] = $newP;
+      $cek_slpit = DB::connection('omcargo')->select(DB::raw("SELECT DEL_SPLIT AS SPLIT_STATUS FROM TX_HDR_DEL WHERE DEL_NO = '".$find->bprp_req_no."' UNION ALL SELECT REC_SPLIT AS SPLIT_STATUS FROM TX_HDR_REC WHERE REC_NO = '".$find->bprp_req_no."'"));
+      $cek_slpit = $cek_slpit[0];
+      if ($cek_slpit->split_status == 'Y') {
+        $paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find->bprp_req_no)->get();
+        $paysplit = (array)$paysplit;
+        foreach ($paysplit as $list) {
+          $newP = [];
+          $list = (array)$list;
+          $newP['PS_CUST_ID'] = $list['cust_id'];
+          $newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+          $setP[] = $newP;
+        }
       }
     // build paysplit
 
@@ -296,7 +302,9 @@ class RealisasiHelper{
             "dtl_eq_qty" => $list->eq_qty,
             "dtl_qty" => $list->qty,
             "dtl_unit" => $list->unit_id,
+            "dtl_unit_qty" => $list->unit_qty,
             "dtl_unit_name" => $list->unit_name,
+            "dtl_sub_tariff" => $list->sub_tariff,
             "dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
           ]);
         }

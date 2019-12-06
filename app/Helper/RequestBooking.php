@@ -141,21 +141,23 @@ class RequestBooking{
 				$newE['EQ_UNIT_ID'] = empty($list['eq_unit_id']) ? 'NULL' : $list['eq_unit_id'];
 				$newE['EQ_GTRF_ID'] = empty($list['group_tariff_id']) ? 'NULL' : $list['group_tariff_id'];
 				$newE['EQ_PKG_ID'] = empty($list['package_id']) ? 'NULL' : $list['package_id'];
-				// $newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
+				$newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
 				$setE[] = $newE;
 			}
 		// build eqpt
 
 		// build paysplit
 			$setP = [];
-			$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
-			$paysplit = (array)$paysplit;
-			foreach ($paysplit as $list) {
-				$newP = [];
-				$list = (array)$list;
-				$newP['PS_CUST_ID'] = $list['cust_id'];
-				$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
-				$setP[] = $newP;
+			if ($find[$config['head_split']] == 'Y') {
+				$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
+				$paysplit = (array)$paysplit;
+				foreach ($paysplit as $list) {
+					$newP = [];
+					$list = (array)$list;
+					$newP['PS_CUST_ID'] = $list['cust_id'];
+					$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+					$setP[] = $newP;
+				}
 			}
 		// build paysplit
 
@@ -315,6 +317,7 @@ class RequestBooking{
 							"dtl_qty" => $list["qty"],
 							"dtl_eq_qty" => $list["eq_qty"],
 							"dtl_unit" => $list["unit_id"],
+							"dtl_unit_qty" => $list["unit_qty"],
 							"dtl_unit_name" => $list["unit_name"],
 							"dtl_group_tariff_id" => $list["group_tariff_id"],
 							"dtl_group_tariff_name" => $list["group_tariff_name"],
@@ -322,6 +325,7 @@ class RequestBooking{
 							"dtl_dpp" => $list["tariff_cal_uper"],
 							"dtl_commodity" => $list["commodity_name"],
 							"dtl_equipment" => $list["equipment_name"],
+							"dtl_sub_tariff" => $list["sub_tariff"],
 							"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 						];
 						DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
@@ -373,6 +377,7 @@ class RequestBooking{
         		"head_primery" => "bm_id",
         		"head_forigen" => "hdr_bm_id",
         		"head_no" => "bm_no",
+        		"head_split" => "bm_split",
         		"head_by" => "bm_create_by",
         		"head_date" => "bm_date",
         		"head_branch" => "bm_branch_id",
@@ -413,6 +418,7 @@ class RequestBooking{
         		"head_primery" => "rec_id",
         		"head_forigen" => "hdr_rec_id",
         		"head_no" => "rec_no",
+        		"head_split" => "rec_split",
         		"head_by" => "rec_create_by",
         		"head_date" => "rec_date",
         		"head_branch" => "rec_branch_id",
@@ -453,6 +459,7 @@ class RequestBooking{
         		"head_primery" => "del_id",
         		"head_forigen" => "hdr_del_id",
         		"head_no" => "del_no",
+        		"head_split" => "del_split",
         		"head_by" => "del_create_by",
         		"head_date" => "del_date",
         		"head_branch" => "del_branch_id",
