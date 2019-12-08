@@ -68,7 +68,7 @@ class UperRequest{
                 'uper_cust_name' => $getH->alt_name,
                 'uper_cust_npwp' => $getH->npwp,
                 'uper_cust_address' => $getH->address,
-                'uper_amount' => $getH->total_uper,
+                'uper_amount' => $getH->total,
                 'uper_currency_code' => $getH->currency,
                 'uper_status' => 'P',
                 // Tambahan Mas Adi
