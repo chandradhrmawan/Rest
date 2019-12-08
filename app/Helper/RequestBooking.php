@@ -378,7 +378,7 @@ class RequestBooking{
         		"head_tab_detil_bl" => "dtl_rec_bl",
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'dtl_in',
-        		"head_tab_detil_date_out" => 'rec_atd',
+        		"head_tab_detil_date_out" => 'rec_etd',
         		"head_tab_detil_date_out_old" => 'rec_extend_from',
         		"head_status" => "rec_status",
         		"head_primery" => "rec_id",
