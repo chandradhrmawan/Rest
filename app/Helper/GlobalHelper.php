@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class GlobalHelper {
 
@@ -226,6 +227,10 @@ class GlobalHelper {
       $connect->orderby($in[0], $in[1]);
       }
 
+      if (isset($input["whereraw"])) {
+          $connect->whereRaw($input["whereraw"]);
+      }
+
       if(!empty($input["where"][0])) {
         $connect->where($input["where"]);
       }
@@ -422,16 +427,6 @@ class GlobalHelper {
   }
 
   public static function join($input) {
-    if (!empty($input['special'])) {
-      if ($input['special'] == "roleReff") {
-        $a = "SELECT tr.*, tr2.REFF_NAME AS SERVICE, tr3.REFF_NAME AS STATUS FROM TR_ROLE tr, TM_REFF tr2, TM_REFF tr3 WHERE tr.ROLE_SERVICE = tr2.REFF_ID AND tr2.REFF_TR_ID = 1 AND tr.ROLE_STATUS = tr3.REFF_ID AND tr3.REFF_TR_ID = 3 ORDER BY tr.role_id DESC";
-        $data = DB::connection("omuster")->select(DB::raw($a));
-      }  else if($input['special'] == "bprpReff") {
-        $a = "SELECT tr.*, tr2.REFF_NAME AS req_type, tr3.REFF_NAME AS STATUS FROM TX_HDR_BPRP tr, TM_REFF tr2, TM_REFF tr3 WHERE tr.BPRP_REQ_TYPE = tr2.REFF_ID AND tr2.REFF_TR_ID = 12 AND tr.BPRP_STATUS = tr3.REFF_ID AND tr3.REFF_TR_ID = 8 AND tr.BPRP_BRANCH_ID = 12 AND tr.BPRP_REQ_TYPE IN (1,2) ORDER BY tr.BPRP_ID DESC";
-        $data = DB::connection("omcargo")->select(DB::raw($a));
-      }
-    }
-    else {
     $connect = DB::connection($input["db"])->table($input["table"]);
     if (isset($input["type"])) {
       if ($input["type"] == "left") {
@@ -472,11 +467,6 @@ class GlobalHelper {
       $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
     }
 
-    if(!empty($input["orderby"][0])) {
-    $in        = $input["orderby"];
-    $connect->orderby(strtoupper($in[0]), $in[1]);
-    }
-
     if (!empty($input["filter"])) {
     $search   = json_decode($input["filter"], TRUE);
     foreach ($search as $value) {
@@ -505,7 +495,26 @@ class GlobalHelper {
       }
     }
 
-    $count    = $connect->count();
+    if(!empty($input["groupby"])) {
+      $connect->groupBy($input["groupby"]);
+    }
+
+    if (isset($input["sort"])) {
+      $sort = json_decode($input["sort"]);
+      foreach ($sort as $sort) {
+      $property = $sort->property;
+      $direction = $sort->direction;
+      $connect->orderby(strtoupper($property), $direction);
+      }
+    } else {
+      if(!empty($input["orderby"][0])) {
+        $in        = $input["orderby"];
+        $connect->orderby(strtoupper($in[0]), $in[1]);
+      }
+    }
+
+    $addSlashes = str_replace('?', "'?'", $connect->toSql());
+    $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
 
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
@@ -520,14 +529,8 @@ class GlobalHelper {
       $data    = json_decode($change);
     } else {
       $data   = $connect->get();
-
       }
-    }
-    if (!empty($input['special'])) {
-      return ["result"=>$data];
-    } else {
-      return ["result"=>$data, "count"=>$count];
-    }
+      return ["result"=>$data, "count"=>count($data)];
   }
 
   public static function whereQuery($input) {

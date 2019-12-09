@@ -240,7 +240,6 @@ class ViewController extends Controller
             $det["alat"][]=$newDt;
           }
         }
-
       }
 
       $all = ["header"=>$header]+$det;
@@ -340,10 +339,37 @@ class ViewController extends Controller
       } catch (ClientException $e) {
         return $e->getResponse();
       }
-      $results = json_decode($res->getBody()->getContents(), true);
-      $qrcode = $results['getDataCetakResponse']['esbBody']['url'];
-      $kapal       = DB::connection('omcargo')->select($query);
-      $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
+      $results  = json_decode($res->getBody()->getContents(), true);
+      $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+      $kapal    = DB::connection('omcargo')->select($query);
+      $nota     = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
+      $handa     = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID','=', $id)->get();
+      foreach ($handa as $list) {
+        $newAt = [];
+        foreach ($list as $key => $value) {
+                $newAt[$key] = $value;
+        }
+
+        $componena  = DB::connection("mdm")
+                      ->table("TM_COMP_NOTA")
+                      ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id]])
+                      ->get();
+        foreach ($componena as $listS) {
+          foreach ($listS as $key => $value) {
+                  $newAt[$key] = $value;
+          }
+          $dat[]=$newAt;
+          if ($newAt["comp_nota_view"] == "1") {
+            $dat["penumpukan"][]=$newAt;
+          } if ($newAt["comp_nota_view"] == "2" || $newAt["comp_nota_view"] == "4") {
+            $dat["handling"][]=$newAt;
+          }  if ($newAt["comp_nota_view"] == "3") {
+            $dat["alat"][]=$newAt;
+          }
+        }
+      }
+
+      // $handlingg  = $dat["handling"];
       $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
       $filename   = "Test";
       $dompdf     = new Dompdf();

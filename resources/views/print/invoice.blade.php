@@ -176,8 +176,7 @@
 	<tr>
 		<td colspan="4"><b>Jenis Jasa</b></td>
 	</tr>
-	@foreach($bl as $bl)
-<?php foreach ($handling[$bl] as $value) { ?>
+<?php foreach ($handling as $value) { ?>
 	<tr>
 		<td width="5%"><?php echo $no; $no++; ?></td>
 		<td width="59%" style="text-align:left">{{$value["dtl_group_tariff_name"]}}</td>
@@ -185,7 +184,6 @@
 		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
 <?php } ?>
-	@endforeach
 <?php } ?>
 <?php if ($alat != "0") {?>
 	<?php foreach ($alat as $alat) { ?>
