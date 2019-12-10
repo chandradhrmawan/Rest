@@ -31,11 +31,12 @@ class StoreController extends Controller
 
     public function api(Request $request) {
       $input  = $request->input();
-      // return response()->json($input);
       if (isset($input['encode']) and $input['encode'] == 'true') {
+        $input_user = $input['user'];
         $request = json_decode($input['request'], true);
         $input = json_decode($input['request'], true);
         $input['encode'] = 'true';
+        $input['user'] = $input_user;
       }
       $action = $input["action"];
       $request = $request;
