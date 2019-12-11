@@ -81,7 +81,7 @@ class RequestBooking{
 							$gthdrId = $gthdrId[0];
 							$getdatein = DB::connection('omcargo')->table('TX_DTL_DEL')->where('hdr_del_id',$gthdrId->del_id)->where('dtl_del_bl', $list['dtl_del_bl'])->get();
 							$getdatein = $getdatein[0];
-
+							$getdatein = (array)$getdatein;
 							$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($getdatein[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 						}
 					}
