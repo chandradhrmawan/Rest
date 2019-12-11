@@ -76,6 +76,14 @@ class RequestBooking{
 						$newD['DTL_DATE_IN'] = empty($list[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}else{
 						$newD['DTL_DATE_IN'] = empty($list[$config['head_tab_detil_date_in']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						if (!empty($find['del_ext_from'])) {
+							$gthdrId = DB::connection('omcargo')->table('TX_HDR_DEL')->where('del_no', $find['del_ext_from'])->get();
+							$gthdrId = $gthdrId[0];
+							$getdatein = DB::connection('omcargo')->table('TX_DTL_DEL')->where('hdr_del_id',$gthdrId->del_id)->where('dtl_bl', $list['dtl_bl'])->get();
+							$getdatein = $getdatein[0];
+
+							$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($getdatein[$config['head_tab_detil_date_in']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						}
 					}
 				}else{
 					$newD['DTL_DATE_IN'] = 'NULL';
@@ -85,8 +93,8 @@ class RequestBooking{
 				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 
 				if ($config['head_tab_detil_date_out_old'] != null and $input['table'] == 'TX_HDR_DEL') {
-					$newD['DTL_DATE_OUT_OLD'] = empty($find[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-					$newD['DTL_DATE_OUT'] = empty($list[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}else{
 					$newD['DTL_DATE_OUT_OLD'] = empty($find[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
@@ -312,7 +320,7 @@ class RequestBooking{
 			$pesan = "Uper Not created, uper percent for this request is 0%";
 		}
 
-		return ['result' => "Success, approved request!", "note" => $pesan, 'no_req' => $find[$config['head_no']]];
+		return ['result' => "Success, approved request! ".$pesan, "note" => $pesan, 'no_req' => $find[$config['head_no']]];
     }
 
     public static function config($input){
@@ -419,8 +427,8 @@ class RequestBooking{
         		"head_tab_detil_bl" => "dtl_del_bl",
         		"head_tab_detil_tl" => null,
         		"head_tab_detil_date_in" => 'dtl_in',
-        		"head_tab_detil_date_out" => 'dtl_out',
-        		"head_tab_detil_date_out_old" => 'del_ext_from_date',
+        		"head_tab_detil_date_out" => 'del_ext_from_date',
+        		"head_tab_detil_date_out_old" => 'dtl_out',
         		"head_status" => "del_status",
         		"head_primery" => "del_id",
         		"head_forigen" => "hdr_del_id",
