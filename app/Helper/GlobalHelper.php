@@ -802,9 +802,9 @@ class GlobalHelper {
   }
 
   public static function getUper($req_no) {
-    $data = DB::connection('omcargo')->table('TX_HDR_UPER')->where('UPER_REQ_NO', $req_no)->get();
+    $data = DB::connection('omcargo')->table('TX_PAYMENT')->where('PAY_REQ_NO', $req_no)->get();
     if (!empty($data)) {
-      return $data[0]->uper_amount;
+      return $data[0]->pay_amount;
     } else {
       return 0;
     }

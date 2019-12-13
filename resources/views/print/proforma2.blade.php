@@ -247,7 +247,7 @@
 		<th width="15%">Nama Alat</th>
 		<th width="15%">Satuan Alat</th>
 		<th width="15%">Jumlah Alat</th>
-    <th width="15%">Jumlah/Durasi</th>
+    <th width="15%">Durasi / Lama Pemakaian Alat</th>
     <th width="10%">Tarif Dasar</th>
     <th width="10%">Total</th>
 	</tr>

@@ -160,7 +160,13 @@ class IndexController extends Controller
 
     function cektoken($input) {
       $token       = $input["token"];
+      try {
       $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
+      } catch(ExpiredException $e) {
+        return response()->json([
+                'error' => 'Provided token is expired. Please Login'
+            ], 400);
+      }
       date_default_timezone_set('GMT');
       $data    = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->get();
       $cektoken= DB::connection('omuster')->table('TM_USER')->where("API_TOKEN",$token)->get();

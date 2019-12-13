@@ -216,7 +216,7 @@ class ViewController extends Controller
       $det            = [];
       $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
       $data["header"] = $header;
-      $detail  = $connect->table("TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->get();
+      $detail  = $connect->table("TX_DTL_NOTA")->where('NOTA_HDR_ID', $id)->orderBy("NOTA_DTL_ID","ASC")->get();
       foreach ($detail as $list) {
         $newDt = [];
         foreach ($list as $key => $value) {
@@ -369,8 +369,12 @@ class ViewController extends Controller
         }
       }
 
-      // $handlingg  = $dat["handling"];
-      $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      if (!empty($dat["handling"])) {
+        $handlingbm  = $dat["handling"];
+        $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handlingbm, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      } else {
+        $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      }
       $filename   = "Test";
       $dompdf     = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
