@@ -101,6 +101,15 @@ class BillingEngine{
           }
         }
 
+        $cek = TsTariff::where([
+          "tariff_prof_hdr_id" => $input['tariff_prof_hdr_id'],
+          "sub_iso_code"       => $subisocode,
+          "iso_code"           => $isocode
+        ])->count();
+        if ($cek > 0) {
+          return [ "Success" => false "result" => "Fail, store profile tariff detil data is exists!"];
+        }
+
         // Detail
         if (isset($input['tariff_id']) and !empty($input['tariff_id'])) {
           $detilS                     = TsTariff::find($input['tariff_id']);
