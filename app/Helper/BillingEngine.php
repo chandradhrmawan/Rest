@@ -95,6 +95,8 @@ class BillingEngine{
               //   "EQUIPMENT_TYPE_ID" => $each[0],
               //   "EQUIPMENT_UNIT" => $each[1]
               // ])->get();
+              $each[0] = $each[0] == 'null' ? '' : $each[0];
+              $each[1] = $each[1] == 'null' ? '' : $each[1];
               $query = "SELECT FNC_CREATE_ISO('EQUIPMENT','".$each[0]."','".$each[1]."','') ISO FROM dual";
               $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
               $alatisocode = $alatisocode[0]->iso_code;
@@ -115,7 +117,10 @@ class BillingEngine{
               //  $itemisocode->where('COMMODITY_UNIT_ID',$each[2]);
               // }
               // $itemisocode    = $itemisocode->get();
-              $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
+              $each[0] = $each[0] == "null" ? '' : $each[0];
+              $each[1] = $each[1] == "null" ? '' : $each[1];
+              $each[2] = $each[2] == 'null' ? '' : $each[2];
+              return $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
               $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
               $itemisocode    = $itemisocode[0]->iso_code;
               if ($isocode == "") {
@@ -132,6 +137,9 @@ class BillingEngine{
               //   "CONT_TYPE"   => $each[1],
               //   "CONT_STATUS" => $each[2]
               // ])->get();
+              $each[0] = $each[0] == 'null' ? '' : $each[0];
+              $each[1] = $each[1] == 'null' ? '' : $each[1];
+              $each[2] = $each[2] == 'null' ? '' : $each[2];
               $query = "SELECT FNC_CREATE_ISO('CONT','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
               $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
               $itemisocode = $itemisocode[0]->iso_code;
@@ -572,7 +580,6 @@ class BillingEngine{
       }
       $getConfLink = config('database.connections.eng');
       $link = oci_connect($getConfLink['username'], $getConfLink['password'], $getConfLink['host'].'/'.$getConfLink['database']);
-      // $link = oci_connect('BILLING_ENGINE', 'billingengineEDII', '10.88.48.124/NPKSBILD');
       $sql = " DECLARE
         detail PKG_TARIFF.BOOKING_DTL;
         equip PKG_TARIFF.BOOKING_EQUIP;
