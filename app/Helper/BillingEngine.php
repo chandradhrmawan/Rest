@@ -63,9 +63,18 @@ class BillingEngine{
         if (!empty($input['ALAT'])) {
           $each       = explode('/', $input['ALAT']);
           
-          $each[0] = $each[0] == 'null' ? '' : $each[0];
-          $each[1] = $each[1] == 'null' ? '' : $each[1];
-          $query = "SELECT FNC_CREATE_ISO('EQUIPMENT','".$each[0]."','".$each[1]."','') ISO FROM dual";
+          $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
+          if ($each[0] == 'null') {
+            $query .= $each[0].",";
+          }else{
+            $query .= "'".$each[0]."',";
+          }
+          if ($each[1] == 'null') {
+            $query .= $each[1].",";
+          }else{
+            $query .= "'".$each[1]."',";
+          }
+          $query .= "'') ISO FROM dual";
           $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
           $alatisocode = $alatisocode[0]->iso;
           $isocode = $alatisocode;
@@ -73,10 +82,23 @@ class BillingEngine{
 
         if (!empty($input['BARANG'])) {
           $each       = explode('/', $input['BARANG']);
-          $each[0] = $each[0] == "null" ? '' : $each[0];
-          $each[1] = $each[1] == "null" ? '' : $each[1];
-          $each[2] = $each[2] == 'null' ? '' : $each[2];
-          $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
+          $query = "SELECT FNC_CREATE_ISO('COMMODITY',";
+          if ($each[0] == 'null') {
+            $query .= $each[0].",";
+          }else{
+            $query .= "'".$each[0]."',";
+          }
+          if ($each[1] == 'null') {
+            $query .= $each[1].",";
+          }else{
+            $query .= "'".$each[1]."',";
+          }
+          if ($each[2] == 'null') {
+            $query .= $each[2];
+          }else{
+            $query .= "'".$each[2]."'";
+          }
+          $query .= ") ISO FROM dual";
           $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
           $itemisocode    = $itemisocode[0]->iso;
           if ($isocode == "") {
@@ -88,10 +110,23 @@ class BillingEngine{
 
         if (!empty($input['KONTAINER'])) {
           $each           = explode('/', $input['KONTAINER']);
-          $each[0] = $each[0] == 'null' ? '' : $each[0];
-          $each[1] = $each[1] == 'null' ? '' : $each[1];
-          $each[2] = $each[2] == 'null' ? '' : $each[2];
-          $query = "SELECT FNC_CREATE_ISO('CONT','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
+          $query = "SELECT FNC_CREATE_ISO('CONT',";
+          if ($each[0] == 'null') {
+            $query .= $each[0].",";
+          }else{
+            $query .= "'".$each[0]."',";
+          }
+          if ($each[1] == 'null') {
+            $query .= $each[1].",";
+          }else{
+            $query .= "'".$each[1]."',";
+          }
+          if ($each[2] == 'null') {
+            $query .= $each[2];
+          }else{
+            $query .= "'".$each[2]."'";
+          }
+          $query .= ") ISO FROM dual";
           $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
           $itemisocode = $itemisocode[0]->iso;
           if ($isocode == "") {
