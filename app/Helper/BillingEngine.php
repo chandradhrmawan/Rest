@@ -15,52 +15,6 @@ class BillingEngine{
         $detil      = $input['detil'];
         $datenow    = Carbon::now()->format('Y-m-d');
 
-        // validate iso
-          // foreach ($detil as $list) {
-          //   if (!empty($list['ALAT'])) {
-          //     $each       = explode('/', $list['ALAT']);
-          //     $subisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-          //       "EQUIPMENT_TYPE_ID" => $each[0],
-          //       "EQUIPMENT_UNIT" => $each[1]
-          //     ])->get();
-          //     if (count($subisocode) == 0) {
-          //       return ["Success"=>false, "result" => "Fail, iso code not found alat", "ALAT" => $list];
-          //     }
-          //   }
-
-          //   if (!empty($list['BARANG'])) {
-          //     $each       = explode('/', $list['BARANG']);
-          //     $isocode    = \DB::connection('mdm')->table('TM_ISO_COMMODITY')->where("PACKAGE_ID", $each[0]);
-          //     if (empty($each[1]) or $each[1] == "null") {
-          //      $isocode->whereNull('COMMODITY_ID');
-          //     }else{
-          //      $isocode->where('COMMODITY_ID',$each[1]);
-          //     }
-          //     if (empty($each[2]) or $each[2] == "null") {
-          //      $isocode->whereNull('COMMODITY_UNIT_ID');
-          //     }else{
-          //      $isocode->where('COMMODITY_UNIT_ID',$each[2]);
-          //     }
-          //     $isocode    = $isocode->get();
-          //     if (count($isocode) == 0) {
-          //       return ["Success"=>false, "result" => "Fail, iso code not found barang", "BARANG" => $list];
-          //     }
-          //   }
-
-          //   elseif (!empty($list['KONTAINER'])) {
-          //     $each           = explode('/', $list['KONTAINER']);
-          //     $isocode        = \DB::connection('mdm')->table('TM_ISO_CONT')->where([
-          //       "CONT_SIZE"   => $each[0],
-          //       "CONT_TYPE"   => $each[1],
-          //       "CONT_STATUS" => $each[2]
-          //     ])->get();
-          //     if (count($isocode) == 0) {
-          //       return ["Success"=>false, "result" => "Fail, iso code not found kontainer", "KONTAINER" => $list];
-          //     }
-          //   }
-          // }
-        // validate iso
-
         // store head
           if(empty($head['TARIFF_ID'])){
             $headS    = new TxProfileTariffHdr;
@@ -83,96 +37,6 @@ class BillingEngine{
           $headS->save();
         // store head
 
-        // store detil
-          TsTariff::where('TARIFF_PROF_HDR_ID',$headS->tariff_id)->delete();
-          foreach ($detil as $list) {
-            $isocode    = "";
-            $subisocode = "";
-            if (!empty($list['ALAT'])) {
-              // Get Data with / separater
-              $each       = explode('/', $list['ALAT']);
-              // $alatisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-              //   "EQUIPMENT_TYPE_ID" => $each[0],
-              //   "EQUIPMENT_UNIT" => $each[1]
-              // ])->get();
-              $each[0] = $each[0] == 'null' ? '' : $each[0];
-              $each[1] = $each[1] == 'null' ? '' : $each[1];
-              $query = "SELECT FNC_CREATE_ISO('EQUIPMENT','".$each[0]."','".$each[1]."','') ISO FROM dual";
-              $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $alatisocode = $alatisocode[0]->iso;
-              $isocode = $alatisocode;
-            }
-
-            if (!empty($list['BARANG'])) {
-              $each       = explode('/', $list['BARANG']);
-              // $itemisocode    = \DB::connection('mdm')->table('TM_ISO_COMMODITY')->where("PACKAGE_ID", $each[0]);
-              // if (empty($each[1]) or $each[1] == "null") {
-              //  $itemisocode->whereNull('COMMODITY_ID');
-              // }else{
-              //  $itemisocode->where('COMMODITY_ID',$each[1]);
-              // }
-              // if (empty($each[2]) or $each[2] == "null") {
-              //  $itemisocode->whereNull('COMMODITY_UNIT_ID');
-              // }else{
-              //  $itemisocode->where('COMMODITY_UNIT_ID',$each[2]);
-              // }
-              // $itemisocode    = $itemisocode->get();
-              $each[0] = $each[0] == "null" ? '' : $each[0];
-              $each[1] = $each[1] == "null" ? '' : $each[1];
-              $each[2] = $each[2] == 'null' ? '' : $each[2];
-              $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
-              $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $itemisocode    = $itemisocode[0]->iso;
-              if ($isocode == "") {
-                $isocode = $itemisocode;
-              }else{
-                $subisocode = $itemisocode;
-              }
-            }
-
-            if (!empty($list['KONTAINER'])) {
-              $each           = explode('/', $list['KONTAINER']);
-              // $itemisocode        = \DB::connection('mdm')->table('TM_ISO_CONT')->where([
-              //   "CONT_SIZE"   => $each[0],
-              //   "CONT_TYPE"   => $each[1],
-              //   "CONT_STATUS" => $each[2]
-              // ])->get();
-              $each[0] = $each[0] == 'null' ? '' : $each[0];
-              $each[1] = $each[1] == 'null' ? '' : $each[1];
-              $each[2] = $each[2] == 'null' ? '' : $each[2];
-              $query = "SELECT FNC_CREATE_ISO('CONT','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
-              $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $itemisocode = $itemisocode[0]->iso;
-              if ($isocode == "") {
-                $isocode = $itemisocode;
-              }else{
-                $subisocode = $itemisocode;
-              }
-            }
-
-            // Detail
-            $detilS                     = new TsTariff;
-            $detilS->tariff_prof_hdr_id = $headS->tariff_id;
-            $detilS->service_code       = $headS->service_code;
-            $detilS->sub_iso_code       = $subisocode;
-            $detilS->iso_code           = $isocode;
-            $detilS->branch_id          = 12;
-            // $detilS->branch_id          = $head['BRANCH_ID'];
-
-            $detilS->nota_id            = $list['LAYANAN'];
-            $detilS->tariff_object      = $list['OBJECT_TARIFF'];
-            $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
-            $detilS->tariff             = $list['TARIFF'];
-            $detilS->stacking_area      = $list['AREA'];
-            $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
-            // $detilS->tariff_STATUS = $list['TARIFF_STATUS'];
-            $detilS->tariff_status      = $headS->tariff_status;
-            // $detilS->tariff_DI = $list['TARIFF_DI'];
-            // $detilS->SUB_TARIFF = $list['SUB_TARIFF'];
-            $detilS->save();
-          }
-        // store detil
-
         if (!empty($head['FILE']['PATH'])) {
           if (!empty($headS->tariff_file) and file_exists($headS->tariff_file)) {
             unlink($headS->tariff_file);
@@ -190,6 +54,79 @@ class BillingEngine{
 
         $listHeader = DB::connection('eng')->table('TX_PROFILE_TARIFF_HDR')->where('TARIFF_ID', $head["TARIFF_ID"])->get();
         return [ "result" => "Success, store profile tariff data", "header"=>$listHeader];
+  }
+
+  public static function storeProfileTariffDetil($input){
+    // store detil
+        $isocode    = "";
+        $subisocode = "";
+        if (!empty($input['ALAT'])) {
+          $each       = explode('/', $input['ALAT']);
+          
+          $each[0] = $each[0] == 'null' ? '' : $each[0];
+          $each[1] = $each[1] == 'null' ? '' : $each[1];
+          $query = "SELECT FNC_CREATE_ISO('EQUIPMENT','".$each[0]."','".$each[1]."','') ISO FROM dual";
+          $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
+          $alatisocode = $alatisocode[0]->iso;
+          $isocode = $alatisocode;
+        }
+
+        if (!empty($input['BARANG'])) {
+          $each       = explode('/', $input['BARANG']);
+          $each[0] = $each[0] == "null" ? '' : $each[0];
+          $each[1] = $each[1] == "null" ? '' : $each[1];
+          $each[2] = $each[2] == 'null' ? '' : $each[2];
+          $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
+          $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
+          $itemisocode    = $itemisocode[0]->iso;
+          if ($isocode == "") {
+            $isocode = $itemisocode;
+          }else{
+            $subisocode = $itemisocode;
+          }
+        }
+
+        if (!empty($input['KONTAINER'])) {
+          $each           = explode('/', $input['KONTAINER']);
+          $each[0] = $each[0] == 'null' ? '' : $each[0];
+          $each[1] = $each[1] == 'null' ? '' : $each[1];
+          $each[2] = $each[2] == 'null' ? '' : $each[2];
+          $query = "SELECT FNC_CREATE_ISO('CONT','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
+          $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
+          $itemisocode = $itemisocode[0]->iso;
+          if ($isocode == "") {
+            $isocode = $itemisocode;
+          }else{
+            $subisocode = $itemisocode;
+          }
+        }
+
+        // Detail
+        if (isset($input['tariff_id']) and !empty($input['tariff_id'])) {
+          $detilS                     = TsTariff::find($input['tariff_id']);
+        }else{
+          $detilS                     = new TsTariff;
+        }
+        $detilS->tariff_prof_hdr_id = $input['tariff_prof_hdr_id'];
+        $detilS->service_code       = $input['service_code'];
+        $detilS->sub_iso_code       = $subisocode;
+        $detilS->iso_code           = $isocode;
+        $detilS->branch_id          = 12;
+        $detilS->nota_id            = $input['LAYANAN'];
+        $detilS->tariff_object      = $input['OBJECT_TARIFF'];
+        $detilS->group_tariff_id    = $input['GROUP_TARIFF'];
+        $detilS->tariff             = $input['TARIFF'];
+        $detilS->stacking_area      = $input['AREA'];
+        $detilS->tariff_reference   = $input['TARIFF_REFERENCE'];
+        $detilS->tariff_status      = $input['tariff_status'];
+        $detilS->save();
+        return [ "result" => "Success, store profile tariff detil data", "details"=>$detilS];
+    // store detil
+  }
+
+  public static function deleteProfileTariffDetil($input){
+    TsTariff::where('tariff_id', $input['id'])->delete();
+    return [ "result" => "Success, delete profile tariff detil data" ];
   }
 
   public static function storeCustomerProfileTariffAndUper($input){

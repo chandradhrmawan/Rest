@@ -38,6 +38,7 @@ class StoreController extends Controller
         $input['encode'] = 'true';
         $input['user'] = $input_user;
       }
+      // return $input;
       $action = $input["action"];
       $request = $request;
       $response = $this->$action($input, $request);
@@ -265,6 +266,12 @@ class StoreController extends Controller
     // BillingEngine
       function storeProfileTariff($input, $request){
         return BillingEngine::storeProfileTariff($input);
+      }
+      function storeProfileTariffDetil($input, $request){
+        return BillingEngine::storeProfileTariffDetil($input);
+      }
+      function deleteProfileTariffDetil($input, $request){
+        return BillingEngine::deleteProfileTariffDetil($input);
       }
       function storeCustomerProfileTariffAndUper($input, $request){
         return BillingEngine::storeCustomerProfileTariffAndUper($input);
