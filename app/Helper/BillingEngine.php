@@ -99,7 +99,7 @@ class BillingEngine{
               $each[1] = $each[1] == 'null' ? '' : $each[1];
               $query = "SELECT FNC_CREATE_ISO('EQUIPMENT','".$each[0]."','".$each[1]."','') ISO FROM dual";
               $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $alatisocode = $alatisocode[0]->iso_code;
+              $alatisocode = $alatisocode[0]->iso;
               $isocode = $alatisocode;
             }
 
@@ -122,7 +122,7 @@ class BillingEngine{
               $each[2] = $each[2] == 'null' ? '' : $each[2];
               $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
               $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $itemisocode    = $itemisocode[0]->iso_code;
+              $itemisocode    = $itemisocode[0]->iso;
               if ($isocode == "") {
                 $isocode = $itemisocode;
               }else{
@@ -142,7 +142,7 @@ class BillingEngine{
               $each[2] = $each[2] == 'null' ? '' : $each[2];
               $query = "SELECT FNC_CREATE_ISO('CONT','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
               $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $itemisocode = $itemisocode[0]->iso_code;
+              $itemisocode = $itemisocode[0]->iso;
               if ($isocode == "") {
                 $isocode = $itemisocode;
               }else{
@@ -482,11 +482,11 @@ class BillingEngine{
           }else{
             $setD .= ' detail.DTL_BM_TYPE := NULL;';
           }
-          // if (isset($list['DTL_STACK_AREA']) and $list['DTL_STACK_AREA'] != 'NULL' and $list['DTL_STACK_AREA'] != NULL) {
-          //   // $setD .= ' detail.DTL_STACK_AREA := '.$list['DTL_STACK_AREA'].';';
-          // }else{
-          //   // $setD .= ' detail.DTL_STACK_AREA := NULL;';
-          // }
+          if (isset($list['DTL_STACK_AREA']) and $list['DTL_STACK_AREA'] != 'NULL' and $list['DTL_STACK_AREA'] != NULL) {
+            $setD .= ' detail.DTL_STACK_AREA := '.$list['DTL_STACK_AREA'].';';
+          }else{
+            $setD .= ' detail.DTL_STACK_AREA := NULL;';
+          }
           if ($list['DTL_TL'] == NULL or $list['DTL_TL'] == 'NULL') {
             // $setD .= ' detail.DTL_TL := '.$list['DTL_TL'].';';
             $setD .= ' detail.DTL_TL := \'N\';';
