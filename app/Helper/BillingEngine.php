@@ -140,7 +140,11 @@ class BillingEngine{
           "tariff_prof_hdr_id" => $input['tariff_prof_hdr_id'],
           "sub_iso_code"       => $subisocode,
           "iso_code"           => $isocode
-        ])->count();
+        ]);
+        if (isset($input['tariff_id']) and !empty($input['tariff_id'])) {
+          $cek->whereNotIn('tariff_id', [$input['tariff_id']]);
+        }
+        $cek = $cek->count();
         if ($cek > 0) {
           return [ "Success" => false, "result" => "Fail, store profile tariff detil data is exists!" ];
         }
