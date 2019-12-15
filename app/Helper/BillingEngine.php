@@ -15,49 +15,51 @@ class BillingEngine{
         $detil      = $input['detil'];
         $datenow    = Carbon::now()->format('Y-m-d');
 
-        foreach ($detil as $list) {
-          if (!empty($list['ALAT'])) {
-            $each       = explode('/', $list['ALAT']);
-            $subisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
-              "EQUIPMENT_TYPE_ID" => $each[0],
-              "EQUIPMENT_UNIT" => $each[1]
-            ])->get();
-            if (count($subisocode) == 0) {
-              return ["Success"=>false, "result" => "Fail, iso code not found alat", "ALAT" => $list];
+        // validate iso
+          foreach ($detil as $list) {
+            if (!empty($list['ALAT'])) {
+              $each       = explode('/', $list['ALAT']);
+              $subisocode = \DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where([
+                "EQUIPMENT_TYPE_ID" => $each[0],
+                "EQUIPMENT_UNIT" => $each[1]
+              ])->get();
+              if (count($subisocode) == 0) {
+                return ["Success"=>false, "result" => "Fail, iso code not found alat", "ALAT" => $list];
+              }
             }
-          }
 
-          if (!empty($list['BARANG'])) {
-            $each       = explode('/', $list['BARANG']);
-            $isocode    = \DB::connection('mdm')->table('TM_ISO_COMMODITY')->where("PACKAGE_ID", $each[0]);
-            if (empty($each[1]) or $each[1] == "null") {
-            	$isocode->whereNull('COMMODITY_ID');
-            }else{
-            	$isocode->where('COMMODITY_ID',$each[1]);
+            if (!empty($list['BARANG'])) {
+              $each       = explode('/', $list['BARANG']);
+              $isocode    = \DB::connection('mdm')->table('TM_ISO_COMMODITY')->where("PACKAGE_ID", $each[0]);
+              if (empty($each[1]) or $each[1] == "null") {
+              	$isocode->whereNull('COMMODITY_ID');
+              }else{
+              	$isocode->where('COMMODITY_ID',$each[1]);
+              }
+              if (empty($each[2]) or $each[2] == "null") {
+              	$isocode->whereNull('COMMODITY_UNIT_ID');
+              }else{
+              	$isocode->where('COMMODITY_UNIT_ID',$each[2]);
+              }
+              $isocode    = $isocode->get();
+              if (count($isocode) == 0) {
+                return ["Success"=>false, "result" => "Fail, iso code not found barang", "BARANG" => $list];
+              }
             }
-            if (empty($each[2]) or $each[2] == "null") {
-            	$isocode->whereNull('COMMODITY_UNIT_ID');
-            }else{
-            	$isocode->where('COMMODITY_UNIT_ID',$each[2]);
-            }
-            $isocode    = $isocode->get();
-            if (count($isocode) == 0) {
-              return ["Success"=>false, "result" => "Fail, iso code not found barang", "BARANG" => $list];
-            }
-          }
 
-          elseif (!empty($list['KONTAINER'])) {
-            $each           = explode('/', $list['KONTAINER']);
-            $isocode        = \DB::connection('mdm')->table('TM_ISO_CONT')->where([
-              "CONT_SIZE"   => $each[0],
-              "CONT_TYPE"   => $each[1],
-              "CONT_STATUS" => $each[2]
-            ])->get();
-            if (count($isocode) == 0) {
-              return ["Success"=>false, "result" => "Fail, iso code not found kontainer", "KONTAINER" => $list];
+            elseif (!empty($list['KONTAINER'])) {
+              $each           = explode('/', $list['KONTAINER']);
+              $isocode        = \DB::connection('mdm')->table('TM_ISO_CONT')->where([
+                "CONT_SIZE"   => $each[0],
+                "CONT_TYPE"   => $each[1],
+                "CONT_STATUS" => $each[2]
+              ])->get();
+              if (count($isocode) == 0) {
+                return ["Success"=>false, "result" => "Fail, iso code not found kontainer", "KONTAINER" => $list];
+              }
             }
           }
-        }
+        // validate iso
 
         // store head
           if(empty($head['TARIFF_ID'])){
@@ -119,7 +121,7 @@ class BillingEngine{
               }
             }
 
-            elseif (!empty($list['KONTAINER'])) {
+            if (!empty($list['KONTAINER'])) {
               $each           = explode('/', $list['KONTAINER']);
               $itemisocode        = \DB::connection('mdm')->table('TM_ISO_CONT')->where([
                 "CONT_SIZE"   => $each[0],
@@ -562,7 +564,8 @@ class BillingEngine{
     		DB::connection('eng')->table('TX_TEMP_TARIFF_SPLIT')->where('TEMP_HDR_ID', $head->temp_hdr_id)->delete();
     		DB::connection('eng')->table('TX_TEMP_TARIFF_HDR')->where('BOOKING_NUMBER', $input['b_no'])->delete();
     	}
-    	$link = oci_connect('BILLING_ENGINE', 'billingengineEDII', '10.88.48.124/NPKSBILD');
+      $getConfLink = config('database.connections.eng');
+    	$link = oci_connect($getConfLink['username'], $getConfLink['password'], $getConfLink['host'].'/'.$getConfLink['port']);
     	$sql = " DECLARE
 		    detail PKG_TARIFF.BOOKING_DTL;
 		    equip PKG_TARIFF.BOOKING_EQUIP;

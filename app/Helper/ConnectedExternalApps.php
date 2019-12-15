@@ -18,7 +18,7 @@ class ConnectedExternalApps{
     if (empty($input['idCustomer'])) {
       return ['Success' => false, 'msg' => 'idCustomer is required!'];
     }
-    $endpoint_url= "10.88.48.57:5555/restv2/npkBilling/getTCAHeader";
+    $endpoint_url=config('endpoint.getListTCA');
     $string_json = '{
          "getTCAHeaderInterfaceRequest": {
             "esbHeader": {
@@ -69,7 +69,7 @@ class ConnectedExternalApps{
     if (empty($input['noRequest'])) {
       return ['Success' => false, 'msg' => 'noRequest is required!'];
     }
-    $endpoint_url= "10.88.48.57:5555/restv2/npkBilling/getTCADetail";
+    $endpoint_url= config('endpoint.getViewDetilTCA');
     $string_json = '{
         "getTCADetailInterfaceRequest": {
             "esbHeader": {},
@@ -107,7 +107,7 @@ class ConnectedExternalApps{
   }
 
   public static function vessel_index($input) {
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/trackingVessel";
+    $endpoint_url=config('endpoint.vessel_index');
     $string_json = '{
       "trackingVesselRequest": {
         "esbHeader": {
@@ -179,7 +179,7 @@ class ConnectedExternalApps{
   public static function peb_index($input) {
     // $date = \Carbon\Carbon::createFromFormat("Ymd", str_replace('-','',$input['date_peb']))->format('dmY');
     $date = date('dmY', strtotime($input['date_peb']));
-    $endpoint_url="http://10.88.48.57:5555/restv2/tpsOnline/searchPEB";
+    $endpoint_url=config('endpoint.peb_index');
     $string_json = '{
       "searchPEBRequest": {
         "esbHeader": {
@@ -268,7 +268,7 @@ class ConnectedExternalApps{
 
   private static function realTosGet($req, $list){
     DB::connection('omcargo')->table('TX_REAL_TOS')->where('idvsb', $req->bm_vvd_id)->where('bl_no', $list->dtl_bm_bl)->delete();
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/searchRealisasi";
+    $endpoint_url=config('endpoint.realTosGet');
     $string_json = '{
       "searchRealisasiRequest": {
         "esbHeader": { },
@@ -353,7 +353,7 @@ class ConnectedExternalApps{
   }
 
   private static function sendRequestBookingNewExcute($req_type, $paid_date, $head, $detil, $config){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/saveCargoNPK";
+    $endpoint_url=config('endpoint.sendRequestBookingNewExcute');
     $respn = [];
     $string_json_arr = [];
     foreach ($detil as $list) {
@@ -460,7 +460,7 @@ class ConnectedExternalApps{
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
 
-    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
+    $endpoint_url=config('endpoint.sendUperPutReceipt');
 
     $string_json= '{
        "arRequestDoc":{
@@ -568,7 +568,7 @@ class ConnectedExternalApps{
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
 
-    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
+    $endpoint_url=config('endpoint.sendNotaPutReceipt');
     $string_json= '{
        "arRequestDoc":{
           "esbHeader":{
@@ -669,7 +669,7 @@ class ConnectedExternalApps{
   }
 
   public static function truckRegistration($input){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/truckRegistration";
+    $endpoint_url=config('endpoint.truckRegistration');
 
     $string_json = '{
           "truckRegistrationInterfaceRequest": {
@@ -719,7 +719,7 @@ class ConnectedExternalApps{
   }
 
   public static function updateTid($input){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/updateTid";
+    $endpoint_url=config('endpoint.updateTid');
 
     $string_json = '{
           "updateTidInterfaceRequest": {
@@ -769,7 +769,7 @@ class ConnectedExternalApps{
   }
 
   public static function closeTCA($input){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/closeTCA";
+    $endpoint_url=config('endpoint.closeTCA');
 
     $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where('terminal_code', $input['tca_terminal_code'])->get();
     $terminal = $terminal[0];
@@ -816,7 +816,7 @@ class ConnectedExternalApps{
   }
 
   public static function createTCA($input, $tca_id){
-    $endpoint_url="http://10.88.48.57:5555/restv2/npkBilling/createTCA";
+    $endpoint_url=config('endpoint.createTCA');
 
     $detail = '';
     foreach ($input['detail'] as $list) {
@@ -903,6 +903,7 @@ class ConnectedExternalApps{
   }
 
   public static function sendNotaProforma($nota_id){
+    $endpoint_url=config('endpoint.sendNotaProforma');
     $find = TxHdrNota::find($nota_id);
     $detil = DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $nota_id)->get();
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$find->nota_branch_id)->get();
@@ -1063,7 +1064,6 @@ class ConnectedExternalApps{
     }
     $lines_json = substr($lines_json, 0,-1);
 
-    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putInvoice";
     $string_json = '{
      "arRequestDoc":{
         "esbHeader":{
@@ -1121,7 +1121,7 @@ class ConnectedExternalApps{
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
 
-    $endpoint_url="http://10.88.48.57:5555/restv2/accountReceivable/putReceipt";
+    $endpoint_url=config('endpoint.notaProformaPutApply');
     $string_json = '{
        "arRequestDoc":{
           "esbHeader":{
@@ -1190,7 +1190,7 @@ class ConnectedExternalApps{
   }
 
   public static function uperSimkeuCek($input){
-    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusReceipt";
+    $endpoint_url=config('endpoint.uperSimkeuCek');
     $string_json = '{
        "inquiryStatusReceiptRequest":{
           "esbHeader":{
@@ -1243,7 +1243,7 @@ class ConnectedExternalApps{
   }
 
   public static function notaProformaSimkeuCek($input){
-    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/statusLunas";
+    $endpoint_url=config('endpoint.notaProformaSimkeuCek');
     $string_json = '{
        "inquiryStatusLusnasRequest":{
           "esbHeader":{
@@ -1296,7 +1296,7 @@ class ConnectedExternalApps{
   }
 
   // public static function getLinkCodeQR($input){
-  //   $endpoint_url="http://10.88.48.33/ibis_qa/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
+  //   $endpoint_url=config('endpoint.')"http://10.88.48.33/ibis_qa/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=".$input['type']."&no=".$input['no'];
   //
   //   $client = new Client();
   //   $request = $client->get($endpoint_url);
@@ -1304,7 +1304,7 @@ class ConnectedExternalApps{
   // }
 
   public static function getLinkCodeQR($input){
-    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+    $endpoint_url=config('endpoint.getLinkCodeQR');
     $string_json = '{
                    "getDataCetakRequest":{
                       "esbHeader":{
