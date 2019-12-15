@@ -142,7 +142,7 @@ class BillingEngine{
           "iso_code"           => $isocode
         ])->count();
         if ($cek > 0) {
-          return [ "Success" => false "result" => "Fail, store profile tariff detil data is exists!"];
+          return [ "Success" => false, "result" => "Fail, store profile tariff detil data is exists!" ];
         }
 
         // Detail
