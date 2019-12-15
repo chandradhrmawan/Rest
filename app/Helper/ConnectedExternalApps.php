@@ -69,7 +69,7 @@ class ConnectedExternalApps{
     if (empty($input['noRequest'])) {
       return ['Success' => false, 'msg' => 'noRequest is required!'];
     }
-    $endpoint_url= config('endpoint.getViewDetilTCA');
+    $endpoint_url=config('endpoint.getViewDetilTCA');
     $string_json = '{
         "getTCADetailInterfaceRequest": {
             "esbHeader": {},
