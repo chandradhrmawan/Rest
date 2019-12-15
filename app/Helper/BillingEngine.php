@@ -120,7 +120,7 @@ class BillingEngine{
               $each[0] = $each[0] == "null" ? '' : $each[0];
               $each[1] = $each[1] == "null" ? '' : $each[1];
               $each[2] = $each[2] == 'null' ? '' : $each[2];
-              return $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
+              $query = "SELECT FNC_CREATE_ISO('COMMODITY','".$each[0]."','".$each[1]."','".$each[2]."') ISO FROM dual";
               $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
               $itemisocode    = $itemisocode[0]->iso_code;
               if ($isocode == "") {
