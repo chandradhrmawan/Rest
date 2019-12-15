@@ -181,23 +181,12 @@ class RequestBooking{
 		if (count($upers) == 0) {
 			return ['result' => "Fail, uper and tariff not found!", "Success" => false];
 		}
-		foreach ($upers as $uper) {
-			$uper = (array)$uper;
-
-			$upPercent = DB::connection('eng')->table('TS_UPER')->where('UPER_NOTA', $config['head_nota_id'])->where('BRANCH_ID', $find[$config['head_branch']])->where('UPER_CUST_ID', $find[$config['head_cust']])->get();
-			if (count($upPercent) == 0) {
+		$upPercent = DB::connection('eng')->table('TS_UPER')->where('UPER_NOTA', $config['head_nota_id'])->where('BRANCH_ID', $find[$config['head_branch']])->where('UPER_CUST_ID', $find[$config['head_cust']])->get();
+		if (count($upPercent) == 0) {
+			$migrateTariff = false;
+			$upPercent = DB::connection('eng')->table('TS_UPER')->where('UPER_NOTA', $config['head_nota_id'])->where('BRANCH_ID', $find[$config['head_branch']])->whereNull('UPER_CUST_ID')->get();
+			if (count($upPercent) == 0){
 				$migrateTariff = false;
-				$upPercent = DB::connection('eng')->table('TS_UPER')->where('UPER_NOTA', $config['head_nota_id'])->where('BRANCH_ID', $find[$config['head_branch']])->whereNull('UPER_CUST_ID')->get();
-				if (count($upPercent) == 0){
-					$migrateTariff = false;
-				}else{
-					$upPercent = $upPercent[0];
-					if ($upPercent->uper_presentase == 0) {
-						$migrateTariff = false;
-					}else{
-						$migrateTariff = true;
-					}
-				}
 			}else{
 				$upPercent = $upPercent[0];
 				if ($upPercent->uper_presentase == 0) {
@@ -206,7 +195,18 @@ class RequestBooking{
 					$migrateTariff = true;
 				}
 			}
-			if ($migrateTariff == true) {
+		}else{
+			$upPercent = $upPercent[0];
+			if ($upPercent->uper_presentase == 0) {
+				$migrateTariff = false;
+			}else{
+				$migrateTariff = true;
+			}
+		}
+		if ($migrateTariff == true) {
+			foreach ($upers as $uper) {
+				$uper = (array)$uper;
+				
 				$createdUperNo = '';
 				// store head
 					$headU = new TxHdrUper;
