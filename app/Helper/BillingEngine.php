@@ -54,7 +54,7 @@ class BillingEngine{
 
         // store detil
           if (count($input['detil']) > 0) {
-            // TsTariff::where('tariff_prof_hdr_id', $headS->tariff_id)->delete();
+            TsTariff::where('tariff_prof_hdr_id', $headS->tariff_id)->delete();
           }
           foreach ($input['detil'] as $list) {
               $isocode    = "";
