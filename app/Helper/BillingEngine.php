@@ -938,6 +938,8 @@ class BillingEngine{
         }else{
           $response["Success"] = true;
         }
+
+        $response["query"] = $sql;
       return $response;
       }
   }
