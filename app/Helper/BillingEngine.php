@@ -53,109 +53,111 @@ class BillingEngine{
         }
 
         // store detil
-        TsTariff::where('tariff_prof_hdr_id', $headS->tariff_id)->delete();
-        foreach ($input['detil'] as $list) {
-            $isocode    = "";
-            $subisocode = "";
-            if (!empty($list['ALAT'])) {
-              $each       = explode('/', $list['ALAT']);
-              
-              $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
-              if ($each[0] == 'null') {
-                $query .= $each[0].",";
-              }else{
-                $query .= "'".$each[0]."',";
+          if (count($input['detil']) > 0) {
+            // TsTariff::where('tariff_prof_hdr_id', $headS->tariff_id)->delete();
+          }
+          foreach ($input['detil'] as $list) {
+              $isocode    = "";
+              $subisocode = "";
+              if (!empty($list['ALAT'])) {
+                $each       = explode('/', $list['ALAT']);
+                
+                $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
+                if ($each[0] == 'null') {
+                  $query .= $each[0].",";
+                }else{
+                  $query .= "'".$each[0]."',";
+                }
+                if ($each[1] == 'null') {
+                  $query .= $each[1].",";
+                }else{
+                  $query .= "'".$each[1]."',";
+                }
+                $query .= "'') ISO FROM dual";
+                $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
+                $alatisocode = $alatisocode[0]->iso;
+                $isocode = $alatisocode;
               }
-              if ($each[1] == 'null') {
-                $query .= $each[1].",";
-              }else{
-                $query .= "'".$each[1]."',";
-              }
-              $query .= "'') ISO FROM dual";
-              $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $alatisocode = $alatisocode[0]->iso;
-              $isocode = $alatisocode;
-            }
 
-            if (!empty($list['BARANG'])) {
-              $each       = explode('/', $list['BARANG']);
-              $query = "SELECT FNC_CREATE_ISO('COMMODITY',";
-              if ($each[0] == 'null') {
-                $query .= $each[0].",";
-              }else{
-                $query .= "'".$each[0]."',";
+              if (!empty($list['BARANG'])) {
+                $each       = explode('/', $list['BARANG']);
+                $query = "SELECT FNC_CREATE_ISO('COMMODITY',";
+                if ($each[0] == 'null') {
+                  $query .= $each[0].",";
+                }else{
+                  $query .= "'".$each[0]."',";
+                }
+                if ($each[1] == 'null') {
+                  $query .= $each[1].",";
+                }else{
+                  $query .= "'".$each[1]."',";
+                }
+                if ($each[2] == 'null') {
+                  $query .= $each[2];
+                }else{
+                  $query .= "'".$each[2]."'";
+                }
+                $query .= ") ISO FROM dual";
+                $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
+                $itemisocode    = $itemisocode[0]->iso;
+                if ($isocode == "") {
+                  $isocode = $itemisocode;
+                }else{
+                  $subisocode = $itemisocode;
+                }
               }
-              if ($each[1] == 'null') {
-                $query .= $each[1].",";
-              }else{
-                $query .= "'".$each[1]."',";
-              }
-              if ($each[2] == 'null') {
-                $query .= $each[2];
-              }else{
-                $query .= "'".$each[2]."'";
-              }
-              $query .= ") ISO FROM dual";
-              $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $itemisocode    = $itemisocode[0]->iso;
-              if ($isocode == "") {
-                $isocode = $itemisocode;
-              }else{
-                $subisocode = $itemisocode;
-              }
-            }
 
-            if (!empty($list['KONTAINER'])) {
-              $each           = explode('/', $list['KONTAINER']);
-              $query = "SELECT FNC_CREATE_ISO('CONT',";
-              if ($each[0] == 'null') {
-                $query .= $each[0].",";
-              }else{
-                $query .= "'".$each[0]."',";
+              if (!empty($list['KONTAINER'])) {
+                $each           = explode('/', $list['KONTAINER']);
+                $query = "SELECT FNC_CREATE_ISO('CONT',";
+                if ($each[0] == 'null') {
+                  $query .= $each[0].",";
+                }else{
+                  $query .= "'".$each[0]."',";
+                }
+                if ($each[1] == 'null') {
+                  $query .= $each[1].",";
+                }else{
+                  $query .= "'".$each[1]."',";
+                }
+                if ($each[2] == 'null') {
+                  $query .= $each[2];
+                }else{
+                  $query .= "'".$each[2]."'";
+                }
+                $query .= ") ISO FROM dual";
+                $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
+                $itemisocode = $itemisocode[0]->iso;
+                if ($isocode == "") {
+                  $isocode = $itemisocode;
+                }else{
+                  $subisocode = $itemisocode;
+                }
               }
-              if ($each[1] == 'null') {
-                $query .= $each[1].",";
-              }else{
-                $query .= "'".$each[1]."',";
-              }
-              if ($each[2] == 'null') {
-                $query .= $each[2];
-              }else{
-                $query .= "'".$each[2]."'";
-              }
-              $query .= ") ISO FROM dual";
-              $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
-              $itemisocode = $itemisocode[0]->iso;
-              if ($isocode == "") {
-                $isocode = $itemisocode;
-              }else{
-                $subisocode = $itemisocode;
-              }
-            }
 
-            // Detail
-            if (isset($list['tariff_id']) and !empty($list['tariff_id'])) {
-              $detilS                     = TsTariff::find($list['tariff_id']);
-            }else{
-              $detilS                     = new TsTariff;
-            }
-            $detilS->tariff_prof_hdr_id = $headS->tariff_id;
-            $detilS->service_code       = $headS->service_code;
-            $detilS->sub_iso_code       = $subisocode;
-            $detilS->iso_code           = $isocode;
-            $detilS->branch_id          = 12;
-            $detilS->nota_id            = $list['LAYANAN'];
-            $detilS->tariff_object      = $list['OBJECT_TARIFF'];
-            $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
-            $detilS->tariff             = $list['TARIFF'];
-            $detilS->stacking_area      = $list['AREA'];
-            $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
-            $detilS->tariff_status      = $headS->tariff_status;
-            $detilS->save();
-        }
+              // Detail
+              if (isset($list['tariff_id']) and !empty($list['tariff_id'])) {
+                $detilS                     = TsTariff::find($list['tariff_id']);
+              }else{
+                $detilS                     = new TsTariff;
+              }
+              $detilS->tariff_prof_hdr_id = $headS->tariff_id;
+              $detilS->service_code       = $headS->service_code;
+              $detilS->sub_iso_code       = $subisocode;
+              $detilS->iso_code           = $isocode;
+              $detilS->branch_id          = 12;
+              $detilS->nota_id            = $list['LAYANAN'];
+              $detilS->tariff_object      = $list['OBJECT_TARIFF'];
+              $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
+              $detilS->tariff             = $list['TARIFF'];
+              $detilS->stacking_area      = $list['AREA'];
+              $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
+              $detilS->tariff_status      = $headS->tariff_status;
+              $detilS->save();
+          }
         // store detil
 
-        $listHeader = DB::connection('eng')->table('TX_PROFILE_TARIFF_HDR')->where('TARIFF_ID', $head["TARIFF_ID"])->get();
+        $listHeader = TxProfileTariffHdr::find($headS->tariff_id);
         return [ "result" => "Success, store profile tariff data", "header"=>$listHeader];
   }
 
@@ -168,12 +170,12 @@ class BillingEngine{
           
           $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
           if ($each[0] == 'null') {
-            $query .= $each[0].",";
+            $query .= "'',";
           }else{
             $query .= "'".$each[0]."',";
           }
           if ($each[1] == 'null') {
-            $query .= $each[1].",";
+            $query .= "'',";
           }else{
             $query .= "'".$each[1]."',";
           }
@@ -187,17 +189,17 @@ class BillingEngine{
           $each       = explode('/', $input['BARANG']);
           $query = "SELECT FNC_CREATE_ISO('COMMODITY',";
           if ($each[0] == 'null') {
-            $query .= $each[0].",";
+            $query .= "'',";
           }else{
             $query .= "'".$each[0]."',";
           }
           if ($each[1] == 'null') {
-            $query .= $each[1].",";
+            $query .= "'',";
           }else{
             $query .= "'".$each[1]."',";
           }
           if ($each[2] == 'null') {
-            $query .= $each[2];
+            $query .= "''";
           }else{
             $query .= "'".$each[2]."'";
           }
@@ -215,17 +217,17 @@ class BillingEngine{
           $each           = explode('/', $input['KONTAINER']);
           $query = "SELECT FNC_CREATE_ISO('CONT',";
           if ($each[0] == 'null') {
-            $query .= $each[0].",";
+            $query .= "'',";
           }else{
             $query .= "'".$each[0]."',";
           }
           if ($each[1] == 'null') {
-            $query .= $each[1].",";
+            $query .= "'',";
           }else{
             $query .= "'".$each[1]."',";
           }
           if ($each[2] == 'null') {
-            $query .= $each[2];
+            $query .= "''";
           }else{
             $query .= "'".$each[2]."'";
           }
