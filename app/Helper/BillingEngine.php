@@ -163,10 +163,12 @@ class BillingEngine{
 
   public static function storeProfileTariffDetil($input){
     // store detil
+      $result = [];
+      foreach ($input['store'] as $list) {
         $isocode    = "";
         $subisocode = "";
-        if (!empty($input['ALAT'])) {
-          $each       = explode('/', $input['ALAT']);
+        if (!empty($list['ALAT'])) {
+          $each       = explode('/', $list['ALAT']);
           
           $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
           if ($each[0] == 'null') {
@@ -185,8 +187,8 @@ class BillingEngine{
           $isocode = $alatisocode;
         }
 
-        if (!empty($input['BARANG'])) {
-          $each       = explode('/', $input['BARANG']);
+        if (!empty($list['BARANG'])) {
+          $each       = explode('/', $list['BARANG']);
           $query = "SELECT FNC_CREATE_ISO('COMMODITY',";
           if ($each[0] == 'null') {
             $query .= "'',";
@@ -213,8 +215,8 @@ class BillingEngine{
           }
         }
 
-        if (!empty($input['KONTAINER'])) {
-          $each           = explode('/', $input['KONTAINER']);
+        if (!empty($list['KONTAINER'])) {
+          $each           = explode('/', $list['KONTAINER']);
           $query = "SELECT FNC_CREATE_ISO('CONT',";
           if ($each[0] == 'null') {
             $query .= "'',";
@@ -242,12 +244,12 @@ class BillingEngine{
         }
 
         $cek = TsTariff::where([
-          "tariff_prof_hdr_id" => $input['tariff_prof_hdr_id'],
+          "tariff_prof_hdr_id" => $list['tariff_prof_hdr_id'],
           "sub_iso_code"       => $subisocode,
           "iso_code"           => $isocode
         ]);
-        if (isset($input['tariff_id']) and !empty($input['tariff_id'])) {
-          $cek->whereNotIn('tariff_id', [$input['tariff_id']]);
+        if (isset($list['tariff_id']) and !empty($list['tariff_id'])) {
+          $cek->whereNotIn('tariff_id', [$list['tariff_id']]);
         }
         $cek = $cek->count();
         if ($cek > 0) {
@@ -255,25 +257,27 @@ class BillingEngine{
         }
 
         // Detail
-        if (isset($input['tariff_id']) and !empty($input['tariff_id'])) {
-          $detilS                     = TsTariff::find($input['tariff_id']);
+        if (isset($list['tariff_id']) and !empty($list['tariff_id'])) {
+          $detilS                     = TsTariff::find($list['tariff_id']);
         }else{
           $detilS                     = new TsTariff;
         }
-        $detilS->tariff_prof_hdr_id = $input['tariff_prof_hdr_id'];
-        $detilS->service_code       = $input['service_code'];
+        $detilS->tariff_prof_hdr_id = $list['tariff_prof_hdr_id'];
+        $detilS->service_code       = $list['service_code'];
         $detilS->sub_iso_code       = $subisocode;
         $detilS->iso_code           = $isocode;
         $detilS->branch_id          = 12;
-        $detilS->nota_id            = $input['LAYANAN'];
-        $detilS->tariff_object      = $input['OBJECT_TARIFF'];
-        $detilS->group_tariff_id    = $input['GROUP_TARIFF'];
-        $detilS->tariff             = $input['TARIFF'];
-        $detilS->stacking_area      = $input['AREA'];
-        $detilS->tariff_reference   = $input['TARIFF_REFERENCE'];
-        $detilS->tariff_status      = $input['tariff_status'];
+        $detilS->nota_id            = $list['LAYANAN'];
+        $detilS->tariff_object      = $list['OBJECT_TARIFF'];
+        $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
+        $detilS->tariff             = $list['TARIFF'];
+        $detilS->stacking_area      = $list['AREA'];
+        $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
+        $detilS->tariff_status      = $list['tariff_status'];
         $detilS->save();
-        return [ "result" => "Success, store profile tariff detil data", "details"=>$detilS];
+        $result[] = $detilS;
+      }
+      return [ "result" => "Success, store profile tariff detil data", "details"=>$result];
     // store detil
   }
 
