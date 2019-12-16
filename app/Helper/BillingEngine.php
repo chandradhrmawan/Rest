@@ -264,6 +264,7 @@ class BillingEngine{
         }
         $detilS->tariff_prof_hdr_id = $list['tariff_prof_hdr_id'];
         $detilS->service_code       = $list['service_code'];
+        $detilS->sub_tariff         = $list['SUB_TARIFF'];
         $detilS->sub_iso_code       = $subisocode;
         $detilS->iso_code           = $isocode;
         $detilS->branch_id          = 12;
@@ -496,6 +497,8 @@ class BillingEngine{
           }
         } else if(strtolower($key) == 'group_tariff_id' and !empty($value)){
           $group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
+        } else if(strtolower($key) == 'sub_tariff' and !empty($value)){
+          $group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
         } else if(strtolower($key) == 'nota_id' and !empty($value)){
           $nota = DB::connection('eng')->table('TM_NOTA')->where('nota_id',$value)->first();
           if (!empty($nota)) {
@@ -707,6 +710,8 @@ class BillingEngine{
             }
           }
         } else if(strtolower($key) == 'group_tariff_id' and !empty($value)){
+          $group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
+        } else if(strtolower($key) == 'sub_tariff' and !empty($value)){
           $group_tariff_name = DB::connection('eng')->table('TM_GROUP_TARIFF')->where('GROUP_TARIFF_ID',$value)->get()[0]->group_tarif_name;
         } else if(strtolower($key) == 'nota_id' and !empty($value)){
           $nota = DB::connection('eng')->table('TM_NOTA')->where('nota_id',$value)->first();
