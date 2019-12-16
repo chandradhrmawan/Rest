@@ -68,7 +68,7 @@ class UperRequest{
                 'uper_cust_name' => $getH->alt_name,
                 'uper_cust_npwp' => $getH->npwp,
                 'uper_cust_address' => $getH->address,
-                'uper_amount' => $getH->total,
+                'uper_amount' => $getH->total_uper,
                 'uper_currency_code' => $getH->currency,
                 'uper_status' => 'P',
                 // Tambahan Mas Adi
@@ -83,9 +83,9 @@ class UperRequest{
                 'uper_faktur_no' => '-',
                 'uper_trade_type' => $getH->trade_type,
                 'uper_req_no' => $getH->booking_number,
-                'uper_ppn' => $getH->ppn,
+                'uper_ppn' => $getH->ppn_uper,
                 'uper_percent' => $getH->percent_uper,
-                'uper_dpp' => $getH->dpp,
+                'uper_dpp' => $getH->dpp_uper,
                 'uper_nota_id' => $getH->nota_id,
                 'uper_req_date' =>  $find[$config['head_date']]
               ];
