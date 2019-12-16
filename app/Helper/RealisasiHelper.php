@@ -112,7 +112,7 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->real_no,$find->real_req_no,$find->bm_vessel_name,$find->bm_ukk,$find->bm_terminal_name);
+    static::migrateNotaData($find->real_no,$find->real_req_no,$find->bm_vessel_name,$find->bm_ukk,$find->bm_terminal_name,'TX_HDR_BM', 'bm_no');
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
@@ -217,26 +217,32 @@ class RealisasiHelper{
     if ($tariffResp['result_flag'] != 'S') {
       return $tariffResp;
     }
-    static::migrateNotaData($find->bprp_no,$find->bprp_req_no,$find->bprp_vessel_name,$find->bprp_ukk,$find->bprp_terminal_name);
+    if ($find->bprp_req_type == 1) {
+      $tabReq = "TX_HDR_REC";
+      $reqNo  = "rec_no";
+    } else if ($find->bprp_req_type == 2) {
+      $tabReq = "TX_HDR_DEL";
+      $reqNo  = "del_no";
+    }
+    static::migrateNotaData($find->bprp_no,$find->bprp_req_no,$find->bprp_vessel_name,$find->bprp_ukk,$find->bprp_terminal_name,$tabReq,$reqNo);
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
     return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no];
   }
 
-  private static function migrateNotaData($booking_number,$req_no,$vessel_name,$ukk,$terminal_id){
+  private static function migrateNotaData($booking_number,$req_no,$vessel_name,$ukk,$terminal_id, $tabReq, $reqNo){
     $hdr_id = TxHdrNota::where('nota_real_no',$booking_number)->pluck('nota_id');
     DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
     TxHdrNota::where('nota_real_no',$booking_number)->delete();
-
 
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
-        $app_id = TxPayment::where('pay_req_no', $req_no)->where('pay_cust_id', $getH->customer_id)->first();
-        $app_id = TxHdrUper::where('uper_req_no',$app_id->pay_req_no)->first();
+        $app_id = DB::connection('omcargo')->table($tabReq)->where($reqNo, $req_no)->get();
+        $app_id = $app_id[0];
         
         $headN = new TxHdrNota;
         // $headN->nota_id = $getH->, // dari triger
