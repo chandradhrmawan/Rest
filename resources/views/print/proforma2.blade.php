@@ -154,7 +154,7 @@
 			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
 			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
 			<td style="text-align:center">
-				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label->nota_service_om_code, $header->nota_req_no, $no)}}
+				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar("BPRP", $header->nota_req_no, $no)}}
 			</td>
 			<td style="text-align:center">
 				<?php if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
@@ -176,7 +176,7 @@
 					$dpp = $sewa1+$sewa2;
 	 			 ?>
 			 </td>
-			<td style="text-align:right">{{number_format($dpp)}}</td>
+			<td style="text-align:right"><?php echo number_format($penumpukan["dtl_dpp"]); ?></td>
 		</tr>
 		@endforeach
 	</table>
