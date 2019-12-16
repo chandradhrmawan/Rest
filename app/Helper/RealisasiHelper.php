@@ -236,7 +236,8 @@ class RealisasiHelper{
     foreach ($getHS as $getH) {
       // store head
         $app_id = TxPayment::where('pay_req_no', $req_no)->where('pay_cust_id', $getH->customer_id)->first();
-        $app_id = TxHdrUper::where('uper_req_no',$app_id->pay_no)->first();
+        $app_id = TxHdrUper::where('uper_req_no',$app_id->pay_req_no)->first();
+        
         $headN = new TxHdrNota;
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
