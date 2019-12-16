@@ -8,6 +8,7 @@ use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
 use App\Helper\ConnectedExternalApps;
 use App\Models\OmCargo\TxPayment;
+use App\Models\OmCargo\TxHdrUper;
 
 class RealisasiHelper{
 
@@ -228,14 +229,18 @@ class RealisasiHelper{
     DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
     TxHdrNota::where('nota_real_no',$booking_number)->delete();
 
+
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
     $getHS = DB::connection('eng')->select(DB::raw($query));
     foreach ($getHS as $getH) {
       // store head
+        $app_id = TxPayment::where('pay_req_no', $req_no)->where('pay_cust_id', $getH->customer_id)->first();
+        $app_id = TxHdrUper::where('uper_req_no',$app_id->pay_no)->first();
         $headN = new TxHdrNota;
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
+        $headN->app_id = $app_id->app_id;
         $headN->nota_group_id = $getH->nota_id;
         $headN->nota_org_id = $getH->branch_org_id;
         $headN->nota_cust_id = $getH->customer_id;

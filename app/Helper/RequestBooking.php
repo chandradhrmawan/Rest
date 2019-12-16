@@ -255,6 +255,7 @@ class RequestBooking{
 						$headU->uper_terminal_name = $find[$config['head_terminal_name']];
 					}
 					$headU->uper_nota_id = $uper['nota_id'];
+					$headU->app_id =$find['app_id'];
 					$headU->save();
 
 					$headU = TxHdrUper::find($headU->uper_id);
