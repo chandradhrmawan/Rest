@@ -921,7 +921,7 @@ class ConnectedExternalApps{
     }
 
     $head_json = '{
-       "billerRequestId":"'.$find->nota_id.'",
+       "billerRequestId":"'.$find->nota_req_no.'",
        "orgId":"1822",
        "trxNumber":"'.$find->nota_no.'",
        "trxNumberOrig":"",

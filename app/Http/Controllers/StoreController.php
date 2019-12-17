@@ -80,8 +80,8 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
-      return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
-      return ConnectedExternalApps::sendNotaProforma(30);
+      // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
+      return ConnectedExternalApps::sendNotaProforma(352);
     }
 
     public function testview_file(){
