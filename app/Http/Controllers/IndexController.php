@@ -222,4 +222,21 @@ class IndexController extends Controller
         ], 400);
       }
     }
+
+    function clearsession($input) {
+      $database    = DB::connection('omuster')->table('TM_USER')->where("USER_STATUS","1")->get();
+      foreach ($database as $data) {
+        $time    = date('H:i:s',strtotime('+7 hour',strtotime(date("h:i:s"))));
+        $active  = intval(strtotime($data->user_active));
+        $now     = intval(strtotime($time));
+        $selisih = ($now - $active)/60;
+        if ($selisih >= 240) {
+          $user[] = [$data->user_name, $selisih];
+           DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_STATUS" => "", "API_TOKEN" => ""]);
+        }
+      }
+      if (!empty($user)) {
+        return $user;
+      }
+    }
 }
