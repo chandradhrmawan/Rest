@@ -23,10 +23,10 @@
   @foreach($data as $data)
   <table width="100%" style="font-size:9px">
     <tr>
-      <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
-      <td width="55%">
-        <div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:9px">NPWP. {{$branch->branch_npwp}}</div></div>
-        </td>
+			<td width="13%"><img src="{{ url('/other/logo_ptp.png') }}" height="70"></td>
+			<td width="45%" style="vertical-align:top;font-size:12px">
+				<div>PT. Pelabuhan Tanjung Priok <br>Jln. Raya Pelabuhan No.9 Tanjung Priok <div style="margin-top:3px;font-size:10px">NPWP. 03.276.305.4-093.000</div></div>
+				</td>
       <td style="vertical-align:top;text-align:right">
       </td>
     </tr>
@@ -107,14 +107,14 @@
       </table>
 </table>
 
-<p style="font-size:9px;margin-top:80px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
+<p style="font-size:9px;margin-top:80px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="width:100%">
 	<tr>
 		<td>
 			<div><?php echo DNS2D::getBarcodeHTML($qrcode, "QRCODE", 1.5,1.5); ?></div>
 		</td>
 		<td style="vertical-align:top">
-			<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
+      <table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
 				<tr><td>Banten,
         <?php
         $originalDate = $header->uper_date;
@@ -135,7 +135,7 @@
 			{{$branch->branch_npwp}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach

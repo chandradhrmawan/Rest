@@ -291,7 +291,7 @@
     <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->nota_amount)}}</td>
   </tr>
 </table>
-<p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
+<p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
 	<tr><td>Banten,
 	<?php
@@ -310,7 +310,7 @@
 			{{$header->nota_no}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach

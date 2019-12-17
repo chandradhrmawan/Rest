@@ -218,7 +218,7 @@
 		<th width="15%">Nama Alat</th>
 		<th width="15%">Satuan Alat</th>
 		<th width="15%">Jumlah Alat</th>
-    <th width="15%">Jumlah/Durasi</th>
+    <th width="15%">Durasi / Lama Pemakaian Alat</th>
     <th width="10%">Tarif Dasar</th>
     <th width="10%">Total</th>
 	</tr>
@@ -281,7 +281,7 @@
 			{{$branch->branch_npwp}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach

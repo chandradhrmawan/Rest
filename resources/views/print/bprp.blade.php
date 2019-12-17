@@ -211,7 +211,7 @@
 				{{$header->bprp_no}}
 		</div>
 	</div>
-	<p style="position:absolute;right:20px;bottom:0px;font-size:11px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+	<p style="position:absolute;right:20px;bottom:0px;font-size:11px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 	@endforeach
   @endforeach
 	@endforeach

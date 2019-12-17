@@ -221,16 +221,25 @@
 		<td style="" colspan="7">
 			<b><?php
 			if((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount > 0) {
-				echo "<b>Sisa Uper</b>";
+				if ($label[0]->nota_service_om_code == "BM") {
+					echo "<b>Pelunasan</b>";
+				} else {
+					echo "<b>Sisa Uper</b>";
+				}
 			} else {
-				echo "<b>Piutang</b>";
+				if ($label[0]->nota_service_om_code == "BM") {
+					echo "<b>Pelunasan</b>";
+				} else {
+					echo "<b>Piutang</b>";
+				}
+
 			} ?></b>
 		</td>
 		<td style="text-align:right;padding-right:9px"><b>IDR</b></td>
-		<td style="text-align:right"><b>{{number_format(abs((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount))}}</b></td>
+		<td style="text-align:right"><b>{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount)}}</b></td>
 	</tr>
 </table>
-<p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}}</font></p>
+<p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="width:100%">
 	<tr>
 		<td>
@@ -255,10 +264,10 @@
 	<div style="position:absolute;bottom:20px;font-size:11px; width:100%">
 		{{$branch->branch_name}} <br>{{$branch->branch_address}}
 		<div style="margin-top:50px;font-size:8px">
-				{{$header->nota_req_no}}
+				{{$header->nota_no}}
 		</div>
 	</div>
-	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y")." | Page 1/1"; ?></p>
+	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 	@endforeach
 	@endforeach
 	@endforeach
