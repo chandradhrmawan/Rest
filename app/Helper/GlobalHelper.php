@@ -798,6 +798,13 @@ class GlobalHelper {
         $date2  =date_create($dtlIn[0]->rec_etd);
         $count = date_diff($date1,$date2);
         echo date("d-m-y", strtotime($dtlOut[$no]->dtl_in))."<br>".date("d-m-y", strtotime($dtlIn[0]->rec_etd))."<br>".$count->format("%d Hari");
+    } else if($service == "BPRP") {
+      $header = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_REQ_NO', '=', $req_no)->get();
+      $dtl    = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header[0]->bprp_id)->get();
+      $date2  = date_add(date_create($dtl[$no]->dtl_dateout), date_interval_create_from_date_string('1 days'));
+      $date1  = date_create($dtl[$no]->dtl_datein);
+      $count  = date_diff($date1,$date2);
+      echo date("d-m-y", strtotime($dtl[$no]->dtl_datein))."<br>".date("d-m-y", strtotime($dtl[$no]->dtl_dateout))."<br>".$count->format("%d Hari");
     }
   }
 
