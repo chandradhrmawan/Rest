@@ -1023,6 +1023,18 @@ class ConnectedExternalApps{
 
     $lines_json = '';
     foreach ($detil as $list) {
+      $masa11 = "";
+      $masa12 = "";
+      $masa2 = "";
+      if ($list->dtl_group_tariff_id == 10) {
+        if ($list->dtl_sub_tariff == 1) {
+          $masa11 = '"'.$list->dtl_masa.'"';
+        }else if ($list->dtl_sub_tariff == 2) {
+          $masa12 = '"'.$list->dtl_masa.'"';
+        }else if ($list->dtl_sub_tariff == 3) {
+          $masa2 = '"'.$list->dtl_masa.'"';
+        }
+      }
       $lines_json  .= '{
           "billerRequestId":"'.$find->nota_no.'",
           "trxNumber":"'.$find->nota_no.'",
@@ -1046,10 +1058,10 @@ class ConnectedExternalApps{
           "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
           "interfaceLineAttribute1":"",
           "interfaceLineAttribute2":"",
-          "interfaceLineAttribute3":null,
-          "interfaceLineAttribute4":null,
-          "interfaceLineAttribute5":"",
-          "interfaceLineAttribute6":"",
+          "interfaceLineAttribute3":"",
+          "interfaceLineAttribute4":'.$masa11.',
+          "interfaceLineAttribute5":'.$masa12.',
+          "interfaceLineAttribute6":'.$masa2.',
           "interfaceLineAttribute7":"",
           "interfaceLineAttribute8":"",
           "interfaceLineAttribute9":"",
