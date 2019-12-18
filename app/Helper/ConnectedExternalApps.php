@@ -1031,6 +1031,14 @@ class ConnectedExternalApps{
       $dateIn = "";
       $dateOut = "";
       if ($list->dtl_group_tariff_id == 10) {
+        // if ($list->masa1 >= 1) {
+        //   $masa11 = 1;
+        //   if ($list->masa1 > 1) {
+        //     $masa12 = $list->masa1-1;
+        //   }
+        // }
+        $masa11 = $list->masa1;
+        $masa2 = $list->masa2;
 
         if (in_array($find->nota_group_id, [14,15])) {
           $bprpHeadId = DB::connection('omcargo')->table('TX_HDR_BPRP')->where('BPRP_NO', $find->nota_real_no)->get();
@@ -1040,14 +1048,6 @@ class ConnectedExternalApps{
           $bprpDtl = $bprpDtl[0];
           $dateIn = date('Y-m-d', strtotime($bprpDtl->dtl_datein));
           $dateOut = date('Y-m-d', strtotime($bprpDtl->dtl_dateout));
-        }
-
-        if ($list->dtl_sub_tariff == 1) {
-          $masa11 = $list->dtl_masa;
-        }else if ($list->dtl_sub_tariff == 2) {
-          $masa12 = $list->dtl_masa;
-        }else if ($list->dtl_sub_tariff == 3) {
-          $masa2 = $list->dtl_masa;
         }
       }
       // old
@@ -1091,11 +1091,11 @@ class ConnectedExternalApps{
         // },';
       // old
       $lines_json  .= '{
-          "billerRequestId":"'.$find->nota_no.'",
+          "billerRequestId":"'.$find->nota_req_no.'",
           "trxNumber":"'.$find->nota_no.'",
           "lineId":null,
           "lineNumber":"'.$dtl_line_count.'",
-          "description":"'.$list->dtl_group_tariff_name.'",
+          "description":"'.$list->dtl_commodity.' '.$list->dtl_qty.' '.$list->dtl_unit_name.'",
           "memoLineId":null,
           "glRevId":null,
           "lineContext":"",
