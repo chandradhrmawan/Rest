@@ -1028,11 +1028,11 @@ class ConnectedExternalApps{
       $masa2 = "";
       if ($list->dtl_group_tariff_id == 10) {
         if ($list->dtl_sub_tariff == 1) {
-          $masa11 = '"'.$list->dtl_masa.'"';
+          $masa11 = $list->dtl_masa;
         }else if ($list->dtl_sub_tariff == 2) {
-          $masa12 = '"'.$list->dtl_masa.'"';
+          $masa12 = $list->dtl_masa;
         }else if ($list->dtl_sub_tariff == 3) {
-          $masa2 = '"'.$list->dtl_masa.'"';
+          $masa2 = $list->dtl_masa;
         }
       }
       $lines_json  .= '{
@@ -1059,9 +1059,9 @@ class ConnectedExternalApps{
           "interfaceLineAttribute1":"",
           "interfaceLineAttribute2":"",
           "interfaceLineAttribute3":"",
-          "interfaceLineAttribute4":'.$masa11.',
-          "interfaceLineAttribute5":'.$masa12.',
-          "interfaceLineAttribute6":'.$masa2.',
+          "interfaceLineAttribute4":"'.$masa11.'",
+          "interfaceLineAttribute5":"'.$masa12.'",
+          "interfaceLineAttribute6":"'.$masa2.'",
           "interfaceLineAttribute7":"",
           "interfaceLineAttribute8":"",
           "interfaceLineAttribute9":"",
