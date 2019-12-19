@@ -905,7 +905,6 @@ class ConnectedExternalApps{
   public static function sendNotaProforma($nota_id){
     $endpoint_url=config('endpoint.sendNotaProforma');
     $find = TxHdrNota::find($nota_id);
-    $detil = DB::connection('omcargo')->table('V_TX_DTL_NOTA_WITH_MEMOLINE')->where('nota_hdr_id', $nota_id)->get();
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$find->nota_branch_id)->get();
     $branch = $branch[0];
 
@@ -1022,80 +1021,33 @@ class ConnectedExternalApps{
     }';
 
     $lines_json = '';
-    $dtl_line_count = 0;
-    foreach ($detil as $list) {
-      $dtl_line_count++;
-      $masa11 = "";
-      $masa12 = "";
-      $masa2 = "";
-      $hitM1 = "";
-      $hitM2 = "";
-      $dateIn = date('Y-m-d', strtotime($find->nota_date));
-      $dateOut = date('Y-m-d', strtotime($find->nota_date));
-      if ($list->dtl_group_tariff_id == 10) {
-        // if ($list->masa1 >= 1) {
-        //   $masa11 = 1;
-        //   if ($list->masa1 > 1) {
-        //     $masa12 = $list->masa1-1;
-        //   }
-        // }
-        $masa11 = $list->masa1;
-        $masa2 = $list->masa2;
+    if (in_array($find->nota_group_id, [14,15])) { // jika bprp
+      $dtl_line_count = 0;
+      $detil = DB::connection('omcargo')->table('V_TX_DTL_NOTA_WITH_MEMOLINE')->where('nota_hdr_id', $nota_id)->get();
+      foreach ($detil as $list) {
+        $dtl_line_count++;
+        $masa11 = "";
+        $masa12 = "";
+        $masa2 = "";
+        $hitM1 = "";
+        $hitM2 = "";
+        $dateIn = date('Y-m-d', strtotime($find->nota_date));
+        $dateOut = date('Y-m-d', strtotime($find->nota_date));
+        if ($list->dtl_group_tariff_id == 10) {
+          $masa11 = $list->masa1;
+          $masa2 = $list->masa2;
 
-        $hitM1 = $masa11*$list->dtl_qty*$list->trf1up;
-        $hitM2 = $masa2*$list->dtl_qty*$list->trf2up;
-
-        if (in_array($find->nota_group_id, [14,15])) {
-          $bprpHeadId = DB::connection('omcargo')->table('TX_HDR_BPRP')->where('BPRP_NO', $find->nota_real_no)->get();
-          $bprpHeadId = $bprpHeadId[0];
-          $bprpHeadId = $bprpHeadId->bprp_id;
-          $bprpDtl = DB::connection('omcargo')->table('TX_DTL_BPRP')->where('HDR_BPRP_ID', $bprpHeadId)->where('DTL_BL', $list->dtl_bl)->get();
-          $bprpDtl = $bprpDtl[0];
-          $dateIn = date('Y-m-d', strtotime($bprpDtl->dtl_datein));
-          $dateOut = date('Y-m-d', strtotime($bprpDtl->dtl_dateout));
+          $hitM1 = $masa11*$list->dtl_qty*$list->trf1up;
+          $hitM2 = $masa2*$list->dtl_qty*$list->trf2up;
         }
-      }
-      // old
-        // $lines_json  .= '{
-        //     "billerRequestId":"'.$find->nota_no.'",
-        //     "trxNumber":"'.$find->nota_no.'",
-        //     "lineId":null,
-        //     "lineNumber":"'.$dtl_line_count.'",
-        //     "description":"'.$list->dtl_service_type.'",
-        //     "memoLineId":null,
-        //     "glRevId":null,
-        //     "lineContext":"",
-        //     "taxFlag":"Y",
-        //     "serviceType":"'.$list->dtl_line_desc.'",
-        //     "eamCode":"`",
-        //     "locationTerminal":"",
-        //     "amount":"'.$list->dtl_dpp.'",
-        //     "taxAmount":"'.$list->dtl_ppn.'",
-        //     "startDate":"'.$dateIn.'",
-        //     "endDate":"'.$dateOut.'",
-        //     "createdBy":"-1",
-        //     "creationDate":"'.date('Y-m-d', strtotime($find->nota_date)).'",
-        //     "lastUpdatedBy":"-1",
-        //     "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->nota_date)).'",
-        //     "interfaceLineAttribute1":"",
-        //     "interfaceLineAttribute2":"'.$dateIn.'",
-        //     "interfaceLineAttribute3":"'.$dateOut.'",
-        //     "interfaceLineAttribute4":"'.$masa11.'",
-        //     "interfaceLineAttribute5":"'.$masa12.'",
-        //     "interfaceLineAttribute6":"'.$masa2.'",
-        //     "interfaceLineAttribute7":"",
-        //     "interfaceLineAttribute8":"",
-        //     "interfaceLineAttribute9":"",
-        //     "interfaceLineAttribute10":"",
-        //     "interfaceLineAttribute11":"",
-        //     "interfaceLineAttribute12":null,
-        //     "interfaceLineAttribute13":"'.$list->dtl_qty.'  ",
-        //     "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
-        //     "interfaceLineAttribute15":"",
-        //     "lineDoc":""
-        // },';
-      // old
-      $lines_json  .= '{
+        $bprpHeadId = DB::connection('omcargo')->table('TX_HDR_BPRP')->where('BPRP_NO', $find->nota_real_no)->get();
+        $bprpHeadId = $bprpHeadId[0];
+        $bprpHeadId = $bprpHeadId->bprp_id;
+        $bprpDtl = DB::connection('omcargo')->table('TX_DTL_BPRP')->where('HDR_BPRP_ID', $bprpHeadId)->where('DTL_BL', $list->dtl_bl)->get();
+        $bprpDtl = $bprpDtl[0];
+        $dateIn = date('Y-m-d', strtotime($bprpDtl->dtl_datein));
+        $dateOut = date('Y-m-d', strtotime($bprpDtl->dtl_dateout));
+        $lines_json  .= '{
           "billerRequestId":"'.$find->nota_req_no.'",
           "trxNumber":"'.$find->nota_no.'",
           "lineId":null,
@@ -1132,11 +1084,54 @@ class ConnectedExternalApps{
           "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
           "interfaceLineAttribute15":"",
           "lineDoc":""
-      },';
+        },';
+      }
+    }else if ($find->nota_group_id == 13) {
+      $detil = DB::connection('omcargo')->table('TX_DTL_NOTA')->where('nota_hdr_id', $nota_id)->get();
+      foreach ($detil as $list) {
+        $lines_json  .= '{
+          "billerRequestId":"'.$find->nota_req_no.'",
+          "trxNumber":"'.$find->nota_no.'",
+          "lineId":null,
+          "lineNumber":"'.$list->dtl_line.'",
+          "description":"'.$list->dtl_service_type.'",
+          "memoLineId":null,
+          "glRevId":null,
+          "lineContext":"",
+          "taxFlag":"Y",
+          "serviceType":"'.$list->dtl_line_desc.'",
+          "eamCode":"`",
+          "locationTerminal":"",
+          "amount":"'.$list->dtl_dpp.'",
+          "taxAmount":"'.$list->dtl_ppn.'",
+          "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "createdBy":"-1",
+          "creationDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "lastUpdatedBy":"-1",
+          "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "interfaceLineAttribute1":"",
+          "interfaceLineAttribute2":"'.$list->dtl_service_type.'",
+          "interfaceLineAttribute3":null,
+          "interfaceLineAttribute4":null,
+          "interfaceLineAttribute5":"",
+          "interfaceLineAttribute6":"",
+          "interfaceLineAttribute7":"",
+          "interfaceLineAttribute8":"",
+          "interfaceLineAttribute9":"",
+          "interfaceLineAttribute10":"",
+          "interfaceLineAttribute11":"",
+          "interfaceLineAttribute12":null,
+          "interfaceLineAttribute13":"'.$list->dtl_qty.'  ",
+          "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
+          "interfaceLineAttribute15":"",
+          "lineDoc":""
+        },';
+      }
     }
     $lines_json = substr($lines_json, 0,-1);
 
-    return $string_json = '{
+    $string_json = '{
      "arRequestDoc":{
         "esbHeader":{
            "internalId":"",
