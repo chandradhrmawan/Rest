@@ -61,7 +61,7 @@ class BillingEngine{
               $subisocode = "";
               if (!empty($list['ALAT'])) {
                 $each       = explode('/', $list['ALAT']);
-                
+
                 $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
                 if ($each[0] == 'null') {
                   $query .= $each[0].",";
@@ -169,7 +169,7 @@ class BillingEngine{
         $subisocode = "";
         if (!empty($list['ALAT'])) {
           $each       = explode('/', $list['ALAT']);
-          
+
           $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
           if ($each[0] == 'null') {
             $query .= "'',";
@@ -1041,7 +1041,7 @@ class BillingEngine{
                   $set_data = [
                       // "uper_hdr_id" => $headU->uper_id,
                       "dtl_line" => $countLine,
-                      "dtl_line_desc" => $list['memoline'],
+                      // "dtl_line_desc" => $list['memoline'],
                       // "dtl_line_context" => , // perlu konfimasi
                       "dtl_service_type" => $list['group_tariff_name'],
                       // Tambahan Mas Adi

@@ -816,4 +816,13 @@ class GlobalHelper {
       return 0;
     }
   }
+
+  public static function totalPenumpukan($req_no) {
+    $data     = DB::connection('omcargo')->table("V_TX_DTL_NOTA")->where([['NOTA_HDR_ID','=', $req_no],["dtl_group_tariff_id","=","10"]])->get();
+    if (!empty($data)) {
+      echo number_format($data[0]->dtl_dpp);
+    } else {
+      return 0;
+    }
+  }
 }

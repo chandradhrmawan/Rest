@@ -21,12 +21,12 @@ $app->get('/key', function() {
 
 $app->post('auth/login',['uses' => 'AuthController@authenticate']);
 $app->post('index',  ['middleware' => 'jwt.auth', 'uses' => 'IndexController@api']);
-// $app->post('/view',  ['middleware' => 'jwt.auth', 'uses' => 'ViewController@api']);
-// $app->post('/store', ['middleware' => 'jwt.auth', 'uses' => 'StoreController@api']);
+$app->post('/view',  ['middleware' => 'jwt.auth', 'uses' => 'ViewController@api']);
+$app->post('/store', ['middleware' => 'jwt.auth', 'uses' => 'StoreController@api']);
 $app->post('/cek', 'IndexController@api');
 // $app->post('index',  'IndexController@api');
-$app->post('/view',  'ViewController@api');
-$app->post('/store', 'StoreController@api');
+// $app->post('/view',  'ViewController@api');
+// $app->post('/store', 'StoreController@api');
 
 $app->post('/get-file', 'StoreController@testview_file');
 
