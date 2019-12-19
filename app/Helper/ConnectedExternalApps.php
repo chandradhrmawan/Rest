@@ -905,7 +905,7 @@ class ConnectedExternalApps{
   public static function sendNotaProforma($nota_id){
     $endpoint_url=config('endpoint.sendNotaProforma');
     $find = TxHdrNota::find($nota_id);
-    $detil = DB::connection('omcargo')->table('V_TX_DTL_NOTA')->where('nota_hdr_id', $nota_id)->get();
+    $detil = DB::connection('omcargo')->table('V_TX_DTL_NOTA_WITH_MEMOLINE')->where('nota_hdr_id', $nota_id)->get();
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$find->nota_branch_id)->get();
     $branch = $branch[0];
 
@@ -1028,6 +1028,8 @@ class ConnectedExternalApps{
       $masa11 = "";
       $masa12 = "";
       $masa2 = "";
+      $hitM1 = "";
+      $hitM2 = "";
       $dateIn = "";
       $dateOut = "";
       if ($list->dtl_group_tariff_id == 10) {
@@ -1039,6 +1041,9 @@ class ConnectedExternalApps{
         // }
         $masa11 = $list->masa1;
         $masa2 = $list->masa2;
+
+        $hitM1 = $masa11*$list->dtl_qty*$list->trf1up;
+        $hitM2 = $masa2*$list->dtl_qty*$list->trf2up;
 
         if (in_array($find->nota_group_id, [14,15])) {
           $bprpHeadId = DB::connection('omcargo')->table('TX_HDR_BPRP')->where('BPRP_NO', $find->nota_real_no)->get();
@@ -1117,11 +1122,11 @@ class ConnectedExternalApps{
           "interfaceLineAttribute4":"'.$masa11.'",
           "interfaceLineAttribute5":"'.$masa12.'",
           "interfaceLineAttribute6":"'.$masa2.'",
-          "interfaceLineAttribute7":"'.$list->dtl_amount.'",
-          "interfaceLineAttribute8":"'.$list->trf1up.'",
-          "interfaceLineAttribute9":"'.$list->trf2up.'",
-          "interfaceLineAttribute10":"'.$list->dtl_tariff.'",
-          "interfaceLineAttribute11":"",
+          "interfaceLineAttribute7":"'.$hitM1.'",
+          "interfaceLineAttribute8":"'.$hitM2.'",
+          "interfaceLineAttribute9":"",
+          "interfaceLineAttribute10":"'.$list->trf1up.'",
+          "interfaceLineAttribute11":"'.$list->trf2up.'",
           "interfaceLineAttribute12":"'.$list->dtl_package.'", 
           "interfaceLineAttribute13":"'.$list->dtl_qty.'  ",
           "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
