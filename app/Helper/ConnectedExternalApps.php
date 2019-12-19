@@ -1030,8 +1030,8 @@ class ConnectedExternalApps{
       $masa2 = "";
       $hitM1 = "";
       $hitM2 = "";
-      $dateIn = "";
-      $dateOut = "";
+      $dateIn = date('Y-m-d', strtotime($find->nota_date));
+      $dateOut = date('Y-m-d', strtotime($find->nota_date));
       if ($list->dtl_group_tariff_id == 10) {
         // if ($list->masa1 >= 1) {
         //   $masa11 = 1;
@@ -1136,7 +1136,7 @@ class ConnectedExternalApps{
     }
     $lines_json = substr($lines_json, 0,-1);
 
-    $string_json = '{
+    return $string_json = '{
      "arRequestDoc":{
         "esbHeader":{
            "internalId":"",
