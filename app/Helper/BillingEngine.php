@@ -29,10 +29,11 @@ class BillingEngine{
           $headS->tariff_name   = $head['TARIFF_NAME'];
           $headS->tariff_status = $head['TARIFF_STATUS'];
           $headS->service_code  = $head['SERVICE_CODE'];
-          $headS->branch_id     = 12;
-          $headS->created_by    = 1;
-          // $headS->branch_id     = $head['BRANCH_ID'];
-          // $headS->created_by    = $head['USER_ID'];
+          // $headS->branch_id     = 12;
+          // $headS->created_by    = 1;
+          $headS->branch_id     = $input["user"]["user_branch_id"];
+          // $headS->branch_code   = $input["user"]["user_branch_code"];
+          $headS->created_by    = $input["user"]["user_id"];
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
