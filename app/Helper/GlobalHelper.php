@@ -200,10 +200,6 @@ class GlobalHelper {
   public static function index($input) {
       $connect  = \DB::connection($input["db"])->table($input["table"]);
 
-      if (!empty($input["range"])) {
-        $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
-      }
-
       if (!empty($input["filter"])) {
       $search   = $input["filter"];
       foreach ($search as $value) {
@@ -220,6 +216,10 @@ class GlobalHelper {
 
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
+      }
+
+      if (!empty($input["selectraw"])) {
+        $result = $connect->select(DB::raw($input["selectraw"]));
       }
 
       if(!empty($input["orderby"][0])) {
@@ -295,6 +295,10 @@ class GlobalHelper {
 
       if (!empty($input["selected"])) {
         $result  = $connect->select($input["selected"]);
+      }
+
+      if (!empty($input["range"])) {
+        $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
       }
 
       $count   = $connect->count();
@@ -650,6 +654,14 @@ class GlobalHelper {
 
   public static function saveheaderdetail($input) {
     $data    = $input["data"];
+    if (isset($input["cekdb"])) {
+      $field = $input["cekdb"];
+      $value = $input["HEADER"]["VALUE"][0][$field];
+      $item  = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where($field, $value)->get();
+      if (!empty($item)) {
+        return ["Success"=>"F", "Error"=>"Data With $field = $value Already Exist"];
+      }
+    }
     $count   = count($input["data"]);
     $cek     = $input["HEADER"]["PK"];
 

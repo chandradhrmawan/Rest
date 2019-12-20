@@ -988,7 +988,11 @@ class BillingEngine{
           $newD['DTL_CONT_SIZE']    = 'NULL';
           $newD['DTL_CONT_TYPE']    = 'NULL';
           $newD['DTL_CONT_STATUS']  = 'NULL';
-          $newD['DTL_UNIT_ID']      = $list['DTL_UNIT_ID'];
+          if ($list['DTL_UNIT_ID'] == NULL or $list['DTL_UNIT_ID'] == 'null') {
+          $newD['DTL_UNIT_ID']     = 'NULL';
+          } else {
+          $newD['DTL_UNIT_ID']     = $list['DTL_UNIT_ID'];
+          }
           $newD['DTL_QTY']          = $list['DTL_QTY'];
           $newD['DTL_TL']           = $list['DTL_TL'];
           $newD['DTL_DATE_IN']      = empty($datein) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($datein)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
