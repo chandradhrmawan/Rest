@@ -86,7 +86,12 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 $app->register(Milon\Barcode\BarcodeServiceProvider::class);
 
+$app->register(Maatwebsite\Excel\ExcelServiceProvider::class);
+
 // Aliases
+class_alias(Maatwebsite\Excel\Facades\Excel::class, 'Excel');
+class_alias(Illuminate\Support\Facades\Response::class, 'Response');
+class_alias(Illuminate\Support\Facades\Config::class, 'Config');
 class_alias(Milon\Barcode\Facades\DNS1DFacade::class, 'DNS1D');
 class_alias(Milon\Barcode\Facades\DNS2DFacade::class, 'DNS2D');
 

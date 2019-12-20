@@ -12,7 +12,7 @@ use App\Helper\UserAndRoleManagemnt;
 use App\Helper\UperRequest;
 use Dompdf\Dompdf;
 use App\Helper\ConnectedExternalApps;
-use PHPExcel_IOFactory;
+use Excel;
 
 class ViewController extends Controller
 {
@@ -637,10 +637,9 @@ class ViewController extends Controller
       $dompdf->stream($filename, array("Attachment" => false));
     }
 
-  function getDebitur($input) {
+  function getDebitur($input, $request) {
     $startDate = date("d-m-Y", strtotime($input["startDate"]));
     $endDate = date("d-m-Y", strtotime($input["endDate"]));
-
     $whereRaw = "A.NOTA_STATUS = 2 AND A.NOTA_PAID = 'Y' AND A.NOTA_BRANCH_ID = 12";
     if (!empty($input["notaNo"])) {
       $whereRaw .= " AND A.NOTA_NO = '".$input["notaNo"]."'";
@@ -662,6 +661,9 @@ class ViewController extends Controller
           A.NOTA_NO, TO_CHAR(A.NOTA_DATE,'YYYY-MM-DD') TGL_NOTA,
           A.NOTA_DPP"
     ))->whereRaw($whereRaw);
+
+    $count  = $query->count();
+
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
         $query->skip($input['start'])->take($input['limit']);
@@ -677,140 +679,44 @@ class ViewController extends Controller
         }
       }
     $result = $query->get();
-    $count  = count($result);
     return ["result"=>$result, "count"=>$count];
   }
 
   function getRekonsilasi($input) {
     $startDate = date("d-m-Y", strtotime($input["startDate"]));
     $endDate = date("d-m-Y", strtotime($input["endDate"]));
-    if (empty($input["notaNo"])) {
-      if (!empty($input["startDate"]) && !empty($input["endDate"])) {
-        $query   = DB::connection("omcargo")
-                    ->table("TX_DTL_NOTA A, TX_HDR_NOTA B")
-                    ->select(DB::raw("
-                    X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
-                    SELECT
-                    B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
-                    CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
-                    CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
-                    CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
-                            ))
-                    ->whereRaw("
-                    A.NOTA_HDR_ID = B.NOTA_ID
-                    AND B.NOTA_STATUS = 2
-                    AND B.NOTA_PAID = 'Y'
-                    AND A.DTL_GROUP_TARIFF_ID = 15
-                    AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
-                    AND B.NOTA_BRANCH_ID = 12
-                    AND B.NOTA_DATE BETWEEN TO_DATE('".$startDate."', 'DD-MM-YYYY') AND TO_DATE('".$endDate."', 'DD-MM-YYYY')
-                    GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
-                    ORDER BY B.NOTA_NO
-                    )X
-                    GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE
-                    "
-                    );
-      } else if(!empty($input["startDate"]) && empty($input["endDate"])) {
-        $query   = DB::connection("omcargo")
-                    ->table("TX_DTL_NOTA A, TX_HDR_NOTA B")
-                    ->select(DB::raw("
-                    X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
-                    SELECT
-                    B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
-                    CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
-                    CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
-                    CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
-                            ))
-                    ->whereRaw("
-                    A.NOTA_HDR_ID = B.NOTA_ID
-                    AND B.NOTA_STATUS = 2
-                    AND B.NOTA_PAID = 'Y'
-                    AND A.DTL_GROUP_TARIFF_ID = 15
-                    AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
-                    AND B.NOTA_BRANCH_ID = 12
-                    AND B.NOTA_DATE > TO_DATE('".$startDate."', 'DD-MM-YYYY')
-                    GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
-                    ORDER BY B.NOTA_NO
-                    )X
-                    GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE
-                    "
-                    );
-      } else if(empty($input["startDate"]) && !empty($input["endDate"])) {
-        $query   = DB::connection("omcargo")
-                    ->table("TX_DTL_NOTA A, TX_HDR_NOTA B")
-                    ->select(DB::raw("
-                    X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
-                    SELECT
-                    B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
-                    CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
-                    CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
-                    CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
-                            ))
-                    ->whereRaw("
-                    A.NOTA_HDR_ID = B.NOTA_ID
-                    AND B.NOTA_STATUS = 2
-                    AND B.NOTA_PAID = 'Y'
-                    AND A.DTL_GROUP_TARIFF_ID = 15
-                    AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
-                    AND B.NOTA_BRANCH_ID = 12
-                    AND B.NOTA_DATE < TO_DATE('".$endDate."', 'DD-MM-YYYY')
-                    GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
-                    ORDER BY B.NOTA_NO
-                    )X
-                    GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE
-                    "
-              );
-      } else {
-        $query   = DB::connection("omcargo")
-                    ->table("TX_DTL_NOTA A, TX_HDR_NOTA B")
-                    ->select(DB::raw("
-                    X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
-                    SELECT
-                    B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
-                    CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
-                    CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
-                    CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
-                            ))
-                    ->whereRaw("
-                    A.NOTA_HDR_ID = B.NOTA_ID
-                    AND B.NOTA_STATUS = 2
-                    AND B.NOTA_PAID = 'Y'
-                    AND A.DTL_GROUP_TARIFF_ID = 15
-                    AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
-                    AND B.NOTA_BRANCH_ID = 12
-                    GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
-                    ORDER BY B.NOTA_NO
-                    )X
-                    GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE
-                    "
-              );
-          }
-    } else if (!empty($input["notaNo"])) {
-      $query   = DB::connection("omcargo")
-                  ->table("TX_DTL_NOTA A, TX_HDR_NOTA B")
-                  ->select(DB::raw("
-                  X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
-                  SELECT
-                  B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
-                  CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
-                  CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
-                  CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
-                          ))
-                  ->whereRaw("
-                  A.NOTA_HDR_ID = B.NOTA_ID
-                  AND B.NOTA_STATUS = 2
-                  AND B.NOTA_PAID = 'Y'
-                  AND A.DTL_GROUP_TARIFF_ID = 15
-                  AND B.NOTA_NO = '".$input["notaNo"]."'
-                  AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
-                  AND B.NOTA_BRANCH_ID = 12
-                  GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
+
+    $whereRaw = "
+      A.NOTA_HDR_ID = B.NOTA_ID
+      AND B.NOTA_STATUS = 2
+      AND B.NOTA_PAID = 'Y'
+      AND A.DTL_GROUP_TARIFF_ID = 15
+      AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
+      AND B.NOTA_BRANCH_ID = 12
+    ";
+    if (!empty($input["notaNo"])) {
+      $whereRaw .= " AND B.NOTA_NO = '".$input["notaNo"]."'";
+    }
+    if (!empty($input["startDate"]) && !empty($input["endDate"])) {
+      $whereRaw .= " AND B.NOTA_DATE BETWEEN TO_DATE('".$startDate."', 'DD-MM-YYYY') AND TO_DATE('".$endDate."', 'DD-MM-YYYY')";
+    } else if(!empty($input["startDate"]) && empty($input["endDate"])) {
+      $whereRaw .= " AND B.NOTA_DATE > TO_DATE('".$startDate."', 'DD-MM-YYYY')";
+    } else if(empty($input["startDate"]) && !empty($input["endDate"])) {
+      $whereRaw .= " AND B.NOTA_DATE < TO_DATE('".$endDate."', 'DD-MM-YYYY')";
+    }
+
+    $whereRaw .= "GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
                   ORDER BY B.NOTA_NO
                   )X
-                  GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE
-                  "
-            );
-    }
+                  GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE";
+    $query   = DB::connection("omcargo")->table("TX_DTL_NOTA A, TX_HDR_NOTA B")->select(DB::raw("
+        X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
+        SELECT
+        B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
+        CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
+        CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
+        CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
+    ))->whereRaw($whereRaw);
 
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
@@ -827,7 +733,14 @@ class ViewController extends Controller
         }
       }
     $result = $query->get();
-    $count  = count($result);
-    return ["result"=>$result, "count"=>$count];
+    return ["result"=>$result];
+
+      // Excel::create('Laravel Excel', function($excel) {
+      //   $excel->sheet('Excel sheet', function($sheet) {
+
+      //     $sheet->setOrientation('landscape');
+
+      //   });
+      // })->export('xls');
   }
 }
