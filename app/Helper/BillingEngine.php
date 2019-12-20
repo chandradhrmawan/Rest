@@ -61,7 +61,7 @@ class BillingEngine{
               $subisocode = "";
               if (!empty($list['ALAT'])) {
                 $each       = explode('/', $list['ALAT']);
-                
+
                 $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
                 if ($each[0] == 'null') {
                   $query .= $each[0].",";
@@ -169,7 +169,7 @@ class BillingEngine{
         $subisocode = "";
         if (!empty($list['ALAT'])) {
           $each       = explode('/', $list['ALAT']);
-          
+
           $query = "SELECT FNC_CREATE_ISO('EQUIPMENT',";
           if ($each[0] == 'null') {
             $query .= "'',";
@@ -988,7 +988,11 @@ class BillingEngine{
           $newD['DTL_CONT_SIZE']    = 'NULL';
           $newD['DTL_CONT_TYPE']    = 'NULL';
           $newD['DTL_CONT_STATUS']  = 'NULL';
-          $newD['DTL_UNIT_ID']      = $list['DTL_UNIT_ID'];
+          if ($list['DTL_UNIT_ID'] == NULL or $list['DTL_UNIT_ID'] == 'null') {
+          $newD['DTL_UNIT_ID']     = 'NULL';
+          } else {
+          $newD['DTL_UNIT_ID']     = $list['DTL_UNIT_ID'];
+          }
           $newD['DTL_QTY']          = $list['DTL_QTY'];
           $newD['DTL_TL']           = $list['DTL_TL'];
           $newD['DTL_DATE_IN']      = empty($datein) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($datein)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
@@ -1041,7 +1045,7 @@ class BillingEngine{
                   $set_data = [
                       // "uper_hdr_id" => $headU->uper_id,
                       "dtl_line" => $countLine,
-                      "dtl_line_desc" => $list['memoline'],
+                      // "dtl_line_desc" => $list['memoline'],
                       // "dtl_line_context" => , // perlu konfimasi
                       "dtl_service_type" => $list['group_tariff_name'],
                       // Tambahan Mas Adi
