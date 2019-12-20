@@ -640,33 +640,35 @@ class ViewController extends Controller
   function getDebitur($input, $request) {
     $startDate = date("d-m-Y", strtotime($input["startDate"]));
     $endDate = date("d-m-Y", strtotime($input["endDate"]));
-    $whereRaw = "A.NOTA_STATUS = 2 AND A.NOTA_PAID = 'Y' AND A.NOTA_BRANCH_ID = 12";
-    if (!empty($input["notaNo"])) {
-      $whereRaw .= " AND A.NOTA_NO = '".$input["notaNo"]."'";
-    }
-    if (!empty($startDate) && !empty($input["endDate"])){
-      $whereRaw .= " AND A.NOTA_DATE BETWEEN TO_DATE('".$startDate."', 'DD-MM-YYYY') AND TO_DATE('".$endDate."', 'DD-MM-YYYY')";
-    } else if(!empty($startDate) && empty($input["endDate"])) {
-      $whereRaw .= " AND A.NOTA_DATE > TO_DATE('".$startDate."', 'DD-MM-YYYY')";
-    } else if(empty($startDate) && !empty($input["endDate"])) {
-      $whereRaw .= " AND A.NOTA_DATE < TO_DATE('".$endDate."', 'DD-MM-YYYY')";
-    }
-    $query   = DB::connection("omcargo")->table("TX_HDR_NOTA A")->select(DB::raw("
-          A.NOTA_CUST_NAME,
-          CASE
-          WHEN NOTA_GROUP_ID = 13 THEN 'BONGKAR MUAT'
-          WHEN NOTA_GROUP_ID = 14 THEN 'RECEIVING'
-          WHEN NOTA_GROUP_ID = 15 THEN 'DELIVERY'
-          WHEN NOTA_GROUP_ID = 19 THEN 'EXTENTION' END AS LAYANAN,
-          A.NOTA_NO, TO_CHAR(A.NOTA_DATE,'YYYY-MM-DD') TGL_NOTA,
-          A.NOTA_DPP"
-    ))->whereRaw($whereRaw);
 
-    $count  = $query->count();
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
+    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',12);
+    }
+    if (!empty($input["condition"]["NOTA_NO"])) {
+      $getRpt->where('NOTA_NO',$input["condition"]["NOTA_NO"]);
+    }
+    if (!empty($input["condition"]["NOTA_CUST_NAME"])) {
+      $getRpt->where('NOTA_CUST_NAME',$input["condition"]["NOTA_CUST_NAME"]);
+    }
+    if (!empty($input["condition"]["LAYANAN"])) {
+      $getRpt->where('LAYANAN',$input["condition"]["LAYANAN"]);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->whereDate('TGL_NOTA', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereDate('TGL_NOTA', '<', $endDate);
+    }
+
+    $count  = $getRpt->count();
 
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
-        $query->skip($input['start'])->take($input['limit']);
+        $getRpt->skip($input['start'])->take($input['limit']);
       }
     }
 
@@ -675,52 +677,45 @@ class ViewController extends Controller
       foreach ($sort as $sort) {
       $property = $sort->property;
       $direction = $sort->direction;
-      $query->orderby(strtoupper($property), $direction);
+      $getRpt->orderby(strtoupper($property), $direction);
         }
       }
-    $result = $query->get();
+    $result = $getRpt->get();
     return ["result"=>$result, "count"=>$count];
   }
 
-  function getRekonsilasi($input) {
+  function getRekonsilasi($input, $request) {
     $startDate = date("d-m-Y", strtotime($input["startDate"]));
     $endDate = date("d-m-Y", strtotime($input["endDate"]));
 
-    $whereRaw = "
-      A.NOTA_HDR_ID = B.NOTA_ID
-      AND B.NOTA_STATUS = 2
-      AND B.NOTA_PAID = 'Y'
-      AND A.DTL_GROUP_TARIFF_ID = 15
-      AND A.DTL_SUB_TARIFF IS NOT NULL AND A.DTL_AMOUNT IS NOT NULL
-      AND B.NOTA_BRANCH_ID = 12
-    ";
-    if (!empty($input["notaNo"])) {
-      $whereRaw .= " AND B.NOTA_NO = '".$input["notaNo"]."'";
+    $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
+    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',12);
     }
-    if (!empty($input["startDate"]) && !empty($input["endDate"])) {
-      $whereRaw .= " AND B.NOTA_DATE BETWEEN TO_DATE('".$startDate."', 'DD-MM-YYYY') AND TO_DATE('".$endDate."', 'DD-MM-YYYY')";
-    } else if(!empty($input["startDate"]) && empty($input["endDate"])) {
-      $whereRaw .= " AND B.NOTA_DATE > TO_DATE('".$startDate."', 'DD-MM-YYYY')";
-    } else if(empty($input["startDate"]) && !empty($input["endDate"])) {
-      $whereRaw .= " AND B.NOTA_DATE < TO_DATE('".$endDate."', 'DD-MM-YYYY')";
+    if (!empty($input["condition"]["VESSEL"])) {
+      $getRpt->where('VESSEL',$input["condition"]["VESSEL"]);
+    }
+    if (!empty($input["condition"]["UKK"])) {
+      $getRpt->where('UKK',$input["condition"]["UKK"]);
+    }
+    if (!empty($input["condition"]["NOTA"])) {
+      $getRpt->where('NOTA',$input["condition"]["NOTA"]);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->whereDate('NOTA_DATE', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereDate('NOTA_DATE', '<', $endDate);
     }
 
-    $whereRaw .= "GROUP BY B.NOTA_VESSEL_NAME, B.NOTA_UKK, B.NOTA_NO, B.NOTA_DATE, A.DTL_SUB_TARIFF
-                  ORDER BY B.NOTA_NO
-                  )X
-                  GROUP BY X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE";
-    $query   = DB::connection("omcargo")->table("TX_DTL_NOTA A, TX_HDR_NOTA B")->select(DB::raw("
-        X.VESSEL, X.UKK, X.NOTA, X.NOTA_DATE, SUM(X.PASS) PASS, SUM(X.SUPERVISI) SUPERVISI, SUM(X.KEBERSIHAN) KEBERSIHAN FROM (
-        SELECT
-        B.NOTA_VESSEL_NAME VESSEL, B.NOTA_UKK UKK, B.NOTA_NO NOTA, B.NOTA_DATE NOTA_DATE,
-        CASE WHEN A.DTL_SUB_TARIFF = 4 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS PASS,
-        CASE WHEN A.DTL_SUB_TARIFF = 5 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS SUPERVISI,
-        CASE WHEN A.DTL_SUB_TARIFF = 6 THEN sum(A.DTL_AMOUNT) ELSE 0 END AS KEBERSIHAN"
-    ))->whereRaw($whereRaw);
+    $count  = $getRpt->count();
 
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
-        $query->skip($input['start'])->take($input['limit']);
+        $getRpt->skip($input['start'])->take($input['limit']);
       }
     }
 
@@ -729,11 +724,12 @@ class ViewController extends Controller
       foreach ($sort as $sort) {
       $property = $sort->property;
       $direction = $sort->direction;
-      $query->orderby(strtoupper($property), $direction);
+      $getRpt->orderby(strtoupper($property), $direction);
         }
       }
-    $result = $query->get();
-    return ["result"=>$result];
+    $result = $getRpt->get();
+
+    return ["result"=>$result, "count"=>$count];
 
       // Excel::create('Laravel Excel', function($excel) {
       //   $excel->sheet('Excel sheet', function($sheet) {
@@ -742,5 +738,54 @@ class ViewController extends Controller
 
       //   });
       // })->export('xls');
+  }
+
+  function getRptDtlPendapatan($input, $request){
+    $startDate = date("d-m-Y", strtotime($input["startDate"]));
+    $endDate = date("d-m-Y", strtotime($input["endDate"]));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+    if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
+      $getRpt->where('REAL_BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
+    }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
+      $getRpt->where('REAL_BRANCH_ID',12);
+    }
+    if (!empty($input["condition"]["KEMASAN"])) {
+      $getRpt->where('KEMASAN',$input["condition"]["KEMASAN"]);
+    }
+    if (!empty($input["condition"]["KOMODITI"])) {
+      $getRpt->where('KOMODITI',$input["condition"]["KOMODITI"]);
+    }
+    if (!empty($input["condition"]["SATUAN"])) {
+      $getRpt->where('SATUAN',$input["condition"]["SATUAN"]);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->whereDate('TGL_NOTA', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereDate('TGL_NOTA', '<', $endDate);
+    }
+
+    $count  = $getRpt->count();
+
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $getRpt->skip($input['start'])->take($input['limit']);
+      }
+    }
+
+    if (isset($input["sort"])) {
+      $sort = json_decode($input["sort"]);
+      foreach ($sort as $sort) {
+      $property = $sort->property;
+      $direction = $sort->direction;
+      $getRpt->orderby(strtoupper($property), $direction);
+        }
+      }
+    $result = $getRpt->get();
+
+    return ["result"=>$result, "count"=>$count];
+
   }
 }
