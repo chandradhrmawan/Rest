@@ -32,6 +32,8 @@ $app->post('/get-file', 'StoreController@testview_file');
 
 $app->post('/tree-menu/{roll_id}', 'ViewController@menuTree');
 
+$app->get('/export_testlainlain','ViewController@exportToExcel');
+
 $app->get('/print/getPass/{id}','ViewController@printGetPass');
 $app->get('/print/uper2/{id}','ViewController@printUper2');
 $app->get('/print/proforma2/{id}','ViewController@printProforma2');

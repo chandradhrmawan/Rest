@@ -730,14 +730,6 @@ class ViewController extends Controller
     $result = $getRpt->get();
 
     return ["result"=>$result, "count"=>$count];
-
-      // Excel::create('Laravel Excel', function($excel) {
-      //   $excel->sheet('Excel sheet', function($sheet) {
-
-      //     $sheet->setOrientation('landscape');
-
-      //   });
-      // })->export('xls');
   }
 
   function getRptDtlPendapatan($input, $request){
@@ -786,6 +778,22 @@ class ViewController extends Controller
     $result = $getRpt->get();
 
     return ["result"=>$result, "count"=>$count];
+  }
 
+  public function exportToExcel(){
+    // Excel::create("ASD", function($excel) {
+    //   $excel->sheet("ASD", function($sheet) {
+    //     $sheet->fromArray("ASD", null, 'A1', false, false);
+    //     $sheet->setOrientation('landscape');
+    //   });
+    // })->export('xls');
+    Excel::create('Laravel Excel', function($excel) {
+      $excel->sheet('Excel sheet', function($sheet) {
+        $sheet->row(1, array(
+         'test1', 'test2'
+       ));
+        $sheet->setOrientation('landscape');
+      });
+    })->export('xls');
   }
 }
