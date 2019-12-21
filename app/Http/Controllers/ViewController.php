@@ -12,7 +12,7 @@ use App\Helper\UserAndRoleManagemnt;
 use App\Helper\UperRequest;
 use Dompdf\Dompdf;
 use App\Helper\ConnectedExternalApps;
-use Excel;
+// use Excel;
 
 class ViewController extends Controller
 {
@@ -638,8 +638,8 @@ class ViewController extends Controller
     }
 
   function getDebitur($input, $request) {
-    $startDate = date("d-m-Y", strtotime($input["startDate"]));
-    $endDate = date("d-m-Y", strtotime($input["endDate"]));
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
     if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
@@ -659,9 +659,9 @@ class ViewController extends Controller
     if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
       $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
     } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-      $getRpt->whereDate('TGL_NOTA', '>', $startDate);
+      $getRpt->where('TGL_NOTA', '>', $startDate);
     } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-      $getRpt->whereDate('TGL_NOTA', '<', $endDate);
+      $getRpt->where('TGL_NOTA', '<', $endDate);
     }
 
     $count  = $getRpt->count();
@@ -685,8 +685,8 @@ class ViewController extends Controller
   }
 
   function getRekonsilasi($input, $request) {
-    $startDate = date("d-m-Y", strtotime($input["startDate"]));
-    $endDate = date("d-m-Y", strtotime($input["endDate"]));
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
     if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
@@ -706,9 +706,9 @@ class ViewController extends Controller
     if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
       $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
     } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-      $getRpt->whereDate('NOTA_DATE', '>', $startDate);
+      $getRpt->where('NOTA_DATE', '>', $startDate);
     } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-      $getRpt->whereDate('NOTA_DATE', '<', $endDate);
+      $getRpt->where('NOTA_DATE', '<', $endDate);
     }
 
     $count  = $getRpt->count();
@@ -733,8 +733,8 @@ class ViewController extends Controller
   }
 
   function getRptDtlPendapatan($input, $request){
-    $startDate = date("d-m-Y", strtotime($input["startDate"]));
-    $endDate = date("d-m-Y", strtotime($input["endDate"]));
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
     if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
@@ -754,9 +754,9 @@ class ViewController extends Controller
     if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
       $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
     } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-      $getRpt->whereDate('TGL_NOTA', '>', $startDate);
+      $getRpt->where('TGL_NOTA', '>', $startDate);
     } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-      $getRpt->whereDate('TGL_NOTA', '<', $endDate);
+      $getRpt->where('TGL_NOTA', '<', $endDate);
     }
 
     $count  = $getRpt->count();
@@ -787,13 +787,13 @@ class ViewController extends Controller
     //     $sheet->setOrientation('landscape');
     //   });
     // })->export('xls');
-    Excel::create('Laravel Excel', function($excel) {
-      $excel->sheet('Excel sheet', function($sheet) {
-        $sheet->row(1, array(
-         'test1', 'test2'
-       ));
-        $sheet->setOrientation('landscape');
-      });
-    })->export('xls');
+    // Excel::create('Laravel Excel', function($excel) {
+    //   $excel->sheet('Excel sheet', function($sheet) {
+    //     $sheet->row(1, array(
+    //      'test1', 'test2'
+    //    ));
+    //     $sheet->setOrientation('landscape');
+    //   });
+    // })->export('xls');
   }
 }
