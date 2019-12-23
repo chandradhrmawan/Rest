@@ -389,6 +389,11 @@ class GlobalHelper {
     $connect->whereIn(strtoupper($in[0]), $in[1]);
     }
 
+    if(!empty($input["whereNotIn"][0])) {
+    $in        = $input["whereNotIn"];
+    $connect->whereNotIn(strtoupper($in[0]), $in[1]);
+    }
+
     if (!empty($input["query"]) && !empty($input["field"])) {
       if (is_array($input["field"])) {
         foreach ($input["field"] as $field) {
