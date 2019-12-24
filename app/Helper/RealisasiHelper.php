@@ -267,7 +267,7 @@ class RealisasiHelper{
         $headN->nota_tax_code = $getH->tax_code;
         $headN->nota_terminal = $terminal_id;
         $headN->nota_branch_id = $getH->branch_id;
-        //$headN->nota_branch_code = $getH->branch_code;
+        $headN->nota_branch_code = $getH->branch_code;
         $headN->nota_vessel_name = $vessel_name;
         $headN->nota_ukk = $ukk;
         // $headN->nota_faktur_no = $getH->; // ?
