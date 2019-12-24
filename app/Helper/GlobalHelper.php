@@ -659,14 +659,6 @@ class GlobalHelper {
 
   public static function saveheaderdetail($input) {
     $data    = $input["data"];
-    if (isset($input["cekdb"])) {
-      $field = $input["cekdb"];
-      $value = $input["HEADER"]["VALUE"][0][$field];
-      $item  = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where($field, $value)->get();
-      if (!empty($item)) {
-        return ["Success"=>"F", "Error"=>"Data With $field = $value Already Exist"];
-      }
-    }
     $count   = count($input["data"]);
     $cek     = $input["HEADER"]["PK"];
 
@@ -682,6 +674,14 @@ class GlobalHelper {
       if ($data == "HEADER") {
         $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
         if ($hdr[0][$cek] == '' || $sq == "N") {
+          if (isset($input["cekdb"])) {
+            $field = $input["cekdb"];
+            $value = $input["HEADER"]["VALUE"][0][$field];
+            $item  = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where($field, $value)->get();
+            if (!empty($item)) {
+              return ["Success"=>"F", "Error"=>"Data With $field = $value Already Exist"];
+            }
+          }
           foreach ($val["VALUE"] as $value) {
             $insert       = $connect->insert([$value]);
           }

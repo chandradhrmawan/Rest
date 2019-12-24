@@ -66,9 +66,13 @@ class AuthController extends BaseController
         $time = date('H:i:s',strtotime('+7 hour',strtotime(date("h:i:s"))));
         if (Hash::check($this->request->input('USER_PASSWD'), $user["user_passwd"])) {
             $cek      = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->first();
-            $header   = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token", "user_active")->first();
+            $header   = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token", "user_active","user_branch_code")->first();
             $brnc_id  = json_decode(json_encode($header), TRUE);
-            $detail   = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID','=',$brnc_id['user_branch_id'])->get();
+            $detail   = DB::connection('mdm')->table('TM_BRANCH')->where([['BRANCH_ID','=',$brnc_id['user_branch_id']],['BRANCH_CODE','=',$brnc_id['user_branch_code']]])->get();
+
+            if (empty($detail)) {
+              return response()->json(["message"=>"Branch Not Found"], 400);
+            }
 
             $data = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $this->request->input('USER_NAME'))->get();
             $token = $data[0]->api_token;

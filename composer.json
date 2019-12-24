@@ -15,7 +15,8 @@
         "barryvdh/laravel-dompdf": "~0.8.0",
         "dompdf/dompdf": "^0.8.3",
         "milon/barcode": "^6.0",
-        "maatwebsite/excel": "~2.1.0"
+        "maatwebsite/excel": "2.*",
+        "phpoffice/phpspreadsheet": "^1.10"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

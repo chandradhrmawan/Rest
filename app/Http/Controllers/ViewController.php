@@ -681,6 +681,10 @@ class ViewController extends Controller
         }
       }
     $result = $getRpt->get();
+    if (isset($input['export'])) {
+      return $this->export($result);
+    }
+
     return ["result"=>$result, "count"=>$count];
   }
 
@@ -780,20 +784,7 @@ class ViewController extends Controller
     return ["result"=>$result, "count"=>$count];
   }
 
-  public function exportToExcel(){
-    // Excel::create("ASD", function($excel) {
-    //   $excel->sheet("ASD", function($sheet) {
-    //     $sheet->fromArray("ASD", null, 'A1', false, false);
-    //     $sheet->setOrientation('landscape');
-    //   });
-    // })->export('xls');
-    // Excel::create('Laravel Excel', function($excel) {
-    //   $excel->sheet('Excel sheet', function($sheet) {
-    //     $sheet->row(1, array(
-    //      'test1', 'test2'
-    //    ));
-    //     $sheet->setOrientation('landscape');
-    //   });
-    // })->export('xls');
+  function ExportDebitur() {
+    return view('print.debitur');
   }
 }
