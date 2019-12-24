@@ -874,6 +874,7 @@ class BillingEngine{
         }
         $setH = " P_SOURCE_ID => 'NPK_BILLING',";
         $setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
+        $setH .= " P_BRANCH_CODE => '".$head['P_BRANCH_CODE']."',";
         $setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
         $setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
         $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
@@ -913,16 +914,16 @@ class BillingEngine{
       $getConfLink = config('database.connections.eng');
       $link = oci_connect($getConfLink['username'], $getConfLink['password'], $getConfLink['host'].'/'.$getConfLink['database']);
       $sql = " DECLARE
-        detail PKG_TARIFF.BOOKING_DTL;
-        equip PKG_TARIFF.BOOKING_EQUIP;
-        paysplit PKG_TARIFF.BOOKING_PAYSPLIT;
-        list_detail PKG_TARIFF.BOOKING_DTL_TBL;
-        list_equip PKG_TARIFF.BOOKING_EQUIP_TBL;
-        list_paysplit PKG_TARIFF.BOOKING_PAYSPLIT_TBL;
+        detail PKG_BILLING.BOOKING_DTL;
+        equip PKG_BILLING.BOOKING_EQUIP;
+        paysplit PKG_BILLING.BOOKING_PAYSPLIT;
+        list_detail PKG_BILLING.BOOKING_DTL_TBL;
+        list_equip PKG_BILLING.BOOKING_EQUIP_TBL;
+        list_paysplit PKG_BILLING.BOOKING_PAYSPLIT_TBL;
         P_RESULT_FLAG VARCHAR2(200);
         P_RESULT_MSG VARCHAR2(200);
         BEGIN ".$input['detil']." ".$input['eqpt']." ".$input['paysplit'];
-      $sql .= " PKG_TARIFF.GET_TARIFF( ".$input['head']." );END;";
+      $sql .= " PKG_BILLING.GET_TARIFF( ".$input['head']." );END;";
 
       // return $sql;
       $stmt = oci_parse($link,$sql);
