@@ -23,6 +23,7 @@ class RealisasiHelper{
       $setH = [];
       $setH['P_NOTA_ID'] = 13;
       $setH['P_BRANCH_ID'] = $find->real_branch_id;
+      $setH['P_BRANCH_CODE'] = $find->real_branch_code;
       $setH['P_CUSTOMER_ID'] = $find->bm_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->real_no;
       $setH['P_REALIZATION'] = 'Y';
@@ -130,6 +131,7 @@ class RealisasiHelper{
       $setH = [];
       $setH['P_NOTA_ID'] = $nota_id;
       $setH['P_BRANCH_ID'] = $find->bprp_branch_id;
+      $setH['P_BRANCH_CODE'] = $find->bprp_branch_code;
       $setH['P_CUSTOMER_ID'] = $find->bprp_cust_id;
       $setH['P_BOOKING_NUMBER'] = $find->bprp_no;
       $setH['P_REALIZATION'] = 'Y';
@@ -265,6 +267,7 @@ class RealisasiHelper{
         $headN->nota_tax_code = $getH->tax_code;
         $headN->nota_terminal = $terminal_id;
         $headN->nota_branch_id = $getH->branch_id;
+        $headN->nota_branch_code = $getH->branch_code; // add new
         $headN->nota_vessel_name = $vessel_name;
         $headN->nota_ukk = $ukk;
         // $headN->nota_faktur_no = $getH->; // ?

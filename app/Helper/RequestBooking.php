@@ -22,6 +22,7 @@ class RequestBooking{
 			$setH = [];
 			$setH['P_NOTA_ID'] = $config['head_nota_id'];
 			$setH['P_BRANCH_ID'] = $find[$config['head_branch']];
+		$setH['P_BRANCH_CODE'] = $find[$config['head_branch_code']];
 			$setH['P_CUSTOMER_ID'] = $find[$config['head_cust']];
 			$setH['P_BOOKING_NUMBER'] = $find[$config['head_no']];
 			$setH['P_REALIZATION'] = 'N';
@@ -356,6 +357,7 @@ class RequestBooking{
         		"head_by" => "bm_create_by",
         		"head_date" => "bm_date",
         		"head_branch" => "bm_branch_id",
+		"head_branch_code" => "bm_branch_code",
         		"head_cust" => "bm_cust_id",
         		"head_trade" => "bm_trade_type",
         		"head_terminal_code" => "bm_terminal_code",
@@ -397,6 +399,7 @@ class RequestBooking{
         		"head_by" => "rec_create_by",
         		"head_date" => "rec_date",
         		"head_branch" => "rec_branch_id",
+		"head_branch_code" => "rec_branch_code",
         		"head_cust" => "rec_cust_id",
         		"head_trade" => "rec_trade_type",
         		"head_terminal_code" => "rec_terminal_code",
@@ -438,7 +441,8 @@ class RequestBooking{
         		"head_by" => "del_create_by",
         		"head_date" => "del_date",
         		"head_branch" => "del_branch_id",
-        		"head_cust" => "del_cust_id",
+		"head_branch_code" => "del_branch_code",
+      		"head_cust" => "del_cust_id",
         		"head_trade" => "del_trade_type",
         		"head_terminal_code" => "del_terminal_code",
         		"head_terminal_name" => "del_terminal_name",
