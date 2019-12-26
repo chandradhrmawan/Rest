@@ -961,6 +961,7 @@ class BillingEngine{
         $setH                       = [];
         $setH['P_NOTA_ID']          = $head['P_NOTA_ID'];
         $setH['P_BRANCH_ID']        = $head['P_BRANCH_ID'];
+        $setH['P_BRANCH_CODE']      = $head['P_BRANCH_CODE'];
         $setH['P_CUSTOMER_ID']      = $head['P_CUSTOMER_ID'];
         $setH['P_RESTITUTION']      = 'N'; // ( N / Y ) DEFAULT N
         $setH['P_BOOKING_NUMBER']   = $head['P_BOOKING_NUMBER'];
