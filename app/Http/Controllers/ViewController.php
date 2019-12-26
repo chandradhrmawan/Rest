@@ -135,7 +135,7 @@ class ViewController extends Controller
       }
 
       $all = ["header"=>$header]+$det;
-      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->get();
+      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
       $terbilang   = $this->terbilang($header[0]->nota_amount);
       if (!array_key_exists("alat",$all)) {
         $alat = 0;
@@ -170,33 +170,33 @@ class ViewController extends Controller
 
       $query = "
                 SELECT
-              	A.*,
-              	CASE
-              	WHEN A.NOTA_GROUP_ID = 13
-              	THEN
-              		(SELECT Y.BM_KADE FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
-              	WHEN A.NOTA_GROUP_ID = 14
-              	THEN
-              		(SELECT X.REC_KADE FROM TX_HDR_REC X WHERE X.REC_NO = A.NOTA_REQ_NO )
-              	WHEN A.NOTA_GROUP_ID = 15
-              	THEN
-              		(SELECT Z.DEL_KADE FROM TX_HDR_DEL Z WHERE Z.DEL_NO = A.NOTA_REQ_NO)
-              	END AS KADE,
+                A.*,
                 CASE
-              	WHEN A.NOTA_GROUP_ID = 13
-              	THEN
-              		(SELECT Y.BM_PBM_NAME FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
-              	END AS PBM_NAME,
-              	CASE
-                    	WHEN A.NOTA_GROUP_ID = 13
-                    		THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
-                    	WHEN A.NOTA_GROUP_ID = 14
-                    		THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
-                    	WHEN A.NOTA_GROUP_ID IN (15,19)
-                    		THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
-                    	END AS PERIODE
+                WHEN A.NOTA_GROUP_ID = 13
+                THEN
+                  (SELECT Y.BM_KADE FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
+                WHEN A.NOTA_GROUP_ID = 14
+                THEN
+                  (SELECT X.REC_KADE FROM TX_HDR_REC X WHERE X.REC_NO = A.NOTA_REQ_NO )
+                WHEN A.NOTA_GROUP_ID = 15
+                THEN
+                  (SELECT Z.DEL_KADE FROM TX_HDR_DEL Z WHERE Z.DEL_NO = A.NOTA_REQ_NO)
+                END AS KADE,
+                CASE
+                WHEN A.NOTA_GROUP_ID = 13
+                THEN
+                  (SELECT Y.BM_PBM_NAME FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
+                END AS PBM_NAME,
+                CASE
+                      WHEN A.NOTA_GROUP_ID = 13
+                        THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
+                      WHEN A.NOTA_GROUP_ID = 14
+                        THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
+                      WHEN A.NOTA_GROUP_ID IN (15,19)
+                        THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
+                      END AS PERIODE
               FROM
-              	TX_HDR_NOTA A
+                TX_HDR_NOTA A
               WHERE
                 A.NOTA_ID = '$id'
               ";
@@ -215,35 +215,35 @@ class ViewController extends Controller
     function printUperPaid($id) {
       $connect    = DB::connection("omcargo");
       $header     = $connect->table("TX_HDR_UPER")->where('UPER_NO', $id)->get();
-      $branch     = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->get();
+      $branch     = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->where('BRANCH_CODE', $header[0]->uper_branch_code)->get();
       $terbilang  = $this->terbilang($header[0]->uper_amount);
       $query      = "
                     SELECT
-                  	A.UPER_CUST_NAME,
-                  	A.UPER_VESSEL_NAME,
-                  	CASE
-                  	WHEN A.UPER_NOTA_ID = 13
-                  		THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.UPER_REQ_NO)
-                  	WHEN A.UPER_NOTA_ID = 14
-                  		THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.UPER_REQ_NO)
-                  	WHEN A.UPER_NOTA_ID IN (15,19)
-                  		THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.UPER_REQ_NO)
-                  	END AS PERIODE,
-                  	A.UPER_NO,
-                  	A.UPER_TRADE_TYPE,
-                  	A.UPER_AMOUNT,
-                  	B.PAY_AMOUNT,
-                  	B.PAY_ACCOUNT_NAME,
-                  	TO_CHAR(B.PAY_DATE,'DD-MON-YY') PAY_DATE,
-                  	B.PAY_NOTE,
-                  	B.PAY_CUST_ID
+                    A.UPER_CUST_NAME,
+                    A.UPER_VESSEL_NAME,
+                    CASE
+                    WHEN A.UPER_NOTA_ID = 13
+                      THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.UPER_REQ_NO)
+                    WHEN A.UPER_NOTA_ID = 14
+                      THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.UPER_REQ_NO)
+                    WHEN A.UPER_NOTA_ID IN (15,19)
+                      THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.UPER_REQ_NO)
+                    END AS PERIODE,
+                    A.UPER_NO,
+                    A.UPER_TRADE_TYPE,
+                    A.UPER_AMOUNT,
+                    B.PAY_AMOUNT,
+                    B.PAY_ACCOUNT_NAME,
+                    TO_CHAR(B.PAY_DATE,'DD-MON-YY') PAY_DATE,
+                    B.PAY_NOTE,
+                    B.PAY_CUST_ID
                   FROM
-                  	TX_HDR_UPER A,
-                  	TX_PAYMENT B
+                    TX_HDR_UPER A,
+                    TX_PAYMENT B
                   WHERE
-                  	A.UPER_NO = B.PAY_NO
-                  	AND B.PAY_TYPE = 1
-                  	AND A.UPER_PAID = 'Y'
+                    A.UPER_NO = B.PAY_NO
+                    AND B.PAY_TYPE = 1
+                    AND A.UPER_PAID = 'Y'
                     AND A.UPER_NO = '$id'";
       $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
       $string_json = '{
@@ -327,7 +327,7 @@ class ViewController extends Controller
       }
 
       $all = ["header"=>$header]+$det;
-      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->get();
+      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->uper_branch_id)->where('BRANCH_CODE', $header[0]->uper_branch_code)->get();
       $terbilang   = $this->terbilang($header[0]->uper_amount);
       if (!array_key_exists("alat",$all)) {
         $alat = 0;
@@ -405,7 +405,7 @@ class ViewController extends Controller
         $change          = str_replace("rec", "req", $data);
         $a               = json_decode($change);
         $all["request"]  = $a;
-        $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $a[0]->req_branch_id)->get();
+        $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $a[0]->req_branch_id)->where('BRANCH_CODE', $a[0]->req_branch_code)->get();
         $html            = view('print.bprp',["branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
       } else if (!empty($b[0]->del_id)) {
@@ -413,7 +413,7 @@ class ViewController extends Controller
         $change          = str_replace("del", "req", $data);
         $b               = json_decode($change);
         $all["request"]  = $b;
-        $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $b[0]->req_branch_id)->get();
+        $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $b[0]->req_branch_id)->where('BRANCH_CODE', $b[0]->req_branch_code)->get();
         $html            = view('print.bprp',["branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
       }
@@ -496,7 +496,7 @@ class ViewController extends Controller
       }
 
       $all = ["header"=>$header]+$det;
-      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->get();
+      $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->where('BRANCH_CODE', $header[0]->nota_branch_code)->get();
       $terbilang   = $this->terbilang($header[0]->nota_amount);
       if (!array_key_exists("alat",$all)) {
         $alat = 0;
@@ -681,10 +681,6 @@ class ViewController extends Controller
         }
       }
     $result = $getRpt->get();
-    if (isset($input['export'])) {
-      return $this->export($result);
-    }
-
     return ["result"=>$result, "count"=>$count];
   }
 
@@ -784,7 +780,93 @@ class ViewController extends Controller
     return ["result"=>$result, "count"=>$count];
   }
 
-  function ExportDebitur() {
-    return view('print.debitur');
+  function ExportDebitur($a,$b,$c,$d,$e,$f) {
+    $branchId    = $a;
+    $notaNo      = $b;
+    $custName    = $c;
+    $layanan     = $d;
+    $start       = $e;
+    $end         = $f;
+
+    $startDate   = date("Y-m-d", strtotime($start));
+    $endDate     = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
+    if (!empty($branchId)) {
+      $getRpt->where('NOTA_BRANCH_ID',$branchId);
+    }else if (empty($branchId)) {
+      $getRpt->where('NOTA_BRANCH_ID',12);
+    }
+    if (!empty($notaNo)) {
+      $getRpt->where('NOTA_NO',$notaNo);
+    }
+    if (!empty($custName)) {
+      $getRpt->where('NOTA_CUST_NAME',$custName);
+    }
+    if (!empty($layanan)) {
+      $getRpt->where('LAYANAN',$layanan);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('TGL_NOTA', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('TGL_NOTA', '<', $endDate);
+    }
+
+    $count  = $getRpt->count();
+    $result = $getRpt->get();
+    return view('print.debitur',[
+                "result"=>$result,
+                "start"=>$start,
+                "end"=>$end
+              ]);
+  }
+
+  function ExportRekonsilasi($a,$b,$c,$d,$e,$f) {
+    $branchId    = $a;
+    $vessel      = $b;
+    $ukk         = $c;
+    $nota        = $d;
+    $start       = $e;
+    $end         = $f;
+
+    $startDate = date("Y-m-d", strtotime($start));
+    $endDate = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
+    if (!empty($branchId)) {
+      $getRpt->where('NOTA_BRANCH_ID',$branchId);
+    }else if (empty($branchId)) {
+      $getRpt->where('NOTA_BRANCH_ID',12);
+    }
+    if (!empty($vessel)) {
+      $getRpt->where('VESSEL',$vessel);
+    }
+    if (!empty($ukk)) {
+      $getRpt->where('UKK',$ukk);
+    }
+    if (!empty($nota)) {
+      $getRpt->where('NOTA',$nota);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('NOTA_DATE', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('NOTA_DATE', '<', $endDate);
+    }
+
+    $result = $getRpt->get();
+
+    return view('print.rekonsilasi',[
+                "result"=>$result,
+                "start"=>$start,
+                "end"=>$end
+              ]);
+  }
+
+  function ExportPendapatan() {
+    return view('print.pendapatan');
   }
 }
