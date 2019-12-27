@@ -146,7 +146,7 @@ class BillingEngine{
               $detilS->service_code       = $headS->service_code;
               $detilS->sub_iso_code       = $subisocode;
               $detilS->iso_code           = $isocode;
-              $detilS->branch_id          = 12;
+              $detilS->branch_id          = $input["user"]["user_branch_id"];
               $detilS->nota_id            = $list['LAYANAN'];
               $detilS->tariff_object      = $list['OBJECT_TARIFF'];
               $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
@@ -268,7 +268,7 @@ class BillingEngine{
         $detilS->sub_tariff         = $list['SUB_TARIFF'];
         $detilS->sub_iso_code       = $subisocode;
         $detilS->iso_code           = $isocode;
-        $detilS->branch_id          = 12;
+        $detilS->branch_id          = $input["user"]["user_branch_id"];
         $detilS->nota_id            = $list['LAYANAN'];
         $detilS->tariff_object      = $list['OBJECT_TARIFF'];
         $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
