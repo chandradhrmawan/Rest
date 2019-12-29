@@ -1029,6 +1029,7 @@ class BillingEngine{
           $newE['EQ_UNIT_ID']       = empty($list['EQ_UNIT_ID']) ? 'NULL' : $list['EQ_UNIT_ID'];
           $newE['EQ_GTRF_ID']       = empty($list['EQ_GTRF_ID']) ? 'NULL' : $list['EQ_GTRF_ID'];
           $newE['EQ_PKG_ID']        = empty($list['EQ_PKG_ID']) ? 'NULL' : $list['EQ_PKG_ID'];
+          $newE['EQ_QTY_PKG']        = empty($list['EQ_QTY_PKG']) ? 'NULL' : $list['EQ_QTY_PKG'];
           $setE[] = $newE;
         }
     // build eqpt
@@ -1087,6 +1088,6 @@ class BillingEngine{
             }
           }
 
-      return ["Header"=>$getHS, "Detail"=>$resultD];
+      return ["Header"=>$getHS, "Detail"=>$resultD, "calculateRespn" => $tariffResp];
     }
   }
