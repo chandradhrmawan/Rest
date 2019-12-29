@@ -356,7 +356,7 @@ class RealisasiHelper{
     }
     TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2]);
     $count = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->whereIn('nota_status', [1,3])->count();
-
+    $sendNotaTracking = [];
     if ($count == 0) {
       $loop = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->get();
       foreach ($loop as $list) {
@@ -369,6 +369,7 @@ class RealisasiHelper{
         //     'result' => 'Fail, send proforma to invoice!'
         //   ];
         // }
+        $sendNotaTracking[] = $sendNota;
         $pay = TxPayment::where('pay_req_no', $list->nota_req_no)->where('pay_cust_id', $list->nota_cust_id)->first();
         if (!empty($pay)) {
           // ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
@@ -386,7 +387,8 @@ class RealisasiHelper{
     return [
       'result' => 'Success, approved proforma!',
       'req_no' => $nota->nota_req_no,
-      'nota_no' => $nota->nota_no
+      'nota_no' => $nota->nota_no,
+      'sendNotaTracking' => $sendNotaTracking
     ];
   }
 
