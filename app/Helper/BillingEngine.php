@@ -1018,6 +1018,7 @@ class BillingEngine{
           $newD['DTL_DATE_OUT']     = empty($dateout) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
           $newD['DTL_DATE_OUT_OLD'] = 'NULL';
           $newD['DTL_PFS']          = $list['DTL_PFS'];
+          $newD['DTL_STACK_AREA']  = $list['DTL_STACK_AREA_ID'];
           $setD[] = $newD;
         }
     // build detil
@@ -1077,7 +1078,8 @@ class BillingEngine{
                       // "dtl_masa2" => , // cooming soon
                       "dtl_tariff" => $list["tariff"],
                       "dtl_package" => $list["package_name"],
-                      "dtl_qty" => $list["qty"],
+                      "dtl_qty" => $list["eq_qty"],
+                      "dtl_eq_qty_pkg" => $list["qty"],
                       // "dtl_unit" => $list["unit_id"],
                       "dtl_unit_name" => $list["unit_name"],
                       "dtl_group_tariff_id" => $list["group_tariff_id"],

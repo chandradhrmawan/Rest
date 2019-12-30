@@ -1081,7 +1081,7 @@ class ConnectedExternalApps{
           "interfaceLineAttribute9":"",
           "interfaceLineAttribute10":"'.$list->trf1up.'",
           "interfaceLineAttribute11":"'.$list->trf2up.'",
-          "interfaceLineAttribute12":"'.$list->dtl_package.'", 
+          "interfaceLineAttribute12":"'.$list->dtl_package.'",
           "interfaceLineAttribute13":"'.$list->dtl_qty.'  ",
           "interfaceLineAttribute14":"'.$list->dtl_unit_name.'",
           "interfaceLineAttribute15":"",
