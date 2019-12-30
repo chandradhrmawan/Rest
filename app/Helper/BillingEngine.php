@@ -31,9 +31,17 @@ class BillingEngine{
           $headS->service_code  = $head['SERVICE_CODE'];
           // $headS->branch_id     = 12;
           // $headS->created_by    = 1;
-          $headS->branch_id     = $head["BRANCH_ID"];
-          // $headS->branch_code   = $input["user"]["user_branch_code"];
-          $headS->created_by    = $head["USER_ID"];
+          if (!empty($head['BRANCH_ID'])) {
+            $headS->branch_id     = $head['BRANCH_ID'];
+          }else{
+            $headS->branch_id     = $input["user"]["user_branch_id"];
+          }
+          if (!empty($head['BRANCH_ID'])) {
+            $headS->branch_code     = $head['BRANCH_CODE'];
+          }else{
+            $headS->branch_code   = $input["user"]["user_branch_code"];
+          }
+          $headS->created_by    = $input["user"]["user_id"];
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
@@ -146,7 +154,11 @@ class BillingEngine{
               $detilS->service_code       = $headS->service_code;
               $detilS->sub_iso_code       = $subisocode;
               $detilS->iso_code           = $isocode;
-              $detilS->branch_id          = 12;
+              if (!empty($head['BRANCH_ID'])) {
+                $detilS->branch_id        = $list['BRANCH_ID'];
+              }else{
+                $detilS->branch_id        = $input["user"]["user_branch_id"];
+              }
               $detilS->nota_id            = $list['LAYANAN'];
               $detilS->tariff_object      = $list['OBJECT_TARIFF'];
               $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
@@ -268,7 +280,7 @@ class BillingEngine{
         $detilS->sub_tariff         = $list['SUB_TARIFF'];
         $detilS->sub_iso_code       = $subisocode;
         $detilS->iso_code           = $isocode;
-        $detilS->branch_id          = 12;
+        $detilS->branch_id          = $input["user"]["user_branch_id"];
         $detilS->nota_id            = $list['LAYANAN'];
         $detilS->tariff_object      = $list['OBJECT_TARIFF'];
         $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
@@ -1018,6 +1030,7 @@ class BillingEngine{
           $newE['EQ_UNIT_ID']       = empty($list['EQ_UNIT_ID']) ? 'NULL' : $list['EQ_UNIT_ID'];
           $newE['EQ_GTRF_ID']       = empty($list['EQ_GTRF_ID']) ? 'NULL' : $list['EQ_GTRF_ID'];
           $newE['EQ_PKG_ID']        = empty($list['EQ_PKG_ID']) ? 'NULL' : $list['EQ_PKG_ID'];
+          $newE['EQ_QTY_PKG']        = empty($list['EQ_QTY_PKG']) ? 'NULL' : $list['EQ_QTY_PKG'];
           $setE[] = $newE;
         }
     // build eqpt
@@ -1076,6 +1089,6 @@ class BillingEngine{
             }
           }
 
-      return ["Header"=>$getHS, "Detail"=>$resultD];
+      return ["Header"=>$getHS, "Detail"=>$resultD, "calculateRespn" => $tariffResp];
     }
   }

@@ -1044,9 +1044,11 @@ class ConnectedExternalApps{
         $bprpHeadId = $bprpHeadId[0];
         $bprpHeadId = $bprpHeadId->bprp_id;
         $bprpDtl = DB::connection('omcargo')->table('TX_DTL_BPRP')->where('HDR_BPRP_ID', $bprpHeadId)->where('DTL_BL', $list->dtl_bl)->get();
-        $bprpDtl = $bprpDtl[0];
-        $dateIn = date('Y-m-d', strtotime($bprpDtl->dtl_datein));
-        $dateOut = date('Y-m-d', strtotime($bprpDtl->dtl_dateout));
+        if (count($bprpDtl) > 0) {
+          $bprpDtl = $bprpDtl[0];
+          $dateIn = date('Y-m-d', strtotime($bprpDtl->dtl_datein));
+          $dateOut = date('Y-m-d', strtotime($bprpDtl->dtl_dateout));
+        }
         $lines_json  .= '{
           "billerRequestId":"'.$find->nota_req_no.'",
           "trxNumber":"'.$find->nota_no.'",
@@ -1178,7 +1180,8 @@ class ConnectedExternalApps{
       }
     }
 
-    return $res = json_decode($res->getBody()->getContents(), true);
+    $res = json_decode($res->getBody()->getContents(), true);
+    return ['response'=>$res, 'request'=>$options];
   }
 
   public static function notaProformaPutApply($nota_id, $pay){
