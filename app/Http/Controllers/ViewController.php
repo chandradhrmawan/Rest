@@ -795,18 +795,22 @@ class ViewController extends Controller
     return ["result"=>$result, "count"=>$count];
   }
 
-  function ExportDebitur($a,$b,$c,$d,$e,$f) {
+  function ExportDebitur($a,$b,$c,$d,$e,$f,$g) {
     $branchId    = $a;
     $notaNo      = $b;
     $custName    = $c;
     $layanan     = $d;
     $start       = $e;
     $end         = $f;
+    $branchCode  = $g;
 
     $startDate   = date("Y-m-d", strtotime($start));
     $endDate     = date("Y-m-d", strtotime($end));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
+    if (!empty($branchCode)) {
+      $getRpt->where('BRANCH_CODE',$branchCode);
+    }
     if (!empty($branchId)) {
       $getRpt->where('NOTA_BRANCH_ID',$branchId);
     }
@@ -836,13 +840,14 @@ class ViewController extends Controller
               ]);
   }
 
-  function ExportRekonsilasi($a,$b,$c,$d,$e,$f) {
+  function ExportRekonsilasi($a,$b,$c,$d,$e,$f,$g) {
     $branchId    = $a;
     $vessel      = $b;
     $ukk         = $c;
     $nota        = $d;
     $start       = $e;
     $end         = $f;
+    $branchCode  = $g;
 
     $startDate = date("Y-m-d", strtotime($start));
     $endDate = date("Y-m-d", strtotime($end));
@@ -850,6 +855,9 @@ class ViewController extends Controller
     $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
     if (!empty($branchId)) {
       $getRpt->where('NOTA_BRANCH_ID',$branchId);
+    }
+    if (!empty($branchCode)) {
+      $getRpt->where('BRANCH_CODE',$branchCode);
     }
     if (!empty($vessel)) {
       $getRpt->where('VESSEL',$vessel);
