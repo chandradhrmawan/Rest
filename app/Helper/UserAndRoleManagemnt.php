@@ -30,8 +30,9 @@ class UserAndRoleManagemnt{
     }
 
     $TS_ROLE_BRANCH = [
+      'role_id' => $input['user_role'],
       'branch_id' => $input['user_branch_id'],
-      'user_branch_code' => $input['user_user_branch_code']
+      'branch_code' => $input['user_user_branch_code']
     ];
 
     if (empty($input['user_id'])) {
@@ -314,6 +315,28 @@ class UserAndRoleManagemnt{
     return [
       "expanded" =>true,
       "children" => $estjs
+    ];
+  }
+
+  public function storeRoleBranch($input)
+  {
+    $cek = DB::connection('omuster')->table('TS_ROLE_BRANCH')->where('USER_ID',$input["USER_ID"])->where('ROLE_ID',$input["ROLE_ID"])->where('BRANCH_ID',$input["BRANCH_ID"])->where('BRANCH_CODE',$input["BRANCH_CODE"])->count();
+    if ($cek > 0) {
+      return [
+        "Success" => false,
+        "result" => "fail, data already exists"
+      ];
+    }
+
+    $store = [
+      'user_id' => $input['USER_ID'],
+      'role_id' => $input['ROLE_ID'],
+      'branch_id' => $input['BRANCH_ID'],
+      'branch_code' => $input['BRANCH_CODE']
+    ];
+    DB::connection('omuster')->table('TS_ROLE_BRANCH')->insert($store);
+    return [
+      "result" => "Success, store user role branch"
     ];
   }
 

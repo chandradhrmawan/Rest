@@ -315,6 +315,9 @@ class StoreController extends Controller
       function deleteRoleBranch($input, $request){
         return UserAndRoleManagemnt::deleteRoleBranch($input);
       }
+      function storeRoleBranch($input, $request){
+        return UserAndRoleManagemnt::storeRoleBranch($input);
+      }
     // UserAndRoleManagemnt
 
     // Schema OmCargo
