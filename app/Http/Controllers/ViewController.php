@@ -645,7 +645,12 @@ class ViewController extends Controller
     if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
       $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
     }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
-      $getRpt->where('NOTA_BRANCH_ID',12);
+      $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    }
+    if (!empty($input["condition"]["BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input["condition"]["BRANCH_CODE"]);
+    }else if (empty($input["condition"]["BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["NOTA_NO"])) {
       $getRpt->where('NOTA_NO',$input["condition"]["NOTA_NO"]);
@@ -692,7 +697,12 @@ class ViewController extends Controller
     if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
       $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
     }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
-      $getRpt->where('NOTA_BRANCH_ID',12);
+      $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    }
+    if (!empty($input["condition"]["NOTA_BRANCH_CODE"])) {
+      $getRpt->where('NOTA_BRANCH_CODE',$input["condition"]["NOTA_BRANCH_CODE"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_CODE"])) {
+      $getRpt->where('NOTA_BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["VESSEL"])) {
       $getRpt->where('VESSEL',$input["condition"]["VESSEL"]);
@@ -740,7 +750,12 @@ class ViewController extends Controller
     if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
       $getRpt->where('REAL_BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
     }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
-      $getRpt->where('REAL_BRANCH_ID',12);
+      $getRpt->where('REAL_BRANCH_ID',$input['user']->user_branch_id);
+    }
+    if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
+      $getRpt->where('REAL_BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
+    }else if (empty($input["condition"]["REAL_BRANCH_CODE"])) {
+      $getRpt->where('REAL_BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["KEMASAN"])) {
       $getRpt->where('KEMASAN',$input["condition"]["KEMASAN"]);

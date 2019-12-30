@@ -34,12 +34,12 @@ class BillingEngine{
           if (!empty($head['BRANCH_ID'])) {
             $headS->branch_id     = $head['BRANCH_ID'];
           }else{
-            $headS->branch_id     = $input["user"]["user_branch_id"];
+            $headS->branch_id     = (array)$input['user']->user_branch_id;
           }
-          if (!empty($head['BRANCH_ID'])) {
+          if (!empty($head['BRANCH_CODE'])) {
             $headS->branch_code     = $head['BRANCH_CODE'];
           }else{
-            $headS->branch_code   = $input["user"]["user_branch_code"];
+            $headS->branch_code   = (array)$input['user']->user_branch_code;
           }
           $headS->created_by    = $input["user"]["user_id"];
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
@@ -155,7 +155,7 @@ class BillingEngine{
               $detilS->sub_iso_code       = $subisocode;
               $detilS->iso_code           = $isocode;
               if (!empty($head['BRANCH_ID'])) {
-                $detilS->branch_id        = $list['BRANCH_ID'];
+                $detilS->branch_id        = $head['BRANCH_ID'];
               }else{
                 $detilS->branch_id        = $input["user"]["user_branch_id"];
               }
@@ -280,7 +280,11 @@ class BillingEngine{
         $detilS->sub_tariff         = $list['SUB_TARIFF'];
         $detilS->sub_iso_code       = $subisocode;
         $detilS->iso_code           = $isocode;
-        $detilS->branch_id          = $input["user"]["user_branch_id"];
+        if (!empty($list['BRANCH_ID'])) {
+          $detilS->branch_id        = $list['BRANCH_ID'];
+        }else{
+          $detilS->branch_id        = (array)$input['user']->user_branch_id;
+        }
         $detilS->nota_id            = $list['LAYANAN'];
         $detilS->tariff_object      = $list['OBJECT_TARIFF'];
         $detilS->group_tariff_id    = $list['GROUP_TARIFF'];
