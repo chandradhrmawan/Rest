@@ -312,6 +312,9 @@ class StoreController extends Controller
       function changePasswordUser($input, $request){
         return UserAndRoleManagemnt::changePasswordUser($input);
       }
+      function deleteRoleBranch($input, $request){
+        return UserAndRoleManagemnt::deleteRoleBranch($input);
+      }
     // UserAndRoleManagemnt
 
     // Schema OmCargo
