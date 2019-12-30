@@ -31,9 +31,9 @@ class BillingEngine{
           $headS->service_code  = $head['SERVICE_CODE'];
           // $headS->branch_id     = 12;
           // $headS->created_by    = 1;
-          $headS->branch_id     = $input["user"]["user_branch_id"];
+          $headS->branch_id     = $head["BRANCH_ID"];
           // $headS->branch_code   = $input["user"]["user_branch_code"];
-          $headS->created_by    = $input["user"]["user_id"];
+          $headS->created_by    = $head["USER_ID"];
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
@@ -1002,6 +1002,7 @@ class BillingEngine{
           $newD['DTL_DATE_OUT']     = empty($dateout) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
           $newD['DTL_DATE_OUT_OLD'] = 'NULL';
           $newD['DTL_PFS']          = $list['DTL_PFS'];
+          $newD['DTL_STACK_AREA']  = $list['DTL_STACK_AREA_ID'];
           $setD[] = $newD;
         }
     // build detil
