@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\OmUster\TmMenu;
 use App\Models\OmUster\TrRole;
+use App\Models\OmUster\TmUser;
 use Illuminate\Support\Facades\Hash;
 
 class UserAndRoleManagemnt{
@@ -27,25 +28,44 @@ class UserAndRoleManagemnt{
         ];
       }
     }
-    $set_data = [
-      'user_name' => $input['user_name'],
-      'user_nik' => $input['user_nik'],
-      'user_role' => $input['user_role'],
-      'user_branch_id' => $input['user_branch_id'],
-      'user_branch_code' => $input['user_branch_code'],
-      'user_full_name' => $input['user_full_name'],
-      'user_status' => $input['user_status']
-    ];
 
-    if (isset($input['user_password']) and !empty($input['user_password'])) {
-      $set_data['user_passwd'] = Hash::make($input['user_password']);
-    }
+    $TS_ROLE_BRANCH = [
+      'branch_id' => $input['user_branch_id'],
+      'user_branch_code' => $input['user_user_branch_code']
+    ];
 
     if (empty($input['user_id'])) {
       $set_data['user_passwd'] = Hash::make('cintaIPC');
-      DB::connection('omuster')->table('TM_USER')->insert($set_data);
+      $newUser = new TmUser;
+      $newUser->user_name = $input['user_name'];
+      $newUser->user_nik = $input['user_nik'];
+      $newUser->user_role = $input['user_role'];
+      $newUser->user_branch_id = $input['user_branch_id'];
+      $newUser->user_branch_code = $input['user_branch_code'];
+      $newUser->user_full_name = $input['user_full_name'];
+      $newUser->user_status = $input['user_status'];
+      $newUser->save();
+      $TS_ROLE_BRANCH['user_id'] = $newUser->user_id;
+      DB::connection('omuster')->table('TS_ROLE_BRANCH')->insert($TS_ROLE_BRANCH);
     }else{
+      $set_data = [
+        'user_name' => $input['user_name'],
+        'user_nik' => $input['user_nik'],
+        'user_role' => $input['user_role'],
+        'user_branch_id' => $input['user_branch_id'],
+        'user_branch_code' => $input['user_branch_code'],
+        'user_full_name' => $input['user_full_name'],
+        'user_status' => $input['user_status']
+      ];
+      if (isset($input['user_password']) and !empty($input['user_password'])) {
+        $set_data['user_passwd'] = Hash::make($input['user_password']);
+      }
       DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update($set_data);
+      $TS_ROLE_BRANCH['user_id'] = $input['user_id'];
+      $cek = DB::connection('omuster')->table('TS_ROLE_BRANCH')->where('user_id', $input['user_id'])->where('branch_id', $input['user_branch_id'])->where('branch_code', $input['user_branch_code'])->count();
+      if ($cek = 0) {
+        DB::connection('omuster')->table('TS_ROLE_BRANCH')->insert($TS_ROLE_BRANCH);
+      }
     }
     return [
       "result" => "Success, store user data"
@@ -302,9 +322,6 @@ class UserAndRoleManagemnt{
     if (!empty($input["condition"]["USER_ID"])) {
       $rb->where('USER_ID',$input["condition"]["USER_ID"]);
     }
-    if (!empty($input["condition"]["ROLE_ID"])) {
-      $rb->where('ROLE_ID',$input["condition"]["ROLE_ID"]);
-    }
     if (!empty($input["condition"]["BRANCH_ID"])) {
       $rb->where('BRANCH_ID',$input["condition"]["BRANCH_ID"]);
     }
@@ -330,12 +347,6 @@ class UserAndRoleManagemnt{
       $user = DB::connection('omuster')->table('TM_USER')->select('user_name','user_full_name','user_nik')->where('user_id', $rbl->user_id)->take(1)->get();
       foreach ($user as $user) {
         foreach ($user as $key => $value) {
-          $newDt[$key] = $value;
-        }
-      }
-      $role = DB::connection('omuster')->table('TR_ROLE')->leftJoin('TM_REFF', 'role_service', '=', 'reff_id')->select('role_name', 'reff_name as role_service_name')->where('role_id', $rbl->role_id)->where('reff_tr_id', 1)->take(1)->get();
-      foreach ($role as $role) {
-        foreach ($role as $key => $value) {
           $newDt[$key] = $value;
         }
       }
