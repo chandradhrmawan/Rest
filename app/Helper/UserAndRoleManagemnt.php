@@ -322,6 +322,9 @@ class UserAndRoleManagemnt{
     if (!empty($input["condition"]["USER_ID"])) {
       $rb->where('USER_ID',$input["condition"]["USER_ID"]);
     }
+    if (!empty($input["condition"]["ROLE_ID"])) {
+      $rb->where('ROLE_ID',$input["condition"]["ROLE_ID"]);
+    }
     if (!empty($input["condition"]["BRANCH_ID"])) {
       $rb->where('BRANCH_ID',$input["condition"]["BRANCH_ID"]);
     }
@@ -347,6 +350,12 @@ class UserAndRoleManagemnt{
       $user = DB::connection('omuster')->table('TM_USER')->select('user_name','user_full_name','user_nik')->where('user_id', $rbl->user_id)->take(1)->get();
       foreach ($user as $user) {
         foreach ($user as $key => $value) {
+          $newDt[$key] = $value;
+        }
+      }
+      $role = DB::connection('omuster')->table('TR_ROLE')->leftJoin('TM_REFF', 'role_service', '=', 'reff_id')->select('role_name', 'reff_name as role_service_name')->where('role_id', $rbl->role_id)->where('reff_tr_id', 1)->take(1)->get();
+      foreach ($role as $role) {
+        foreach ($role as $key => $value) {
           $newDt[$key] = $value;
         }
       }
