@@ -32,6 +32,7 @@ class UserAndRoleManagemnt{
       'user_nik' => $input['user_nik'],
       'user_role' => $input['user_role'],
       'user_branch_id' => $input['user_branch_id'],
+      'user_branch_code' => $input['user_branch_code'],
       'user_full_name' => $input['user_full_name'],
       'user_status' => $input['user_status']
     ];
