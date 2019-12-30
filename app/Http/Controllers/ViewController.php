@@ -794,8 +794,6 @@ class ViewController extends Controller
     $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
     if (!empty($branchId)) {
       $getRpt->where('NOTA_BRANCH_ID',$branchId);
-    }else if (empty($branchId)) {
-      $getRpt->where('NOTA_BRANCH_ID',12);
     }
     if (!empty($notaNo)) {
       $getRpt->where('NOTA_NO',$notaNo);
@@ -837,8 +835,6 @@ class ViewController extends Controller
     $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
     if (!empty($branchId)) {
       $getRpt->where('NOTA_BRANCH_ID',$branchId);
-    }else if (empty($branchId)) {
-      $getRpt->where('NOTA_BRANCH_ID',12);
     }
     if (!empty($vessel)) {
       $getRpt->where('VESSEL',$vessel);

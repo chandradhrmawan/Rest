@@ -478,16 +478,17 @@ class GlobalHelper {
 
     if (!empty($input["filter"])) {
     $search   = json_decode($input["filter"], TRUE);
-    foreach ($search as $value) {
-      if ($value["operator"] == "like")
-        $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
-      else if($value["operator"] == "eq")
-        $connect->whereDate($value["property"],'=',$value["value"]);
-      else if($value["operator"] == "gt")
-        $connect->whereDate($value["property"],'>=',$value["value"]);
-      else if($value["operator"] == "lt")
-        $connect->whereDate($value["property"],'<=',$value["value"]);
-      }
+    return $search;
+    // foreach ($search as $value) {
+    //   if ($value["operator"] == "like")
+    //     $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+    //   else if($value["operator"] == "eq")
+    //     $connect->whereDate($value["property"],'=',$value["value"]);
+    //   else if($value["operator"] == "gt")
+    //     $connect->whereDate($value["property"],'>=',$value["value"]);
+    //   else if($value["operator"] == "lt")
+    //     $connect->whereDate($value["property"],'<=',$value["value"]);
+    //   }
     }
 
     if (!empty($input["query"]) && !empty($input["field"])) {

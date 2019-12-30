@@ -1030,7 +1030,7 @@ class BillingEngine{
           $newE['EQ_UNIT_ID']       = empty($list['EQ_UNIT_ID']) ? 'NULL' : $list['EQ_UNIT_ID'];
           $newE['EQ_GTRF_ID']       = empty($list['EQ_GTRF_ID']) ? 'NULL' : $list['EQ_GTRF_ID'];
           $newE['EQ_PKG_ID']        = empty($list['EQ_PKG_ID']) ? 'NULL' : $list['EQ_PKG_ID'];
-          $newE['EQ_QTY_PKG']        = empty($list['EQ_QTY_PKG']) ? 'NULL' : $list['EQ_QTY_PKG'];
+          $newE['EQ_QTY_PKG']       = empty($list['EQ_QTY_PKG']) ? 'NULL' : $list['EQ_QTY_PKG'];
           $setE[] = $newE;
         }
     // build eqpt
@@ -1074,8 +1074,8 @@ class BillingEngine{
                       // "dtl_masa2" => , // cooming soon
                       "dtl_tariff" => $list["tariff"],
                       "dtl_package" => $list["package_name"],
-                      "dtl_qty" => $list["eq_qty"],
-                      "dtl_eq_qty_pkg" => $list["qty"],
+                      "qty" => $list["eq_qty"],
+                      "dtl_qty" => $list["qty"],
                       // "dtl_unit" => $list["unit_id"],
                       "dtl_unit_name" => $list["unit_name"],
                       "dtl_group_tariff_id" => $list["group_tariff_id"],
