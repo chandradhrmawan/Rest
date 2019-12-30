@@ -22,7 +22,7 @@ class RequestBooking{
 			$setH = [];
 			$setH['P_NOTA_ID'] = $config['head_nota_id'];
 			$setH['P_BRANCH_ID'] = $find[$config['head_branch']];
-		$setH['P_BRANCH_CODE'] = $find[$config['head_branch_code']];
+			$setH['P_BRANCH_CODE'] = $find[$config['head_branch_code']];
 			$setH['P_CUSTOMER_ID'] = $find[$config['head_cust']];
 			$setH['P_BOOKING_NUMBER'] = $find[$config['head_no']];
 			$setH['P_REALIZATION'] = 'N';
@@ -94,8 +94,17 @@ class RequestBooking{
 				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 
 				if ($config['head_tab_detil_date_out_old'] != null and $input['table'] == 'TX_HDR_DEL') {
-					$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-					$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					if ($find['del_ext_status'] == 'Y') {
+						$newD['DTL_DATE_OUT'] = empty($list['dtl_out']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_out'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						$old_req_id = DB::connection('omcargo')->table('TX_HDR_DEL')->where('DEL_NO',$find['del_ext_from'])->get();
+						$old_req_id = $old_req_id[0]->del_id;
+						$old_bl = DB::connection('omcargo')->table('TX_DTL_DEL')->where('HDR_DEL_ID',$old_req_id)->where('DTL_DEL_BL',$list['dtl_del_bl'])->get();
+						$old_bl_date_out = $old_bl[0]->dtl_out;
+						$newD['DTL_DATE_OUT_OLD'] = empty($old_bl_date_out) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($old_bl_date_out)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					}else{
+						$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					}
 				}else{
 					$newD['DTL_DATE_OUT_OLD'] = empty($find[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
@@ -357,7 +366,7 @@ class RequestBooking{
         		"head_by" => "bm_create_by",
         		"head_date" => "bm_date",
         		"head_branch" => "bm_branch_id",
-		"head_branch_code" => "bm_branch_code",
+        		"head_branch_code" => "bm_branch_code",
         		"head_cust" => "bm_cust_id",
         		"head_trade" => "bm_trade_type",
         		"head_terminal_code" => "bm_terminal_code",
@@ -399,7 +408,7 @@ class RequestBooking{
         		"head_by" => "rec_create_by",
         		"head_date" => "rec_date",
         		"head_branch" => "rec_branch_id",
-		"head_branch_code" => "rec_branch_code",
+        		"head_branch_code" => "rec_branch_code",
         		"head_cust" => "rec_cust_id",
         		"head_trade" => "rec_trade_type",
         		"head_terminal_code" => "rec_terminal_code",
@@ -441,8 +450,8 @@ class RequestBooking{
         		"head_by" => "del_create_by",
         		"head_date" => "del_date",
         		"head_branch" => "del_branch_id",
-		"head_branch_code" => "del_branch_code",
-      		"head_cust" => "del_cust_id",
+        		"head_branch_code" => "del_branch_code",
+        		"head_cust" => "del_cust_id",
         		"head_trade" => "del_trade_type",
         		"head_terminal_code" => "del_terminal_code",
         		"head_terminal_name" => "del_terminal_name",
