@@ -32,7 +32,7 @@ class UserAndRoleManagemnt{
     $TS_ROLE_BRANCH = [
       'role_id' => $input['user_role'],
       'branch_id' => $input['user_branch_id'],
-      'branch_code' => $input['user_user_branch_code']
+      'branch_code' => $input['user_branch_code']
     ];
 
     if (empty($input['user_id'])) {
