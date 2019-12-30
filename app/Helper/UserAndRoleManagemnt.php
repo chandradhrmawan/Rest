@@ -318,7 +318,7 @@ class UserAndRoleManagemnt{
     ];
   }
 
-  public function storeRoleBranch($input)
+  public static function storeRoleBranch($input)
   {
     $cek = DB::connection('omuster')->table('TS_ROLE_BRANCH')->where('USER_ID',$input["USER_ID"])->where('ROLE_ID',$input["ROLE_ID"])->where('BRANCH_ID',$input["BRANCH_ID"])->where('BRANCH_CODE',$input["BRANCH_CODE"])->count();
     if ($cek > 0) {
