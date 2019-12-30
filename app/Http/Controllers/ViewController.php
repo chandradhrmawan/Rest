@@ -638,7 +638,18 @@ class ViewController extends Controller
     }
 
     function printRealisasi($id) {
-      return view("print.realisasi");
+      $connect        = DB::connection('omcargo');
+      $det            = [];
+      $header         = $connect->table("TX_HDR_REALISASI")->where("REAL_ID", "=", $id)->join("TX_HDR_BM","TX_HDR_REALISASI.REAL_REQ_NO","=","TX_HDR_BM.BM_NO")->get();
+      $data["header"] = $header;
+      $detail  = $connect->table("TX_DTL_BM")->where('HDR_BM_ID', $header[0]->bm_id)->get();
+      // foreach ($detail as $list) {
+      //   $newDt = [];
+      //   foreach ($list as $key => $value) {
+      //           $newDt[$key] = $value;
+      //   }
+      return $detail;
+      // return view("print.realisasi");
     }
 
     function getDebitur($input, $request) {

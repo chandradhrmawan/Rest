@@ -41,7 +41,7 @@ class BillingEngine{
           }else{
             $headS->branch_code   = (array)$input['user']->user_branch_code;
           }
-          $headS->created_by    = $input["user"]["user_id"];
+          $headS->created_by    = $head['USER_ID'];
           $headS->created_date  = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
           $headS->save();
         // store head
