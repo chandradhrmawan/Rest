@@ -750,7 +750,7 @@ class ViewController extends Controller
     if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
       $getRpt->where('REAL_BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
     }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
-      $getRpt->where('REAL_BRANCH_ID',12);
+      $getRpt->where('REAL_BRANCH_ID',$input['user']->user_branch_id);
     }
     if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
       $getRpt->where('REAL_BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
