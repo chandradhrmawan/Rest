@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
+use App\Helper\UserAndRoleManagemnt;
 use Firebase\JWT\ExpiredException;
 use App\Models\OmUster\TmUser;
 use App\Models\OmCargo\TsUnit;
@@ -60,6 +61,11 @@ class IndexController extends Controller
       }
       $this->validate($request, $s);
       return response($latest);
+    }
+
+    function listRoleBranch($input, $request)
+    {
+      return UserAndRoleManagemnt::listRoleBranch($input);
     }
 
     function vessel_index($input, $request) {
