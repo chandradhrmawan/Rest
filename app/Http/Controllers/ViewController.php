@@ -642,14 +642,53 @@ class ViewController extends Controller
       $det            = [];
       $header         = $connect->table("TX_HDR_REALISASI")->where("REAL_ID", "=", $id)->join("TX_HDR_BM","TX_HDR_REALISASI.REAL_REQ_NO","=","TX_HDR_BM.BM_NO")->get();
       $data["header"] = $header;
-      $detail  = $connect->table("TX_DTL_BM")->where('HDR_BM_ID', $header[0]->bm_id)->get();
-      // foreach ($detail as $list) {
-      //   $newDt = [];
-      //   foreach ($list as $key => $value) {
-      //           $newDt[$key] = $value;
-      //   }
-      return $detail;
-      // return view("print.realisasi");
+      $nota           = $connect->table("TX_HDR_NOTA")->where('NOTA_REAL_NO', $header[0]->real_no)->get();
+      $detail         = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID', $nota[0]->nota_id)->get();
+      foreach ($detail as $list) {
+        $newDt = [];
+        foreach ($list as $key => $value) {
+                $newDt[$key] = $value;
+        }
+
+          if (!empty($newDt["dtl_bl"])) {
+            $det["handling"][]=$newDt;
+          } else {
+            $det["alat"][]=$newDt;
+          }
+      }
+
+      if (!array_key_exists("alat",$det)) {
+        $det["alat"]=0;
+      }
+
+      if (!array_key_exists("handling",$det)) {
+        $handling   = 0;
+        $bl = 0;
+      } else {
+        $hand = $det["handling"];
+        $bl = [];
+        for ($i=0; $i < count($hand); $i++) {
+          if (!in_array($hand[$i]["dtl_bl"],$bl)) {
+            $bl[] = $hand[$i]["dtl_bl"];
+          }
+        }
+        for ($i=0; $i < count($bl); $i++) {
+          $data       = DB::connection('omcargo')->table("V_TX_DTL_NOTA")
+                      ->where([['NOTA_HDR_ID ', '=', $nota[0]->nota_id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
+                      ->get();
+          $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
+        }
+      }
+      $data["detail"] = $det;
+      $branch         = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->bm_branch_id)->where('BRANCH_CODE', $header[0]->bm_branch_code)->get();
+      $html           =  view("print.realisasi",["header"=>$header, "bl"=>$bl, "handling"=>$handling, "alat"=>$det["alat"],"branch"=>$branch]);
+      $filename       = $header[0]->real_no."_".rand(10,100000);
+      $dompdf         = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
     }
 
     function getDebitur($input, $request) {

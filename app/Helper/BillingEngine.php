@@ -310,6 +310,7 @@ class BillingEngine{
           DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->insert([
             'CUST_PROFILE_STATUS' => $input['CUST_PROFILE_STATUS'],
             'CUST_PROFILE_ID' => $input['CUST_PROFILE_ID'],
+            'CUST_PROFILE_NOTE' => $input['CUST_PROFILE_NOTE'],
             'TARIFF_HDR_ID' => $list['TARIFF_HDR_ID']
           ]);
         }

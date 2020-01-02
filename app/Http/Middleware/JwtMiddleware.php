@@ -33,7 +33,7 @@ class JwtMiddleware
           $selisih = ($now - $active)/60;
 
           if ($selisih >= 240) {
-            $update  = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->update(["USER_STATUS"=>"0","API_TOKEN"=>""]);
+            $update  = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->update(["USER_LOGIN"=>"0","API_TOKEN"=>""]);
             return response()->json([
                     'error' => 'Provided token is expired. Please Login'
                 ], 400);

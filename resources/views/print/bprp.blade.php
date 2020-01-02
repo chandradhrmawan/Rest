@@ -199,10 +199,10 @@
   @endforeach
 </table>
 <table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
-	<tr><td>Palembang, <?php  echo strtoupper(date("d-M-y", strtotime($header->bprp_date))); ?></td></tr>
-	<tr><td>DGM Keuangan & Administrasi</td></tr>
-	<tr><td><div style="margin-top:50px"><u>Clara Primasari Henryanto</u></div></td></tr>
-	<tr><td>NIPP. 287117773</td></tr>
+	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->bprp_date))); ?></td></tr>
+	<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
+	<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
+	<tr><td>NIPP. 285047354</td></tr>
 </table>
 
 	<div style="position:absolute;bottom:20px;font-size:12px; width:100%">
