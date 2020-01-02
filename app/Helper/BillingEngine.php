@@ -320,7 +320,8 @@ class BillingEngine{
             'UPER_CUST_ID' => $input['CUST_PROFILE_ID'],
             'UPER_NOTA' => $list['UPER_NOTA'],
             'UPER_PRESENTASE' => $list['UPER_PRESENTASE'],
-            'BRANCH_ID' => $input['BRANCH_ID']
+            'BRANCH_ID' => $input['BRANCH_ID'],
+            'BRANCH_CODE' => $input['BRANCH_CODE']
           ]);
         }
         return [ "result" => "Success, store and set profile tariff and uper customer" ];
