@@ -36,9 +36,9 @@ class UserAndRoleManagemnt{
     ];
 
     if (empty($input['user_id'])) {
-      $set_data['user_passwd'] = Hash::make('cintaIPC');
       $newUser = new TmUser;
       $newUser->user_name = $input['user_name'];
+      $newUser->user_passwd = Hash::make('cintaIPC');
       $newUser->user_nik = $input['user_nik'];
       $newUser->user_role = $input['user_role'];
       $newUser->user_branch_id = $input['user_branch_id'];
@@ -63,8 +63,8 @@ class UserAndRoleManagemnt{
       }
       DB::connection('omuster')->table('TM_USER')->where('user_id',$input['user_id'])->update($set_data);
       $TS_ROLE_BRANCH['user_id'] = $input['user_id'];
-      $cek = DB::connection('omuster')->table('TS_ROLE_BRANCH')->where('user_id', $input['user_id'])->where('branch_id', $input['user_branch_id'])->where('branch_code', $input['user_branch_code'])->count();
-      if ($cek = 0) {
+      $cek = DB::connection('omuster')->table('TS_ROLE_BRANCH')->where('user_id', $input['user_id'])->where('branch_id', $input['user_branch_id'])->where('branch_code', $input['user_branch_code'])->where('role_id', $input['user_role'])->count();
+      if ($cek == 0) {
         DB::connection('omuster')->table('TS_ROLE_BRANCH')->insert($TS_ROLE_BRANCH);
       }
     }
