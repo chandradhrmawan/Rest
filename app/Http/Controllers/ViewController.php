@@ -975,11 +975,28 @@ class ViewController extends Controller
         $getRpt->where('TGL_NOTA', '<', $endDate);
       }
 
+      $raw    = $getRpt;
       $result = $getRpt->get();
 
+      $kemasan = [];
+      for ($i=0; $i < count($result); $i++) {
+        if (!in_array($result[$i]->kemasan,$kemasan)) {
+          $kemasan[] = $result[$i]->kemasan;
+        }
+      }
 
+      $newDt = [];
+      foreach ($result as $key => $value) {
+        $newDt[$value->kemasan][] = $value;
+      }
 
-      return ["result"=>$result, "count"=>$count];
-      // return view('print.pendapatan');
+      $data = $newDt;
+
+      return view('print.pendapatan',[
+        "data"=>$data,
+        "kemasan" =>$kemasan,
+        "start"=>$start,
+        "end"=>$end
+      ]);
     }
 }
