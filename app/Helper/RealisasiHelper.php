@@ -385,6 +385,7 @@ class RealisasiHelper{
     }
 
     return [
+      'Success' => true,
       'result' => 'Success, approved proforma!',
       'req_no' => $nota->nota_req_no,
       'nota_no' => $nota->nota_no,
