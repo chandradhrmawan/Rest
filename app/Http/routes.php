@@ -41,6 +41,6 @@ $app->get('/print/bprp2/{id}'     ,'ViewController@printBprp');
 $app->get('/print/realisasi2/{id}','ViewController@printRealisasi');
 
 // Export
-$app->get('/export/debitur/{branchId}/{notaNo}/{custName}/{layanan}/{startDate}/{endDate}/{branchCode}'  ,'ViewController@ExportDebitur');
-$app->get('/export/rekonsilasi/{branchId}/{vessel}/{ukk}/{nota}/{startDate}/{endDate}/{branchCode}'   ,'ViewController@ExportRekonsilasi');
-$app->get('/export/pendapatan'   ,'ViewController@ExportPendapatan');
+$app->get('/export/debitur/{branchId}/{notaNo}/{custName}/{layanan}/{startDate}/{endDate}/{branchCode}'      ,'ViewController@ExportDebitur');
+$app->get('/export/rekonsilasi/{branchId}/{vessel}/{ukk}/{nota}/{startDate}/{endDate}/{branchCode}'          ,'ViewController@ExportRekonsilasi');
+$app->get('/export/pendapatan/{branchId}/{kemasan}/{komoditi}/{satuan}/{startDate}/{endDate}/{branchCode}'   ,'ViewController@ExportPendapatan');

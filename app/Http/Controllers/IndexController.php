@@ -187,7 +187,7 @@ class IndexController extends Controller
       $selisih = ($now - $active)/60;
 
       if ($selisih >= 240) {
-        $update  = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->update(["USER_STATUS"=>"0","API_TOKEN"=>""]);
+        $update  = DB::connection('omuster')->table('TM_USER')->where("USER_ID",$credentials->sub)->update(["USER_LOGIN"=>"0","API_TOKEN"=>""]);
         return response()->json([
                 'error' => 'Provided token is expired. Please Login'
             ], 400);
@@ -205,7 +205,7 @@ class IndexController extends Controller
     }
 
     function cleartoken($input) {
-      $update = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->update(["USER_STATUS"=>"0","API_TOKEN"=>""]);
+      $update = DB::connection('omuster')->table('TM_USER')->where('api_token', $input["token"])->update(["USER_LOGIN"=>"0","API_TOKEN"=>""]);
       return ["message" => "Logout"];
     }
 
@@ -220,7 +220,7 @@ class IndexController extends Controller
       }
 
       if (Hash::check($password, $user["user_passwd"])) {
-        $update = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $username)->update(["USER_STATUS"=>"0","API_TOKEN"=>"", "USER_ACTIVE"=>""]);
+        $update = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $username)->update(["USER_LOGIN"=>"0","API_TOKEN"=>"", "USER_ACTIVE"=>""]);
         return response()->json(["message"=> "Clear Token Success, Login Again"]);
       } else {
         return response()->json([
@@ -230,7 +230,7 @@ class IndexController extends Controller
     }
 
     function clearsession($input) {
-      $database    = DB::connection('omuster')->table('TM_USER')->where("USER_STATUS","1")->get();
+      $database    = DB::connection('omuster')->table('TM_USER')->where("USER_LOGIN","1")->get();
       foreach ($database as $data) {
         $time    = date('H:i:s',strtotime('+7 hour',strtotime(date("h:i:s"))));
         $active  = intval(strtotime($data->user_active));
@@ -238,7 +238,7 @@ class IndexController extends Controller
         $selisih = ($now - $active)/60;
         if ($selisih >= 240) {
           $user[] = [$data->user_name, $selisih];
-           DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_STATUS" => "", "API_TOKEN" => ""]);
+           DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_LOGIN" => "", "API_TOKEN" => ""]);
         }
       }
       if (!empty($user)) {

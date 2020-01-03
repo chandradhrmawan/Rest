@@ -61,6 +61,13 @@ class AuthController extends BaseController
                 'message' => 'Invalid Username / Password'
             ], 400);
         }
+
+        if (empty($user->user_status) || $user->user_status == 0) {
+          return response()->json([
+              'message' => 'User Inactive'
+          ], 400);
+        };
+
         // Verify the password and generate the token
         date_default_timezone_set('GMT');
         $time = date('H:i:s',strtotime('+7 hour',strtotime(date("h:i:s"))));

@@ -939,7 +939,47 @@ class ViewController extends Controller
                 ]);
     }
 
-    function ExportPendapatan() {
-      return view('print.pendapatan');
+    function ExportPendapatan($a,$b,$c,$d,$e,$f,$g) {
+      $branchId    = $a;
+      $kemasan     = $b;
+      $komoditi    = $c;
+      $satuan      = $d;
+      $start       = $e;
+      $end         = $f;
+      $branchCode  = $g;
+
+      $startDate = date("Y-m-d", strtotime($start));
+      $endDate = date("Y-m-d", strtotime($end));
+
+      $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+      if (!empty($branchId)) {
+        $getRpt->where('REAL_BRANCH_ID',$branchId);
+      }
+      if (!empty($branchCode)) {
+        $getRpt->where('REAL_BRANCH_CODE',$branchCode);
+      }
+      if (!empty($kemasan)) {
+        $getRpt->where('KEMASAN',$kemasan);
+      }
+      if (!empty($komoditi)) {
+        $getRpt->where('KOMODITI',$komoditi);
+      }
+      if (!empty($satuan)) {
+        $getRpt->where('SATUAN',$satuan);
+      }
+      if (!empty($start) AND !empty($end)) {
+        $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+      } else if (!empty($start) AND empty($end)) {
+        $getRpt->where('TGL_NOTA', '>', $startDate);
+      } else if (empty($start) AND !empty($end)) {
+        $getRpt->where('TGL_NOTA', '<', $endDate);
+      }
+
+      $result = $getRpt->get();
+
+
+
+      return ["result"=>$result, "count"=>$count];
+      // return view('print.pendapatan');
     }
 }
