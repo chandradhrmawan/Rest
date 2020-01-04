@@ -67,6 +67,25 @@ class StoreController extends Controller
       ]);
     }
 
+    public function storeTsNota($input, $request)
+    {
+      $setData = [
+        "branch_id" => $input['branch_id'],
+        "branch_code" => $input['branch_code'],
+        "nota_id" => $input['nota_id']
+      ];
+
+      $cek = DB::connection('mdm')->table('TS_NOTA')->where($setData)->count();
+      if ($cek > 0) {
+        return [
+          "Success" => false,
+          "response" => "Fail, data already exists"
+        ];
+      }
+      DB::connection('mdm')->table('TS_NOTA')->insert($setData);
+      return [ "response" => "Success, store data" ];
+    }
+
     public function store_cust($input, $request){
       $set_data = $input['parameter'][0];
       $cek = DB::connection('mdm')->table('TM_CUSTOMER')->where((string)trim('CUSTOMER_ID'), (string)trim($input['parameter'][0]['CUSTOMER_ID']))->count();
@@ -135,6 +154,7 @@ class StoreController extends Controller
         "truck_cust_id" => $input['truck_cust_id'],
         "truck_cust_name" => $input['truck_cust_name'],
         "truck_branch_id" => $input['truck_branch_id'],
+        "truck_branch_code" => $input['truck_branch_code'],
         "truck_date" => $input['truck_date'],
         "truck_cust_address" => $input['truck_cust_address'],
         "truck_type" => $input['truck_type'],

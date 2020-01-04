@@ -48,6 +48,63 @@ class ViewController extends Controller
       return ConnectedExternalApps::getViewDetilTCA($input);
     }
 
+    function getViewNotaPLB($input, $request){
+      $parent = DB::connection('mdm')->table('TM_NOTA')->whereNull('no_parent_id')->where('service_code', 2)->orderBy('nota_id', 'asc')->get();
+
+      $estjs = [];
+      foreach ($parent as $list) {
+        $childs = DB::connection('mdm')->table('TM_NOTA')->where('no_parent_id', $list->nota_id)->where('service_code', 2)->orderBy('nota_id', 'asc')->get();
+        if (count($childs) > 0) {
+          $addAg = [];
+          foreach ($childs as $listSc) {
+            $addAgAg = [];
+            $add_th_k = "leaf";
+            $add_th_v = true;
+            $newSet = [
+              "menuId" => $listSc->nota_id,
+              "text" => $listSc->nota_name,
+              "iconCls" => "",
+              "checked" => false
+            ];
+            $newSet[$add_th_k] = $add_th_v;
+
+            if (count($addAgAg) > 0) {
+              $newSet['children'] = $addAgAg;
+            }
+            $addAg[] = $newSet;
+          }
+          $add_sc_k = "expanded";
+          $add_sc_v =  true;
+        }else{
+          $addAg = [];
+          $add_sc_k = "leaf";
+          $add_sc_v =  true;
+        }
+
+        $add = [
+          "menuId" => $list->nota_id,
+          "text" => $list->nota_name,
+          "iconCls" => "",
+          "checked" => false
+        ];
+
+        $add[$add_sc_k] = $add_sc_v;
+
+        if (count($addAg) > 0) {
+          $add['children'] = $addAg;
+        }
+
+        $estjs[] = $add;
+      }
+
+      return [
+        "expanded" => true,
+        "text" => "Nota",
+        "iconCls" => "",
+        "children" => $estjs
+      ];
+    }
+
     public function view($input, $request) {
       $table  = $input["table"];
       $data   = \DB::connection($input["db"])->table($table)->get();
@@ -427,6 +484,60 @@ class ViewController extends Controller
       $dompdf->stream($filename, array("Attachment" => false));
     }
 
+    function printRealisasi($id) {
+      $connect        = DB::connection('omcargo');
+      $det            = [];
+      $header         = $connect->table("TX_HDR_REALISASI")->where("REAL_ID", "=", $id)->join("TX_HDR_BM","TX_HDR_REALISASI.REAL_REQ_NO","=","TX_HDR_BM.BM_NO")->get();
+      $data["header"] = $header;
+      $nota           = $connect->table("TX_HDR_NOTA")->where('NOTA_REAL_NO', $header[0]->real_no)->get();
+      $detail         = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID', $nota[0]->nota_id)->get();
+      foreach ($detail as $list) {
+        $newDt = [];
+        foreach ($list as $key => $value) {
+                $newDt[$key] = $value;
+        }
+
+          if (!empty($newDt["dtl_bl"])) {
+            $det["handling"][]=$newDt;
+          } else {
+            $det["alat"][]=$newDt;
+          }
+      }
+
+      if (!array_key_exists("alat",$det)) {
+        $det["alat"]=0;
+      }
+
+      if (!array_key_exists("handling",$det)) {
+        $handling   = 0;
+        $bl = 0;
+      } else {
+        $hand = $det["handling"];
+        $bl = [];
+        for ($i=0; $i < count($hand); $i++) {
+          if (!in_array($hand[$i]["dtl_bl"],$bl)) {
+            $bl[] = $hand[$i]["dtl_bl"];
+          }
+        }
+        for ($i=0; $i < count($bl); $i++) {
+          $data       = DB::connection('omcargo')->table("V_TX_DTL_NOTA")
+                      ->where([['NOTA_HDR_ID ', '=', $nota[0]->nota_id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
+                      ->get();
+          $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
+        }
+      }
+      $data["detail"] = $det;
+      $branch         = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->bm_branch_id)->where('BRANCH_CODE', $header[0]->bm_branch_code)->get();
+      $html           =  view("print.realisasi",["header"=>$header, "bl"=>$bl, "handling"=>$handling, "alat"=>$det["alat"],"branch"=>$branch]);
+      $filename       = $header[0]->real_no."_".rand(10,100000);
+      $dompdf         = new Dompdf();
+      $dompdf->set_option('isRemoteEnabled', true);
+      $dompdf->loadHtml($html);
+      $dompdf->setPaper('A4', 'potrait');
+      $dompdf->render();
+      $dompdf->stream($filename, array("Attachment" => false));
+    }
+
     function penyebut($nilai) {
       $nilai = abs($nilai);
       $huruf = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
@@ -637,366 +748,312 @@ class ViewController extends Controller
       $dompdf->stream($filename, array("Attachment" => false));
     }
 
-    function printRealisasi($id) {
-      $connect        = DB::connection('omcargo');
-      $det            = [];
-      $header         = $connect->table("TX_HDR_REALISASI")->where("REAL_ID", "=", $id)->join("TX_HDR_BM","TX_HDR_REALISASI.REAL_REQ_NO","=","TX_HDR_BM.BM_NO")->get();
-      $data["header"] = $header;
-      $nota           = $connect->table("TX_HDR_NOTA")->where('NOTA_REAL_NO', $header[0]->real_no)->get();
-      $detail         = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID', $nota[0]->nota_id)->get();
-      foreach ($detail as $list) {
-        $newDt = [];
-        foreach ($list as $key => $value) {
-                $newDt[$key] = $value;
-        }
+  function getDebitur($input, $request) {
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
-          if (!empty($newDt["dtl_bl"])) {
-            $det["handling"][]=$newDt;
-          } else {
-            $det["alat"][]=$newDt;
-          }
-      }
-
-      if (!array_key_exists("alat",$det)) {
-        $det["alat"]=0;
-      }
-
-      if (!array_key_exists("handling",$det)) {
-        $handling   = 0;
-        $bl = 0;
-      } else {
-        $hand = $det["handling"];
-        $bl = [];
-        for ($i=0; $i < count($hand); $i++) {
-          if (!in_array($hand[$i]["dtl_bl"],$bl)) {
-            $bl[] = $hand[$i]["dtl_bl"];
-          }
-        }
-        for ($i=0; $i < count($bl); $i++) {
-          $data       = DB::connection('omcargo')->table("V_TX_DTL_NOTA")
-                      ->where([['NOTA_HDR_ID ', '=', $nota[0]->nota_id],["dtl_bl", "=", $bl[$i]],["dtl_group_tariff_id", "!=", "10"]])
-                      ->get();
-          $handling[$bl[$i]] = json_decode(json_encode($data),TRUE);
-        }
-      }
-      $data["detail"] = $det;
-      $branch         = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->bm_branch_id)->where('BRANCH_CODE', $header[0]->bm_branch_code)->get();
-      $html           =  view("print.realisasi",["header"=>$header, "bl"=>$bl, "handling"=>$handling, "alat"=>$det["alat"],"branch"=>$branch]);
-      $filename       = $header[0]->real_no."_".rand(10,100000);
-      $dompdf         = new Dompdf();
-      $dompdf->set_option('isRemoteEnabled', true);
-      $dompdf->loadHtml($html);
-      $dompdf->setPaper('A4', 'potrait');
-      $dompdf->render();
-      $dompdf->stream($filename, array("Attachment" => false));
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
+    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    }
+    if (!empty($input["condition"]["BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input["condition"]["BRANCH_CODE"]);
+    }else if (empty($input["condition"]["BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
+    }
+    if (!empty($input["condition"]["NOTA_NO"])) {
+      $getRpt->where('NOTA_NO',$input["condition"]["NOTA_NO"]);
+    }
+    if (!empty($input["condition"]["NOTA_CUST_NAME"])) {
+      $getRpt->where('NOTA_CUST_NAME',$input["condition"]["NOTA_CUST_NAME"]);
+    }
+    if (!empty($input["condition"]["LAYANAN"])) {
+      $getRpt->where('LAYANAN',$input["condition"]["LAYANAN"]);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->where('TGL_NOTA', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->where('TGL_NOTA', '<', $endDate);
     }
 
-    function getDebitur($input, $request) {
-      $startDate = date("Y-m-d", strtotime($input["startDate"]));
-      $endDate = date("Y-m-d", strtotime($input["endDate"]));
+    $count  = $getRpt->count();
 
-      $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
-      if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
-        $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
-      }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
-        $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $getRpt->skip($input['start'])->take($input['limit']);
       }
-      if (!empty($input["condition"]["BRANCH_CODE"])) {
-        $getRpt->where('BRANCH_CODE',$input["condition"]["BRANCH_CODE"]);
-      }else if (empty($input["condition"]["BRANCH_CODE"])) {
-        $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
-      }
-      if (!empty($input["condition"]["NOTA_NO"])) {
-        $getRpt->where('NOTA_NO',$input["condition"]["NOTA_NO"]);
-      }
-      if (!empty($input["condition"]["NOTA_CUST_NAME"])) {
-        $getRpt->where('NOTA_CUST_NAME',$input["condition"]["NOTA_CUST_NAME"]);
-      }
-      if (!empty($input["condition"]["LAYANAN"])) {
-        $getRpt->where('LAYANAN',$input["condition"]["LAYANAN"]);
-      }
-      if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
-        $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-      } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-        $getRpt->where('TGL_NOTA', '>', $startDate);
-      } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-        $getRpt->where('TGL_NOTA', '<', $endDate);
-      }
-
-      $count  = $getRpt->count();
-
-      if (!empty($input['start']) || $input["start"] == '0') {
-        if (!empty($input['limit'])) {
-          $getRpt->skip($input['start'])->take($input['limit']);
-        }
-      }
-
-      if (isset($input["sort"])) {
-        $sort = json_decode($input["sort"]);
-        foreach ($sort as $sort) {
-        $property = $sort->property;
-        $direction = $sort->direction;
-        $getRpt->orderby(strtoupper($property), $direction);
-          }
-        }
-      $result = $getRpt->get();
-      return ["result"=>$result, "count"=>$count];
     }
 
-    function getRekonsilasi($input, $request) {
-      $startDate = date("Y-m-d", strtotime($input["startDate"]));
-      $endDate = date("Y-m-d", strtotime($input["endDate"]));
-
-      $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
-      if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
-        $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
-      }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
-        $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
-      }
-      if (!empty($input["condition"]["NOTA_BRANCH_CODE"])) {
-        $getRpt->where('NOTA_BRANCH_CODE',$input["condition"]["NOTA_BRANCH_CODE"]);
-      }else if (empty($input["condition"]["NOTA_BRANCH_CODE"])) {
-        $getRpt->where('NOTA_BRANCH_CODE',$input['user']->user_branch_code);
-      }
-      if (!empty($input["condition"]["VESSEL"])) {
-        $getRpt->where('VESSEL',$input["condition"]["VESSEL"]);
-      }
-      if (!empty($input["condition"]["UKK"])) {
-        $getRpt->where('UKK',$input["condition"]["UKK"]);
-      }
-      if (!empty($input["condition"]["NOTA"])) {
-        $getRpt->where('NOTA',$input["condition"]["NOTA"]);
-      }
-      if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
-        $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
-      } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-        $getRpt->where('NOTA_DATE', '>', $startDate);
-      } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-        $getRpt->where('NOTA_DATE', '<', $endDate);
-      }
-
-      $count  = $getRpt->count();
-
-      if (!empty($input['start']) || $input["start"] == '0') {
-        if (!empty($input['limit'])) {
-          $getRpt->skip($input['start'])->take($input['limit']);
+    if (isset($input["sort"])) {
+      $sort = json_decode($input["sort"]);
+      foreach ($sort as $sort) {
+      $property = $sort->property;
+      $direction = $sort->direction;
+      $getRpt->orderby(strtoupper($property), $direction);
         }
       }
+    $result = $getRpt->get();
+    return ["result"=>$result, "count"=>$count];
+  }
 
-      if (isset($input["sort"])) {
-        $sort = json_decode($input["sort"]);
-        foreach ($sort as $sort) {
-        $property = $sort->property;
-        $direction = $sort->direction;
-        $getRpt->orderby(strtoupper($property), $direction);
-          }
-        }
-      $result = $getRpt->get();
+  function getRekonsilasi($input, $request) {
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
-      return ["result"=>$result, "count"=>$count];
+    $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
+    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    }
+    if (!empty($input["condition"]["NOTA_BRANCH_CODE"])) {
+      $getRpt->where('NOTA_BRANCH_CODE',$input["condition"]["NOTA_BRANCH_CODE"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_CODE"])) {
+      $getRpt->where('NOTA_BRANCH_CODE',$input['user']->user_branch_code);
+    }
+    if (!empty($input["condition"]["VESSEL"])) {
+      $getRpt->where('VESSEL',$input["condition"]["VESSEL"]);
+    }
+    if (!empty($input["condition"]["UKK"])) {
+      $getRpt->where('UKK',$input["condition"]["UKK"]);
+    }
+    if (!empty($input["condition"]["NOTA"])) {
+      $getRpt->where('NOTA',$input["condition"]["NOTA"]);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->where('NOTA_DATE', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->where('NOTA_DATE', '<', $endDate);
     }
 
-    function getRptDtlPendapatan($input, $request){
-      $startDate = date("Y-m-d", strtotime($input["startDate"]));
-      $endDate = date("Y-m-d", strtotime($input["endDate"]));
+    $count  = $getRpt->count();
 
-      $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
-      if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
-        $getRpt->where('REAL_BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
-      }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
-        $getRpt->where('REAL_BRANCH_ID',$input['user']->user_branch_id);
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $getRpt->skip($input['start'])->take($input['limit']);
       }
-      if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
-        $getRpt->where('REAL_BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
-      }else if (empty($input["condition"]["REAL_BRANCH_CODE"])) {
-        $getRpt->where('REAL_BRANCH_CODE',$input['user']->user_branch_code);
-      }
-      if (!empty($input["condition"]["KEMASAN"])) {
-        $getRpt->where('KEMASAN',$input["condition"]["KEMASAN"]);
-      }
-      if (!empty($input["condition"]["KOMODITI"])) {
-        $getRpt->where('KOMODITI',$input["condition"]["KOMODITI"]);
-      }
-      if (!empty($input["condition"]["SATUAN"])) {
-        $getRpt->where('SATUAN',$input["condition"]["SATUAN"]);
-      }
-      if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
-        $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-      } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-        $getRpt->where('TGL_NOTA', '>', $startDate);
-      } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-        $getRpt->where('TGL_NOTA', '<', $endDate);
-      }
-
-      $count  = $getRpt->count();
-
-      if (!empty($input['start']) || $input["start"] == '0') {
-        if (!empty($input['limit'])) {
-          $getRpt->skip($input['start'])->take($input['limit']);
-        }
-      }
-
-      if (isset($input["sort"])) {
-        $sort = json_decode($input["sort"]);
-        foreach ($sort as $sort) {
-        $property = $sort->property;
-        $direction = $sort->direction;
-        $getRpt->orderby(strtoupper($property), $direction);
-          }
-        }
-      $result = $getRpt->get();
-
-      return ["result"=>$result, "count"=>$count];
     }
 
-    function ExportDebitur($a,$b,$c,$d,$e,$f,$g) {
-      $branchId    = $a;
-      $notaNo      = $b;
-      $custName    = $c;
-      $layanan     = $d;
-      $start       = $e;
-      $end         = $f;
-      $branchCode  = $g;
-
-      $startDate   = date("Y-m-d", strtotime($start));
-      $endDate     = date("Y-m-d", strtotime($end));
-
-      $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
-      if (!empty($branchCode)) {
-        $getRpt->where('BRANCH_CODE',$branchCode);
-      }
-      if (!empty($branchId)) {
-        $getRpt->where('NOTA_BRANCH_ID',$branchId);
-      }
-      if (!empty($notaNo)) {
-        $getRpt->where('NOTA_NO',$notaNo);
-      }
-      if (!empty($custName)) {
-        $getRpt->where('NOTA_CUST_NAME',$custName);
-      }
-      if (!empty($layanan)) {
-        $getRpt->where('LAYANAN',$layanan);
-      }
-      if (!empty($start) AND !empty($end)) {
-        $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-      } else if (!empty($start) AND empty($end)) {
-        $getRpt->where('TGL_NOTA', '>', $startDate);
-      } else if (empty($start) AND !empty($end)) {
-        $getRpt->where('TGL_NOTA', '<', $endDate);
-      }
-
-      $count  = $getRpt->count();
-      $result = $getRpt->get();
-      return view('print.debitur',[
-                  "result"=>$result,
-                  "start"=>$start,
-                  "end"=>$end
-                ]);
-    }
-
-    function ExportRekonsilasi($a,$b,$c,$d,$e,$f,$g) {
-      $branchId    = $a;
-      $vessel      = $b;
-      $ukk         = $c;
-      $nota        = $d;
-      $start       = $e;
-      $end         = $f;
-      $branchCode  = $g;
-
-      $startDate = date("Y-m-d", strtotime($start));
-      $endDate = date("Y-m-d", strtotime($end));
-
-      $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
-      if (!empty($branchId)) {
-        $getRpt->where('NOTA_BRANCH_ID',$branchId);
-      }
-      if (!empty($branchCode)) {
-        $getRpt->where('BRANCH_CODE',$branchCode);
-      }
-      if (!empty($vessel)) {
-        $getRpt->where('VESSEL',$vessel);
-      }
-      if (!empty($ukk)) {
-        $getRpt->where('UKK',$ukk);
-      }
-      if (!empty($nota)) {
-        $getRpt->where('NOTA',$nota);
-      }
-      if (!empty($start) AND !empty($end)) {
-        $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
-      } else if (!empty($start) AND empty($end)) {
-        $getRpt->where('NOTA_DATE', '>', $startDate);
-      } else if (empty($start) AND !empty($end)) {
-        $getRpt->where('NOTA_DATE', '<', $endDate);
-      }
-
-      $result = $getRpt->get();
-
-      return view('print.rekonsilasi',[
-                  "result"=>$result,
-                  "start"=>$start,
-                  "end"=>$end
-                ]);
-    }
-
-    function ExportPendapatan($a,$b,$c,$d,$e,$f,$g) {
-      $branchId    = $a;
-      $kemasan     = $b;
-      $komoditi    = $c;
-      $satuan      = $d;
-      $start       = $e;
-      $end         = $f;
-      $branchCode  = $g;
-
-      $startDate = date("Y-m-d", strtotime($start));
-      $endDate = date("Y-m-d", strtotime($end));
-
-      $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
-      if (!empty($branchId)) {
-        $getRpt->where('REAL_BRANCH_ID',$branchId);
-      }
-      if (!empty($branchCode)) {
-        $getRpt->where('REAL_BRANCH_CODE',$branchCode);
-      }
-      if (!empty($kemasan)) {
-        $getRpt->where('KEMASAN',$kemasan);
-      }
-      if (!empty($komoditi)) {
-        $getRpt->where('KOMODITI',$komoditi);
-      }
-      if (!empty($satuan)) {
-        $getRpt->where('SATUAN',$satuan);
-      }
-      if (!empty($start) AND !empty($end)) {
-        $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-      } else if (!empty($start) AND empty($end)) {
-        $getRpt->where('TGL_NOTA', '>', $startDate);
-      } else if (empty($start) AND !empty($end)) {
-        $getRpt->where('TGL_NOTA', '<', $endDate);
-      }
-
-      $raw    = $getRpt;
-      $result = $getRpt->get();
-
-      $kemasan = [];
-      for ($i=0; $i < count($result); $i++) {
-        if (!in_array($result[$i]->kemasan,$kemasan)) {
-          $kemasan[] = $result[$i]->kemasan;
+    if (isset($input["sort"])) {
+      $sort = json_decode($input["sort"]);
+      foreach ($sort as $sort) {
+      $property = $sort->property;
+      $direction = $sort->direction;
+      $getRpt->orderby(strtoupper($property), $direction);
         }
       }
+    $result = $getRpt->get();
 
-      $newDt = [];
-      foreach ($result as $key => $value) {
-        $newDt[$value->kemasan][] = $value;
-      }
+    return ["result"=>$result, "count"=>$count];
+  }
 
-      $data = $newDt;
+  function getRptDtlPendapatan($input, $request){
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
-      return view('print.pendapatan',[
-        "data"=>$data,
-        "kemasan" =>$kemasan,
-        "start"=>$start,
-        "end"=>$end
-      ]);
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+    if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
+      $getRpt->where('REAL_BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
+    }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
+      $getRpt->where('REAL_BRANCH_ID',$input['user']->user_branch_id);
     }
+    if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
+      $getRpt->where('REAL_BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
+    }else if (empty($input["condition"]["REAL_BRANCH_CODE"])) {
+      $getRpt->where('REAL_BRANCH_CODE',$input['user']->user_branch_code);
+    }
+    if (!empty($input["condition"]["KEMASAN"])) {
+      $getRpt->where('KEMASAN',$input["condition"]["KEMASAN"]);
+    }
+    if (!empty($input["condition"]["KOMODITI"])) {
+      $getRpt->where('KOMODITI',$input["condition"]["KOMODITI"]);
+    }
+    if (!empty($input["condition"]["SATUAN"])) {
+      $getRpt->where('SATUAN',$input["condition"]["SATUAN"]);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->where('TGL_NOTA', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->where('TGL_NOTA', '<', $endDate);
+    }
+
+    $count  = $getRpt->count();
+
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $getRpt->skip($input['start'])->take($input['limit']);
+      }
+    }
+
+    if (isset($input["sort"])) {
+      $sort = json_decode($input["sort"]);
+      foreach ($sort as $sort) {
+      $property = $sort->property;
+      $direction = $sort->direction;
+      $getRpt->orderby(strtoupper($property), $direction);
+        }
+      }
+    $result = $getRpt->get();
+
+    return ["result"=>$result, "count"=>$count];
+  }
+
+  function ExportDebitur($a,$b,$c,$d,$e,$f,$g) {
+    $branchId    = $a;
+    $notaNo      = $b;
+    $custName    = $c;
+    $layanan     = $d;
+    $start       = $e;
+    $end         = $f;
+    $branchCode  = $g;
+
+    $startDate   = date("Y-m-d", strtotime($start));
+    $endDate     = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
+    if (!empty($branchId)) {
+      $getRpt->where('NOTA_BRANCH_ID',$branchId);
+    }
+    if (!empty($branchCode)) {
+      $getRpt->where('BRANCH_CODE',$branchCode);
+    }
+    if (!empty($notaNo)) {
+      $getRpt->where('NOTA_NO',$notaNo);
+    }
+    if (!empty($custName)) {
+      $getRpt->where('NOTA_CUST_NAME',$custName);
+    }
+    if (!empty($layanan)) {
+      $getRpt->where('LAYANAN',$layanan);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('TGL_NOTA', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('TGL_NOTA', '<', $endDate);
+    }
+
+    $count  = $getRpt->count();
+    $result = $getRpt->get();
+    return view('print.debitur',[
+                "result"=>$result,
+                "start"=>$start,
+                "end"=>$end
+              ]);
+  }
+
+  function ExportRekonsilasi($a,$b,$c,$d,$e,$f,$g) {
+    $branchId    = $a;
+    $vessel      = $b;
+    $ukk         = $c;
+    $nota        = $d;
+    $start       = $e;
+    $end         = $f;
+    $branchCode  = $g;
+
+    $startDate = date("Y-m-d", strtotime($start));
+    $endDate = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
+    if (!empty($branchId)) {
+      $getRpt->where('NOTA_BRANCH_ID',$branchId);
+    }
+    if (!empty($branchCode)) {
+      $getRpt->where('BRANCH_CODE',$branchCode);
+    }
+    if (!empty($vessel)) {
+      $getRpt->where('VESSEL',$vessel);
+    }
+    if (!empty($ukk)) {
+      $getRpt->where('UKK',$ukk);
+    }
+    if (!empty($nota)) {
+      $getRpt->where('NOTA',$nota);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('NOTA_DATE', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('NOTA_DATE', '<', $endDate);
+    }
+
+    $result = $getRpt->get();
+
+    return view('print.rekonsilasi',[
+                "result"=>$result,
+                "start"=>$start,
+                "end"=>$end
+              ]);
+  }
+
+  function ExportPendapatan($a,$b,$c,$d,$e,$f,$g) {
+    $branchId    = $a;
+    $kemasan     = $b;
+    $komoditi    = $c;
+    $satuan      = $d;
+    $start       = $e;
+    $end         = $f;
+    $branchCode  = $g;
+
+    $startDate = date("Y-m-d", strtotime($start));
+    $endDate = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+    if (!empty($branchId)) {
+      $getRpt->where('REAL_BRANCH_ID',$branchId);
+    }
+    if (!empty($branchCode)) {
+      $getRpt->where('REAL_BRANCH_CODE',$branchCode);
+    }
+    if (!empty($kemasan)) {
+      $getRpt->where('KEMASAN',$kemasan);
+    }
+    if (!empty($komoditi)) {
+      $getRpt->where('KOMODITI',$komoditi);
+    }
+    if (!empty($satuan)) {
+      $getRpt->where('SATUAN',$satuan);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('TGL_NOTA', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('TGL_NOTA', '<', $endDate);
+    }
+
+    $raw    = $getRpt;
+    $result = $getRpt->get();
+
+    $kemasan = [];
+    for ($i=0; $i < count($result); $i++) {
+      if (!in_array($result[$i]->kemasan,$kemasan)) {
+        $kemasan[] = $result[$i]->kemasan;
+      }
+    }
+
+    $newDt = [];
+    foreach ($result as $key => $value) {
+      $newDt[$value->kemasan][] = $value;
+    }
+
+    $data = $newDt;
+
+    return view('print.pendapatan',[
+      "data"=>$data,
+      "kemasan" =>$kemasan,
+      "start"=>$start,
+      "end"=>$end
+    ]);
+  }
 }
