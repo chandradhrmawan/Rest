@@ -705,9 +705,17 @@ class GlobalHelper {
           $directory  = $val["DB"].'/'.$val["TABLE"].'/'.str_random(5).'/';
           $response   = FileUpload::upload_file($list, $directory);
           if (!empty($list["DOC_TYPE"])) {
-            $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_type'=>$list["DOC_TYPE"],'doc_name'=>$list["PATH"],'doc_path'=>$response['link']];
+            if (!empty($list["DOC_NAME"])) {
+              $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_type'=>$list["DOC_TYPE"],'doc_name'=>$list["DOC_NAME"],'doc_path'=>$response['link']];
+            } else {
+              $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_type'=>$list["DOC_TYPE"],'doc_name'=>$list["PATH"],'doc_path'=>$response['link']];
+            }
           } else {
-            $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_name'=>$list["PATH"],'doc_path'=>$response['link']];
+            if (!empty($list["DOC_NAME"])) {
+              $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_name'=>$list["DOC_NAME"],'doc_path'=>$response['link']];
+            } else {
+              $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_name'=>$list["PATH"],'doc_path'=>$response['link']];
+            }
           }
           if ($response['response'] == true) {
               $connect->insert([$addVal]);

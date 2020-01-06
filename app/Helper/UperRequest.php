@@ -225,7 +225,7 @@ class UperRequest{
                   'uper_paid' => 'V'
                 ]);
             }
-            return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no];
+            return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no, 'note' => $res];
         } else if ($input['pay_type'] == 2) {
             $res = ConnectedExternalApps::sendNotaPutReceipt($nota->nota_id, $pay);
             ConnectedExternalApps::notaProformaPutApply($nota->nota_id, $pay);
@@ -292,7 +292,7 @@ class UperRequest{
   private static function sendRequestBooking($input){
     $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V', 'F'])->count();
     if ($cekStatus == 0) {
-      return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['uper_paid_date']]);
+      ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['uper_paid_date']]);
     }
   }
 
