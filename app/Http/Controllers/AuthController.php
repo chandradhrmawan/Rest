@@ -81,12 +81,14 @@ class AuthController extends BaseController
               return response()->json(["message"=>"Branch Not Found"], 400);
             }
 
-            $data = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $this->request->input('USER_NAME'))->get();
+            $usr = DB::connection('omuster')->table('TM_USER')->where('USER_NAME', $this->request->input('USER_NAME'))->get();
+            $data = DB::connection('omuster')->table('TM_USER')->join('TR_ROLE',"TR_ROLE.ROLE_ID","=","USER_ROLE")->where("TM_USER.USER_NAME", $usr[0]->user_name)->get();
+
             $token = $data[0]->api_token;
             if (empty($token)) {
               $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_LOGIN' => '1','USER_ACTIVE' => $time]);
               $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token", "user_active")->first();
-              return response()->json(["message"=>"Login Success", "user"=>$hdr,"branch"=>$detail]);
+              return response()->json(["message"=>"Login Success", "user"=>$data,"branch"=>$detail]);
             }
             try {
             $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);
@@ -94,7 +96,7 @@ class AuthController extends BaseController
                 $a = TmUser::where('API_TOKEN', $token)->update(['USER_LOGIN' => '0','API_TOKEN' => ""]);
                 $b = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->update(['API_TOKEN' => $this->jwt($user), 'USER_LOGIN' => '1','USER_ACTIVE' => $time]);
                 $hdr  = TmUser::where('USER_NAME', $this->request->input('USER_NAME'))->select("user_id", "user_name", "user_role","user_nik","user_branch_id", "user_full_name", "api_token")->first();
-                return response()->json(["message"=>"Login Success", "user"=>$hdr,"branch"=>$detail]);
+                return response()->json(["message"=>"Login Success", "user"=>$data,"branch"=>$detail]);
             } catch(Exception $e) {
                 return response()->json(["message"=>"Error Token"], 400);
             }

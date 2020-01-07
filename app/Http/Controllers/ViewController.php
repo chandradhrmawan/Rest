@@ -48,13 +48,50 @@ class ViewController extends Controller
       return ConnectedExternalApps::getViewDetilTCA($input);
     }
 
-    public function getViewNotaPLB_new($input, $request)
+    public function getViewNotaPLB($input, $request)
     {
       $childs = DB::connection('mdm')->table('TM_NOTA')->where('no_parent_id', $input['nota_id'])->where('service_code', 2)->orderBy('nota_id', 'asc')->get();
       if (count($childs) == 0) {
         return ['Success' => false, 'response' => 'Fail, this nota not have childs', "json" => ""];
       }
       $estjs = [];
+      // not use
+        // foreach ($childs as $list) {
+        //   $setData = [
+        //     "branch_id" => $input['branch_id'],
+        //     "branch_code" => $input['branch_code'],
+        //     "nota_id" => $list->nota_id
+        //   ];
+        //   $cekAgain = DB::connection('mdm')->table('TS_NOTA')->where($setData)->count();
+        //   if($cekAgain == 0){
+        //     $checked = false;
+        //   }else{
+        //     $checked = true;
+        //   }
+        //   $add = [
+        //     "menuId" => $list->nota_id,
+        //     "text" => $list->nota_name,
+        //     "iconCls" => "",
+        //     "checked" => $checked,
+        //     "leaf" => true
+        //   ];
+        //   $estjs[] = $add;
+        // }
+
+        // return [
+        //   'Success' => true,
+        //   'response' => 'Success, get data',
+        //   /*'branch_id' => $input['branch_id'],
+        //   'branch_code' => $input['branch_code'],*/
+        //   "json" => [
+        //     "expanded" => true,
+        //     "text" => "Nota",
+        //     "iconCls" => "",
+        //     "children" => $estjs
+        //   ]
+        // ];
+      // not use
+
       foreach ($childs as $list) {
         $setData = [
           "branch_id" => $input['branch_id'],
@@ -68,11 +105,9 @@ class ViewController extends Controller
           $checked = true;
         }
         $add = [
-          "menuId" => $list->nota_id,
-          "text" => $list->nota_name,
-          "iconCls" => "",
-          "checked" => $checked,
-          "leaf" => true
+          "boxLabel" => $list->nota_name,
+          "inputValue" => $list->nota_id,
+          "checked" => $checked
         ];
         $estjs[] = $add;
       }
@@ -83,15 +118,16 @@ class ViewController extends Controller
         /*'branch_id' => $input['branch_id'],
         'branch_code' => $input['branch_code'],*/
         "json" => [
-          "expanded" => true,
-          "text" => "Nota",
-          "iconCls" => "",
-          "children" => $estjs
+          "xtype" => "radiogroup",
+          "name" => "nota",
+          "fieldLabel" => "Nota",
+          "columns" => 1,
+          "items" => $estjs
         ]
       ];
     }
 
-    function getViewNotaPLB($input, $request){
+    function getViewNotaPLB_old($input, $request){
       $parent = DB::connection('mdm')->table('TM_NOTA')->whereNull('no_parent_id')->where('service_code', 2)->orderBy('nota_id', 'asc')->get();
 
       $estjs = [];
