@@ -196,9 +196,10 @@ class UperRequest{
 
         $pay = TxPayment::find($pay->pay_id);
         if ($input['pay_type'] == 1){
+        	$res = '';
             if ($pay->pay_status == 1) {
               $res = ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
-              if ($res['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
+              if ($res['response']['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
                 TxPayment::where('pay_id',$pay->pay_id)->update(['pay_status'=>2]);
                 static::updateUperStatus([
                   'uper_id' => $uper->uper_id,
@@ -207,7 +208,7 @@ class UperRequest{
                   'uper_no' => $uper->uper_no,
                   'uper_paid' => 'R'
                 ]);
-                return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
+                return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['response']['arResponseDoc']['esbBody'][0]['errorMessage']];
               }
               static::updateUperStatus([
                 'uper_id' => $uper->uper_id,
