@@ -72,8 +72,11 @@ class StoreController extends Controller
       $setData = [
         "branch_id" => $input['branch_id'],
         "branch_code" => $input['branch_code'],
-        "nota_id" => $input['nota_id']
+        "nota_id" => $input['nota_id'],
+        "nota_parent_id" => $input['nota_parent_id']
       ];
+      $nota_id_parent = DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->get();
+      $setData['nota_id_parent'] = $nota_id_parent[0]->no_parent_id;
 
       $cek = DB::connection('mdm')->table('TS_NOTA')->where($setData)->count();
       if ($cek > 0) {
@@ -100,7 +103,34 @@ class StoreController extends Controller
 
     public function testlain($input, $request){
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
-      return ConnectedExternalApps::sendNotaProforma(376);
+      // return ConnectedExternalApps::sendNotaProforma(376);
+      $pay = [
+        "pay_id"=> "306",
+        "pay_no"=> "10108020000010",
+        "pay_req_no"=> "BMBTN200043",
+        "pay_method"=> "2",
+        "pay_cust_id"=> "12401095",
+        "pay_cust_name"=> "PT. AGRISTAR GRAIN INDONESIA",
+        "pay_bank_code"=> "MDR",
+        "pay_bank_name"=> "MANDIRI",
+        "pay_branch_id"=> "12",
+        "pay_account_no"=> "120-00-2018777-4",
+        "pay_account_name"=> "PTP MANDIRI 120-00-2018777-4",
+        "pay_amount"=> "8552148",
+        "pay_date"=> "2020-01-07 13=>39=>00",
+        "pay_note"=> "NOTED",
+        "pay_create_by"=> "1",
+        "pay_create_date"=> "2020-01-07 00=>00=>00",
+        "pay_type"=> "1",
+        "pay_file"=> "omcargo/tx_payment/306/file-sample_150kB.pdf",
+        "pay_sender_bank_code"=> null,
+        "pay_sender_bank_name"=> null,
+        "pay_sender_account_no"=> null,
+        "pay_sender_account_name"=> null,
+        "pay_status"=> "1",
+        "pay_currency"=> "IDR"
+      ];
+      return ConnectedExternalApps::sendUperPutReceipt(282, (object)$pay);
     }
 
     public function testview_file(){
