@@ -549,6 +549,7 @@ class ConnectedExternalApps{
           }
        }
     }';
+    // return $string_json;
     $username="billing";
     $password ="b1Llin9";
     $client = new Client();
@@ -563,9 +564,17 @@ class ConnectedExternalApps{
     );
     try {
       $res = $client->post($endpoint_url, $options);
-      return json_decode($res->getBody()->getContents(), true);
+      $retrn = [
+        "request" => $options,
+        "response" => json_decode($res->getBody()->getContents(), true) 
+      ];
+      return $retrn;
     } catch (ClientException $e) {
-      return $e->getResponse();
+      $retrn = [
+        "request" => $options,
+        "response" => $e->getResponse() 
+      ];
+      return $retrn;
     }
   }
 
