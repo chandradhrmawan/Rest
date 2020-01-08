@@ -216,7 +216,7 @@ class RequestBooking{
 		if ($migrateTariff == true) {
 			foreach ($upers as $uper) {
 				$uper = (array)$uper;
-				
+
 				$createdUperNo = '';
 				// store head
 					$headU = new TxHdrUper;

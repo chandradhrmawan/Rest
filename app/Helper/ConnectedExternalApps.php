@@ -11,6 +11,7 @@ use App\Models\OmCargo\TxHdrDel;
 use App\Models\OmCargo\TxHdrRec;
 use App\Models\OmCargo\TxHdrNota;
 use App\Helper\RequestBooking;
+use App\Helper\UperRequest;
 
 class ConnectedExternalApps{
 
@@ -566,13 +567,13 @@ class ConnectedExternalApps{
       $res = $client->post($endpoint_url, $options);
       $retrn = [
         "request" => $options,
-        "response" => json_decode($res->getBody()->getContents(), true) 
+        "response" => json_decode($res->getBody()->getContents(), true)
       ];
       return $retrn;
     } catch (ClientException $e) {
       $retrn = [
         "request" => $options,
-        "response" => $e->getResponse() 
+        "response" => $e->getResponse()
       ];
       return $retrn;
     }
@@ -1319,7 +1320,13 @@ class ConnectedExternalApps{
     }else if ($results['inquiryStatusReceiptResponse']['esbHeader']['responseCode'] == 1) {
       if ($results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceipt'] == 'S') {
         TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'Y']);
-        return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
+        $upr = TxHdrUper::where('uper_no',$input['uper_no'])->get();
+        $dt = [
+          'req_no' => $upr[0]->uper_req_no,
+          'uper_paid_date' => $upr[0]->uper_paid_date
+        ];
+        $sendRequestBooking = UperRequest::sendRequestBooking($dt);
+        return ['result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no'], 'sendRequestBooking' => $sendRequestBooking];
       }else if($results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceipt'] == 'F'){
         // TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
         return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];

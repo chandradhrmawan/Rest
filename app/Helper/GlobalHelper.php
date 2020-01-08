@@ -811,8 +811,8 @@ class GlobalHelper {
     if ($service == "DEL") {
         $header = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->get();
         $dtl    = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header[0]->del_id)->get();
-        $date2  =date_create("2019-12-16");
-        $date1  =date_create("2019-11-13");
+        $date2  =date_create($dtl[$no]->dtl_out);
+        $date1  =date_create($dtl[$no]->dtl_in);
         $count = date_diff($date1,$date2);
         // echo
         echo date("d-m-y", strtotime($dtl[$no]->dtl_in))."<br>".date("d-m-y", strtotime($dtl[$no]->dtl_out))."<br>".$count->format('%a Hari');

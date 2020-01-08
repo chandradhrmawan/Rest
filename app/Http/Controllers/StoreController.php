@@ -72,20 +72,24 @@ class StoreController extends Controller
       $setData = [
         "branch_id" => $input['branch_id'],
         "branch_code" => $input['branch_code'],
-        "nota_id" => $input['nota_id'],
-        "nota_parent_id" => $input['nota_parent_id']
+        "nota_id_parent" => $input['nota_id_parent']
       ];
-      $nota_id_parent = DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->get();
-      $setData['nota_id_parent'] = $nota_id_parent[0]->no_parent_id;
+      // $nota_id_parent = DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->get();
+      // $setData['nota_id_parent'] = $nota_id_parent[0]->no_parent_id;
 
       $cek = DB::connection('mdm')->table('TS_NOTA')->where($setData)->count();
+      $strData = [
+        "branch_id" => $input['branch_id'],
+        "branch_code" => $input['branch_code'],
+        "nota_id_parent" => $input['nota_id_parent']
+      ];
+      $strData['nota_id'] = $input['nota_id'];
+      $strData['nota_form_name'] = $input['nota_form_name'];
       if ($cek > 0) {
-        return [
-          "Success" => false,
-          "response" => "Fail, data already exists"
-        ];
+        DB::connection('mdm')->table('TS_NOTA')->where($setData)->update($strData);
+      }else{
+        DB::connection('mdm')->table('TS_NOTA')->insert($strData);
       }
-      DB::connection('mdm')->table('TS_NOTA')->insert($setData);
       return [ "response" => "Success, store data" ];
     }
 
@@ -102,6 +106,7 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+	return ConnectedExternalApps::uperSimkeuCek($input);
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
       // return ConnectedExternalApps::sendNotaProforma(376);
       $pay = [
