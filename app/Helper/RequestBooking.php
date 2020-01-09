@@ -107,8 +107,8 @@ class RequestBooking{
 						$old_bl_date_out = $old_bl[0]->dtl_out;
 						$newD['DTL_DATE_OUT_OLD'] = empty($old_bl_date_out) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($old_bl_date_out)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}else{
-						$newD['DTL_DATE_OUT'] = empty($find[$config['head_tab_detil_date_out']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-						$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_OUT'] = empty($list['dtl_out']) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list['dtl_out'])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 					}
 				}else{
 					$newD['DTL_DATE_OUT_OLD'] = empty($find[$config['head_tab_detil_date_out_old']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($find[$config['head_tab_detil_date_out_old']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
