@@ -106,7 +106,7 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
-	return ConnectedExternalApps::uperSimkeuCek($input);
+     return ConnectedExternalApps::uperSimkeuCek($input);
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
       // return ConnectedExternalApps::sendNotaProforma(376);
       $pay = [
