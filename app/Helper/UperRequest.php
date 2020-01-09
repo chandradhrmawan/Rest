@@ -208,7 +208,7 @@ class UperRequest{
                   'uper_no' => $uper->uper_no,
                   'uper_paid' => 'R'
                 ]);
-                return ["Success"=>true, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['response']['arResponseDoc']['esbBody'][0]['errorMessage'], 'updateUperStatus' => $updateUperStatus];
+                return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['response']['arResponseDoc']['esbBody'][0]['errorMessage'], 'updateUperStatus' => $updateUperStatus];
               }
               $updateUperStatus = static::updateUperStatus([
                 'uper_id' => $uper->uper_id,
@@ -294,6 +294,8 @@ class UperRequest{
     $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V', 'F'])->count();
     if ($cekStatus == 0) {
       return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['uper_paid_date']]);
+    }else{
+      return ['response' => 'not send request'];
     }
   }
 
