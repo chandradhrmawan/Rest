@@ -429,10 +429,10 @@ class ConnectedExternalApps{
                   "timestamp": "2"
               },
               "esbBody": {
-                  "inBlNumber": "'.$listA[$config['head_tab_detil_bl']].'",
-                  "inCargoName": "'.$list->dtl_cmdty_name.'",
-                  "inVvdNumber": "'.$head[$config['head_vvd_id']].'",
-                  "insertdata": "'.$vparam.'"
+                  "blNumber": "'.$listA[$config['head_tab_detil_bl']].'",
+                  "cargoName": "'.$list->dtl_cmdty_name.'",
+                  "vvdNumber": "'.$head[$config['head_vvd_id']].'",
+                  "insertData": "'.$vparam.'"
               }
           }
       }';
