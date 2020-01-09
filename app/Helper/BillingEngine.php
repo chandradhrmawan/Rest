@@ -894,6 +894,11 @@ class BillingEngine{
         $setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
         $setH .= " P_BRANCH_CODE => '".$head['P_BRANCH_CODE']."',";
         $setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
+        if (empty($head['P_PBM_INTERNAL']) or $head['P_PBM_INTERNAL'] == 'NULL') {
+          $setH .= " P_PBM_INTERNAL => ".$head['P_PBM_INTERNAL'].",";
+        }else{
+          $setH .= " P_PBM_INTERNAL => '".$head['P_PBM_INTERNAL']."',";
+        }
         $setH .= " P_NOTA_ID => '".$head['P_NOTA_ID']."',";
         $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
         $setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";

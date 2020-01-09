@@ -17,13 +17,18 @@ class RequestBooking{
 			return ['result' => "Fail, requst not found!"];
 		}
 		$find = (array)$find[0];
-
+		$pbmCek = 'N';
+		if ($input['table'] == 'TX_HDR_BM') {
+			$countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$find['bm_pbm_id'])->where('BRANCH_ID',$find['bm_branch_id'])->where('BRANCH_CODE',$find['bm_branch_code'])->count();
+			if ($countPBM > 0) { $pbmCek = 'Y'; }
+		}
 		// build head
 			$setH = [];
 			$setH['P_NOTA_ID'] = $config['head_nota_id'];
 			$setH['P_BRANCH_ID'] = $find[$config['head_branch']];
 			$setH['P_BRANCH_CODE'] = $find[$config['head_branch_code']];
 			$setH['P_CUSTOMER_ID'] = $find[$config['head_cust']];
+			$setH['P_PBM_INTERNAL'] = $pbmCek;
 			$setH['P_BOOKING_NUMBER'] = $find[$config['head_no']];
 			$setH['P_REALIZATION'] = 'N';
 			$setH['P_RESTITUTION'] = 'N';
