@@ -1331,7 +1331,7 @@ class ConnectedExternalApps{
         // TxHdrUper::where('uper_no',$input['uper_no'])->update(['uper_paid' => 'F']);
         return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
       }else{
-        return ['Success' => false, 'result' => $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
+        return ['Success' => true, 'result' => 'Data dalam antrian. '. $results['inquiryStatusReceiptResponse']['esbBody']['details'][0]['statusReceiptMsg'], 'uper_no' => $input['uper_no']];
       }
     }
   }
