@@ -208,7 +208,7 @@ class UperRequest{
                   'uper_no' => $uper->uper_no,
                   'uper_paid' => 'R'
                 ]);
-                return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['response']['arResponseDoc']['esbBody'][0]['errorMessage'], 'updateUperStatus' => $updateUperStatus];
+                return ["Success"=>true, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['response']['arResponseDoc']['esbBody'][0]['errorMessage'], 'updateUperStatus' => $updateUperStatus];
               }
               $updateUperStatus = static::updateUperStatus([
                 'uper_id' => $uper->uper_id,
