@@ -18,7 +18,7 @@ class RealisasiHelper{
       return ['Success' => false, 'result' => 'Fail, not found data!'];
     }
     $find = $find[0];
-    $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$find['bm_pbm_id'])->where('BRANCH_ID',$find['bm_branch_id'])->where('BRANCH_CODE',$find['bm_branch_code'])->count();
+    $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$find->bm_pbm_id)->where('BRANCH_ID',$find->bm_branch_id)->where('BRANCH_CODE',$find->bm_branch_code)->count();
     if ($countPBM > 0) { $pbmCek = 'Y'; }
     else{ $pbmCek = 'N'; }
     // build head
