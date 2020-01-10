@@ -1102,5 +1102,5 @@ class BillingEngine{
           }
 
       return ["Header"=>$getHS, "Detail"=>$resultD, "calculateRespn" => $tariffResp];
-    }
   }
+}
