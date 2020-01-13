@@ -18,13 +18,16 @@ class RealisasiHelper{
       return ['Success' => false, 'result' => 'Fail, not found data!'];
     }
     $find = $find[0];
-
+    $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$find->bm_pbm_id)->where('BRANCH_ID',$find->bm_branch_id)->where('BRANCH_CODE',$find->bm_branch_code)->count();
+    if ($countPBM > 0) { $pbmCek = 'Y'; }
+    else{ $pbmCek = 'N'; }
     // build head
       $setH = [];
       $setH['P_NOTA_ID'] = 13;
       $setH['P_BRANCH_ID'] = $find->real_branch_id;
       $setH['P_BRANCH_CODE'] = $find->real_branch_code;
       $setH['P_CUSTOMER_ID'] = $find->bm_cust_id;
+      $setH['P_PBM_INTERNAL'] = $pbmCek;
       $setH['P_BOOKING_NUMBER'] = $find->real_no;
       $setH['P_REALIZATION'] = 'Y';
       $setH['P_RESTITUTION'] = 'N';
@@ -133,6 +136,7 @@ class RealisasiHelper{
       $setH['P_BRANCH_ID'] = $find->bprp_branch_id;
       $setH['P_BRANCH_CODE'] = $find->bprp_branch_code;
       $setH['P_CUSTOMER_ID'] = $find->bprp_cust_id;
+      $setH['P_PBM_INTERNAL'] = 'N';
       $setH['P_BOOKING_NUMBER'] = $find->bprp_no;
       $setH['P_REALIZATION'] = 'Y';
       $setH['P_RESTITUTION'] = 'N';
