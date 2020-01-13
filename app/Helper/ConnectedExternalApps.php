@@ -1067,12 +1067,18 @@ class ConnectedExternalApps{
           $dateIn = date('Y-m-d', strtotime($bprpDtl->dtl_datein));
           $dateOut = date('Y-m-d', strtotime($bprpDtl->dtl_dateout));
         }
+
+        if ($list->dtl_group_tariff_name == 'PENUMPUKAN') {
+          $descrpt = $list->dtl_commodity.' '.$list->dtl_qty.' '.$list->dtl_unit_name;
+        }else{
+          $descrpt = $list->dtl_group_tariff_name;
+        }
         $lines_json  .= '{
           "billerRequestId":"'.$find->nota_req_no.'",
           "trxNumber":"'.$find->nota_no.'",
           "lineId":null,
           "lineNumber":"'.$dtl_line_count.'",
-          "description":"'.$list->dtl_commodity.' '.$list->dtl_qty.' '.$list->dtl_unit_name.'",
+          "description":"'.$descrpt.'",
           "memoLineId":null,
           "glRevId":null,
           "lineContext":"",
