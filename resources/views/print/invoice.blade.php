@@ -191,6 +191,8 @@
 	</tr>
 <?php } ?>
 <?php } ?>
+</table>
+<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 <?php if ($alat != "0") {?>
 	<?php foreach ($alat as $alat) { ?>
 			<tr>

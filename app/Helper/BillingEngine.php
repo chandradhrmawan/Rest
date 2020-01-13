@@ -987,6 +987,7 @@ class BillingEngine{
         $setH['P_BRANCH_CODE']      = $head['P_BRANCH_CODE'];
         $setH['P_CUSTOMER_ID']      = $head['P_CUSTOMER_ID'];
         $setH['P_RESTITUTION']      = 'N'; // ( N / Y ) DEFAULT N
+        $setH['P_PBM_INTERNAL']     = 'N';
         $setH['P_BOOKING_NUMBER']   = $head['P_BOOKING_NUMBER'];
         $setH['P_REALIZATION']      = $head['P_REALIZATION'];
         $setH['P_TRADE']            = $head['P_TRADE'];
