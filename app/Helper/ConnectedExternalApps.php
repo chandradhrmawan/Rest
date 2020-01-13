@@ -12,6 +12,7 @@ use App\Models\OmCargo\TxHdrRec;
 use App\Models\OmCargo\TxHdrNota;
 use App\Helper\RequestBooking;
 use App\Helper\UperRequest;
+use Carbon\Carbon;
 
 class ConnectedExternalApps{
 
@@ -1073,6 +1074,7 @@ class ConnectedExternalApps{
         }else{
           $descrpt = $list->dtl_group_tariff_name;
         }
+
         $lines_json  .= '{
           "billerRequestId":"'.$find->nota_req_no.'",
           "trxNumber":"'.$find->nota_no.'",
@@ -1435,5 +1437,61 @@ class ConnectedExternalApps{
     $results = json_decode($res->getBody()->getContents(), true);
 
     return $results['getDataCetakResponse']['esbBody']['url'];
+  }
+
+  public static function sendNotifToIBISQA(){
+    $endpoint_url=config('endpoint.sendNotifToIBISQA');
+    $data = DB::connection('omcargo')->table('TX_NOTIF')->orderBY('notif_id', 'desc')->get();
+    foreach ($data as $list) {
+      $string_json = '{ 
+        "saveNotifRequest": { 
+                "esbHeader": { 
+                        "internalId": "", 
+                        "externalId": "1211344", 
+                        "timestamp": "", 
+                        "responseTimestamp": "", 
+                        "responseCode": "", 
+                        "responseMessage": "" 
+        }, 
+                "esbBody": { 
+
+                        "pNotifType": "'.$list->notif_type.'", 
+                        "pNotifDate": "'.date('d/m/Y', strtotime($list->notif_date)).'",
+                        "pNotifDesc": "'.$list->notif_desc.'", 
+                        "pNotifBillingId": "'.$list->notif_id.'",
+                        "pAppId": "1"
+                        } 
+                } 
+        }';
+
+      $username="npk_billing";
+      $password ="npk_billing";
+      $client = new Client();
+      $options= array(
+        'auth' => [
+          $username,
+          $password
+        ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        return $e->getResponse();
+      }
+      $results = json_decode($res->getBody()->getContents(), true);
+      if (isset($results['saveNotifResponse']['esbBody']['pMsg']) and $results['saveNotifResponse']['esbBody']['pMsg'] != 'NOT OK') {
+        DB::connection('omcargo')->table('TX_NOTIF')->where('notif_id', $list->notif_id)->delete();
+      }
+      DB::connection('omcargo')->table('TH_LOGS_API_STORE')->insert([
+        "create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
+        "action" => 'sendNotifToIBISQA',
+        "json_request" => json_encode($options),
+        "json_response" => json_encode($results),
+        "create_name" => 'schedule'
+      ]);
+    }
   }
 }

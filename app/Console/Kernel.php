@@ -38,5 +38,7 @@ class Kernel extends ConsoleKernel
           }
         }
       })->everyThirtyMinutes();
+
+      $schedule->call('App\Helper\ConnectedExternalApps@sendNotifToIBISQA')->everyMinute();
     }
 }
