@@ -63,6 +63,32 @@ class IndexController extends Controller
       return response($latest);
     }
 
+    function listTmNota($input, $request){
+      $data = DB::connection('mdm')->table('TM_NOTA')->leftJoin('TS_NOTA', 'TS_NOTA.nota_id', '=', 'TM_NOTA.nota_id')->leftJoin('TM_REFF', 'TM_REFF.reff_id', '=', 'TM_NOTA.service_code')->select(
+        'TM_NOTA.*',
+        'case when TS_NOTA.flag_status is null then \'N\' else TS_NOTA.flag_status end flag_status',
+        'TM_REFF.reff_name as area'
+      );
+      if(!empty($input["orderby"][0])) {
+        $in        = $input["orderby"];
+        $data->orderby($in[0], $in[1]);
+      }
+      if(!empty($input["where"][0])) {
+        $data->where($input["where"]);
+      }
+      $data->where(['TM_REFF.REFF_TR_ID' => '8']);
+      $count    = $data->count();
+      if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['limit'])) {
+          $data->skip($input['start'])->take($input['limit']);
+        }
+      }
+      $data = $data->get();
+
+
+      return ["result"=>$data, "count"=>$count];
+    }
+
     function listRoleBranch($input, $request)
     {
       return UserAndRoleManagemnt::listRoleBranch($input);
