@@ -44,6 +44,67 @@ class ViewController extends Controller
       }
     }
 
+    function splitNota($input, $request){
+      $sql = "
+        SELECT
+          *
+        FROM
+          BILLING_MDM.TM_COMP_NOTA
+        WHERE
+          BRANCH_ID = ^$^branch_id
+          AND BRANCH_CODE = '^$^branch_code'
+          AND COMP_FORM_SHOW = 'Y'
+          AND NOTA_ID IN  
+          (
+            SELECT DISTINCT 
+              GROUP_TARIFF_ID FROM (
+                SELECT 
+                  GROUP_TARIFF_ID 
+                FROM 
+                  BILLING_MDM.TM_COMP_NOTA 
+                WHERE 
+                  NOTA_ID = ^$^nota_id
+                  AND BRANCH_ID = ^$^branch_id
+                  AND branch_code = '^$^branch_code'
+                  AND (
+                    COMP_REQUIRED = 'Y'
+                    OR GROUP_TARIFF_ID IN (12,13)
+                  ) 
+                UNION ALL 
+                SELECT DISTINCT 
+                  GROUP_TARIFF_ID 
+                FROM 
+                  TS_TARIFF 
+                WHERE 
+                  TARIFF_PROF_HDR_ID IN (
+                    SELECT
+                      A.TARIFF_ID
+                    FROM
+                      TX_PROFILE_TARIFF_HDR A
+                    LEFT JOIN 
+                      TS_CUSTOMER_PROFILE B ON 
+                        B.TARIFF_HDR_ID = A.TARIFF_ID 
+                        AND B.CUST_PROFILE_STATUS = '3'
+                        AND B.CUST_PROFILE_IS_ACTIVE = '1'
+                    WHERE
+                      A.BRANCH_ID = ^$^branch_id
+                      AND A.BRANCH_CODE = '^$^branch_code'
+                      AND A.TARIFF_TYPE IN ('2', '3')
+                      AND A.TARIFF_STATUS = '3'
+                      AND A.TARIFF_IS_ACTIVE = '1'
+                      AND B.CUST_PROFILE_ID = '^$^cust_profile_id'
+                  ) 
+                  AND NOTA_ID = ^$^nota_id
+            )
+          )
+      ";
+      $searchVal = array("^$^branch_id", "^$^branch_code", "^$^nota_id", "^$^cust_profile_id");
+      $replaceVal = array($input['branch_id'], $input['branch_code'], $input['nota_id'], $input['cust_profile_id']);
+      $sql = str_replace($searchVal, $replaceVal, $sql);
+      $result = DB::connection('eng')->select(DB::raw($sql));
+      return ["response" => $result];
+    }
+
     function getViewDetilTCA($input, $request){
       return ConnectedExternalApps::getViewDetilTCA($input);
     }
