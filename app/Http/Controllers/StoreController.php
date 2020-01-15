@@ -69,22 +69,36 @@ class StoreController extends Controller
 
     public function storeTsNota($input, $request)
     {
+      if ($input['flag_status'] == 'Y') {
+        $cekActive = DB::connection('mdm')->table('TS_NOTA')->where([
+          "flag_status" => $input['flag_status'],
+          "branch_id" => $input['branch_id'],
+          "branch_code" => $input['branch_code'],
+          "nota_id_parent" => $input['nota_id_parent']
+        ])->count();
+        if ($cekActive > 0 ) {
+          return [ "Success" => false, "response" => "Fail, tidak boleh ada 2 data yang active" ];
+        }
+      }
+
       $setData = [
         "branch_id" => $input['branch_id'],
         "branch_code" => $input['branch_code'],
+        "nota_id" => $input['nota_id'],
         "nota_id_parent" => $input['nota_id_parent']
       ];
-      // $nota_id_parent = DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->get();
-      // $setData['nota_id_parent'] = $nota_id_parent[0]->no_parent_id;
 
       $cek = DB::connection('mdm')->table('TS_NOTA')->where($setData)->count();
+      if (empty($input['flag_status'])) {
+        $input['flag_status'] = 'N';
+      }
       $strData = [
         "branch_id" => $input['branch_id'],
         "branch_code" => $input['branch_code'],
-        "nota_id_parent" => $input['nota_id_parent']
+        "nota_id_parent" => $input['nota_id_parent'],
+        "nota_id" => $input['nota_id'],
+        "flag_status" => $input['flag_status']
       ];
-      $strData['nota_id'] = $input['nota_id'];
-      $strData['nota_form_name'] = $input['nota_form_name'];
       if ($cek > 0) {
         DB::connection('mdm')->table('TS_NOTA')->where($setData)->update($strData);
       }else{
@@ -106,6 +120,7 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+      return ConnectedExternalApps::sendNotifToIBISQA();
      return ConnectedExternalApps::uperSimkeuCek($input);
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
       // return ConnectedExternalApps::sendNotaProforma(376);
@@ -311,6 +326,10 @@ class StoreController extends Controller
     // RequestBooking
       function sendRequest($input, $request){
         return RequestBooking::sendRequest($input);
+      }
+
+      function sendRequestPLG($input, $request){
+        return RequestBooking::sendRequestPLG($input);
       }
 
       function approvalRequest($input, $request){

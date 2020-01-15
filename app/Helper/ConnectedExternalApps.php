@@ -118,7 +118,7 @@ class ConnectedExternalApps{
           },
           "esbBody": {
             "vesselName": "'.strtoupper($input['query']).'",
-            "kadeName": "",
+            "kadeName": "'.strtoupper($input['query']).'",
             "terminalCode": "'.$input['ibis_terminal_code'].'"
           }
         }
@@ -1441,7 +1441,7 @@ class ConnectedExternalApps{
 
   public static function sendNotifToIBISQA(){
     $endpoint_url=config('endpoint.sendNotifToIBISQA');
-    $data = DB::connection('omcargo')->table('TX_NOTIF')->orderBY('notif_id', 'desc')->get();
+    $data = DB::connection('omcargo')->table('TX_NOTIF')->where('notif_flag_status', 0)->get();
     foreach ($data as $list) {
       $string_json = '{ 
         "saveNotifRequest": { 
@@ -1482,8 +1482,8 @@ class ConnectedExternalApps{
         return $e->getResponse();
       }
       $results = json_decode($res->getBody()->getContents(), true);
-      if (isset($results['saveNotifResponse']['esbBody']['pMsg']) and $results['saveNotifResponse']['esbBody']['pMsg'] != 'NOT OK') {
-        DB::connection('omcargo')->table('TX_NOTIF')->where('notif_id', $list->notif_id)->delete();
+      if (isset($results['saveNotifResponse']['esbBody']['pMsg']) and $results['saveNotifResponse']['esbBody']['pMsg'] == 'OK') {
+        DB::connection('omcargo')->table('TX_NOTIF')->where('notif_id', $list->notif_id)->update(['notif_flag_status'=>1]);
       }
       DB::connection('omcargo')->table('TH_LOGS_API_STORE')->insert([
         "create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
