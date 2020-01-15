@@ -1459,6 +1459,9 @@ class ConnectedExternalApps{
                         "pNotifDate": "'.date('d/m/Y', strtotime($list->notif_date)).'",
                         "pNotifDesc": "'.$list->notif_desc.'", 
                         "pNotifBillingId": "'.$list->notif_id.'",
+                        "pCustomerId": "'.$list->customer_id.'",
+                        "pBranchId": "'.$list->branch_id.'",
+                        "pBranchCode": "'.$list->branch_code.'",
                         "pAppId": "1"
                         } 
                 } 
