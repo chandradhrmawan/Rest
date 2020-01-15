@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
 use App\Helper\ConnectedExternalApps;
+use App\Helper\FileUpload;
 use App\Models\OmCargo\TxPayment;
 use App\Models\OmCargo\TxHdrUper;
 
@@ -336,6 +337,26 @@ class RealisasiHelper{
     if ($count == 0) {
       return ['result' => 'Fail, proforma not found!', 'no_req' => $input['req_no'], 'Success' => false];
     }
+
+    if (!empty($input['file']) and !empty($input['file']['PATH'] and !empty($input['file']['BASE64'])) {
+      if (empty($input['proforma_no'])) {
+        return ['Success' => false, 'result' => 'Fail, proforma no is null!']
+      }
+      $cekOldDoc  = DB::connection('omcargo')->table('TX_DOCUMENT')->where('req_no', $input['proforma_no'])->get();
+      if (count($cekOldDoc) > 0) {
+        unlink($cekOldDoc[0]->doc_path);
+        DB::connection('omcargo')->table('TX_DOCUMENT')->where('req_no', $input['proforma_no'])->delete();
+      }
+      $directory  = 'omcargo/TX_DOCUMENT/rejectedProformaNota'.$input['req_no'].'/';
+      $response   = FileUpload::upload_file($input['file'], $directory);
+      DB::connection('omcargo')->table('TX_DOCUMENT')->insert([
+        'REQ_NO' => $input['proforma_no'],
+        'DOC_NO' => $input['file']['DOC_NO'],
+        'DOC_NAME' => $input['file']['DOC_NAME'],
+        'DOC_PATH' => $response['link']
+      ]);
+    }
+
     TxHdrNota::where('nota_real_no',$input['req_no'])->update([
       "nota_status"=>3
     ]);
