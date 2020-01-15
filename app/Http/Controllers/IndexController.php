@@ -64,7 +64,14 @@ class IndexController extends Controller
     }
 
     function listTmNota($input, $request){
-      $data = DB::connection('mdm')->table('TM_NOTA')->leftJoin('TS_NOTA', 'TS_NOTA.nota_id', '=', 'TM_NOTA.nota_id')->leftJoin('TM_REFF', 'TM_REFF.reff_id', '=', 'TM_NOTA.service_code')->select(
+      $data = DB::connection('mdm')->table('TM_NOTA')
+        ->leftJoin('TS_NOTA', function($join) use ($input)
+        {
+          $join->on('TS_NOTA.nota_id', '=', 'TM_NOTA.nota_id');
+          $join->on('TS_NOTA.branch_id', '=', $input['condition']['branch_id']);
+          $join->on('TS_NOTA.branch_code', '=', DB::raw("'".$input['condition']['branch_code']."'"));
+        })
+        ->leftJoin('TM_REFF', 'TM_REFF.reff_id', '=', 'TM_NOTA.service_code')->select(
         'TM_NOTA.*',
         'case when TS_NOTA.flag_status is null then \'N\' else TS_NOTA.flag_status end flag_status',
         'TM_REFF.reff_name as area'
@@ -73,8 +80,8 @@ class IndexController extends Controller
         $in        = $input["orderby"];
         $data->orderby($in[0], $in[1]);
       }
-      if(!empty($input["where"][0])) {
-        $data->where($input["where"]);
+      if(!empty($input["condition"]["service_code"])) {
+        $data->where("service_code",$input["condition"]["service_code"]);
       }
       $data->where(['TM_REFF.REFF_TR_ID' => '8']);
       $count    = $data->count();
