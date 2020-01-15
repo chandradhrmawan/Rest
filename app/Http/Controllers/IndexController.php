@@ -278,4 +278,20 @@ class IndexController extends Controller
         return $user;
       }
     }
+
+    function unit($input) {
+      $tsUnit   = DB::connection('omcargo')->table("TS_UNIT")->where("UNIT_SUBJECT", $input["unit_subject"])->get();
+      foreach ($tsUnit as $tsUnit) {
+        $unit_id[]  = $tsUnit->unit_id;
+      }
+
+      $tmUnit   = DB::connection('mdm')->table("TM_UNIT")->orderby($input["orderby"][0], $input["orderby"][1])->get();
+      foreach ($tmUnit as $tmUnit) {
+        if (in_array($tmUnit->unit_id,$unit_id)) {
+          $data[] = $tmUnit;
+        }
+      }
+
+      return $data;
+    }
 }

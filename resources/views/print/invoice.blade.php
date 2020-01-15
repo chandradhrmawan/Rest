@@ -174,11 +174,11 @@
 		<?php }} ?>
 	</table>
 <?php	} else { ?>
+	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 <?php
  	$no = 1;
 	if ($bl != "0") {
 ?>
-<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr>
 		<td colspan="4"><b>Jenis Jasa</b></td>
 	</tr>
@@ -191,13 +191,11 @@
 	</tr>
 <?php } ?>
 <?php } ?>
-</table>
-<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 <?php if ($alat != "0") {?>
 	<?php foreach ($alat as $alat) { ?>
 			<tr>
-				<td><?php echo $no;$no++; ?></td>
-				<td><?php echo $alat["dtl_group_tariff_name"]; ?></td>
+				<td width="5%"><?php echo $no;$no++; ?></td>
+				<td width="66%"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
 				<td style="text-align:left">IDR</td>
 				<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
 			</tr>
