@@ -1446,12 +1446,12 @@ class ConnectedExternalApps{
       $string_json = '{ 
         "saveNotifRequest": { 
                 "esbHeader": { 
-                        "internalId": "", 
-                        "externalId": "1211344", 
-                        "timestamp": "", 
+                        "internalId": "0cee4735-956d-4da0-9521-e93cfe399849", 
+                        "externalId": "3443434", 
+                        "timestamp": "20200115 16:08:37.093", 
                         "responseTimestamp": "", 
-                        "responseCode": "", 
-                        "responseMessage": "" 
+                        "responseCode": "00", 
+                        "responseMessage": "Success" 
         }, 
                 "esbBody": { 
 
