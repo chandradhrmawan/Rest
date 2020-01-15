@@ -338,9 +338,9 @@ class RealisasiHelper{
       return ['result' => 'Fail, proforma not found!', 'no_req' => $input['req_no'], 'Success' => false];
     }
 
-    if (!empty($input['file']) and !empty($input['file']['PATH'] and !empty($input['file']['BASE64'])) {
+    if (!empty($input['file']) and !empty($input['file']['PATH']) and !empty($input['file']['BASE64'])) {
       if (empty($input['proforma_no'])) {
-        return ['Success' => false, 'result' => 'Fail, proforma no is null!']
+        return ['Success' => false, 'result' => 'Fail, proforma no is null!'];
       }
       $cekOldDoc  = DB::connection('omcargo')->table('TX_DOCUMENT')->where('req_no', $input['proforma_no'])->get();
       if (count($cekOldDoc) > 0) {
