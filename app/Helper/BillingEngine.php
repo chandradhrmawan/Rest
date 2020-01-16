@@ -986,11 +986,11 @@ class BillingEngine{
   }
 
   public static function getSimulasiTarif($input) {
-    $pbmCek = 'N';
-    $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$head['P_PBM_ID'])->where('BRANCH_ID',$head['P_BRANCH_ID'])->where('BRANCH_CODE',$head['P_BRANCH_CODE'])->count();
-    if ($countPBM > 0) { $pbmCek = 'Y'; }
     // build head
         $head                       = $input["HEADER"];
+        $pbmCek = 'N';
+        $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$head['P_PBM_ID'])->where('BRANCH_ID',$head['P_BRANCH_ID'])->where('BRANCH_CODE',$head['P_BRANCH_CODE'])->count();
+        if ($countPBM > 0) { $pbmCek = 'Y'; }
         $setH                       = [];
         $setH['P_NOTA_ID']          = $head['P_NOTA_ID'];
         $setH['P_BRANCH_ID']        = $head['P_BRANCH_ID'];
