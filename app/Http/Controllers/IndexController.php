@@ -294,4 +294,47 @@ class IndexController extends Controller
 
       return $data;
     }
+
+    function listproforma($input) {
+      $data     = [];
+
+      $proforma = DB::connection('omcargo')
+                  ->table("TX_HDR_NOTA")
+                  ->join("TM_REFF B", "B.REFF_ID", "=", "TX_HDR_NOTA.NOTA_STATUS")
+                  ->orderBy("TX_HDR_NOTA.NOTA_ID", "DESC");
+
+      if(!empty($input["where"][0])) {
+        $proforma->where($input["where"]);
+      }
+
+      if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['limit'])) {
+          $proforma->skip($input['start'])->take($input['limit']);
+        }
+      }
+
+      $header   = $proforma->get();
+      $count    = count($header);
+
+      foreach ($header as $list) {
+        $newDt = [];
+        foreach ($list as $key => $value) {
+          $newDt[$key] = $value;
+        }
+
+          $file   = DB::connection('omcargo')
+                    ->table('TX_DOCUMENT')
+                    ->where('REQ_NO', $newDt["nota_no"]);
+
+          $detil = $file->get();
+          foreach ($detil as $listS) {
+            foreach ($listS as $key => $value) {
+              $newDt[$key] = $value;
+            }
+          }
+          $result[] = $newDt;
+        }
+
+      return ["result"=>$result, "count"=>$count];
+  }
 }
