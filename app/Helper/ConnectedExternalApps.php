@@ -23,13 +23,13 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.getListTCA');
     $string_json = '{
          "getTCAHeaderInterfaceRequest": {
-            "esbHeader": {
-               "internalId": "",
-               "externalId": "",
-               "timestamp": "",
-               "responseTimestamp": "",
-               "responseCode": "",
-               "responseMessage": ""
+          "esbHeader": {
+            "internalId": "",
+            "externalId": "",
+            "timestamp": "",
+            "responseTimestamp": "",
+            "responseCode": "",
+            "responseMessage": ""
             },
             "esbBody": {
                "idPort": "201",
@@ -74,7 +74,14 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.getViewDetilTCA');
     $string_json = '{
         "getTCADetailInterfaceRequest": {
-            "esbHeader": {},
+          "esbHeader": {
+            "internalId": "",
+            "externalId": "",
+            "timestamp": "",
+            "responseTimestamp": "",
+            "responseCode": "",
+            "responseMessage": ""
+            },
             "esbBody": {
                 "noRequest": "'.$input['noRequest'].'"
             }
@@ -113,8 +120,12 @@ class ConnectedExternalApps{
     $string_json = '{
       "trackingVesselRequest": {
         "esbHeader": {
-          "externalId": "5275682735",
-          "timestamp": "YYYYMMDD HH:Mi:SS"
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
           },
           "esbBody": {
             "vesselName": "'.strtoupper($input['query']).'",
@@ -185,8 +196,12 @@ class ConnectedExternalApps{
     $string_json = '{
       "searchPEBRequest": {
         "esbHeader": {
-          "externalId": "5275682735",
-          "timestamp": "YYYYMMDD HH:Mi:SS"
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
           },
           "esbBody": {
             "username": "PLDB",
@@ -273,7 +288,14 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.realTosGet');
     $string_json = '{
       "searchRealisasiRequest": {
-        "esbHeader": { },
+        "esbHeader": {
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
+          },
           "esbBody": {
             "vvd": "'.$req->bm_vvd_id.'",
             "noblss": "'.$list->dtl_bm_bl.'"
@@ -474,13 +496,13 @@ class ConnectedExternalApps{
 
     $string_json= '{
        "arRequestDoc":{
-          "esbHeader":{
-             "internalId":"",
-             "externalId":"",
-             "timestamp":"",
-             "responseTimestamp":"",
-             "responseCode":"",
-             "responseMessage":""
+        "esbHeader": {
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
           },
           "esbBody":[
              {
@@ -590,13 +612,13 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.sendNotaPutReceipt');
     $string_json= '{
        "arRequestDoc":{
-          "esbHeader":{
-             "internalId":"",
-             "externalId":"",
-             "timestamp":"",
-             "responseTimestamp":"",
-             "responseCode":"",
-             "responseMessage":""
+        "esbHeader": {
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
           },
           "esbBody":[
              {
@@ -692,13 +714,13 @@ class ConnectedExternalApps{
 
     $string_json = '{
           "truckRegistrationInterfaceRequest": {
-              "esbHeader": {
-                "internalId": "",
-                "externalId": "",
-                "timestamp": "",
-                "responseTimestamp": "",
-                "responseCode": "",
-                "responseMessage": ""
+            "esbHeader": {
+              "internalId": "",
+              "externalId": "",
+              "timestamp": "",
+              "responseTimestamp": "",
+              "responseCode": "",
+              "responseMessage": ""
               },
               "esbBody": {
                   "vTruckId": "'. str_replace(' ','',$input['truck_plat_no']).'",
@@ -742,13 +764,13 @@ class ConnectedExternalApps{
 
     $string_json = '{
           "updateTidInterfaceRequest": {
-              "esbHeader": {
-                "internalId": "",
-                "externalId": "",
-                "timestamp": "",
-                "responseTimestamp": "",
-                "responseCode": "",
-                "responseMessage": ""
+            "esbHeader": {
+              "internalId": "",
+              "externalId": "",
+              "timestamp": "",
+              "responseTimestamp": "",
+              "responseCode": "",
+              "responseMessage": ""
               },
               "esbBody": {
                   "truckId": "'.$input['truck_plat_no'].'",
@@ -800,8 +822,14 @@ class ConnectedExternalApps{
 
     $string_json = '{
             "closeTCAInterfaceRequest": {
-               "esbHeader": {
-            },
+             "esbHeader": {
+              "internalId": "",
+              "externalId": "",
+              "timestamp": "",
+              "responseTimestamp": "",
+              "responseCode": "",
+              "responseMessage": ""
+              },
               "esbBody": {
                 "vTid": "'.$truck->truck_id_seq.'",
                 "vNoRequest": "'.$input['tca_req_no'].'",
@@ -859,13 +887,13 @@ class ConnectedExternalApps{
     $string_json = '{
      "createTCAInterfaceRequest": {
       "esbHeader": {
-       "internalId": "",
-       "externalId": "",
-       "timestamp": "",
-       "responseTimestamp": "",
-       "responseCode": "",
-       "responseMessage": ""
-       },
+        "internalId": "",
+        "externalId": "",
+        "timestamp": "",
+        "responseTimestamp": "",
+        "responseCode": "",
+        "responseMessage": ""
+        },
        "esbBody": {
         "vVessel": "'.$input['vVessel'].'",
          "vVin": "'.$input['vVin'].'",
@@ -1161,13 +1189,13 @@ class ConnectedExternalApps{
 
     $string_json = '{
      "arRequestDoc":{
-        "esbHeader":{
-           "internalId":"",
-           "externalId":"EDI-2910201921570203666",
-           "timestamp":"2019-10-29 21:57:020.36665400",
-           "responseTimestamp":"",
-           "responseCode":"",
-           "responseMessage":""
+      "esbHeader": {
+        "internalId": "",
+        "externalId": "",
+        "timestamp": "",
+        "responseTimestamp": "",
+        "responseCode": "",
+        "responseMessage": ""
         },
         "esbBody":[
           { "header": '.$head_json.', "lines": ['.$lines_json.'] }
@@ -1220,13 +1248,13 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.notaProformaPutApply');
     $string_json = '{
        "arRequestDoc":{
-          "esbHeader":{
-             "internalId":"",
-             "externalId":"EDI-2910201921570203666",
-             "timestamp":"2019-10-29 21:57:020.36665400",
-             "responseTimestamp":"",
-             "responseCode":"",
-             "responseMessage":""
+        "esbHeader": {
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
           },
           "esbBody":[
              {
@@ -1289,13 +1317,13 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.uperSimkeuCek');
     $string_json = '{
        "inquiryStatusReceiptRequest":{
-          "esbHeader":{
-             "internalId":"",
-             "externalId":"EDI-2910201921570203666",
-             "timestamp":"2019-10-29 21:57:020.36665400",
-             "responseTimestamp":"",
-             "responseCode":"",
-             "responseMessage":""
+        "esbHeader": {
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
           },
           "esbBody":[
              {
@@ -1348,13 +1376,14 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.notaProformaSimkeuCek');
     $string_json = '{
        "inquiryStatusLusnasRequest":{
-          "esbHeader":{
-             "internalId":"",
-             "externalId":"EDI-2910201921570203666",
-             "timestamp":"2019-10-29 21:57:020.36665400",
-             "responseTimestamp":"",
-             "responseCode":"",
-             "responseMessage":""
+        "esbHeader": {
+          "internalId": "",
+          "externalId": "",
+          "timestamp": "",
+          "responseTimestamp": "",
+          "responseCode": "",
+          "responseMessage": ""
+          },
           },
           "esbBody":[
              {
@@ -1401,13 +1430,13 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.getLinkCodeQR');
     $string_json = '{
                    "getDataCetakRequest":{
-                      "esbHeader":{
-                         "internalId":"",
-                         "externalId":"EDI-2910201921570203666",
-                         "timestamp":"2019-10-29 21:57:020.36665400",
-                         "responseTimestamp":"",
-                         "responseCode":"",
-                         "responseMessage":""
+                    "esbHeader": {
+                      "internalId": "",
+                      "externalId": "",
+                      "timestamp": "",
+                      "responseTimestamp": "",
+                      "responseCode": "",
+                      "responseMessage": ""
                       },
                       "esbBody":{
                          "kode":"billingedii",
@@ -1445,14 +1474,14 @@ class ConnectedExternalApps{
     foreach ($data as $list) {
       $string_json = '{ 
         "saveNotifRequest": { 
-                "esbHeader": { 
-                        "internalId": "0cee4735-956d-4da0-9521-e93cfe399849", 
-                        "externalId": "3443434", 
-                        "timestamp": "20200115 16:08:37.093", 
-                        "responseTimestamp": "", 
-                        "responseCode": "00", 
-                        "responseMessage": "Success" 
-        }, 
+          "esbHeader": {
+            "internalId": "",
+            "externalId": "",
+            "timestamp": "",
+            "responseTimestamp": "",
+            "responseCode": "",
+            "responseMessage": ""
+            },
                 "esbBody": { 
 
                         "pNotifType": "'.$list->notif_type.'", 
