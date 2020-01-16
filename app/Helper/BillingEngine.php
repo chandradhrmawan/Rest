@@ -890,7 +890,10 @@ class BillingEngine{
         if (empty($head['P_USER_ID'])) {
           return ["Success"=>false, 'result_flag' => false, 'result_msg' => 'Fail, user created by is null'];
         }
-        $setH = " P_SOURCE_ID => 'NPK_BILLING',";
+        if (empty($head['P_SOURCE_ID'])) {
+          $head['P_SOURCE_ID'] = 'NPK_BILLING';
+        }
+        $setH = " P_SOURCE_ID => '".$head['P_SOURCE_ID']."',";
         $setH .= " P_BRANCH_ID => '".$head['P_BRANCH_ID']."',";
         $setH .= " P_BRANCH_CODE => '".$head['P_BRANCH_CODE']."',";
         $setH .= " P_CUSTOMER_ID => '".$head['P_CUSTOMER_ID']."',";
@@ -903,7 +906,11 @@ class BillingEngine{
         $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
         $setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
         $setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
-        $setH .= " P_TRADE => '".$head['P_TRADE']."',";
+        if (empty($head['P_TRADE']) or $head['P_TRADE'] == 'NULL') {
+          $setH .= " P_TRADE => ".$head['P_TRADE'].",";
+        }else{
+          $setH .= " P_TRADE => '".$head['P_TRADE']."',";
+        }
         $setH .= " P_DETAIL => list_detail,";
         $setH .= " P_EQUIPMENT => list_equip,";
         $setH .= " P_PAY_SPLIT => list_paysplit,";
@@ -979,6 +986,9 @@ class BillingEngine{
   }
 
   public static function getSimulasiTarif($input) {
+    $pbmCek = 'N';
+    $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$head['P_PBM_ID'])->where('BRANCH_ID',$head['P_BRANCH_ID'])->where('BRANCH_CODE',$head['P_BRANCH_CODE'])->count();
+    if ($countPBM > 0) { $pbmCek = 'Y'; }
     // build head
         $head                       = $input["HEADER"];
         $setH                       = [];
@@ -987,7 +997,7 @@ class BillingEngine{
         $setH['P_BRANCH_CODE']      = $head['P_BRANCH_CODE'];
         $setH['P_CUSTOMER_ID']      = $head['P_CUSTOMER_ID'];
         $setH['P_RESTITUTION']      = 'N'; // ( N / Y ) DEFAULT N
-        $setH['P_PBM_INTERNAL']     = 'N';
+        $setH['P_PBM_INTERNAL']     = $pbmCek;
         $setH['P_BOOKING_NUMBER']   = $head['P_BOOKING_NUMBER'];
         $setH['P_REALIZATION']      = $head['P_REALIZATION'];
         $setH['P_TRADE']            = $head['P_TRADE'];
