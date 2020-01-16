@@ -100,7 +100,7 @@ class ViewController extends Controller
       ";
       if (!empty($input['pbm_id'])) {
         $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$input['pbm_id'])->where('BRANCH_ID',$input['branch_id'])->where('BRANCH_CODE',$input['branch_code'])->count();
-        if ($countPBM > 0) {
+        if ($countPBM == 0) {
           $sql = "SELECT * FROM (".$sql.") WHERE COMP_NOTA_NAME <> 'STEVEDORING'";
         }
       }
