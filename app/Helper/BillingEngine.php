@@ -292,6 +292,9 @@ class BillingEngine{
         $detilS->stacking_area      = $list['AREA'];
         $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
         $detilS->tariff_status      = $list['tariff_status'];
+        $detilS->via                = $list['VIA'];
+        $detilS->fumigasi_type      = $list['FUMIGATION_TYPE'];
+        $detilS->pluggin_type       = $list['PLUGGIN_TYPE'];
         $detilS->save();
         $result[] = $detilS;
       }
@@ -579,6 +582,9 @@ class BillingEngine{
       $cont_desc = "";
       $cont_status_desc = "";
       $cont_type_desc = "";
+      $cont_type_desc = "";
+      $via_name = "";
+      $fumigasi_name = "";
 
       $newDt = [];
       $newDt['equipment_type_id'] = '';
@@ -602,6 +608,8 @@ class BillingEngine{
       $newDt['commodity_unit_code'] = $commodity_unit_code;
       $newDt['commodity_unit_name'] = $commodity_unit_name;
       $newDt['commodity_unit_min'] = $commodity_unit_min;
+      $newDt['via_name'] = $via_name;
+      $newDt['fumigasi_name'] = $fumigasi_name;
 
       $newDt['tariff_reference_name'] = '';
       if (!empty($list->tariff_reference)) {
@@ -613,6 +621,14 @@ class BillingEngine{
       }
       foreach ($list as $key => $value) {
         $newDt[$key] = $value;
+        if (strtoupper($key) == 'VIA' and !empty($value)) {
+          $via_name = DB::connection('mdm')->table('TM_REFF')->where('reff_tr_id',4)->where('reff_id', $value)->first();
+          $via_name = $via_name->reff_name;
+        }
+        if (strtoupper($key) == 'FUMIGASI_TYPE' and !empty($value)) {
+          $fumigasi_name = DB::connection('mdm')->table('TM_REFF')->where('reff_tr_id',12)->where('reff_id', $value)->first();
+          $fumigasi_name = $fumigasi_name->reff_name;
+        }
         if (strtoupper($key) == 'ISO_CODE' and !empty($value)) {
           $package_name = "";
           $package_code = "";
@@ -769,6 +785,8 @@ class BillingEngine{
       $newDt['cont_status_desc'] = $cont_status_desc;
       $newDt['cont_type_desc'] = $cont_type_desc;
       $newDt['group_tarif_name'] = $group_tariff_name;
+      $newDt['via_name'] = $via_name;
+      $newDt['fumigasi_name'] = $fumigasi_name;
       $response_detil[] = $newDt;
     }
     // return $response_detil;

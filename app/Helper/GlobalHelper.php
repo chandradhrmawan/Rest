@@ -539,6 +539,11 @@ class GlobalHelper {
     } else {
       $data   = $connect->get();
       }
+
+      // query builder
+      $addSlashes = str_replace('?', "'?'", $connect->toSql());
+      $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
+
       return ["result"=>$data, "count"=>count($data)];
   }
 
