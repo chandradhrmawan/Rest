@@ -292,6 +292,9 @@ class BillingEngine{
         $detilS->stacking_area      = $list['AREA'];
         $detilS->tariff_reference   = $list['TARIFF_REFERENCE'];
         $detilS->tariff_status      = $list['tariff_status'];
+        $detilS->via                = $list['VIA'];
+        $detilS->fumigasi_type      = $list['FUMIGATION_TYPE'];
+        $detilS->pluggin_type       = $list['PLUGGIN_TYPE'];
         $detilS->save();
         $result[] = $detilS;
       }
