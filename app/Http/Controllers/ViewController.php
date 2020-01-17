@@ -53,7 +53,7 @@ class ViewController extends Controller
         WHERE
           BRANCH_ID = ^$^branch_id
           AND BRANCH_CODE = '^$^branch_code'
-          AND COMP_FORM_SHOW = 'Y'
+          -- AND COMP_FORM_SHOW = 'Y'
           AND NOTA_ID IN  
           (
             SELECT DISTINCT 
@@ -98,11 +98,9 @@ class ViewController extends Controller
             )
           )
       ";
-      if (!empty($input['pbm_id'])) {
-        $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$input['pbm_id'])->where('BRANCH_ID',$input['branch_id'])->where('BRANCH_CODE',$input['branch_code'])->count();
-        if ($countPBM == 0) {
-          $sql = "SELECT * FROM (".$sql.") WHERE COMP_NOTA_NAME <> 'STEVEDORING'";
-        }
+      $countPBM = DB::connection('mdm')->table('TM_PBM_INTERNAL')->where('PBM_ID',$input['pbm_id'])->where('BRANCH_ID',$input['branch_id'])->where('BRANCH_CODE',$input['branch_code'])->count();
+      if ($countPBM == 0) {
+        $sql = "SELECT * FROM (".$sql.") WHERE COMP_NOTA_NAME <> 'STEVEDORING'";
       }
 
 
@@ -110,7 +108,7 @@ class ViewController extends Controller
       $replaceVal = array($input['branch_id'], $input['branch_code'], $input['nota_id'], $input['cust_profile_id']);
       $sql = str_replace($searchVal, $replaceVal, $sql);
       $result = DB::connection('eng')->select(DB::raw($sql));
-      return ["response" => $result, "query" => $sql];
+      return ["result" => $result, "count" => count($result), "query" => $sql];
     }
 
     function getViewDetilTCA($input, $request){
