@@ -294,7 +294,7 @@ class BillingEngine{
         $detilS->tariff_status      = $list['tariff_status'];
         $detilS->via                = $list['VIA'];
         $detilS->fumigasi_type      = $list['FUMIGATION_TYPE'];
-        $detilS->pluggin_type       = $list['PLUGGIN_TYPE'];
+        $detilS->pluggin_unit       = $list['PLUGGIN_UNIT'];
         $detilS->save();
         $result[] = $detilS;
       }
