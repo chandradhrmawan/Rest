@@ -585,6 +585,7 @@ class BillingEngine{
       $cont_type_desc = "";
       $via_name = "";
       $fumigasi_name = "";
+      $plugging_unit_name = "";
 
       $newDt = [];
       $newDt['equipment_type_id'] = '';
@@ -610,6 +611,7 @@ class BillingEngine{
       $newDt['commodity_unit_min'] = $commodity_unit_min;
       $newDt['via_name'] = $via_name;
       $newDt['fumigasi_name'] = $fumigasi_name;
+      $newDt['plugging_unit_name'] = $plugging_unit_name;
 
       $newDt['tariff_reference_name'] = '';
       if (!empty($list->tariff_reference)) {
@@ -621,6 +623,10 @@ class BillingEngine{
       }
       foreach ($list as $key => $value) {
         $newDt[$key] = $value;
+        if (strtoupper($key) == 'PLUGGIN_UNIT' and !empty($value)) {
+          $plugging_unit_name = DB::connection('mdm')->table('TM_UNIT')->where('unit_id', $value)->first();
+          $plugging_unit_name = $plugging_unit_name->unit_name;
+        }
         if (strtoupper($key) == 'VIA' and !empty($value)) {
           $via_name = DB::connection('mdm')->table('TM_REFF')->where('reff_tr_id',4)->where('reff_id', $value)->first();
           $via_name = $via_name->reff_name;
@@ -787,6 +793,7 @@ class BillingEngine{
       $newDt['group_tarif_name'] = $group_tariff_name;
       $newDt['via_name'] = $via_name;
       $newDt['fumigasi_name'] = $fumigasi_name;
+      $newDt['plugging_unit_name'] = $plugging_unit_name;
       $response_detil[] = $newDt;
     }
     // return $response_detil;
