@@ -707,8 +707,9 @@ class GlobalHelper {
           if (isset($list["id"])) {
             unset($list["id"]);
           }
-          $directory  = $val["DB"].'/'.$val["TABLE"].'/'.str_random(5).'/';
-          $response   = FileUpload::upload_file($list, $directory);
+
+          $directory  = $val["DB"].'/'.strtoupper($val["TABLE"]).'/'.date('d-m-Y').'/';
+          $response   = FileUpload::upload_file($list, $directory,$input["HEADER"]["TABLE"], $header[strtolower($input["HEADER"]["PK"])]);
           if (!empty($list["DOC_TYPE"])) {
             if (!empty($list["DOC_NAME"])) {
               $addVal     = [$val["FK"][0]=>$header[$val["FK"][1]]]+['doc_no'=>$list["DOC_NO"],'doc_type'=>$list["DOC_TYPE"],'doc_name'=>$list["DOC_NAME"],'doc_path'=>$response['link']];
@@ -798,7 +799,13 @@ class GlobalHelper {
           $fil     = [];
           $fk      = $val["FK"][0];
           $fkhdr   = $header[0][$val["FK"][1]];
-          $detail  = $connect->where(strtoupper($fk), "like", "%".strtoupper($fkhdr)."%")->delete();
+          $detail  = $connect->where(strtoupper($fk), "like", "%".strtoupper($fkhdr)."%")->first();
+            if (file_exists($detail->doc_path)) {
+              $file    = unlink($detail->doc_path);
+              $result["file"] = "File delete success";
+            } else {
+              $result["file"] = "Error Delete File / File Not Found";
+            }
           }
 
         else {
@@ -807,9 +814,9 @@ class GlobalHelper {
           $detail  = $connect->where(strtoupper($fk), "like",  "%".strtoupper($fkhdr)."%")->delete();
         }
     }
-
+    $result["header"] = $pk." = ".$header[0][strtolower($pk)]." Delete Success";
     $delHead = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where(strtoupper($pk), "like", strtoupper($pkVal))->delete();
-    return "Data Berhasil Dihapus";
+    return $result;
   }
 
   public static function tanggalMasukKeluar($service, $req_no, $no) {
