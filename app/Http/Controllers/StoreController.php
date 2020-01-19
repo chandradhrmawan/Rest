@@ -184,6 +184,7 @@ class StoreController extends Controller
         $new->comp_name = $input['truck_cust_name'];
         $new->comp_address = $input['truck_cust_address'];
         $new->comp_branch_id = $input['truck_branch_id'];
+        $new->comp_branch_code = $input['truck_branch_code'];
         $new->save();
         $input['truck_cust_id'] = $new->comp_id;
       }
