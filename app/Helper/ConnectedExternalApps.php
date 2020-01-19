@@ -487,7 +487,7 @@ class ConnectedExternalApps{
 
   public static function sendUperPutReceipt($uper_id, $pay){
     $uperH = TxHdrUper::find($uper_id);
-    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$uperH->uper_branch_id)->where('branch_code',$uperH->uper_branch_id)->get();
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$uperH->uper_branch_id)->where('branch_code',$uperH->uper_branch_code)->get();
     $branch = $branch[0];
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
