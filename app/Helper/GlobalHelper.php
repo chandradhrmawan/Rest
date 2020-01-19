@@ -666,6 +666,9 @@ class GlobalHelper {
     $data    = $input["data"];
     $count   = count($input["data"]);
     $cek     = $input["HEADER"]["PK"];
+    $dbhdr   = $input["HEADER"]["DB"];
+    $tblhdr  = $input["HEADER"]["TABLE"];
+
 
     if(!empty($input["HEADER"]["SEQUENCE"])) {
     $sq      = $input["HEADER"]["SEQUENCE"];
@@ -695,8 +698,12 @@ class GlobalHelper {
             $insert       = $connect->where($cek,$hdr[0][$cek])->update($value);
           }
         }
-        $header   = $connect->orderby($val["PK"], "desc")->first();
+
+        $sequence = DB::connection('omcargo')->table("user_sequences")->select("last_number")->where('sequence_name', 'SEQ_'.$tblhdr)->get();
+        $seq      = ($sequence[0]->last_number)-1;
+        $header   = DB::connection($dbhdr)->table($tblhdr)->where($cek, $seq)->first();
         $header   = json_decode(json_encode($header), TRUE);
+
       }
       else if($data == "FILE") {
         if ($hdr[0][$cek] != '') {

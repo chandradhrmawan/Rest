@@ -294,7 +294,7 @@ class ViewController extends Controller
     }
     // UserAndRoleManagemnt
 
-    function printGetPass($id) {
+  function printGetPass($id) {
       $data = DB::connection("omcargo")
                 ->table("TX_HDR_TCA")
                 ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
@@ -306,8 +306,26 @@ class ViewController extends Controller
                   ])
                 ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
                 ->get();
+      $request = substr($data[0]->tca_req_no,0,3);
 
-      $html = view('print.getPass', ["data"=>$data]);
+      if ($request == "DEL") {
+        $title = "DELIVERY";
+      } else if ($request == "REC") {
+        $title = "RECEIVING";
+      } else {
+        $req     = DB::connection('omcargo')->table("TX_HDR_BM")->where('BM_NO', $data[0]->tca_req_no)->get();
+        $hdrid   = $req[0]->bm_id;
+        $req_det = DB::connection('omcargo')->table("TX_DTL_BM")->where('HDR_BM_ID', $hdrid)->get();
+        $tl      = $req_det[0]->dtl_bm_tl;
+        $type    = $req_det[0]->dtl_bm_type;
+        if ($tl == "Y" && $type == "Bongkar") {
+          $title = "DELIVERY";
+        } else {
+          $title = "RECEIVING";
+        }
+      }
+
+      $html = view('print.getPass', ["data"=>$data, "title" => $title]);
       $filename = "Test";
       $dompdf = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
