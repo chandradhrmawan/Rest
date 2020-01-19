@@ -6,12 +6,15 @@ use Illuminate\Http\Request;
 
 class FileUpload{
 
-	public static function upload_file($file, $directory, $table, $id)
+	public static function upload_file($file, $directory, $table = null, $id = null)
 	{
 		if (!file_exists($directory)){
             mkdir($directory, 0777);
         }
-				$path 				= $table."_".$id."_".$file['PATH'];
+        $path         = $file['PATH'];
+        if (!empty($table) and !empty($id)) {
+          $path         = $table."_".$id."_".$path;
+        }
         $decoded_file = base64_decode($file['BASE64']); // decode the file
         $file 				= explode('/', $path);
         $file 				= $file[count($file)-1];
