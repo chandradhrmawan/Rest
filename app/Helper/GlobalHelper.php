@@ -51,7 +51,7 @@ class GlobalHelper {
               foreach ($list as $key => $value) {
                 $newDt[$key] = $value;
               }
-              $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
+              $dataUrl = "http://10.88.56.112/api/public/".$detail[0]["doc_path"];
               $url     = str_replace(" ", "%20", $dataUrl);
               $file = file_get_contents($url);
               $newDt["base64"]  =  base64_encode($file);
@@ -131,7 +131,7 @@ class GlobalHelper {
            foreach ($list as $key => $value) {
              $newDt[$key] = $value;
            }
-           $dataUrl = "http://10.88.48.33/api/public/".$list->doc_path;
+           $dataUrl = "http://10.88.56.112/api/public/".$list->doc_path;
            $url     = str_replace(" ", "%20", $dataUrl);
            $file = file_get_contents($url);
            $newDt["base64"]  =  base64_encode($file);

@@ -184,8 +184,8 @@ class UperRequest{
           $pay->save();
 
           if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
-            $directory  = 'omcargo/tx_payment/'.$pay->pay_id.'/';
-            $response   = FileUpload::upload_file($input['pay_file'], $directory);
+            $directory  = 'omcargo/TX_PAYMENT/'.date('d-m-Y').'/';
+            $response   = FileUpload::upload_file($input['pay_file'], $directory, "TX_PAYMENT", $pay->pay_id);
             if ($response['response'] == true) {
               TxPayment::where('pay_id',$pay->pay_id)->update([
                 'pay_file' => $response['link']

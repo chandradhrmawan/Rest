@@ -316,6 +316,11 @@ class IndexController extends Controller
       $header   = $proforma->get();
       $count    = count($header);
 
+      if (empty($header)) {
+        $result  = "";
+        $count   = 0;
+      }
+
       foreach ($header as $list) {
         $newDt = [];
         foreach ($list as $key => $value) {

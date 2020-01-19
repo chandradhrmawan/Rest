@@ -51,8 +51,12 @@ class BillingEngine{
             unlink($headS->tariff_file);
           }
 
-          $directory  = 'billing/profile_tariff/'.$headS->tariff_id.'/';
-          $response   = FileUpload::upload_file($head['FILE'], $directory);
+          // Ubah
+          $directory  = 'billing/profile_tariff/'.date('d-m-Y').'/';
+          $response   = FileUpload::upload_file($head['FILE'], $directory, "TX_PROFILE_TARIFF_HDR", $headS->tariff_id);
+
+          // $directory  = 'billing/profile_tariff/'.$headS->tariff_id.'/';
+          // $response   = FileUpload::upload_file($head['FILE'], $directory);
           if ($response['response'] == true) {
             TxProfileTariffHdr::where('tariff_id',$headS->tariff_id)->update([
               'tariff_name' => $head['TARIFF_NAME'],
