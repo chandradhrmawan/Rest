@@ -15,7 +15,8 @@ class TxProfileTariffHdr extends Model
     	"tariff_type",
     	"tariff_start",
     	"tariff_end",
-    	"branch_id",
+      "branch_id",
+    	"branch_code",
     	"tariff_no",
     	"tariff_status",
     	"created_date",
@@ -26,19 +27,19 @@ class TxProfileTariffHdr extends Model
     	"tariff_short_name"
     ];
 
-    protected $appends = ['branch_code','branch_name'];
+    protected $appends = ['branch_name'];
 
-    public function getBranchCodeAttribute(){
-      $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
-      if (count($get) > 0) {
-        return $get[0]->branch_code;
-      }else{
-        return '-';
-      }
-    }
+    // public function getBranchCodeAttribute(){
+    //   $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
+    //   if (count($get) > 0) {
+    //     return $get[0]->branch_code;
+    //   }else{
+    //     return '-';
+    //   }
+    // }
 
     public function getBranchNameAttribute(){
-      $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->get();
+      $get = DB::connection('mdm')->table('TM_BRANCH')->where('BRANCH_ID', $this->attributes['branch_id'])->where('BRANCH_CODE', $this->attributes['branch_code'])->get();
       if (count($get) > 0) {
         return $get[0]->branch_name;
       }else{
