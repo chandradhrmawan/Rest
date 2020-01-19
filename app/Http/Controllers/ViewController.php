@@ -294,7 +294,7 @@ class ViewController extends Controller
     }
     // UserAndRoleManagemnt
 
-    function printGetPass($id) {
+  function printGetPass($id) {
       $data = DB::connection("omcargo")
                 ->table("TX_HDR_TCA")
                 ->join("TX_DTL_TCA","TX_DTL_TCA.TCA_HDR_ID","=","TX_HDR_TCA.TCA_ID")
@@ -306,8 +306,26 @@ class ViewController extends Controller
                   ])
                 ->orderBy("TX_HDR_TCA.TCA_ID", "desc")
                 ->get();
+      $request = substr($data[0]->tca_req_no,0,3);
 
-      $html = view('print.getPass', ["data"=>$data]);
+      if ($request == "DEL") {
+        $title = "DELIVERY";
+      } else if ($request == "REC") {
+        $title = "RECEIVING";
+      } else {
+        $req     = DB::connection('omcargo')->table("TX_HDR_BM")->where('BM_NO', $data[0]->tca_req_no)->get();
+        $hdrid   = $req[0]->bm_id;
+        $req_det = DB::connection('omcargo')->table("TX_DTL_BM")->where('HDR_BM_ID', $hdrid)->get();
+        $tl      = $req_det[0]->dtl_bm_tl;
+        $type    = $req_det[0]->dtl_bm_type;
+        if ($tl == "Y" && $type == "Bongkar") {
+          $title = "DELIVERY";
+        } else {
+          $title = "RECEIVING";
+        }
+      }
+
+      $html = view('print.getPass', ["data"=>$data, "title" => $title]);
       $filename = "Test";
       $dompdf = new Dompdf();
       $dompdf->set_option('isRemoteEnabled', true);
@@ -1286,4 +1304,77 @@ class ViewController extends Controller
 
     return ["result"=>$result, "count"=>$count];
   }
+
+  function einvoiceLink($input) {
+    $query = "
+              SELECT
+              A.*,
+              CASE
+              WHEN A.NOTA_GROUP_ID = 13
+              THEN
+                (SELECT Y.BM_KADE FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
+              WHEN A.NOTA_GROUP_ID = 14
+              THEN
+                (SELECT X.REC_KADE FROM TX_HDR_REC X WHERE X.REC_NO = A.NOTA_REQ_NO )
+              WHEN A.NOTA_GROUP_ID = 15
+              THEN
+                (SELECT Z.DEL_KADE FROM TX_HDR_DEL Z WHERE Z.DEL_NO = A.NOTA_REQ_NO)
+              END AS KADE,
+              CASE
+                    WHEN A.NOTA_GROUP_ID = 13
+                      THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
+                    WHEN A.NOTA_GROUP_ID = 14
+                      THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
+                    WHEN A.NOTA_GROUP_ID IN (15,19)
+                      THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
+                    END AS PERIODE
+            FROM
+              TX_HDR_NOTA A
+            WHERE
+              A.NOTA_NO = '".$input["nota_no"]."'
+            ";
+
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+    $string_json = '{
+                   "getDataCetakRequest":{
+                      "esbHeader":{
+                         "internalId":"",
+                         "externalId":"EDI-2910201921570203666",
+                         "timestamp":"2019-10-29 21:57:020.36665400",
+                         "responseTimestamp":"",
+                         "responseCode":"",
+                         "responseMessage":""
+                      },
+                      "esbBody":{
+                         "kode":"billingedii",
+                         "tipe":"nota",
+                         "nota":"'.$input["nota_no"].'"
+                      }
+                   }
+                }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    $results  = json_decode($res->getBody()->getContents(), true);
+    $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+
+    return ["link" => $qrcode];
+  }
+
+
 }

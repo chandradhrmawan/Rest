@@ -666,6 +666,9 @@ class GlobalHelper {
     $data    = $input["data"];
     $count   = count($input["data"]);
     $cek     = $input["HEADER"]["PK"];
+    $dbhdr   = $input["HEADER"]["DB"];
+    $tblhdr  = $input["HEADER"]["TABLE"];
+
 
     if(!empty($input["HEADER"]["SEQUENCE"])) {
     $sq      = $input["HEADER"]["SEQUENCE"];
@@ -679,6 +682,9 @@ class GlobalHelper {
       if ($data == "HEADER") {
         $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
         if ($hdr[0][$cek] == '' || $sq == "N") {
+          $sequence = DB::connection('omcargo')->table("DUAL")->select("SEQ_".$tblhdr.".NEXTVAL")->get();
+          $seq      = ($sequence[0]->nextval);
+
           if (isset($input["cekdb"])) {
             $field = $input["cekdb"];
             $value = $input["HEADER"]["VALUE"][0][$field];
@@ -687,16 +693,34 @@ class GlobalHelper {
               return ["Success"=>"F", "Error"=>"Data With $field = $value Already Exist"];
             }
           }
-          foreach ($val["VALUE"] as $value) {
+
+          foreach ($val["VALUE"] as $list) {
+            $newDt = [];
+            foreach ($list as $key => $value) {
+              if ($key == $cek) {
+                $newDt[$key] = $seq;
+              } else {
+                $newDt[$key] = $value;
+              }
+            }
+          }
+
+          $datahdr[] = $newDt;
+          foreach ($datahdr as $value) {
             $insert       = $connect->insert([$value]);
           }
+
+        $header   = DB::connection($dbhdr)->table($tblhdr)->where($cek, $seq)->first();
+        $header   = json_decode(json_encode($header), TRUE);
+
         } else {
           foreach ($val["VALUE"] as $value) {
             $insert       = $connect->where($cek,$hdr[0][$cek])->update($value);
+            $header   = DB::connection($dbhdr)->table($tblhdr)->where($cek, $input["HEADER"]["VALUE"][0][$cek])->first();
+            $header   = json_decode(json_encode($header), TRUE);
           }
         }
-        $header   = $connect->orderby($val["PK"], "desc")->first();
-        $header   = json_decode(json_encode($header), TRUE);
+
       }
       else if($data == "FILE") {
         if ($hdr[0][$cek] != '') {
