@@ -487,7 +487,7 @@ class ConnectedExternalApps{
 
   public static function sendUperPutReceipt($uper_id, $pay){
     $uperH = TxHdrUper::find($uper_id);
-    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$uperH->uper_branch_id)->where('branch_code',$uperH->uper_branch_id)->get();
     $branch = $branch[0];
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
@@ -604,7 +604,7 @@ class ConnectedExternalApps{
 
   public static function sendNotaPutReceipt($nota_id, $pay){
     $notaH = TxHdrNota::find($nota_id);
-    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$notaH->nota_branch_id)->where('branch_code',$notaH->nota_branch_code)->get();
     $branch = $branch[0];
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
@@ -952,7 +952,7 @@ class ConnectedExternalApps{
   public static function sendNotaProforma($nota_id){
     $endpoint_url=config('endpoint.sendNotaProforma');
     $find = TxHdrNota::find($nota_id);
-    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$find->nota_branch_id)->get();
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$find->nota_branch_id)->where('branch_code',$find->nota_branch_code)->get();
     $branch = $branch[0];
 
     $findU_uper_no = null;
@@ -1240,7 +1240,7 @@ class ConnectedExternalApps{
 
   public static function notaProformaPutApply($nota_id, $pay){
     $notaH = TxHdrNota::find($nota_id);
-    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$pay->pay_branch_id)->get();
+    $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$notaH->nota_branch_id)->where('branch_code',$notaH->nota_branch_code)->get();
     $branch = $branch[0];
     $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
     $bank = $bank[0];
