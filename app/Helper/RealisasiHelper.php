@@ -250,7 +250,7 @@ class RealisasiHelper{
       // store head
         $app_id = DB::connection('omcargo')->table($tabReq)->where($reqNo, $req_no)->get();
         $app_id = $app_id[0];
-        
+
         $headN = new TxHdrNota;
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
@@ -347,8 +347,12 @@ class RealisasiHelper{
         unlink($cekOldDoc[0]->doc_path);
         DB::connection('omcargo')->table('TX_DOCUMENT')->where('req_no', $input['proforma_no'])->delete();
       }
-      $directory  = 'omcargo/TX_DOCUMENT/rejectedProformaNota'.$input['req_no'].'/';
-      $response   = FileUpload::upload_file($input['file'], $directory);
+      // Ubah
+      $directory  = 'omcargo/TX_DOCUMENT/'.date('d-m-Y').'/';
+      $response   = FileUpload::upload_file($input['file'], $directory, "TX_NOTA_REJECT_PROFORMA", $input['req_no']);
+
+      // $directory  = 'omcargo/TX_DOCUMENT/rejectedProformaNota'.$input['req_no'].'/';
+      // $response   = FileUpload::upload_file($input['file'], $directory);
       DB::connection('omcargo')->table('TX_DOCUMENT')->insert([
         'REQ_NO' => $input['proforma_no'],
         'DOC_NO' => $input['file']['DOC_NO'],
