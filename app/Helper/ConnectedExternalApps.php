@@ -965,6 +965,11 @@ class ConnectedExternalApps{
       $findU_uper_terminal_code = $findU->uper_terminal_code;
       $findU_uper_amount = $findU->uper_amount;
     }
+    if (strtoupper($find->nota_branch_code) == 'PTN') {
+      $branchCode = 'BTN';
+    }else{
+      $branchCode = $find->nota_branch_code;
+    }
 
     $head_json = '{
        "billerRequestId":"'.$find->nota_req_no.'",
@@ -995,7 +1000,7 @@ class ConnectedExternalApps{
        "endDate":null,
        "terminal":"'.$findU_uper_terminal_code.'",
        "vesselName":"'.$find->nota_vessel_name.'",
-       "branchCode":"'.$find->nota_branch_code.'",
+       "branchCode":"'.$branchCode.'",
        "errorMessage":"",
        "apiMessage":"",
        "createdBy":"-1",
