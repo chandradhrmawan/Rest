@@ -489,7 +489,7 @@ class ConnectedExternalApps{
     $uperH = TxHdrUper::find($uper_id);
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$uperH->uper_branch_id)->where('branch_code',$uperH->uper_branch_code)->get();
     $branch = $branch[0];
-    $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
+    $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->where('branch_code',$uperH->uper_branch_code)->get();
     $bank = $bank[0];
 
     $endpoint_url=config('endpoint.sendUperPutReceipt');
@@ -606,7 +606,7 @@ class ConnectedExternalApps{
     $notaH = TxHdrNota::find($nota_id);
     $branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$notaH->nota_branch_id)->where('branch_code',$notaH->nota_branch_code)->get();
     $branch = $branch[0];
-    $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->get();
+    $bank = DB::connection('mdm')->table('TM_BANK')->where('bank_code',$pay->pay_bank_code)->where('branch_id',$pay->pay_branch_id)->where('branch_code',$notaH->nota_branch_code)->get();
     $bank = $bank[0];
 
     $endpoint_url=config('endpoint.sendNotaPutReceipt');
@@ -965,10 +965,16 @@ class ConnectedExternalApps{
       $findU_uper_terminal_code = $findU->uper_terminal_code;
       $findU_uper_amount = $findU->uper_amount;
     }
+    
     if (strtoupper($find->nota_branch_code) == 'PTN') {
       $branchCode = 'BTN';
     }else{
       $branchCode = $find->nota_branch_code;
+    }
+    if (strtoupper($find->branch_account) == '081') {
+      $branchAccount = '080';
+    }else{
+      $branchAccount = $find->branch_account;
     }
 
     $head_json = '{
@@ -1061,7 +1067,7 @@ class ConnectedExternalApps{
        "uangJaminan":"'.$findU_uper_amount.'",
        "piutang":"'.($find->nota_amount-$findU_uper_amount).'",
        "sourceInvoiceType":"'.$find->nota_context.'",
-       "branchAccount":"'.$branch->branch_account.'",
+       "branchAccount":"'.$branchAccount.'",
        "statusCetak":"",
        "statusKirimEmail":"",
        "amountDasarPenghasilan":"'.$find->nota_dpp.'",
@@ -1165,12 +1171,12 @@ class ConnectedExternalApps{
           "locationTerminal":"",
           "amount":"'.$list->dtl_dpp.'",
           "taxAmount":"'.$list->dtl_ppn.'",
-          "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
-          "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "startDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).' 00:00:00",
+          "endDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).' 00:00:00",
           "createdBy":"-1",
-          "creationDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "creationDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).' 00:00:00",
           "lastUpdatedBy":"-1",
-          "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).'",
+          "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->dtl_create_date)).' 00:00:00",
           "interfaceLineAttribute1":"",
           "interfaceLineAttribute2":"'.$list->dtl_service_type.'",
           "interfaceLineAttribute3":"-",
