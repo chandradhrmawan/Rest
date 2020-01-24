@@ -993,6 +993,7 @@ class ConnectedExternalApps{
     }
 
     $branchAccount = $find->branch_account;
+    $notaDate      = $find->nota_date;
 
     $head_json = '{
        "billerRequestId":"'.$find->nota_req_no.'",
@@ -1001,7 +1002,7 @@ class ConnectedExternalApps{
        "trxNumberOrig":"",
        "trxNumberPrev":"",
        "trxTaxNumber":"",
-       "trxDate":"'.date('Y-m-d', strtotime($find->nota_date)).' 00:00:00",
+       "trxDate":"'.$notaDate.'",
        "trxClass":"INV",
        "trxTypeId":"-1",
        "paymentReferenceNumber":"",
@@ -1027,9 +1028,9 @@ class ConnectedExternalApps{
        "errorMessage":"",
        "apiMessage":"",
        "createdBy":"-1",
-       "creationDate":"'.date('Y-m-d', strtotime($find->nota_date)).' 00:00:00",
+       "creationDate":"'.$notaDate.'",
        "lastUpdatedBy":"-1",
-       "lastUpdateDate":"'.date('Y-m-d', strtotime($find->nota_date)).' 00:00:00",
+       "lastUpdateDate":"'.$notaDate.'",
        "lastUpdateLogin":"-1",
        "customerTrxIdOut":null,
        "processFlag":"",
@@ -1075,7 +1076,7 @@ class ConnectedExternalApps{
        "jenisPerdagangan":"",
        "docNum":"",
        "statusLunas":"",
-       "tglPelunasan":"'.date('Y-m-d', strtotime($find->nota_date)).'",
+       "tglPelunasan":"'.$notaDate.'",
        "amountTerbilang":"",
        "ppnDipungutSendiri":"'.$find->nota_ppn.'",
        "ppnDipungutPemungut":"",
@@ -1106,8 +1107,8 @@ class ConnectedExternalApps{
         $masa2 = "";
         $hitM1 = "";
         $hitM2 = "";
-        $dateIn = date('Y-m-d', strtotime($find->nota_date));
-        $dateOut = date('Y-m-d', strtotime($find->nota_date));
+        $dateIn = $notaDate;
+        $dateOut = $notaDate;
         if ($list->dtl_group_tariff_id == 10) {
           $masa11 = $list->masa1;
           $masa2 = $list->masa2;
@@ -1149,9 +1150,9 @@ class ConnectedExternalApps{
           "startDate":"'.$dateIn.'",
           "endDate":"'.$dateOut.'",
           "createdBy":"-1",
-          "creationDate":"'.date('Y-m-d', strtotime($find->nota_date)).'",
+          "creationDate":"'.$notaDate.'",
           "lastUpdatedBy":"-1",
-          "lastUpdatedDate":"'.date('Y-m-d', strtotime($find->nota_date)).'",
+          "lastUpdatedDate":"'.$notaDate.'",
           "interfaceLineAttribute1":"",
           "interfaceLineAttribute2":"'.$dateIn.'",
           "interfaceLineAttribute3":"'.$dateOut.'",
@@ -1188,12 +1189,12 @@ class ConnectedExternalApps{
           "locationTerminal":"",
           "amount":"'.$list->dtl_dpp.'",
           "taxAmount":"'.$list->dtl_ppn.'",
-          "startDate":"'.date('Y-m-d', strtotime(strtr($find->dtl_create_date, '/', '-'))).'",
-          "endDate":"'.date('Y-m-d', strtotime(strtr($find->dtl_create_date, '/', '-'))).'",
+          "startDate":"'.$notaDate.'",
+          "endDate":"'.$notaDate.'",
           "createdBy":"-1",
-          "creationDate":"'.date('Y-m-d', strtotime(strtr($find->dtl_create_date, '/', '-'))).'",
+          "creationDate":"'.$notaDate.'",
           "lastUpdatedBy":"-1",
-          "lastUpdatedDate":"'.date('Y-m-d', strtotime(strtr($find->dtl_create_date, '/', '-'))).'",
+          "lastUpdatedDate":"'.$notaDate.'",
           "interfaceLineAttribute1":"",
           "interfaceLineAttribute2":"'.$list->dtl_service_type.'",
           "interfaceLineAttribute3":"-",
