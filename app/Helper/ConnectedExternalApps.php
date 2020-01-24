@@ -394,9 +394,16 @@ class ConnectedExternalApps{
       $packageNameParent = $packageNameParent[0];
       $packageNameParent = $packageNameParent->package_name;
       $vparam .= '^'.$packageNameParent; // PKG_NAME
-      $vparam .= '^'.$list->dtl_qty; // TON
-      $vparam .= '^'.$list->dtl_qty; // CUBIC
-      $vparam .= '^'.$list->dtl_qty; // QTY
+      $paramTon = 0;
+      $paramCub = 0;
+      if ($list->dtl_unit_id == 1 or $list->dtl_unit_id == 2) {
+        $paramTon = $list->dtl_qty;
+      } else if ($list->dtl_unit_id == 3) {
+        $paramCub = $list->dtl_qty;
+      }
+      $vparam .= '^'.$paramTon; // TON
+      $vparam .= '^'.$paramCub; // CUBIC
+      $vparam .= '^0'; // QTY
       $vparam .= '^'; // ID_INV
       $vparam .= '^'.$head[$config['head_no']]; // ID_REQ
       if ($req_type == 'BM') {
