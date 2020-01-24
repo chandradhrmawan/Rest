@@ -51,7 +51,7 @@ class GlobalHelper {
               foreach ($list as $key => $value) {
                 $newDt[$key] = $value;
               }
-              $dataUrl = "http://10.88.56.112/api/public/".$detail[0]["doc_path"];
+              $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
               $url     = str_replace(" ", "%20", $dataUrl);
               $file = file_get_contents($url);
               $newDt["base64"]  =  base64_encode($file);
@@ -131,7 +131,7 @@ class GlobalHelper {
            foreach ($list as $key => $value) {
              $newDt[$key] = $value;
            }
-           $dataUrl = "http://10.88.56.112/api/public/".$list->doc_path;
+           $dataUrl = "http://10.88.48.33/api/public/".$list->doc_path;
            $url     = str_replace(" ", "%20", $dataUrl);
            $file = file_get_contents($url);
            $newDt["base64"]  =  base64_encode($file);
@@ -669,7 +669,6 @@ class GlobalHelper {
     $dbhdr   = $input["HEADER"]["DB"];
     $tblhdr  = $input["HEADER"]["TABLE"];
 
-
     if(!empty($input["HEADER"]["SEQUENCE"])) {
     $sq      = $input["HEADER"]["SEQUENCE"];
     } else {
@@ -682,8 +681,13 @@ class GlobalHelper {
       if ($data == "HEADER") {
         $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
         if ($hdr[0][$cek] == '' || $sq == "N") {
-          $sequence = DB::connection('omcargo')->table("DUAL")->select("SEQ_".$tblhdr.".NEXTVAL")->get();
-          $seq      = ($sequence[0]->nextval);
+          if ($dbhdr == "omuster") {
+            $sequence = DB::connection($dbhdr)->table("DUAL")->select($tblhdr."_SEQ.NEXTVAL")->get();
+            $seq      = ($sequence[0]->nextval);
+          } else {
+            $sequence = DB::connection($dbhdr)->table("DUAL")->select("SEQ_".$tblhdr.".NEXTVAL")->get();
+            $seq      = ($sequence[0]->nextval);
+          }
 
           if (isset($input["cekdb"])) {
             $field = $input["cekdb"];

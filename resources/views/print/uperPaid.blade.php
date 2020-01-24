@@ -135,7 +135,7 @@
 			{{$branch->branch_npwp}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach
