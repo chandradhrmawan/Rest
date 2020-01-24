@@ -501,6 +501,12 @@ class ConnectedExternalApps{
 
     $endpoint_url=config('endpoint.sendUperPutReceipt');
 
+    if (strtoupper($branch->branch_code) == 'PTN') {
+      $branchCode = 'BTN';
+    }else{
+      $branchCode = $branch->branch_code;
+    }
+
     $string_json= '{
        "arRequestDoc":{
         "esbHeader": {
@@ -556,7 +562,7 @@ class ConnectedExternalApps{
                    "amountOrig":null,
                    "lastUpdateDate":"'.$pay->pay_create_date.'",
                    "lastUpdateBy":"-1",
-                   "branchCode":"'.$branch->branch_code.'",
+                   "branchCode":"'.$branchCode.'",
                    "branchAccount":"'.$branch->branch_account.'",
                    "sourceInvoiceType":"NPKBILLING",
                    "remarkToBankId":"BANK_ACCOUNT_ID",
@@ -617,6 +623,13 @@ class ConnectedExternalApps{
     $bank = $bank[0];
 
     $endpoint_url=config('endpoint.sendNotaPutReceipt');
+
+    if (strtoupper($branch->branch_code) == 'PTN') {
+      $branchCode = 'BTN';
+    }else{
+      $branchCode = $branch->branch_code;
+    }
+
     $string_json= '{
        "arRequestDoc":{
         "esbHeader": {
@@ -672,7 +685,7 @@ class ConnectedExternalApps{
                    "amountOrig":null,
                    "lastUpdateDate":"'.$pay->pay_create_date.'",
                    "lastUpdateBy":"-1",
-                   "branchCode":"'.$branch->branch_code.'",
+                   "branchCode":"'.$branchCode.'",
                    "branchAccount":"'.$branch->branch_account.'",
                    "sourceInvoiceType":"NPKBILLING",
                    "remarkToBankId":"BANK_ACCOUNT_ID",
@@ -972,17 +985,14 @@ class ConnectedExternalApps{
       $findU_uper_terminal_code = $findU->uper_terminal_code;
       $findU_uper_amount = $findU->uper_amount;
     }
-    
+
     if (strtoupper($find->nota_branch_code) == 'PTN') {
       $branchCode = 'BTN';
     }else{
       $branchCode = $find->nota_branch_code;
     }
-    if (strtoupper($find->branch_account) == '081') {
-      $branchAccount = '080';
-    }else{
-      $branchAccount = $find->branch_account;
-    }
+
+    $branchAccount = $find->branch_account;
 
     $head_json = '{
        "billerRequestId":"'.$find->nota_req_no.'",
@@ -1490,8 +1500,8 @@ class ConnectedExternalApps{
     $endpoint_url=config('endpoint.sendNotifToIBISQA');
     $data = DB::connection('omcargo')->table('TX_NOTIF')->where('notif_flag_status', 0)->get();
     foreach ($data as $list) {
-      $string_json = '{ 
-        "saveNotifRequest": { 
+      $string_json = '{
+        "saveNotifRequest": {
           "esbHeader": {
             "internalId": "",
             "externalId": "",
@@ -1500,18 +1510,18 @@ class ConnectedExternalApps{
             "responseCode": "",
             "responseMessage": ""
             },
-                "esbBody": { 
+                "esbBody": {
 
-                        "pNotifType": "'.$list->notif_type.'", 
+                        "pNotifType": "'.$list->notif_type.'",
                         "pNotifDate": "'.date('d/m/Y', strtotime($list->notif_date)).'",
-                        "pNotifDesc": "'.$list->notif_desc.'", 
+                        "pNotifDesc": "'.$list->notif_desc.'",
                         "pNotifBillingId": "'.$list->notif_id.'",
                         "pCustomerId": "'.$list->customer_id.'",
                         "pBranchId": "'.$list->branch_id.'",
                         "pBranchCode": "'.$list->branch_code.'",
                         "pAppId": "1"
-                        } 
-                } 
+                        }
+                }
         }';
 
       $username="npk_billing";
