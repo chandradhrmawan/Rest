@@ -520,7 +520,7 @@ class ConnectedExternalApps{
           "esbBody":[
              {
                 "header":{
-                   "orgId":"1822",
+                   "orgId":"'.$branch->branch_org_id.'",
                    "receiptNumber":"'.$uperH->uper_no.'",
                    "receiptMethod":"UPER",
                    "receiptAccount":"'.$pay->pay_account_name.' '.$pay->pay_bank_code.' '.$pay->pay_account_no.'",
@@ -575,7 +575,7 @@ class ConnectedExternalApps{
              }
           ],
           "esbSecurity":{
-             "orgId":"1822",
+             "orgId":"'.$branch->branch_org_id.'",
              "batchSourceId":"",
              "lastUpdateLogin":"",
              "userId":"",
@@ -643,7 +643,7 @@ class ConnectedExternalApps{
           "esbBody":[
              {
                 "header":{
-                   "orgId":"1822",
+                   "orgId":"'.$branch->branch_org_id.'",
                    "receiptNumber":"'.$notaH->nota_no.'",
                    "receiptMethod":"BANK",
                    "receiptAccount":"'.$pay->pay_account_name.' '.$pay->pay_bank_code.' '.$pay->pay_account_no.'",
@@ -698,7 +698,7 @@ class ConnectedExternalApps{
              }
           ],
           "esbSecurity":{
-             "orgId":"1822",
+             "orgId":"'.$branch->branch_org_id.'",
              "batchSourceId":"",
              "lastUpdateLogin":"",
              "userId":"",
@@ -993,11 +993,12 @@ class ConnectedExternalApps{
     }
 
     $branchAccount = $find->branch_account;
+    $notaDateNoHour= date('Y-m-d', strtotime($find->nota_date));
     $notaDate      = $find->nota_date;
 
     $head_json = '{
        "billerRequestId":"'.$find->nota_req_no.'",
-       "orgId":"1822",
+       "orgId":"'.$branch->branch_org_id.'",
        "trxNumber":"'.$find->nota_no.'",
        "trxNumberOrig":"",
        "trxNumberPrev":"",
@@ -1076,7 +1077,7 @@ class ConnectedExternalApps{
        "jenisPerdagangan":"",
        "docNum":"",
        "statusLunas":"",
-       "tglPelunasan":"'.$notaDate.'",
+       "tglPelunasan":"'.$notaDateNoHour.'",
        "amountTerbilang":"",
        "ppnDipungutSendiri":"'.$find->nota_ppn.'",
        "ppnDipungutPemungut":"",
@@ -1189,12 +1190,12 @@ class ConnectedExternalApps{
           "locationTerminal":"",
           "amount":"'.$list->dtl_dpp.'",
           "taxAmount":"'.$list->dtl_ppn.'",
-          "startDate":"'.$notaDate.'",
-          "endDate":"'.$notaDate.'",
+          "startDate":"'.$notaDateNoHour.'",
+          "endDate":"'.$notaDateNoHour.'",
           "createdBy":"-1",
-          "creationDate":"'.$notaDate.'",
+          "creationDate":"'.$notaDateNoHour.'",
           "lastUpdatedBy":"-1",
-          "lastUpdatedDate":"'.$notaDate.'",
+          "lastUpdatedDate":"'.$notaDateNoHour.'",
           "interfaceLineAttribute1":"",
           "interfaceLineAttribute2":"'.$list->dtl_service_type.'",
           "interfaceLineAttribute3":"-",
@@ -1230,7 +1231,7 @@ class ConnectedExternalApps{
           { "header": '.$head_json.', "lines": ['.$lines_json.'] }
         ],
         "esbSecurity":{
-           "orgId":"1822",
+           "orgId":"'.$branch->branch_org_id.'",
            "batchSourceId":"",
            "lastUpdateLogin":"",
            "userId":"",
@@ -1290,7 +1291,7 @@ class ConnectedExternalApps{
                 "header":{
                    "paymentCode":"'.$notaH->nota_no.'",
                    "trxNumber":"'.$notaH->nota_no.'",
-                   "orgId":"1822",
+                   "orgId":"'.$branch->branch_org_id.'",
                    "amountApplied":"'.$pay->pay_amount.'",
                    "cashReceiptId":null,
                    "customerTrxId":"'.$pay->pay_cust_id.'",
@@ -1311,7 +1312,7 @@ class ConnectedExternalApps{
              }
           ],
           "esbSecurity":{
-             "orgId":"1822",
+             "orgId":"'.$branch->branch_org_id.'",
              "batchSourceId":"",
              "lastUpdateLogin":"",
              "userId":"",
