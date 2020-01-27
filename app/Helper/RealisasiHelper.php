@@ -241,7 +241,6 @@ class RealisasiHelper{
   private static function migrateNotaData($booking_number,$req_no,$vessel_name,$ukk,$terminal_id, $tabReq, $reqNo){
     $hdr_id = TxHdrNota::where('nota_real_no',$booking_number)->pluck('nota_id');
     DB::connection('omcargo')->table('TX_DTL_NOTA')->whereIn('nota_hdr_id',$hdr_id)->delete();
-    TxHdrNota::where('nota_real_no',$booking_number)->delete();
 
     $datenow    = Carbon::now()->format('Y-m-d');
     $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number = '".$booking_number."'";
@@ -251,7 +250,17 @@ class RealisasiHelper{
         $app_id = DB::connection('omcargo')->table($tabReq)->where($reqNo, $req_no)->get();
         $app_id = $app_id[0];
 
-        $headN = new TxHdrNota;
+        $findOldHead = TxHdrNota::where([
+          'nota_real_no'=>$booking_number,
+          'nota_cust_id'=>$getH->customer_id,
+          'nota_branch_code'=>$getH->branch_code
+        ])->get();
+
+        if (count($findOldHead) == 1) {
+          $headN = TxHdrNota::find($findOldHead[0]->nota_id);
+        }else{
+          $headN = new TxHdrNota;
+        }
         // $headN->nota_id = $getH->, // dari triger
         // $headN->nota_no = $getH->, // dari triger
         $headN->app_id = $app_id->app_id;
