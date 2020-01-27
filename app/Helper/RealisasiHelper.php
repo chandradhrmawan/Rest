@@ -121,7 +121,7 @@ class RealisasiHelper{
     DB::connection('omcargo')->table('TX_HDR_REALISASI')->where('real_id',$input['id'])->update([
       "real_status" => 2
     ]);
-    return ['result' => 'Success, Confirm RBM Data!', 'no_req' => $find->bm_no];
+    return ['result' => 'Success, Confirm RBM Data!', 'no_req' => $find->bm_no, 'tariffResp' => $tariffResp];
   }
 
   public static function confirmRealBPRP($input){
@@ -235,7 +235,7 @@ class RealisasiHelper{
     DB::connection('omcargo')->table('TX_HDR_BPRP')->where('bprp_id',$input['id'])->update([
       "bprp_status" => 2
     ]);
-    return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no];
+    return ['result' => 'Success, Confirm BPRP Data!', 'no_req' => $find->bprp_no, 'tariffResp' => $tariffResp];
   }
 
   private static function migrateNotaData($booking_number,$req_no,$vessel_name,$ukk,$terminal_id, $tabReq, $reqNo){
