@@ -350,7 +350,7 @@ class ViewController extends Controller
 
       $componen  = DB::connection("mdm")
                     ->table("TM_COMP_NOTA")
-                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id]])
+                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id],["BRANCH_CODE", $header[0]->nota_branch_code]])
                     ->get();
       foreach ($componen as $listS) {
         foreach ($listS as $key => $value) {
@@ -543,7 +543,7 @@ class ViewController extends Controller
 
       $componen  = DB::connection("mdm")
                     ->table("TM_COMP_NOTA")
-                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID",'=', $header[0]->uper_nota_id]])
+                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID",'=', $header[0]->uper_nota_id],["BRANCH_CODE", "=",$header[0]->uper_branch_code]])
                     ->get();
       foreach ($componen as $listS) {
         foreach ($listS as $key => $value) {
@@ -766,8 +766,9 @@ class ViewController extends Controller
 
       $componen  = DB::connection("mdm")
                     ->table("TM_COMP_NOTA")
-                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id]])
+                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id],["BRANCH_CODE", "=",$header[0]->nota_branch_code]])
                     ->get();
+
       foreach ($componen as $listS) {
         foreach ($listS as $key => $value) {
                 $newDt[$key] = $value;
@@ -782,6 +783,7 @@ class ViewController extends Controller
         }
       }
     }
+
 
     $all = ["header"=>$header]+$det;
     $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->where('BRANCH_CODE', $header[0]->nota_branch_code)->get();
@@ -881,7 +883,8 @@ class ViewController extends Controller
       return $e->getResponse();
     }
     $results  = json_decode($res->getBody()->getContents(), true);
-    $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+    // $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+    $qrcode   = "0";
     $kapal    = DB::connection('omcargo')->select($query);
     $nota     = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
     $handa     = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID','=', $id)->get();
@@ -893,7 +896,7 @@ class ViewController extends Controller
 
       $componena  = DB::connection("mdm")
                     ->table("TM_COMP_NOTA")
-                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id]])
+                    ->where([['GROUP_TARIFF_ID','=', $list->dtl_group_tariff_id],["NOTA_ID", "=",$header[0]->nota_group_id],["BRANCH_CODE", "=",$header[0]->nota_branch_code]])
                     ->get();
       foreach ($componena as $listS) {
         foreach ($listS as $key => $value) {
@@ -1306,34 +1309,6 @@ class ViewController extends Controller
   }
 
   function einvoiceLink($input) {
-    $query = "
-              SELECT
-              A.*,
-              CASE
-              WHEN A.NOTA_GROUP_ID = 13
-              THEN
-                (SELECT Y.BM_KADE FROM TX_HDR_BM Y WHERE Y.BM_NO = A.NOTA_REQ_NO)
-              WHEN A.NOTA_GROUP_ID = 14
-              THEN
-                (SELECT X.REC_KADE FROM TX_HDR_REC X WHERE X.REC_NO = A.NOTA_REQ_NO )
-              WHEN A.NOTA_GROUP_ID = 15
-              THEN
-                (SELECT Z.DEL_KADE FROM TX_HDR_DEL Z WHERE Z.DEL_NO = A.NOTA_REQ_NO)
-              END AS KADE,
-              CASE
-                    WHEN A.NOTA_GROUP_ID = 13
-                      THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
-                    WHEN A.NOTA_GROUP_ID = 14
-                      THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
-                    WHEN A.NOTA_GROUP_ID IN (15,19)
-                      THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
-                    END AS PERIODE
-            FROM
-              TX_HDR_NOTA A
-            WHERE
-              A.NOTA_NO = '".$input["nota_no"]."'
-            ";
-
     $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
     $string_json = '{
                    "getDataCetakRequest":{

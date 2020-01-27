@@ -350,8 +350,8 @@ class RequestBooking{
 			}
 
 			return [
-				'result' => "Success, approved request! ".$pesan, 
-				"note" => $pesan, 
+				'result' => "Success, approved request! ".$pesan,
+				"note" => $pesan,
 				'no_req' => $find[$config['head_no']],
 				'sendRequestBooking' => $sendRequestBooking
 			];
