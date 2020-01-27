@@ -273,7 +273,7 @@ class RealisasiHelper{
         $headN->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')"); // ?
         $headN->nota_amount = $getH->total; // ?
         $headN->nota_currency_code = $getH->currency;
-        // $headN->nota_status = $getH->; // ?
+        $headN->nota_status = 1; // ?
         $headN->nota_context = $getH->nota_context;
         $headN->nota_sub_context = $getH->nota_sub_context;
         $headN->nota_service_code = $getH->nota_service_code;
