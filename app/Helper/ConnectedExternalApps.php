@@ -983,7 +983,8 @@ class ConnectedExternalApps{
     if (!empty($findU)) {
       $findU_uper_no = $findU->uper_no;
       $findU_uper_terminal_code = $findU->uper_terminal_code;
-      $findU_uper_amount = $findU->uper_amount;
+      $findP = DB::connection('omcargo')->table('TX_PAYMENT')->where('pay_no',$findU_uper_no)->where('pay_branch_code',$findU->uper_branch_code)->get();
+      $findU_uper_amount = $findP[0]->pay_amount;
     }
 
     if (strtoupper($find->nota_branch_code) == 'PTN') {
