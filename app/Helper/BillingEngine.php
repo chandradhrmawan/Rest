@@ -1009,8 +1009,16 @@ class BillingEngine{
           $response["Success"] = true;
         }
 
+        $cekMemoline = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID', $head['temp_hdr_id'])->whereNull('memoline')->get();
+        if (count($cekMemoline) > 0) {
+          $response["Success"] = false;
+          $response["result_flag"] = false;
+          $response["result_msg"] = 'memoline not found!';
+          $response["detil"] = $cekMemoline;
+        }
+        
         $response["query"] = $sql;
-      return $response;
+        return $response;
       }
   }
 
