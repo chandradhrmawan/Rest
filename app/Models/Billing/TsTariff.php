@@ -8,6 +8,6 @@ class TsTariff extends Model
 {
     protected $connection = 'eng';
     protected $table = 'TS_TARIFF';
-    protected $primaryKey = 'TARIFF_ID';
+    protected $primaryKey = 'tariff_id';
     public $timestamps = false;
 }
