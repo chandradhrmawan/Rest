@@ -54,6 +54,7 @@ class RequestBooking{
 				foreach ($detil as $list) {
 					$newD = [];
 					$list = (array)$list;
+					$newD['DTL_VIA'] = 'NULL';
 					$newD['DTL_BL'] = empty($list[$config['head_tab_detil_bl']]) ? 'NULL' : $list[$config['head_tab_detil_bl']];
 					$newD['DTL_PKG_ID'] = empty($list['dtl_pkg_id']) ? 'NULL' : $list['dtl_pkg_id'];
 					$newD['DTL_CMDTY_ID'] = empty($list['dtl_cmdty_id']) ? 'NULL' : $list['dtl_cmdty_id'];
@@ -526,6 +527,11 @@ class RequestBooking{
 				foreach ($detil as $list) {
 					$newD = [];
 					$list = (array)$list;
+					if (empty($config['DTL_VIA'])) {
+						$newD['DTL_VIA'] = 'NULL';
+					}else{
+						$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
+					}
 					if (empty($config['DTL_BL'])) {
 						$newD['DTL_BL'] = 'NULL';
 					}else{
@@ -674,6 +680,7 @@ class RequestBooking{
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_REC",
 					"head_forigen" => "rec_hdr_id",
+					"DTL_VIA" => null,
 					"DTL_BL" => null,
 					"DTL_PKG_ID" => null,
 					"DTL_CMDTY_ID" => "rec_dtl_cmdty_id",

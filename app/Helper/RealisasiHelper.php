@@ -62,6 +62,7 @@ class RealisasiHelper{
         if (empty($list['dtl_bm_id'])) {
           return ['Success' => false, 'result' => 'Fail, not found detil bm on real detil id : '.$list['dtl_real_id']];
         }
+        $newD['DTL_VIA'] = 'NULL';
         $getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', 13)->where('BRANCH_ID',$find->bm_branch_id)->where('GROUP_TARIFF_ID', 15)->count();
         if ($getPFS > 0) {
           $newD['DTL_PFS'] = 'Y';
@@ -167,6 +168,7 @@ class RealisasiHelper{
       foreach ($detil as $list) {
         $newD = [];
         $list = (array)$list;
+        $newD['DTL_VIA'] = 'NULL';
         $getPFS = DB::connection('mdm')->table('TM_COMP_NOTA')->where('NOTA_ID', $nota_id)->where('BRANCH_ID',$find->bprp_branch_id)->where('GROUP_TARIFF_ID', 15)->count();
         if ($getPFS > 0) {
           $newD['DTL_PFS'] = 'Y';

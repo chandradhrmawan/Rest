@@ -823,6 +823,11 @@ class BillingEngine{
         $setD = '';
         foreach ($detil as $list) {
           $countD++;
+          if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
+            $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
+          }else{
+            $setD .= ' detail.DTL_VIA := \''.$list['DTL_VIA'].'\';';
+          }
           if ($list['DTL_BL'] == NULL or $list['DTL_BL'] == 'NULL') {
             $setD .= ' detail.DTL_BL := '.$list['DTL_BL'].';';
           }else{
@@ -1016,7 +1021,7 @@ class BillingEngine{
           $response["result_msg"] = 'memoline not found!';
           $response["detil"] = $cekMemoline;
         }
-        
+
         $response["query"] = $sql;
         return $response;
       }
@@ -1049,6 +1054,7 @@ class BillingEngine{
         foreach ($detil as $list) {
           $newD                     = [];
           $list                     = (array)$list;
+          $newD['DTL_VIA']          = 'NULL';
           $newD['DTL_BL']           = $list['DTL_BL'];
           $newD['DTL_PKG_ID']       = $list['DTL_PKG_ID'];
           if ($list['DTL_CMDTY_ID'] == NULL or $list['DTL_CMDTY_ID'] == 'null') {
