@@ -198,7 +198,7 @@ class BillingEngine{
           }else{
             $query .= "'".$each[1]."',";
           }
-          $query .= "'') ISO FROM dual";
+          $query .= "'','') ISO FROM dual";
           $alatisocode = \DB::connection('mdm')->select(DB::raw($query));
           $alatisocode = $alatisocode[0]->iso;
           $isocode = $alatisocode;
@@ -222,7 +222,7 @@ class BillingEngine{
           }else{
             $query .= "'".$each[2]."'";
           }
-          $query .= ") ISO FROM dual";
+          $query .= ",'') ISO FROM dual";
           $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
           $itemisocode    = $itemisocode[0]->iso;
           if ($isocode == "") {
