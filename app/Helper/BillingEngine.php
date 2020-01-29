@@ -250,6 +250,11 @@ class BillingEngine{
           }else{
             $query .= "'".$each[2]."'";
           }
+          if ($each[3] == 'null') {
+            $query .= "''";
+          }else{
+            $query .= "'".$each[3]."'";
+          }
           $query .= ") ISO FROM dual";
           $itemisocode = \DB::connection('mdm')->select(DB::raw($query));
           $itemisocode = $itemisocode[0]->iso;
