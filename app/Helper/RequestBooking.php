@@ -535,13 +535,9 @@ class RequestBooking{
 					if (empty($config['DTL_BL'])) {
 						$newD['DTL_BL'] = 'NULL';
 					}else{
-						$newD['DTL_BL'] = empty($list[$config['DTL_BL']]) ? 'NULL' : $list[$config['DTL_BL']];
+						$newD['DTL_BL'] = empty($list[$config['DTL_BL']]) ? 'NULL' : strtoupper($list[$config['DTL_BL']]);
 					}
-					if (empty($config['DTL_PKG_ID'])) {
-						$newD['DTL_PKG_ID'] = 'NULL';
-					}else{
-						$newD['DTL_PKG_ID'] = empty($list[$config['DTL_PKG_ID']]) ? 'NULL' : $list[$config['DTL_PKG_ID']];
-					}
+					$newD['DTL_PKG_ID'] = 8;
 					if (empty($config['DTL_CMDTY_ID'])) {
 						$newD['DTL_CMDTY_ID'] = 'NULL';
 					}else{
@@ -550,7 +546,13 @@ class RequestBooking{
 					if (empty($config['DTL_CHARACTER'])) {
 						$newD['DTL_CHARACTER'] = 'NULL';
 					}else{
-						$newD['DTL_CHARACTER'] = empty($list[$config['DTL_CHARACTER']]) ? 'NULL' : $list[$config['DTL_CHARACTER']];
+						if (empty($list[$config['DTL_CHARACTER']])) {
+							$newD['DTL_CHARACTER'] = 'NULL';
+						}else if ($list[$config['DTL_CHARACTER']] == 'Y'){
+							$newD['DTL_CHARACTER'] = 2;
+						}else if ($list[$config['DTL_CHARACTER']] == 'N'){
+							$newD['DTL_CHARACTER'] = 0;
+						}
 					}
 					if (empty($config['DTL_CONT_SIZE'])) {
 						$newD['DTL_CONT_SIZE'] = 'NULL';
@@ -574,6 +576,8 @@ class RequestBooking{
 					}
 					if (empty($config['DTL_QTY'])) {
 						$newD['DTL_QTY'] = 'NULL';
+					}else if ($config['DTL_QTY'] == 1) {
+						$newD['DTL_QTY'] = 1;
 					}else{
 						$newD['DTL_QTY'] = empty($list[$config['DTL_QTY']]) ? 'NULL' : $list[$config['DTL_QTY']];
 					}
@@ -600,17 +604,17 @@ class RequestBooking{
 					if (empty($config['DTL_DATE_IN'])) {
 						$newD['DTL_DATE_IN'] = 'NULL';
 					}else{
-						$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : $list[$config['DTL_DATE_IN']];
+						$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 					if (empty($config['DTL_DATE_OUT'])) {
 						$newD['DTL_DATE_OUT'] = 'NULL';
 					}else{
-						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : $list[$config['DTL_DATE_OUT']];
+						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 					if (empty($config['DTL_DATE_OUT_OLD'])) {
 						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 					}else{
-						$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : $list[$config['DTL_DATE_OUT_OLD']];
+						$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT_OLD']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 					$setD[] = $newD;
 				}
@@ -677,21 +681,27 @@ class RequestBooking{
 					"head_no" => "rec_no",
 					"head_by" => "rec_create_by",
 					"head_status" => "rec_status",
+					"head_vessel_name" => "rec_vessel_name",
+					"head_date" => "rec_create_date",
+					"head_pbm_id" => "rec_pbm_id",
+					"head_pbm_name" => "rec_pbm_name",
+					"head_shipping_agent_id" => "rec_stackby_id",
+					"head_shipping_agent_name" => "rec_stackby_name",
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_REC",
 					"head_forigen" => "rec_hdr_id",
 					"DTL_VIA" => 'rec_dtl_via',
-					"DTL_BL" => null,
+					"DTL_BL" => 'rec_dtl_cont',
 					"DTL_PKG_ID" => null,
 					"DTL_CMDTY_ID" => "rec_dtl_cmdty_id",
-					"DTL_CHARACTER" => null,
+					"DTL_CHARACTER" => "rec_dtl_cont_danger",
 					"DTL_CONT_SIZE" => "rec_dtl_cont_size",
 					"DTL_CONT_TYPE" => "rec_dtl_cont_type",
 					"DTL_CONT_STATUS" => "rec_dtl_cont_status",
 					"DTL_UNIT_ID" => null,
-					"DTL_QTY" => null,
+					"DTL_QTY" => 1,
 					"DTL_TL" => null,
-					"DTL_DATE_IN" => null,
+					"DTL_DATE_IN" => 'rec_dtl_date_plan',
 					"DTL_DATE_OUT" => null,
 					"DTL_DATE_OUT_OLD" => null
 	        	],
