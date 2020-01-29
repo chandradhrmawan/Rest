@@ -883,8 +883,7 @@ class ViewController extends Controller
       return $e->getResponse();
     }
     $results  = json_decode($res->getBody()->getContents(), true);
-    // $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
-    $qrcode   = "0";
+    $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
     $kapal    = DB::connection('omcargo')->select($query);
     $nota     = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
     $handa     = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID','=', $id)->get();

@@ -342,4 +342,33 @@ class IndexController extends Controller
 
       return ["result"=>$result, "count"=>$count];
   }
+
+  function listProfileCustomer($input) {
+    $tsUper = DB::connection('eng')->table('TS_UPER')->get();
+    $newDt = [];
+
+    foreach ($tsUper as $value) {
+      $tsCustomerProfile = DB::connection('eng')->table('TS_CUSTOMER_PROFILE')->where('CUST_PROFILE_ID', $value->uper_cust_id)->first();
+      if (!empty($tsCustomerProfile)) {
+        $joinUperCustomer = DB::connection('eng')->table('TS_UPER A')
+                            ->join("TS_CUSTOMER_PROFILE b","b.CUST_PROFILE_ID", "=","a.UPER_CUST_ID")
+                            ->join("BILLING_MDM.TM_CUSTOMER c","b.CUST_PROFILE_ID", "=","c.CUSTOMER_ID")
+                            ->where('b.CUST_PROFILE_ID', $value->uper_cust_id)
+                            ->first();
+        $newDt[] = $joinUperCustomer;
+      } else {
+        $joinUperCustomer = DB::connection('eng')->table('TS_UPER A')
+                            ->join("BILLING_MDM.TM_CUSTOMER B","B.CUSTOMER_ID", "=","A.UPER_CUST_ID")
+                            ->where('A.UPER_CUST_ID', $value->uper_cust_id)
+                            ->first();
+
+        if (!empty($joinUperCustomer)) {
+          $newDt[] = $joinUperCustomer;
+        }
+      }
+    }
+
+    $count = count($newDt);
+    return ["result" =>$newDt, "count"=>$count];
+  }
 }
