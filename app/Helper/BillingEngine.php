@@ -588,6 +588,7 @@ class BillingEngine{
       $commodity_unit_code = "";
       $commodity_unit_name = "";
       $commodity_unit_min = "";
+      $cont_commodity_id = "";
       $cont_commodity_name = "";
       $cont_desc = "";
       $cont_status_desc = "";
@@ -610,6 +611,7 @@ class BillingEngine{
       $newDt['cont_desc'] = $cont_desc;
       $newDt['cont_status_desc'] = $cont_status_desc;
       $newDt['cont_type_desc'] = $cont_type_desc;
+      $newDt['cont_commodity_id'] = $cont_commodity_id;
       $newDt['cont_commodity_name'] = $cont_commodity_name;
       $newDt['package_id'] = '';
       $newDt['commodity_id'] = '';
@@ -656,6 +658,7 @@ class BillingEngine{
           $cont_desc = "";
           $cont_status_desc = "";
           $cont_type_desc = "";
+          $cont_commodity_id = "";
           $cont_commodity_name = "";
           $equi = DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where('ISO_CODE',$value)->first();
           if (!empty($equi)) {
@@ -681,6 +684,7 @@ class BillingEngine{
               }
               if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
                 $get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
+                $cont_commodity_id = $get->commodity_id;
                 $cont_commodity_name = $get->commodity_name;
               }
               if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
@@ -752,6 +756,7 @@ class BillingEngine{
               }
               if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
                 $get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
+                $cont_commodity_id = $get->commodity_id;
                 $cont_commodity_name = $get->commodity_name;
               }
               if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
@@ -810,6 +815,7 @@ class BillingEngine{
       $newDt['cont_desc'] = $cont_desc;
       $newDt['cont_status_desc'] = $cont_status_desc;
       $newDt['cont_type_desc'] = $cont_type_desc;
+      $newDt['cont_commodity_id'] = $cont_commodity_id;
       $newDt['cont_commodity_name'] = $cont_commodity_name;
       $newDt['group_tarif_name'] = $group_tariff_name;
       $newDt['via_name'] = $via_name;
