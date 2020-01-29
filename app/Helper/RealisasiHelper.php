@@ -414,7 +414,7 @@ class RealisasiHelper{
         if (!empty($pay)) {
           // ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
           if ($pay->pay_amount >= $list->nota_amount) {
-            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'Y']);
+            TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'D']);
           }else{
             TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'I']);
           }
