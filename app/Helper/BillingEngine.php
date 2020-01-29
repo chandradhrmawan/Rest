@@ -246,9 +246,9 @@ class BillingEngine{
             $query .= "'".$each[1]."',";
           }
           if ($each[2] == 'null') {
-            $query .= "''";
+            $query .= "'',";
           }else{
-            $query .= "'".$each[2]."'";
+            $query .= "'".$each[2]."',";
           }
           if ($each[3] == 'null') {
             $query .= "''";
@@ -588,6 +588,7 @@ class BillingEngine{
       $commodity_unit_code = "";
       $commodity_unit_name = "";
       $commodity_unit_min = "";
+      $cont_commodity_name = "";
       $cont_desc = "";
       $cont_status_desc = "";
       $cont_type_desc = "";
@@ -609,6 +610,7 @@ class BillingEngine{
       $newDt['cont_desc'] = $cont_desc;
       $newDt['cont_status_desc'] = $cont_status_desc;
       $newDt['cont_type_desc'] = $cont_type_desc;
+      $newDt['cont_commodity_name'] = $cont_commodity_name;
       $newDt['package_id'] = '';
       $newDt['commodity_id'] = '';
       $newDt['commodity_unit_id'] = '';
@@ -654,6 +656,7 @@ class BillingEngine{
           $cont_desc = "";
           $cont_status_desc = "";
           $cont_type_desc = "";
+          $cont_commodity_name = "";
           $equi = DB::connection('mdm')->table('TM_ISO_EQUIPMENT')->where('ISO_CODE',$value)->first();
           if (!empty($equi)) {
             foreach ($equi as $keyS => $valueS) {
@@ -676,6 +679,10 @@ class BillingEngine{
               if (strtoupper($keyS) != 'ISO_CODE') {
                 $newDt[$keyS] = $valueS;
               }
+              if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
+                $get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
+                $cont_commodity_name = $get->commodity_name;
+              }
               if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
                 $get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
                 $cont_desc = $get->cont_desc;
@@ -684,7 +691,7 @@ class BillingEngine{
                 $get = DB::connection('mdm')->table('TM_CONT_STATUS')->where('CONT_STATUS',$valueS)->first();
                 $cont_status_desc = $get->cont_status_desc;
               }
-               if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
+              if (strtoupper($keyS) == 'CONT_TYPE' and !empty($valueS)) {
                 $get = DB::connection('mdm')->table('TM_CONT_TYPE')->where('CONT_TYPE',$valueS)->first();
                 $cont_type_desc = $get->cont_type_desc;
               }
@@ -743,6 +750,10 @@ class BillingEngine{
               if (strtoupper($keyS) != 'ISO_CODE') {
                 $newDt[$keyS] = $valueS;
               }
+              if (strtoupper($keyS) == 'COMMODITY_ID' and !empty($valueS)) {
+                $get = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID',$valueS)->first();
+                $cont_commodity_name = $get->commodity_name;
+              }
               if (strtoupper($keyS) == 'CONT_SIZE' and !empty($valueS)) {
                 $get = DB::connection('mdm')->table('TM_CONT_SIZE')->where('CONT_SIZE',$valueS)->first();
                 $cont_desc = $get->cont_desc;
@@ -799,6 +810,7 @@ class BillingEngine{
       $newDt['cont_desc'] = $cont_desc;
       $newDt['cont_status_desc'] = $cont_status_desc;
       $newDt['cont_type_desc'] = $cont_type_desc;
+      $newDt['cont_commodity_name'] = $cont_commodity_name;
       $newDt['group_tarif_name'] = $group_tariff_name;
       $newDt['via_name'] = $via_name;
       $newDt['fumigasi_name'] = $fumigasi_name;
