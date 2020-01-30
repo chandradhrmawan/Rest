@@ -55,9 +55,6 @@ class StoreController extends Controller
     }
 
     function saveLogs($action,$input, $response, $user){
-      if ($user != "esb") {
-        $user = $user->user_full_name;
-      }
       DB::connection('omcargo')->table('TH_LOGS_API_STORE')->insert([
         "create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
         "action" => $action,
@@ -120,8 +117,43 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+      $arrCon = [
+        "head_primery" => "rec_id",
+        "head_branch" => "rec_branch_id",
+        "head_branch_code" => "rec_branch_code",
+        "head_cust" => "rec_cust_id",
+        "head_no" => "rec_no",
+        "head_by" => "rec_create_by",
+        "head_status" => "rec_status",
+        "head_vessel_name" => "rec_vessel_name",
+        "head_date" => "rec_create_date",
+        "head_pbm_id" => "rec_pbm_id",
+        "head_pbm_name" => "rec_pbm_name",
+        "head_shipping_agent_id" => "rec_stackby_id",
+        "head_shipping_agent_name" => "rec_stackby_name",
+        "head_paymethod" => "rec_paymethod",
+        "head_mark" => "rec_msg",
+        "p_tarde" => null,
+        "head_tab_detil" => "TX_DTL_REC",
+        "head_forigen" => "rec_hdr_id",
+        "DTL_VIA" => 'rec_dtl_via',
+        "DTL_BL" => 'rec_dtl_cont',
+        "DTL_PKG_ID" => null,
+        "DTL_CMDTY_ID" => "rec_dtl_cmdty_id",
+        "DTL_CHARACTER" => "rec_dtl_cont_danger",
+        "DTL_CONT_SIZE" => "rec_dtl_cont_size",
+        "DTL_CONT_TYPE" => "rec_dtl_cont_type",
+        "DTL_CONT_STATUS" => "rec_dtl_cont_status",
+        "DTL_UNIT_ID" => null,
+        "DTL_QTY" => 1,
+        "DTL_TL" => null,
+        "DTL_DATE_IN" => 'rec_dtl_date_plan',
+        "DTL_DATE_OUT" => null,
+        "DTL_DATE_OUT_OLD" => null
+      ];
+      return ConnectedExternalApps::sendRequestBookingPLG('TX_HDR_REC',105,$arrCon);
       return ConnectedExternalApps::sendNotifToIBISQA();
-     return ConnectedExternalApps::uperSimkeuCek($input);
+      return ConnectedExternalApps::uperSimkeuCek($input);
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
       // return ConnectedExternalApps::sendNotaProforma(376);
       $pay = [
@@ -329,13 +361,18 @@ class StoreController extends Controller
         return RequestBooking::sendRequest($input);
       }
 
+      function approvalRequest($input, $request){
+        return RequestBooking::approvalRequest($input);
+      }
+
       function sendRequestPLG($input, $request){
         return RequestBooking::sendRequestPLG($input);
       }
 
-      function approvalRequest($input, $request){
-        return RequestBooking::approvalRequest($input);
+      function approvalRequestPLG($input, $request){
+        return RequestBooking::approvalRequestPLG($input);
       }
+
     // RequestBooking
 
     // BillingEngine

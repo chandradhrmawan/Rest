@@ -19,7 +19,8 @@ class JwtMiddleware
             ], 401);
         }
         if ($token == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiZWFyZXIiLCJzdWIiOiIzNCIsImV4cCI6Mjg3MDY1OTgzMn0.gSWsv4ZvKbEUWSRT41ECtUND_k3vFCfR4R8DuY6DYLk") {
-          $request->request->add(['user' => 'esb']);
+          $data = DB::connection('omuster')->table('TM_USER')->where("USER_ID",58)->get();
+          $request->request->add(['user' => $data[0]]);
           return $next($request);
         } else {
           $credentials = JWT::decode($token, env('JWT_SECRET'), ['HS256']);

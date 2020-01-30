@@ -495,6 +495,7 @@ class RequestBooking{
 
 	// PLG
 	    public static function sendRequestPLG($input){
+	    	$input["user"] = 
 			$input['table'] = strtoupper($input['table']);
 			$config = static::configPLG($input['table']);
 			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
@@ -524,10 +525,54 @@ class RequestBooking{
 
 			// build detil
 				$setD = [];
+				$insertTsContHs = [];
+				$insertTxHisContHs = [];
 				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
 				foreach ($detil as $list) {
-					$newD = [];
 					$list = (array)$list;
+					// history 
+					$insertTsCont = [];
+					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
+						'cont_no' => $list[$config['DTL_BL']],
+						'branch_id' => $find[$config['head_branch']],
+						'branch_code' => $find[$config['head_branch_code']]
+					])->orderBy('count_counter', 'desc')->get();
+					if (count($cekTsCont) == 0) {
+						$insertTsCont = [
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']],
+							'cont_location' => 'GATO',
+							'cont_size' => $list[$config['DTL_CONT_SIZE']],
+							'cont_type' => $list[$config['DTL_CONT_TYPE']],
+							'count_counter' => 0
+						];
+						DB::connection('omuster')->table('TS_CONTAINER')->insert($insertTsCont);
+						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']]
+						])->orderBy('count_counter', 'desc')->get();
+					}
+					$cekTsCont = $cekTsCont[0];
+					$insertTsContHs[] = $insertTsCont;
+					$insertTxHisCont = [
+						'no_containet' => $list[$config['DTL_BL']],
+						'no_request' => $find[$config['head_no']],
+						'kegiatan' => $config['kegiatan'],
+						'id_user' => $input["user"]["user_id"],
+						// 'id_yard' => $list[$config['DTL_BL']], ?
+						'status_cont' => $list[$config['DTL_CONT_STATUS']],
+						'vvd_id' => $find[$config['head_vvd']],
+						'counter' => $cekTsCont->count_counter+1
+						// 'sub_counter' => $list[$config['DTL_BL']], ?
+						// 'why' => $list[$config['DTL_BL']], ?
+						// 'aktif' => $list[$config['DTL_BL']], ?
+					];
+					DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($insertTxHisCont);
+					$insertTxHisContHs[] = $insertTxHisCont;
+
+					$newD = [];
 					if (empty($config['DTL_VIA'])) {
 						$newD['DTL_VIA'] = 'NULL';
 					}else{
@@ -669,16 +714,25 @@ class RequestBooking{
 					$config['head_status'] => 2
 				]);
 			}
+			$tariffResp['his_cont'] = [
+				'insertTsContHs' => $insertTsContHs,
+				'insertTxHisContHs' => $insertTxHisContHs,
+			];
 			return $tariffResp;
 	    }
 
 	    public static function configPLG($input){
 	    	$requst_config = [
 	        	"TX_HDR_REC" => [
+					"kegiatan" => 1,
 					"head_primery" => "rec_id",
 					"head_branch" => "rec_branch_id",
 					"head_branch_code" => "rec_branch_code",
 					"head_cust" => "rec_cust_id",
+					"head_cust_name" => "rec_cust_name",
+					"head_cust_addr" => "rec_cust_address",
+					"head_cust_npwp" => "rec_cust_npwp",
+					"head_vvd" => "rec_vvd_id",
 					"head_no" => "rec_no",
 					"head_by" => "rec_create_by",
 					"head_status" => "rec_status",
@@ -689,14 +743,17 @@ class RequestBooking{
 					"head_shipping_agent_id" => "rec_stackby_id",
 					"head_shipping_agent_name" => "rec_stackby_name",
 					"head_paymethod" => "rec_paymethod",
+					"head_from" => "rec_from",
 					"head_mark" => "rec_msg",
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_REC",
 					"head_forigen" => "rec_hdr_id",
 					"DTL_VIA" => 'rec_dtl_via',
+					"DTL_VIA_NAME" => 'rec_dtl_via_name',
 					"DTL_BL" => 'rec_dtl_cont',
 					"DTL_PKG_ID" => null,
 					"DTL_CMDTY_ID" => "rec_dtl_cmdty_id",
+					"DTL_CMDTY_NAME" => "rec_dtl_cmdty_name",
 					"DTL_CHARACTER" => "rec_dtl_cont_danger",
 					"DTL_CONT_SIZE" => "rec_dtl_cont_size",
 					"DTL_CONT_TYPE" => "rec_dtl_cont_type",
@@ -704,6 +761,8 @@ class RequestBooking{
 					"DTL_UNIT_ID" => null,
 					"DTL_QTY" => 1,
 					"DTL_TL" => null,
+					"DTL_OWNER" => 'rec_dtl_owner',
+					"DTL_OWNER_NAME" => 'rec_dtl_owner_name',
 					"DTL_DATE_IN" => 'rec_dtl_date_plan',
 					"DTL_DATE_OUT" => null,
 					"DTL_DATE_OUT_OLD" => null
