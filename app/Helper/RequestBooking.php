@@ -258,7 +258,7 @@ class RequestBooking{
 						$headU->uper_branch_id = $uper['branch_id'];
 						$headU->uper_branch_code = $uper['branch_code'];
 						$headU->uper_vessel_name = $find[$config['head_vessel_name']];
-						$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
+						// $headU->uper_faktur_no = ''; // ? dari triger bf i
 						$headU->uper_trade_type = $uper['trade_type'];
 						$headU->uper_trade_name = $uper['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 						$headU->uper_req_no = $uper['booking_number'];
@@ -765,7 +765,7 @@ class RequestBooking{
 					"DTL_QTY" => 1,
 					"DTL_TL" => null,
 					"DTL_DATE_IN" => null,
-					"DTL_DATE_OUT" => null,
+					"DTL_DATE_OUT" => 'del_dtl_date_plan'
 					"DTL_DATE_OUT_OLD" => null
 	        	],
 	        	"TX_HDR_DEL_CARGO" => [
@@ -850,7 +850,7 @@ class RequestBooking{
 						$headU->nota_branch_id = $tarif['branch_id'];
 						$headU->nota_branch_code = $tarif['branch_code'];
 						$headU->nota_vessel_name = $find[$config['head_vessel_name']];
-						$headU->nota_faktur_no = '12576817'; // ? dari triger bf i
+						// $headU->nota_faktur_no = '12576817'; // ? dari triger bf i
 						$headU->nota_trade_type = $tarif['trade_type'];
 						// $headU->uper_trade_name = $tarif['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 						$headU->nota_req_no = $tarif['booking_number'];
@@ -860,21 +860,21 @@ class RequestBooking{
 						$headU->uper_percent = $tarif['percent_uper'];
 						$headU->uper_dpp = $tarif['dpp_uper'];
 						if ($config['head_pbm_id'] != null) {
-							// $headU->uper_pbm_id = $find[$config['head_pbm_id']];
+							$headU->nota_pbm_id = $find[$config['head_pbm_id']];
 						}
 						if ($config['head_pbm_name'] != null) {
-							// $headU->uper_pbm_name = $find[$config['head_pbm_name']];
+							$headU->nota_pbm_name = $find[$config['head_pbm_name']];
 						}
 						if ($config['head_shipping_agent_id'] != null) {
-							// $headU->uper_shipping_agent_id = $find[$config['head_shipping_agent_id']];
+							$headU->nota_stackby_id = $find[$config['head_shipping_agent_id']];
 						}
 						if ($config['head_shipping_agent_name'] != null) {
-							// $headU->uper_shipping_agent_name = $find[$config['head_shipping_agent_name']];
+							$headU->nota_stackby_name = $find[$config['head_shipping_agent_name']];
 						}
-						// $headU->uper_req_date = $find[$config['head_date']];
-						if ($config['head_terminal_name'] != null) {
-							// $headU->uper_terminal_name = $find[$config['head_terminal_name']];
-						}
+						$headU->nota_req_date = $find[$config['head_date']];
+						// if ($config['head_terminal_name'] != null) {
+						// 	// $headU->nota_terminal = $find[$config['head_terminal_name']];
+						// }
 						$headU->nota_group_id = $tarif['nota_id'];
 						$headU->app_id =$find['app_id'];
 						$headU->save();
@@ -895,19 +895,19 @@ class RequestBooking{
 							$countLine++;
 							$list = (array)$list;
 							$set_data = [
-								"uper_hdr_id" => $headU->nota_id,
+								"nota_hdr_id" => $headU->nota_id,
 								"dtl_line" => $countLine,
 								"dtl_line_desc" => $list['memoline'],
 								// "dtl_line_context" => , // perlu konfimasi
 								"dtl_service_type" => $list['group_tariff_name'],
 								"dtl_amount" => $list['total_uper'],
 								"dtl_ppn" => $list["ppn_uper"],
-								// "dtl_masa" => $list["day_period"],
+								"dtl_masa" => $list["day_period"],
 								// "dtl_masa1" => , // cooming soon
 								// "dtl_masa12" => , // cooming soon
 								// "dtl_masa2" => , // cooming soon
 								"dtl_masa_reff" => $list["stack_combine"],
-								// "dtl_total_tariff" => $list["tariff_uper"],
+								"dtl_total_tariff" => $list["tariff"],
 								"dtl_tariff" => $list["tariff"],
 								"dtl_package" => $list["package_name"],
 								"dtl_qty" => $list["qty"],
@@ -924,7 +924,7 @@ class RequestBooking{
 								"dtl_sub_tariff" => $list["sub_tariff"],
 								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 							];
-							DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
+							DB::connection('omcargo')->table('TX_DTL_NOTA')->insert($set_data);
 						}
 					}
 				}
@@ -944,7 +944,7 @@ class RequestBooking{
 			}
 
 			if ($find[$config['head_paymethod']] == 2) {
-				// $sendRequestBooking = ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
+				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['tabel' => $input['table'] 'id' => $input['id'] ,'config' => $config ]);
 			}
 
 			return [
