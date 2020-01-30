@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
 use App\Models\OmCargo\TxHdrUper;
+use App\Models\OmUster\TxHdrNota;
 
 class RequestBooking{
 
@@ -687,6 +688,8 @@ class RequestBooking{
 					"head_pbm_name" => "rec_pbm_name",
 					"head_shipping_agent_id" => "rec_stackby_id",
 					"head_shipping_agent_name" => "rec_stackby_name",
+					"head_paymethod" => "rec_paymethod",
+					"head_mark" => "rec_msg",
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_REC",
 					"head_forigen" => "rec_hdr_id",
@@ -739,6 +742,14 @@ class RequestBooking{
 					"head_no" => "del_no",
 					"head_by" => "del_create_by",
 					"head_status" => "del_status",
+					"head_vessel_name" => "del_vessel_name",
+					"head_date" => "del_create_date",
+					"head_pbm_id" => "del_pbm_id",
+					"head_pbm_name" => "del_pbm_name",
+					"head_shipping_agent_id" => "del_stackby_id",
+					"head_shipping_agent_name" => "del_stackby_name",
+					"head_paymethod" => "del_paymethod",
+					"head_mark" => "del_msg",
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_DEL",
 					"head_forigen" => "del_hdr_id",
@@ -786,6 +797,162 @@ class RequestBooking{
 	        ];
 
 	        return $requst_config[$input];
+	    }
+
+	    public static function approvalRequestPLG($input){
+	    	$input['table'] = strtoupper($input['table']);
+			$config = static::configPLG($input['table']);
+			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+			if (empty($find)) {
+				return ['result' => "Fail, requst not found!", "Success" => false];
+			}
+			$find = (array)$find[0];
+			$uper = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->get();
+			if (count($uper) > 0) {
+				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
+			}
+			if ($input['approved'] == 'false') {
+				DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+					$config['head_status'] => 4,
+					$config['head_mark'] => $input['msg']
+				]);
+				return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
+			}
+
+			$datenow    = Carbon::now()->format('Y-m-d');
+			$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
+			$tarifs = DB::connection('eng')->select(DB::raw($query));
+			if (count($tarifs) == 0) {
+				return ['result' => "Fail, proforma and tariff not found!", "Success" => false];
+			}
+			$migrateTariff = true;
+			if ($migrateTariff == true) {
+				foreach ($tarifs as $tarif) {
+					$tarif = (array)$tarif;
+
+					$createdUperNo = '';
+					// store head
+						$headU = new TxHdrNota;
+						$headU->nota_org_id = $tarif['branch_org_id'];
+						$headU->nota_cust_id = $tarif['customer_id'];
+						$headU->nota_cust_name = $tarif['alt_name'];
+						$headU->nota_cust_npwp = $tarif['npwp'];
+						$headU->nota_cust_address = $tarif['address'];
+						$headU->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+						$headU->nota_amount = $tarif['total_uper'];
+						$headU->nota_currency_code = $tarif['currency'];
+						// $headU->nota_status = 'P'; // ? blm fix
+						$headU->nota_service_code = $tarif['nota_service_code'];
+						$headU->nota_branch_account = $tarif['branch_account'];
+						$headU->nota_context = $tarif['nota_context'];
+						$headU->nota_sub_context = $tarif['nota_sub_context'];
+						$headU->nota_terminal = $find[$config['head_terminal_code']];
+						$headU->nota_branch_id = $tarif['branch_id'];
+						$headU->nota_branch_code = $tarif['branch_code'];
+						$headU->nota_vessel_name = $find[$config['head_vessel_name']];
+						$headU->nota_faktur_no = '12576817'; // ? dari triger bf i
+						$headU->nota_trade_type = $tarif['trade_type'];
+						// $headU->uper_trade_name = $tarif['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
+						$headU->nota_req_no = $tarif['booking_number'];
+						$headU->nota_ppn = $tarif['ppn_uper'];
+						// $headU->uper_paid // ? pasti null
+						// $headU->uper_paid_date // ? pasti null
+						$headU->uper_percent = $tarif['percent_uper'];
+						$headU->uper_dpp = $tarif['dpp_uper'];
+						if ($config['head_pbm_id'] != null) {
+							// $headU->uper_pbm_id = $find[$config['head_pbm_id']];
+						}
+						if ($config['head_pbm_name'] != null) {
+							// $headU->uper_pbm_name = $find[$config['head_pbm_name']];
+						}
+						if ($config['head_shipping_agent_id'] != null) {
+							// $headU->uper_shipping_agent_id = $find[$config['head_shipping_agent_id']];
+						}
+						if ($config['head_shipping_agent_name'] != null) {
+							// $headU->uper_shipping_agent_name = $find[$config['head_shipping_agent_name']];
+						}
+						// $headU->uper_req_date = $find[$config['head_date']];
+						if ($config['head_terminal_name'] != null) {
+							// $headU->uper_terminal_name = $find[$config['head_terminal_name']];
+						}
+						$headU->nota_group_id = $tarif['nota_id'];
+						$headU->app_id =$find['app_id'];
+						$headU->save();
+
+						$headU = TxHdrNota::find($headU->uper_id);
+						$createdUperNo .= $headU->nota_no.', ';
+					// store head
+
+					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$tarif['temp_hdr_id']."' AND CUSTOMER_ID = '".$tarif['customer_id']."'";
+					$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+
+					$countLine = 0;
+					foreach ($group_tariff as $grpTrf) {
+						$grpTrf = (array)$grpTrf;
+						$tarifD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$tarif['temp_hdr_id'])->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+
+						foreach ($tarifD as $list) {
+							$countLine++;
+							$list = (array)$list;
+							$set_data = [
+								"uper_hdr_id" => $headU->nota_id,
+								"dtl_line" => $countLine,
+								"dtl_line_desc" => $list['memoline'],
+								// "dtl_line_context" => , // perlu konfimasi
+								"dtl_service_type" => $list['group_tariff_name'],
+								"dtl_amount" => $list['total_uper'],
+								"dtl_ppn" => $list["ppn_uper"],
+								// "dtl_masa" => $list["day_period"],
+								// "dtl_masa1" => , // cooming soon
+								// "dtl_masa12" => , // cooming soon
+								// "dtl_masa2" => , // cooming soon
+								"dtl_masa_reff" => $list["stack_combine"],
+								// "dtl_total_tariff" => $list["tariff_uper"],
+								"dtl_tariff" => $list["tariff"],
+								"dtl_package" => $list["package_name"],
+								"dtl_qty" => $list["qty"],
+								"dtl_eq_qty" => $list["eq_qty"],
+								"dtl_unit" => $list["unit_id"],
+								"dtl_unit_qty" => $list["unit_qty"],
+								"dtl_unit_name" => $list["unit_name"],
+								"dtl_group_tariff_id" => $list["group_tariff_id"],
+								"dtl_group_tariff_name" => $list["group_tariff_name"],
+								"dtl_bl" => $list["no_bl"],
+								"dtl_dpp" => $list["tariff_cal_uper"],
+								"dtl_commodity" => $list["commodity_name"],
+								"dtl_equipment" => $list["equipment_name"],
+								"dtl_sub_tariff" => $list["sub_tariff"],
+								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+							];
+							DB::connection('omcargo')->table('TX_DTL_UPER')->insert($set_data);
+						}
+					}
+				}
+			}
+
+			DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+				$config['head_status'] => 3,
+				$config['head_mark'] => $input['msg']
+			]);
+
+			$sendRequestBooking = '';
+			if ($migrateTariff == true) {
+				$pesan = "Created Nota No : ".$createdUperNo;
+			}else if($migrateTariff == false) {
+				// $sendRequestBooking = ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
+				// $pesan = "Nota Not created, uper percent for this request is 0%";
+			}
+
+			if ($find[$config['head_paymethod']] == 2) {
+				// $sendRequestBooking = ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
+			}
+
+			return [
+				'result' => "Success, approved request! ".$pesan,
+				"note" => $pesan,
+				'no_req' => $find[$config['head_no']],
+				'sendRequestBooking' => $sendRequestBooking
+			];
 	    }
 	// PLG
 }
