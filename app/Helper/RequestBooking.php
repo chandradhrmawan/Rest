@@ -765,7 +765,7 @@ class RequestBooking{
 					"DTL_QTY" => 1,
 					"DTL_TL" => null,
 					"DTL_DATE_IN" => null,
-					"DTL_DATE_OUT" => 'del_dtl_date_plan'
+					"DTL_DATE_OUT" => 'del_dtl_date_plan',
 					"DTL_DATE_OUT_OLD" => null
 	        	],
 	        	"TX_HDR_DEL_CARGO" => [
