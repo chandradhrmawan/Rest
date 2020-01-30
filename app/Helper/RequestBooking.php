@@ -794,10 +794,15 @@ class RequestBooking{
 					"DTL_DATE_OUT_OLD" => null
 	        	],
 	        	"TX_HDR_DEL" => [
+	        		"kegiatan" => 2,
 					"head_primery" => "del_id",
 					"head_branch" => "del_branch_id",
 					"head_branch_code" => "del_branch_code",
 					"head_cust" => "del_cust_id",
+					"head_cust_name" => "del_cust_name",
+					"head_cust_addr" => "del_cust_address",
+					"head_cust_npwp" => "del_cust_npwp",
+					"head_vvd" => "del_vvd_id",
 					"head_no" => "del_no",
 					"head_by" => "del_create_by",
 					"head_status" => "del_status",
@@ -823,6 +828,8 @@ class RequestBooking{
 					"DTL_UNIT_ID" => null,
 					"DTL_QTY" => 1,
 					"DTL_TL" => null,
+					"DTL_OWNER" => 'del_dtl_owner',
+					"DTL_OWNER_NAME" => 'del_dtl_owner_name',
 					"DTL_DATE_IN" => null,
 					"DTL_DATE_OUT" => 'del_dtl_date_plan',
 					"DTL_DATE_OUT_OLD" => null
