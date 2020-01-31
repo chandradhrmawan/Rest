@@ -60,7 +60,7 @@ class StoreController extends Controller
         "action" => $action,
         "json_request" => json_encode($input),
         "json_response" => json_encode($response),
-        "create_name" => $user
+        "create_name" => $user->user_full_name
       ]);
     }
 
