@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Helper\BillingEngine;
 use App\Models\OmCargo\TxHdrUper;
+use App\Models\OmUster\TxHdrNota;
 
 class RequestBooking{
 
@@ -257,7 +258,7 @@ class RequestBooking{
 						$headU->uper_branch_id = $uper['branch_id'];
 						$headU->uper_branch_code = $uper['branch_code'];
 						$headU->uper_vessel_name = $find[$config['head_vessel_name']];
-						$headU->uper_faktur_no = '12576817'; // ? dari triger bf i
+						// $headU->uper_faktur_no = ''; // ? dari triger bf i
 						$headU->uper_trade_type = $uper['trade_type'];
 						$headU->uper_trade_name = $uper['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 						$headU->uper_req_no = $uper['booking_number'];
@@ -494,6 +495,7 @@ class RequestBooking{
 
 	// PLG
 	    public static function sendRequestPLG($input){
+	    	$input["user"] = 
 			$input['table'] = strtoupper($input['table']);
 			$config = static::configPLG($input['table']);
 			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
@@ -523,10 +525,54 @@ class RequestBooking{
 
 			// build detil
 				$setD = [];
+				$insertTsContHs = [];
+				$insertTxHisContHs = [];
 				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
 				foreach ($detil as $list) {
-					$newD = [];
 					$list = (array)$list;
+					// history 
+					$insertTsCont = [];
+					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
+						'cont_no' => $list[$config['DTL_BL']],
+						'branch_id' => $find[$config['head_branch']],
+						'branch_code' => $find[$config['head_branch_code']]
+					])->orderBy('count_counter', 'desc')->get();
+					if (count($cekTsCont) == 0) {
+						$insertTsCont = [
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']],
+							'cont_location' => 'GATO',
+							'cont_size' => $list[$config['DTL_CONT_SIZE']],
+							'cont_type' => $list[$config['DTL_CONT_TYPE']],
+							'count_counter' => 0
+						];
+						DB::connection('omuster')->table('TS_CONTAINER')->insert($insertTsCont);
+						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']]
+						])->orderBy('count_counter', 'desc')->get();
+					}
+					$cekTsCont = $cekTsCont[0];
+					$insertTsContHs[] = $insertTsCont;
+					$insertTxHisCont = [
+						'no_containet' => $list[$config['DTL_BL']],
+						'no_request' => $find[$config['head_no']],
+						'kegiatan' => $config['kegiatan'],
+						'id_user' => $input["user"]["user_id"],
+						// 'id_yard' => $list[$config['DTL_BL']], ?
+						'status_cont' => $list[$config['DTL_CONT_STATUS']],
+						'vvd_id' => $find[$config['head_vvd']],
+						'counter' => $cekTsCont->count_counter+1
+						// 'sub_counter' => $list[$config['DTL_BL']], ?
+						// 'why' => $list[$config['DTL_BL']], ?
+						// 'aktif' => $list[$config['DTL_BL']], ?
+					];
+					DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($insertTxHisCont);
+					$insertTxHisContHs[] = $insertTxHisCont;
+
+					$newD = [];
 					if (empty($config['DTL_VIA'])) {
 						$newD['DTL_VIA'] = 'NULL';
 					}else{
@@ -535,13 +581,9 @@ class RequestBooking{
 					if (empty($config['DTL_BL'])) {
 						$newD['DTL_BL'] = 'NULL';
 					}else{
-						$newD['DTL_BL'] = empty($list[$config['DTL_BL']]) ? 'NULL' : $list[$config['DTL_BL']];
+						$newD['DTL_BL'] = empty($list[$config['DTL_BL']]) ? 'NULL' : strtoupper($list[$config['DTL_BL']]);
 					}
-					if (empty($config['DTL_PKG_ID'])) {
-						$newD['DTL_PKG_ID'] = 'NULL';
-					}else{
-						$newD['DTL_PKG_ID'] = empty($list[$config['DTL_PKG_ID']]) ? 'NULL' : $list[$config['DTL_PKG_ID']];
-					}
+					$newD['DTL_PKG_ID'] = 8;
 					if (empty($config['DTL_CMDTY_ID'])) {
 						$newD['DTL_CMDTY_ID'] = 'NULL';
 					}else{
@@ -550,7 +592,13 @@ class RequestBooking{
 					if (empty($config['DTL_CHARACTER'])) {
 						$newD['DTL_CHARACTER'] = 'NULL';
 					}else{
-						$newD['DTL_CHARACTER'] = empty($list[$config['DTL_CHARACTER']]) ? 'NULL' : $list[$config['DTL_CHARACTER']];
+						if (empty($list[$config['DTL_CHARACTER']])) {
+							$newD['DTL_CHARACTER'] = 'NULL';
+						}else if ($list[$config['DTL_CHARACTER']] == 'Y'){
+							$newD['DTL_CHARACTER'] = 2;
+						}else if ($list[$config['DTL_CHARACTER']] == 'N'){
+							$newD['DTL_CHARACTER'] = 0;
+						}
 					}
 					if (empty($config['DTL_CONT_SIZE'])) {
 						$newD['DTL_CONT_SIZE'] = 'NULL';
@@ -574,6 +622,8 @@ class RequestBooking{
 					}
 					if (empty($config['DTL_QTY'])) {
 						$newD['DTL_QTY'] = 'NULL';
+					}else if ($config['DTL_QTY'] == 1) {
+						$newD['DTL_QTY'] = 1;
 					}else{
 						$newD['DTL_QTY'] = empty($list[$config['DTL_QTY']]) ? 'NULL' : $list[$config['DTL_QTY']];
 					}
@@ -600,17 +650,17 @@ class RequestBooking{
 					if (empty($config['DTL_DATE_IN'])) {
 						$newD['DTL_DATE_IN'] = 'NULL';
 					}else{
-						$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : $list[$config['DTL_DATE_IN']];
+						$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 					if (empty($config['DTL_DATE_OUT'])) {
 						$newD['DTL_DATE_OUT'] = 'NULL';
 					}else{
-						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : $list[$config['DTL_DATE_OUT']];
+						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 					if (empty($config['DTL_DATE_OUT_OLD'])) {
 						$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 					}else{
-						$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : $list[$config['DTL_DATE_OUT_OLD']];
+						$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT_OLD']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 					$setD[] = $newD;
 				}
@@ -664,34 +714,56 @@ class RequestBooking{
 					$config['head_status'] => 2
 				]);
 			}
+			$tariffResp['his_cont'] = [
+				'insertTsContHs' => $insertTsContHs,
+				'insertTxHisContHs' => $insertTxHisContHs,
+			];
 			return $tariffResp;
 	    }
 
 	    public static function configPLG($input){
 	    	$requst_config = [
 	        	"TX_HDR_REC" => [
+					"kegiatan" => 1,
 					"head_primery" => "rec_id",
 					"head_branch" => "rec_branch_id",
 					"head_branch_code" => "rec_branch_code",
 					"head_cust" => "rec_cust_id",
+					"head_cust_name" => "rec_cust_name",
+					"head_cust_addr" => "rec_cust_address",
+					"head_cust_npwp" => "rec_cust_npwp",
+					"head_vvd" => "rec_vvd_id",
 					"head_no" => "rec_no",
 					"head_by" => "rec_create_by",
 					"head_status" => "rec_status",
+					"head_vessel_name" => "rec_vessel_name",
+					"head_date" => "rec_create_date",
+					"head_pbm_id" => "rec_pbm_id",
+					"head_pbm_name" => "rec_pbm_name",
+					"head_shipping_agent_id" => "rec_stackby_id",
+					"head_shipping_agent_name" => "rec_stackby_name",
+					"head_paymethod" => "rec_paymethod",
+					"head_from" => "rec_from",
+					"head_mark" => "rec_msg",
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_REC",
 					"head_forigen" => "rec_hdr_id",
 					"DTL_VIA" => 'rec_dtl_via',
-					"DTL_BL" => null,
+					"DTL_VIA_NAME" => 'rec_dtl_via_name',
+					"DTL_BL" => 'rec_dtl_cont',
 					"DTL_PKG_ID" => null,
 					"DTL_CMDTY_ID" => "rec_dtl_cmdty_id",
-					"DTL_CHARACTER" => null,
+					"DTL_CMDTY_NAME" => "rec_dtl_cmdty_name",
+					"DTL_CHARACTER" => "rec_dtl_cont_danger",
 					"DTL_CONT_SIZE" => "rec_dtl_cont_size",
 					"DTL_CONT_TYPE" => "rec_dtl_cont_type",
 					"DTL_CONT_STATUS" => "rec_dtl_cont_status",
 					"DTL_UNIT_ID" => null,
-					"DTL_QTY" => null,
+					"DTL_QTY" => 1,
 					"DTL_TL" => null,
-					"DTL_DATE_IN" => null,
+					"DTL_OWNER" => 'rec_dtl_owner',
+					"DTL_OWNER_NAME" => 'rec_dtl_owner_name',
+					"DTL_DATE_IN" => 'rec_dtl_date_plan',
 					"DTL_DATE_OUT" => null,
 					"DTL_DATE_OUT_OLD" => null
 	        	],
@@ -722,29 +794,44 @@ class RequestBooking{
 					"DTL_DATE_OUT_OLD" => null
 	        	],
 	        	"TX_HDR_DEL" => [
+	        		"kegiatan" => 2,
 					"head_primery" => "del_id",
 					"head_branch" => "del_branch_id",
 					"head_branch_code" => "del_branch_code",
 					"head_cust" => "del_cust_id",
+					"head_cust_name" => "del_cust_name",
+					"head_cust_addr" => "del_cust_address",
+					"head_cust_npwp" => "del_cust_npwp",
+					"head_vvd" => "del_vvd_id",
 					"head_no" => "del_no",
 					"head_by" => "del_create_by",
 					"head_status" => "del_status",
+					"head_vessel_name" => "del_vessel_name",
+					"head_date" => "del_create_date",
+					"head_pbm_id" => "del_pbm_id",
+					"head_pbm_name" => "del_pbm_name",
+					"head_shipping_agent_id" => "del_stackby_id",
+					"head_shipping_agent_name" => "del_stackby_name",
+					"head_paymethod" => "del_paymethod",
+					"head_mark" => "del_msg",
 					"p_tarde" => null,
 					"head_tab_detil" => "TX_DTL_DEL",
 					"head_forigen" => "del_hdr_id",
 					"DTL_VIA" => 'del_dtl_via',
-					"DTL_BL" => null,
+					"DTL_BL" => 'del_dtl_cont',
 					"DTL_PKG_ID" => null,
-					"DTL_CMDTY_ID" => null,
-					"DTL_CHARACTER" => null,
+					"DTL_CMDTY_ID" => 'del_dtl_cmdty_id',
+					"DTL_CHARACTER" => 'del_dtl_cont_danger',
 					"DTL_CONT_SIZE" => 'del_dtl_cont_size',
 					"DTL_CONT_TYPE" => 'del_dtl_cont_type',
 					"DTL_CONT_STATUS" => 'del_dtl_cont_status',
 					"DTL_UNIT_ID" => null,
-					"DTL_QTY" => null,
+					"DTL_QTY" => 1,
 					"DTL_TL" => null,
+					"DTL_OWNER" => 'del_dtl_owner',
+					"DTL_OWNER_NAME" => 'del_dtl_owner_name',
 					"DTL_DATE_IN" => null,
-					"DTL_DATE_OUT" => null,
+					"DTL_DATE_OUT" => 'del_dtl_date_plan',
 					"DTL_DATE_OUT_OLD" => null
 	        	],
 	        	"TX_HDR_DEL_CARGO" => [
@@ -776,6 +863,162 @@ class RequestBooking{
 	        ];
 
 	        return $requst_config[$input];
+	    }
+
+	    public static function approvalRequestPLG($input){
+	    	$input['table'] = strtoupper($input['table']);
+			$config = static::configPLG($input['table']);
+			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+			if (empty($find)) {
+				return ['result' => "Fail, requst not found!", "Success" => false];
+			}
+			$find = (array)$find[0];
+			$uper = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->get();
+			if (count($uper) > 0) {
+				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
+			}
+			if ($input['approved'] == 'false') {
+				DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+					$config['head_status'] => 4,
+					$config['head_mark'] => $input['msg']
+				]);
+				return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
+			}
+
+			$datenow    = Carbon::now()->format('Y-m-d');
+			$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
+			$tarifs = DB::connection('eng')->select(DB::raw($query));
+			if (count($tarifs) == 0) {
+				return ['result' => "Fail, proforma and tariff not found!", "Success" => false];
+			}
+			$migrateTariff = true;
+			if ($migrateTariff == true) {
+				foreach ($tarifs as $tarif) {
+					$tarif = (array)$tarif;
+
+					$createdUperNo = '';
+					// store head
+						$headU = new TxHdrNota;
+						$headU->nota_org_id = $tarif['branch_org_id'];
+						$headU->nota_cust_id = $tarif['customer_id'];
+						$headU->nota_cust_name = $tarif['alt_name'];
+						$headU->nota_cust_npwp = $tarif['npwp'];
+						$headU->nota_cust_address = $tarif['address'];
+						$headU->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+						$headU->nota_amount = $tarif['total_uper'];
+						$headU->nota_currency_code = $tarif['currency'];
+						// $headU->nota_status = 'P'; // ? blm fix
+						$headU->nota_service_code = $tarif['nota_service_code'];
+						$headU->nota_branch_account = $tarif['branch_account'];
+						$headU->nota_context = $tarif['nota_context'];
+						$headU->nota_sub_context = $tarif['nota_sub_context'];
+						$headU->nota_terminal = $find[$config['head_terminal_code']];
+						$headU->nota_branch_id = $tarif['branch_id'];
+						$headU->nota_branch_code = $tarif['branch_code'];
+						$headU->nota_vessel_name = $find[$config['head_vessel_name']];
+						// $headU->nota_faktur_no = '12576817'; // ? dari triger bf i
+						$headU->nota_trade_type = $tarif['trade_type'];
+						// $headU->uper_trade_name = $tarif['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
+						$headU->nota_req_no = $tarif['booking_number'];
+						$headU->nota_ppn = $tarif['ppn_uper'];
+						// $headU->uper_paid // ? pasti null
+						// $headU->uper_paid_date // ? pasti null
+						$headU->uper_percent = $tarif['percent_uper'];
+						$headU->uper_dpp = $tarif['dpp_uper'];
+						if ($config['head_pbm_id'] != null) {
+							$headU->nota_pbm_id = $find[$config['head_pbm_id']];
+						}
+						if ($config['head_pbm_name'] != null) {
+							$headU->nota_pbm_name = $find[$config['head_pbm_name']];
+						}
+						if ($config['head_shipping_agent_id'] != null) {
+							$headU->nota_stackby_id = $find[$config['head_shipping_agent_id']];
+						}
+						if ($config['head_shipping_agent_name'] != null) {
+							$headU->nota_stackby_name = $find[$config['head_shipping_agent_name']];
+						}
+						$headU->nota_req_date = $find[$config['head_date']];
+						// if ($config['head_terminal_name'] != null) {
+						// 	// $headU->nota_terminal = $find[$config['head_terminal_name']];
+						// }
+						$headU->nota_group_id = $tarif['nota_id'];
+						$headU->app_id =$find['app_id'];
+						$headU->save();
+
+						$headU = TxHdrNota::find($headU->uper_id);
+						$createdUperNo .= $headU->nota_no.', ';
+					// store head
+
+					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$tarif['temp_hdr_id']."' AND CUSTOMER_ID = '".$tarif['customer_id']."'";
+					$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+
+					$countLine = 0;
+					foreach ($group_tariff as $grpTrf) {
+						$grpTrf = (array)$grpTrf;
+						$tarifD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$tarif['temp_hdr_id'])->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
+
+						foreach ($tarifD as $list) {
+							$countLine++;
+							$list = (array)$list;
+							$set_data = [
+								"nota_hdr_id" => $headU->nota_id,
+								"dtl_line" => $countLine,
+								"dtl_line_desc" => $list['memoline'],
+								// "dtl_line_context" => , // perlu konfimasi
+								"dtl_service_type" => $list['group_tariff_name'],
+								"dtl_amount" => $list['total_uper'],
+								"dtl_ppn" => $list["ppn_uper"],
+								"dtl_masa" => $list["day_period"],
+								// "dtl_masa1" => , // cooming soon
+								// "dtl_masa12" => , // cooming soon
+								// "dtl_masa2" => , // cooming soon
+								"dtl_masa_reff" => $list["stack_combine"],
+								"dtl_total_tariff" => $list["tariff"],
+								"dtl_tariff" => $list["tariff"],
+								"dtl_package" => $list["package_name"],
+								"dtl_qty" => $list["qty"],
+								"dtl_eq_qty" => $list["eq_qty"],
+								"dtl_unit" => $list["unit_id"],
+								"dtl_unit_qty" => $list["unit_qty"],
+								"dtl_unit_name" => $list["unit_name"],
+								"dtl_group_tariff_id" => $list["group_tariff_id"],
+								"dtl_group_tariff_name" => $list["group_tariff_name"],
+								"dtl_bl" => $list["no_bl"],
+								"dtl_dpp" => $list["tariff_cal_uper"],
+								"dtl_commodity" => $list["commodity_name"],
+								"dtl_equipment" => $list["equipment_name"],
+								"dtl_sub_tariff" => $list["sub_tariff"],
+								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+							];
+							DB::connection('omcargo')->table('TX_DTL_NOTA')->insert($set_data);
+						}
+					}
+				}
+			}
+
+			DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+				$config['head_status'] => 3,
+				$config['head_mark'] => $input['msg']
+			]);
+
+			$sendRequestBooking = '';
+			if ($migrateTariff == true) {
+				$pesan = "Created Nota No : ".$createdUperNo;
+			}else if($migrateTariff == false) {
+				// $sendRequestBooking = ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
+				// $pesan = "Nota Not created, uper percent for this request is 0%";
+			}
+
+			if ($find[$config['head_paymethod']] == 2) {
+				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['tabel' => $input['table'], 'id' => $input['id'] ,'config' => $config ]);
+			}
+
+			return [
+				'result' => "Success, approved request! ".$pesan,
+				"note" => $pesan,
+				'no_req' => $find[$config['head_no']],
+				'sendRequestBooking' => $sendRequestBooking
+			];
 	    }
 	// PLG
 }

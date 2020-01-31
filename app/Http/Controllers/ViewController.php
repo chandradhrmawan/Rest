@@ -274,6 +274,10 @@ class ViewController extends Controller
         return UperRequest::viewTempUper($input);
     }
 
+    function viewTempUperPLG($input, $request) {
+        return UperRequest::viewTempUperPLG($input);
+    }
+
     // BillingEngine
     function viewProfileTariff($input, $request) {
         return BillingEngine::viewProfileTariff($input);
