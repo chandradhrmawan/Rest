@@ -193,6 +193,9 @@ class RequestBooking{
 				return ['result' => "Fail, requst not found!", "Success" => false];
 			}
 			$find = (array)$find[0];
+			if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
+				return ['result' => "Fail, requst already approved!", "Success" => false];
+			}
 			$uper = DB::connection('omcargo')->table('TX_HDR_UPER')->where('uper_req_no',$find[$config['head_no']])->get();
 			if (count($uper) > 0) {
 				return ['result' => "Fail, request already exist on uper!", "Success" => false];
@@ -504,6 +507,9 @@ class RequestBooking{
 				return ['Success' => false, 'result' => "Fail, requst not found!"];
 			}
 			$find = (array)$find[0];
+			if ($find[$config['head_status']] == 3) {
+				return ['Success' => false, 'result' => "Fail, requst already send!"];
+			}
 			$pbmCek = 'N';
 			// build head
 				$setH = [];
@@ -878,6 +884,9 @@ class RequestBooking{
 				return ['result' => "Fail, requst not found!", "Success" => false];
 			}
 			$find = (array)$find[0];
+			if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
+				return ['result' => "Fail, requst already approved!", "Success" => false];
+			}
 			$uper = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->get();
 			if (count($uper) > 0) {
 				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
@@ -904,32 +913,36 @@ class RequestBooking{
 					$createdUperNo = '';
 					// store head
 						$headU = new TxHdrNota;
+						// $headU->app_id =$find['app_id'];
+						$headU->nota_group_id = $tarif['nota_id'];
 						$headU->nota_org_id = $tarif['branch_org_id'];
 						$headU->nota_cust_id = $tarif['customer_id'];
 						$headU->nota_cust_name = $tarif['alt_name'];
 						$headU->nota_cust_npwp = $tarif['npwp'];
 						$headU->nota_cust_address = $tarif['address'];
 						$headU->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
-						$headU->nota_amount = $tarif['total_uper'];
+						$headU->nota_amount = $tarif['total'];
 						$headU->nota_currency_code = $tarif['currency'];
-						// $headU->nota_status = 'P'; // ? blm fix
-						$headU->nota_service_code = $tarif['nota_service_code'];
-						$headU->nota_branch_account = $tarif['branch_account'];
+						$headU->nota_status = 1;
 						$headU->nota_context = $tarif['nota_context'];
 						$headU->nota_sub_context = $tarif['nota_sub_context'];
-						$headU->nota_terminal = $find[$config['head_terminal_code']];
+						$headU->nota_service_code = $tarif['nota_service_code'];
+						$headU->nota_branch_account = $tarif['branch_account'];
+						$headU->nota_tax_code = $tarif['tax_code'];
+						// $headU->nota_terminal = $find[$config['head_terminal_name']];
 						$headU->nota_branch_id = $tarif['branch_id'];
 						$headU->nota_branch_code = $tarif['branch_code'];
 						$headU->nota_vessel_name = $find[$config['head_vessel_name']];
-						// $headU->nota_faktur_no = '12576817'; // ? dari triger bf i
+						// $headU->ukk = 'ukk';
 						$headU->nota_trade_type = $tarif['trade_type'];
-						// $headU->uper_trade_name = $tarif['trade_type'] == 'D' ? 'Domestik' : 'Internasional';
 						$headU->nota_req_no = $tarif['booking_number'];
+						// $headU->nota_real_no = '';
+
 						$headU->nota_ppn = $tarif['ppn_uper'];
-						// $headU->uper_paid // ? pasti null
-						// $headU->uper_paid_date // ? pasti null
-						$headU->uper_percent = $tarif['percent_uper'];
-						$headU->uper_dpp = $tarif['dpp_uper'];
+						// $headN->nota_paid = $getH->; // pasti null
+				        // $headN->nota_paid_date = $getH->; // pasti null
+				        // $headN->rest_payment = $getH->; // pasti null
+				        $headU->nota_dpp = $tarif['dpp'];
 						if ($config['head_pbm_id'] != null) {
 							$headU->nota_pbm_id = $find[$config['head_pbm_id']];
 						}
@@ -943,14 +956,9 @@ class RequestBooking{
 							$headU->nota_stackby_name = $find[$config['head_shipping_agent_name']];
 						}
 						$headU->nota_req_date = $find[$config['head_date']];
-						// if ($config['head_terminal_name'] != null) {
-						// 	// $headU->nota_terminal = $find[$config['head_terminal_name']];
-						// }
-						$headU->nota_group_id = $tarif['nota_id'];
-						$headU->app_id =$find['app_id'];
 						$headU->save();
 
-						$headU = TxHdrNota::find($headU->uper_id);
+						$headU = TxHdrNota::find($headU->nota_id);
 						$createdUperNo .= $headU->nota_no.', ';
 					// store head
 
@@ -966,36 +974,36 @@ class RequestBooking{
 							$countLine++;
 							$list = (array)$list;
 							$set_data = [
+								"dtl_group_tariff_id" => $list["group_tariff_id"],
+								"dtl_group_tariff_name" => $list["group_tariff_name"],
+								"dtl_bl" => $list["no_bl"],
+								"dtl_dpp" => $list["tariff_cal"],
+								"dtl_commodity" => $list["commodity_name"],
+								"dtl_equipment" => $list["equipment_name"],
+								"dtl_masa_reff" => $list["stack_combine"],
+								// "nota_dtl_id" => '',
 								"nota_hdr_id" => $headU->nota_id,
 								"dtl_line" => $countLine,
 								"dtl_line_desc" => $list['memoline'],
 								// "dtl_line_context" => , // perlu konfimasi
 								"dtl_service_type" => $list['group_tariff_name'],
-								"dtl_amount" => $list['total_uper'],
-								"dtl_ppn" => $list["ppn_uper"],
+								"dtl_amount" => $list['total'],
+								"dtl_ppn" => $list["ppn"],
 								"dtl_masa" => $list["day_period"],
 								// "dtl_masa1" => , // cooming soon
 								// "dtl_masa12" => , // cooming soon
 								// "dtl_masa2" => , // cooming soon
-								"dtl_masa_reff" => $list["stack_combine"],
-								"dtl_total_tariff" => $list["tariff"],
 								"dtl_tariff" => $list["tariff"],
 								"dtl_package" => $list["package_name"],
-								"dtl_qty" => $list["qty"],
 								"dtl_eq_qty" => $list["eq_qty"],
+								"dtl_qty" => $list["qty"],
 								"dtl_unit" => $list["unit_id"],
 								"dtl_unit_qty" => $list["unit_qty"],
 								"dtl_unit_name" => $list["unit_name"],
-								"dtl_group_tariff_id" => $list["group_tariff_id"],
-								"dtl_group_tariff_name" => $list["group_tariff_name"],
-								"dtl_bl" => $list["no_bl"],
-								"dtl_dpp" => $list["tariff_cal_uper"],
-								"dtl_commodity" => $list["commodity_name"],
-								"dtl_equipment" => $list["equipment_name"],
 								"dtl_sub_tariff" => $list["sub_tariff"],
 								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
 							];
-							DB::connection('omcargo')->table('TX_DTL_NOTA')->insert($set_data);
+							DB::connection('omuster')->table('TX_DTL_NOTA')->insert($set_data);
 						}
 					}
 				}
@@ -1015,7 +1023,7 @@ class RequestBooking{
 			}
 
 			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['tabel' => $input['table'], 'id' => $input['id'] ,'config' => $config ]);
+				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['table' => $input['table'], 'id' => $input['id'] ,'config' => $config ]);
 			}
 
 			return [
@@ -1028,24 +1036,46 @@ class RequestBooking{
 
 	    public static function storePaymentPLG($input)
 	    {
+            $cekNota = TxHdrNota::where([
+            	'nota_no'=>$input['pay_nota_no'],
+            	'nota_paid'=>'Y'
+            ])->count();
+            if ($cekNota > 0) {
+            	return ['result' => "Fail, proforma already paid!", "Success" => false];
+            }
+	    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
+              return ["Success"=>false, "result" => "Fail, file is required"];
+            }
+	    	$store = new TxPayment;
 	    	// pay_id            number,
 	    	// pay_no            varchar2(20 byte),
-	    	// pay_req_no        varchar2(20 byte),
-	    	// pay_method        varchar2(5 byte),
-	    	// pay_cust_id       number,
-	    	// pay_cust_name     varchar2(100 byte),
-	    	// pay_bank_code     varchar2(10 byte),
-	    	// pay_bank_name     varchar2(100 byte),
-	    	// pay_branch_id     number,
-	    	// pay_account_no    varchar2(10 byte),
-	    	// pay_account_name  varchar2(100 byte),
-	    	// pay_amount        integer,
-	    	// pay_date          date,
-	    	// pay_note          varchar2(200 byte),
-	    	// pay_create_by     number,
-	    	// pay_create_date   date                        default sysdate,
-	    	// pay_type          varchar2(5 byte),
-	    	// pay_file          varchar2(200 byte
+	    	$store->pay_nota_no = $input['pay_nota_no'];
+	    	$store->pay_req_no = $input['pay_req_no'];
+	    	$store->pay_method = $input['pay_method'];
+	    	$store->pay_cust_id = $input['pay_cust_id'];
+	    	$store->pay_cust_name = $input['pay_cust_name'];
+	    	$store->pay_bank_code = $input['pay_bank_code'];
+	    	$store->pay_bank_name = $input['pay_bank_name'];
+	    	$store->pay_branch_id = $input['pay_branch_id'];
+	    	$store->pay_account_no = $input['pay_account_no'];
+	    	$store->pay_account_name = $input['pay_account_name'];
+	    	$store->pay_amount = $input['pay_amount'];
+	    	$store->pay_date = $input['pay_date'];
+	    	$store->pay_note = $input['pay_note'];
+	    	$store->pay_create_by = $input['user'];
+	    	$store->pay_create_date = $input['pay_create_date'];
+	    	$store->pay_type = $input['pay_type'];
+	    	$store->save();
+
+	    	if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
+	    		$directory  = 'omuster/TX_PAYMENT/'.date('d-m-Y').'/';
+	    		$response   = FileUpload::upload_file($input['pay_file'], $directory, "TX_PAYMENT", $store->pay_id);
+	    		if ($response['response'] == true) {
+	    			TxPayment::where('pay_id',$store->pay_id)->update([
+	    				'pay_file' => $response['link']
+	    			]);
+	    		}
+	    	}
 	    	return 'asd';
 	    }
 	// PLG

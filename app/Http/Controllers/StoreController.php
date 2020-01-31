@@ -118,10 +118,15 @@ class StoreController extends Controller
 
     public function testlain($input, $request){
       $arrCon = [
+        "kegiatan" => 1,
         "head_primery" => "rec_id",
         "head_branch" => "rec_branch_id",
         "head_branch_code" => "rec_branch_code",
         "head_cust" => "rec_cust_id",
+        "head_cust_name" => "rec_cust_name",
+        "head_cust_addr" => "rec_cust_address",
+        "head_cust_npwp" => "rec_cust_npwp",
+        "head_vvd" => "rec_vvd_id",
         "head_no" => "rec_no",
         "head_by" => "rec_create_by",
         "head_status" => "rec_status",
@@ -132,14 +137,17 @@ class StoreController extends Controller
         "head_shipping_agent_id" => "rec_stackby_id",
         "head_shipping_agent_name" => "rec_stackby_name",
         "head_paymethod" => "rec_paymethod",
+        "head_from" => "rec_from",
         "head_mark" => "rec_msg",
         "p_tarde" => null,
         "head_tab_detil" => "TX_DTL_REC",
         "head_forigen" => "rec_hdr_id",
         "DTL_VIA" => 'rec_dtl_via',
+        "DTL_VIA_NAME" => 'rec_dtl_via_name',
         "DTL_BL" => 'rec_dtl_cont',
         "DTL_PKG_ID" => null,
         "DTL_CMDTY_ID" => "rec_dtl_cmdty_id",
+        "DTL_CMDTY_NAME" => "rec_dtl_cmdty_name",
         "DTL_CHARACTER" => "rec_dtl_cont_danger",
         "DTL_CONT_SIZE" => "rec_dtl_cont_size",
         "DTL_CONT_TYPE" => "rec_dtl_cont_type",
@@ -147,11 +155,13 @@ class StoreController extends Controller
         "DTL_UNIT_ID" => null,
         "DTL_QTY" => 1,
         "DTL_TL" => null,
+        "DTL_OWNER" => 'rec_dtl_owner',
+        "DTL_OWNER_NAME" => 'rec_dtl_owner_name',
         "DTL_DATE_IN" => 'rec_dtl_date_plan',
         "DTL_DATE_OUT" => null,
         "DTL_DATE_OUT_OLD" => null
       ];
-      return ConnectedExternalApps::sendRequestBookingPLG('TX_HDR_REC',105,$arrCon);
+      return ConnectedExternalApps::sendRequestBookingPLG(['table' => 'TX_HDR_REC', 'id' => '137' ,'config' => $arrCon]);
       return ConnectedExternalApps::sendNotifToIBISQA();
       return ConnectedExternalApps::uperSimkeuCek($input);
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
