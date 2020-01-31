@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Helper\BillingEngine;
 use App\Models\OmCargo\TxHdrUper;
 use App\Models\OmUster\TxHdrNota;
+use App\Models\OmUster\TxPayment;
 
 class RequestBooking{
 
@@ -495,7 +496,7 @@ class RequestBooking{
 
 	// PLG
 	    public static function sendRequestPLG($input){
-	    	$input["user"] = 
+	    	// dd($input["user"]);
 			$input['table'] = strtoupper($input['table']);
 			$config = static::configPLG($input['table']);
 			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
@@ -525,53 +526,9 @@ class RequestBooking{
 
 			// build detil
 				$setD = [];
-				$insertTsContHs = [];
-				$insertTxHisContHs = [];
 				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
 				foreach ($detil as $list) {
 					$list = (array)$list;
-					// history 
-					$insertTsCont = [];
-					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
-						'cont_no' => $list[$config['DTL_BL']],
-						'branch_id' => $find[$config['head_branch']],
-						'branch_code' => $find[$config['head_branch_code']]
-					])->orderBy('count_counter', 'desc')->get();
-					if (count($cekTsCont) == 0) {
-						$insertTsCont = [
-							'cont_no' => $list[$config['DTL_BL']],
-							'branch_id' => $find[$config['head_branch']],
-							'branch_code' => $find[$config['head_branch_code']],
-							'cont_location' => 'GATO',
-							'cont_size' => $list[$config['DTL_CONT_SIZE']],
-							'cont_type' => $list[$config['DTL_CONT_TYPE']],
-							'count_counter' => 0
-						];
-						DB::connection('omuster')->table('TS_CONTAINER')->insert($insertTsCont);
-						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
-							'cont_no' => $list[$config['DTL_BL']],
-							'branch_id' => $find[$config['head_branch']],
-							'branch_code' => $find[$config['head_branch_code']]
-						])->orderBy('count_counter', 'desc')->get();
-					}
-					$cekTsCont = $cekTsCont[0];
-					$insertTsContHs[] = $insertTsCont;
-					$insertTxHisCont = [
-						'no_containet' => $list[$config['DTL_BL']],
-						'no_request' => $find[$config['head_no']],
-						'kegiatan' => $config['kegiatan'],
-						'id_user' => $input["user"]["user_id"],
-						// 'id_yard' => $list[$config['DTL_BL']], ?
-						'status_cont' => $list[$config['DTL_CONT_STATUS']],
-						'vvd_id' => $find[$config['head_vvd']],
-						'counter' => $cekTsCont->count_counter+1
-						// 'sub_counter' => $list[$config['DTL_BL']], ?
-						// 'why' => $list[$config['DTL_BL']], ?
-						// 'aktif' => $list[$config['DTL_BL']], ?
-					];
-					DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($insertTxHisCont);
-					$insertTxHisContHs[] = $insertTxHisCont;
-
 					$newD = [];
 					if (empty($config['DTL_VIA'])) {
 						$newD['DTL_VIA'] = 'NULL';
@@ -708,11 +665,59 @@ class RequestBooking{
 
 			// return $tariffResp = BillingEngine::calculateTariff($set_data);
 			$tariffResp = BillingEngine::calculateTariff($set_data);
+			
+			$insertTsContHs = [];
+			$insertTxHisContHs = [];
 
 			if ($tariffResp['result_flag'] == 'S') {
 				DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
+				foreach ($detil as $list) {
+					$list = (array)$list;
+					// history container
+						$insertTsCont = [];
+						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']]
+						])->orderBy('cont_counter', 'desc')->get();
+						if (count($cekTsCont) == 0) {
+							$insertTsCont = [
+								'cont_no' => $list[$config['DTL_BL']],
+								'branch_id' => $find[$config['head_branch']],
+								'branch_code' => $find[$config['head_branch_code']],
+								'cont_location' => 'GATO',
+								'cont_size' => $list[$config['DTL_CONT_SIZE']],
+								'cont_type' => $list[$config['DTL_CONT_TYPE']],
+								'cont_counter' => 0
+							];
+							DB::connection('omuster')->table('TS_CONTAINER')->insert($insertTsCont);
+							$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
+								'cont_no' => $list[$config['DTL_BL']],
+								'branch_id' => $find[$config['head_branch']],
+								'branch_code' => $find[$config['head_branch_code']]
+							])->orderBy('cont_counter', 'desc')->get();
+						}
+						$cekTsCont = $cekTsCont[0];
+						$insertTsContHs[] = $insertTsCont;
+						$insertTxHisCont = [
+							'no_container' => $list[$config['DTL_BL']],
+							'no_request' => $find[$config['head_no']],
+							'kegiatan' => $config['kegiatan'],
+							'id_user' => $input["user"]->user_id,
+							// 'id_yard' => $list[$config['DTL_BL']], ?
+							'status_cont' => $list[$config['DTL_CONT_STATUS']],
+							'vvd_id' => $find[$config['head_vvd']],
+							'counter' => $cekTsCont->cont_counter+1
+							// 'sub_counter' => $list[$config['DTL_BL']], ?
+							// 'why' => $list[$config['DTL_BL']], ?
+							// 'aktif' => $list[$config['DTL_BL']], ?
+						];
+						DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($insertTxHisCont);
+						$insertTxHisContHs[] = $insertTxHisCont;
+					// history container
+				}
 			}
 			$tariffResp['his_cont'] = [
 				'insertTsContHs' => $insertTsContHs,
@@ -1019,6 +1024,29 @@ class RequestBooking{
 				'no_req' => $find[$config['head_no']],
 				'sendRequestBooking' => $sendRequestBooking
 			];
+	    }
+
+	    public static function storePaymentPLG($input)
+	    {
+	    	// pay_id            number,
+	    	// pay_no            varchar2(20 byte),
+	    	// pay_req_no        varchar2(20 byte),
+	    	// pay_method        varchar2(5 byte),
+	    	// pay_cust_id       number,
+	    	// pay_cust_name     varchar2(100 byte),
+	    	// pay_bank_code     varchar2(10 byte),
+	    	// pay_bank_name     varchar2(100 byte),
+	    	// pay_branch_id     number,
+	    	// pay_account_no    varchar2(10 byte),
+	    	// pay_account_name  varchar2(100 byte),
+	    	// pay_amount        integer,
+	    	// pay_date          date,
+	    	// pay_note          varchar2(200 byte),
+	    	// pay_create_by     number,
+	    	// pay_create_date   date                        default sysdate,
+	    	// pay_type          varchar2(5 byte),
+	    	// pay_file          varchar2(200 byte
+	    	return 'asd';
 	    }
 	// PLG
 }

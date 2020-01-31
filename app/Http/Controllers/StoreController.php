@@ -373,6 +373,10 @@ class StoreController extends Controller
         return RequestBooking::approvalRequestPLG($input);
       }
 
+      function storePaymentPLG($input, $request){
+        return RequestBooking::storePaymentPLG($input);
+      }
+
     // RequestBooking
 
     // BillingEngine
