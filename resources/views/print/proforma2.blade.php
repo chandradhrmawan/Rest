@@ -20,6 +20,7 @@
 		@foreach($header as $header)
 		@foreach($branch as $branch)
 		@foreach($kapal as $kapal)
+		@foreach($uper 	as $uper)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
@@ -282,14 +283,26 @@
     <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">PPN 10%</td>
     <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($header->nota_ppn)}}</td>
+    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->nota_ppn)}}</td>
   </tr>
   <tr>
-    <td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-top: 0;border-left:0" colspan="2">Grand Total</td>
-    <td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-    <td style="border-left:  0;border-top: 0;text-align:right">{{number_format($header->nota_amount)}}</td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Total</td>
+    <td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
+    <td style="border-left:  0;border-top: 0;border-bottom:0;text-align:right">{{number_format($header->nota_amount)}}</td>
   </tr>
+	<tr>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Jumlah Pembayaran</td>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
+		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format($uper->pay_amount)}}</td>
+	</tr>
+	<tr>
+		<td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
+		<td style="border-right: 0;border-top: 0;border-left:0" colspan="2">Grand Total</td>
+		<td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
+		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format($total)}}</td>
+	</tr>
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
@@ -311,6 +324,7 @@
 	</div>
 </div>
 <p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
+@endforeach
 @endforeach
 @endforeach
 @endforeach
