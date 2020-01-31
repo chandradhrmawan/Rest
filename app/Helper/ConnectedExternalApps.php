@@ -1566,15 +1566,10 @@ class ConnectedExternalApps{
 
   // PLG
     // send request to TOS
-      public static function sendRequestBookingPLG($table, $id, $config)
+      public static function sendRequestBookingPLG($arr)
       {
-        $endpoint_url=config('endpoint.tosPLG');
-        $toFunct = 'buildJson'.$table;
-        $arr = [
-          'table'   => $table,
-          'id'      => $id,
-          'config'  => $config
-        ];
+        $endpoint_url=config('endpoint.tosPostPLG');
+        $toFunct = 'buildJson'.$arr['table'];
         $getJson = static::$toFunct($arr);
 
         $username="npks";
@@ -1623,24 +1618,24 @@ class ConnectedExternalApps{
         $arrdetil = substr($arrdetil, 0,-1);
         $head = DB::connection('omuster')->table($arr['table'])->where($arr['config']['head_primery'], $arr['id'])->first();
         $head = (array)$head;
-        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$config['head_no']])->first();
+        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
         $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
           'reff_tr_id' => 5,
-          'reff_id' => $head[$config['head_from']]
+          'reff_id' => $head[$arr['config']['head_from']]
         ])->first();
         return $json_body = '{
           "action" : "getReceiving",
           "header": {
-            "REQ_NO": "'.$head[$config['head_no']].'",
-            "REQ_RECEIVING_DATE": "'.$head[$config['head_date']].'",
+            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
             "NO_NOTA": "'.$nota->nota_no.'",
-            "TGL_NOTA": "'.$nota->nota_date.'",
-            "NM_CONSIGNEE": "'.$head[$config['head_cust_name']].'",
-            "ALAMAT": "'.$head[$config['head_cust_addr']].'",
+            "TGL_NOTA": "'.date('m/d/Y', strtotime($nota->nota_date)).'",
+            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
+            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
             "REQ_MARK": "",
-            "NPWP": '.$head[$config['head_cust_npwp']].'",
+            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
             "RECEIVING_DARI": "'.$rec_dr->reff_name.'",
-            "TANGGAL_LUNAS": "'.$nota->nota_paid_date.'",
+            "TANGGAL_LUNAS": "'.date('m/d/Y', strtotime($nota->nota_paid_date)).'",
             "DI": ""
           },
           "arrdetail": ['.$arrdetil.']
