@@ -506,10 +506,10 @@ class RequestBooking{
 			if (empty($find)) {
 				return ['Success' => false, 'result' => "Fail, requst not found!"];
 			}
+			$find = (array)$find[0];
 			if ($find[$config['head_status']] == 3) {
 				return ['Success' => false, 'result' => "Fail, requst already send!"];
 			}
-			$find = (array)$find[0];
 			$pbmCek = 'N';
 			// build head
 				$setH = [];
