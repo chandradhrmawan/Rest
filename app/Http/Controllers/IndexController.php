@@ -371,4 +371,8 @@ class IndexController extends Controller
     $count = count($newDt);
     return ["result" =>$newDt, "count"=>$count];
   }
+
+  function vwheaderdetail($input) {
+
+  }
 }

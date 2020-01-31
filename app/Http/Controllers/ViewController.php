@@ -374,7 +374,6 @@ class ViewController extends Controller
 
     $all = ["header"=>$header]+$det;
     $branch      = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
-    $terbilang   = $this->terbilang($header[0]->nota_amount);
     if (!array_key_exists("alat",$all)) {
       $alat = 0;
     } else {
@@ -439,10 +438,45 @@ class ViewController extends Controller
               A.NOTA_ID = '$id'
             ";
     $kapal       = DB::connection('omcargo')->select($query);
-    $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
-    $html       = view('print.proforma2',["bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
-    $filename   = $all["header"][0]->nota_no.rand(10,100000);
-    $dompdf     = new Dompdf();
+    $nota        = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
+
+    // Data Uper And Payment
+    $query      = "
+                  SELECT
+                  A.UPER_CUST_NAME,
+                  A.UPER_VESSEL_NAME,
+                  CASE
+                  WHEN A.UPER_NOTA_ID = 13
+                    THEN (SELECT TO_CHAR(BM_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MON-YY') FROM TX_HDR_BM WHERE BM_NO = A.UPER_REQ_NO)
+                  WHEN A.UPER_NOTA_ID = 14
+                    THEN (SELECT TO_CHAR(REC_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MON-YY') FROM TX_HDR_REC WHERE REC_NO = A.UPER_REQ_NO)
+                  WHEN A.UPER_NOTA_ID IN (15,19)
+                    THEN (SELECT TO_CHAR(DEL_ETA,'DD-MON-YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MON-YY') FROM TX_HDR_DEL WHERE DEL_NO = A.UPER_REQ_NO)
+                  END AS PERIODE,
+                  A.UPER_NO,
+                  A.UPER_TRADE_TYPE,
+                  A.UPER_AMOUNT,
+                  B.PAY_AMOUNT,
+                  B.PAY_ACCOUNT_NAME,
+                  TO_CHAR(B.PAY_DATE,'DD-MON-YY') PAY_DATE,
+                  B.PAY_NOTE,
+                  B.PAY_CUST_ID
+                FROM
+                  TX_HDR_UPER A,
+                  TX_PAYMENT B
+                WHERE
+                  A.UPER_NO = B.PAY_NO
+                  AND B.PAY_TYPE = 1
+                  AND A.UPER_PAID = 'Y'
+                  AND A.UPER_REQ_NO = '".$header[0]->nota_req_no."'";
+    $uper        = DB::connection('omcargo')->select($query);
+    $notaAmount  = $header[0]->nota_amount;
+    $payAmount   = $uper[0]->pay_amount;
+    $total       = $notaAmount - $payAmount;
+    $terbilang   = $this->terbilang($total);
+    $html        = view('print.proforma2',["total"=>$total,"uper"=>$uper, "bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+    $filename    = $all["header"][0]->nota_no.rand(10,100000);
+    $dompdf      = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
     $dompdf->loadHtml($html);
     $dompdf->setPaper('A4', 'potrait');
@@ -598,7 +632,7 @@ class ViewController extends Controller
       $penumpukan = $all["penumpukan"];
     }
 
-    $nota       = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->uper_nota_id)->get();
+    $nota       = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->uper_nota_id)->get();
     $html       = view('print.uper2',["bl"=>$bl,"branch"=>$branch,"label"=>$nota,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat,"terbilang"=>$terbilang]);
 
     $filename   = $all["header"][0]->uper_no.rand(10,100000);
@@ -889,7 +923,7 @@ class ViewController extends Controller
     $results  = json_decode($res->getBody()->getContents(), true);
     $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
     $kapal    = DB::connection('omcargo')->select($query);
-    $nota     = DB::connection('eng')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
+    $nota     = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
     $handa     = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID','=', $id)->get();
     foreach ($handa as $list) {
       $newAt = [];
