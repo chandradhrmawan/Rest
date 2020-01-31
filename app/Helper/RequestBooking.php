@@ -193,6 +193,9 @@ class RequestBooking{
 				return ['result' => "Fail, requst not found!", "Success" => false];
 			}
 			$find = (array)$find[0];
+			if ($find[$config['head_status']] == 3 $input['approved'] == 'true') {
+				return ['result' => "Fail, requst already approved!", "Success" => false];
+			}
 			$uper = DB::connection('omcargo')->table('TX_HDR_UPER')->where('uper_req_no',$find[$config['head_no']])->get();
 			if (count($uper) > 0) {
 				return ['result' => "Fail, request already exist on uper!", "Success" => false];
@@ -1028,6 +1031,7 @@ class RequestBooking{
 
 	    public static function storePaymentPLG($input)
 	    {
+	    	$store = new TxPayment;
 	    	// pay_id            number,
 	    	// pay_no            varchar2(20 byte),
 	    	// pay_req_no        varchar2(20 byte),

@@ -1346,6 +1346,10 @@ class ConnectedExternalApps{
     }
 
     public static function uperSimkeuCek($input){
+      $cekUperPaid = TxHdrUper::where('uper_no',$input['uper_no'])->where('uper_paid', 'Y')->count();
+      if ($cekUperPaid > 0) {
+        return ['result' => "Info, uper already paid!", "Success" => true];
+      }
       $endpoint_url=config('endpoint.uperSimkeuCek');
       $string_json = '{
          "inquiryStatusReceiptRequest":{
