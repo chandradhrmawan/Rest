@@ -67,8 +67,21 @@ class GlobalHelper {
           else {
             $fk      = $val["FK"][0];
             $fkhdr   = $header[0][$val["FK"][1]];
-            $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
-            $vwdata[$data] = $detail;
+            if(!empty($val["WHERE"][0])) {
+              $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->where($val["WHERE"])->get();
+            } else {
+              $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
+            }
+            if (empty($detail)) {
+              $field      = DB::connection($val["DB"])->table('USER_TAB_COLUMNS')->select('column_name')->where('table_name', $val["TABLE"])->get();
+              $empty      = [];
+              foreach ($field as $value) {
+                $empty[$value->column_name] = "";
+              }
+              $vwdata[$data] = $empty;
+            } else {
+              $vwdata[$data] = $detail;
+            }
           }
       }
 
@@ -446,6 +459,12 @@ class GlobalHelper {
     } else {
       foreach ($input["join"] as $list) {
         $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+      }
+    }
+
+    if (isset($input["leftJoin"])) {
+      foreach ($input["leftJoin"] as $list) {
+        $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
       }
     }
 

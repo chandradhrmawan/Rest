@@ -317,7 +317,7 @@ class IndexController extends Controller
       $count    = count($header);
 
       if (empty($header)) {
-        $result  = "";
+        $result  = [];
         $count   = 0;
       }
 
@@ -372,7 +372,192 @@ class IndexController extends Controller
     return ["result" =>$newDt, "count"=>$count];
   }
 
-  function vwheaderdetail($input) {
-
+  function viewDetail($input){
+      $field      = DB::connection($input["db"])->table('USER_TAB_COLUMNS')->select('column_name')->where('table_name', 'TX_GATEIN')->get();
+      $data       = [];
+      foreach ($field as $value) {
+        $data[$value->column_name] = "";
+      }
   }
+
+  public static function viewDetailTes($input) {
+      $data    = $input["data"];
+      $count   = count($input["data"]);
+      $pk      = $input["HEADER"]["PK"][0];
+      $pkVal   = $input["HEADER"]["PK"][1];
+      foreach ($data as $data) {
+        $val     = $input[$data];
+        $connect  = DB::connection($val["DB"])->table($val["TABLE"]);
+          if ($data == "HEADER") {
+             $header   = $connect->where(strtoupper($pk), "like", strtoupper($pkVal))->get();
+             $header   = json_decode(json_encode($header), TRUE);
+             $vwdata = ["HEADER" => $header];
+          }
+
+          else if($data == "FILE") {
+            if (isset($input[$data]["BASE64"])) {
+              if ($input[$data]["BASE64"] == "N" || $input[$data]["BASE64"] == "n" ) {
+                $fil     = [];
+                $fk      = $val["FK"][0];
+                $fkhdr   = $header[0][$val["FK"][1]];
+                $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
+                foreach ($detail as $list) {
+                  $newDt = [];
+                  foreach ($list as $key => $value) {
+                    $newDt[$key] = $value;
+                  }
+                  $fil[] = $newDt;
+                  $vwdata[$data] = $fil;
+                  }
+                  if (empty($detail)) {
+                    $vwdata[$data] = [];
+                    }
+              }
+            } else {
+            $fil     = [];
+            $fk      = $val["FK"][0];
+            $fkhdr   = $header[0][$val["FK"][1]];
+            $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
+            foreach ($detail as $list) {
+              $newDt = [];
+              foreach ($list as $key => $value) {
+                $newDt[$key] = $value;
+              }
+              $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
+              $url     = str_replace(" ", "%20", $dataUrl);
+              $file = file_get_contents($url);
+              $newDt["base64"]  =  base64_encode($file);
+              $fil[] = $newDt;
+              $vwdata[$data] = $fil;
+              }
+              if (empty($detail)) {
+                $vwdata[$data] = [];
+                }
+              }
+            }
+
+          else {
+            $fk      = $val["FK"][0];
+            $fkhdr   = $header[0][$val["FK"][1]];
+            if(!empty($val["WHERE"][0])) {
+              $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->where($val["WHERE"])->get();
+            } else {
+              $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
+            }
+            if (empty($detail)) {
+              $field      = DB::connection($val["DB"])->table('USER_TAB_COLUMNS')->select('column_name')->where('table_name', $val["TABLE"])->get();
+              $empty      = [];
+              foreach ($field as $value) {
+                $empty[$value->column_name] = "";
+              }
+              $vwdata[$data] = $empty;
+            } else {
+              $vwdata[$data] = $detail;
+            }
+          }
+      }
+
+      if (!empty($input["changeKey"])) {
+        $result  = $vwdata;
+        $data    = json_encode($result);
+        $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
+        $vwdata  = json_decode($change);
+      }
+
+      if (isset($input["spesial"])) {
+        if ($input["spesial"] == "TM_LUMPSUM") {
+          $id       = $input["HEADER"]["PK"][1];
+          $detail   = [];
+          $cust     = [];
+          $fil      = [];
+          $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->where("LUMPSUM_ID", "=", $id)->get();
+          foreach ($data_a as $list) {
+            $newDt = [];
+            foreach ($list as $key => $value) {
+              $newDt[$key] = $value;
+            }
+
+            $data_c = DB::connection("omcargo")->table('TM_REFF')->where([["REFF_TR_ID", "=", "11"],["REFF_ID", "=", $list->lumpsum_stacking_type]])->get();
+            foreach ($data_c as $listc) {
+              $newDt = [];
+              foreach ($listc as $key => $value) {
+                $newDt[$key] = $value;
+              }
+            }
+
+          if ($list->lumpsum_stacking_type == "2") {
+            $data_b = DB::connection("mdm")->table('TM_STORAGE')->where("storage_code", $list->lumpsum_area_code)->get();
+          } else {
+            $data_b = DB::connection("mdm")->table('TM_YARD')->where("yard_code", $list->lumpsum_area_code)->get();
+          }
+          foreach ($data_b as $listS) {
+            foreach ($listS as $key => $value) {
+              $newDt[$key] = $value;
+            }
+          }
+          $detail[] = $newDt;
+         }
+
+         $data_d   = DB::connection("omcargo")->table('TS_LUMPSUM_CUST')->where("LUMPSUM_ID", "=", $id)->get();
+         foreach ($data_d as $listD) {
+           $custo = [];
+           foreach ($listD as $key => $value) {
+             $custo[$key] = $value;
+           }
+             $cust[] = $custo;
+         }
+
+         $vwdata["DETAIL"] = $detail;
+         $vwdata["CUSTOMER"] = $cust;
+         $no       = $vwdata["HEADER"][0]["lumpsum_no"];
+         $data_e   = DB::connection("omcargo")->table('TX_DOCUMENT')->where("REQ_NO", "=", $id)->get();
+         foreach ($data_e as $list) {
+           $newDt = [];
+           foreach ($list as $key => $value) {
+             $newDt[$key] = $value;
+           }
+           $dataUrl = "http://10.88.48.33/api/public/".$list->doc_path;
+           $url     = str_replace(" ", "%20", $dataUrl);
+           $file = file_get_contents($url);
+           $newDt["base64"]  =  base64_encode($file);
+           $fil[] = $newDt;
+           $vwdata["FILE"] = $fil;
+           }
+           if (empty($data_e)) {
+             $vwdata["FILE"] = [];
+           }
+        }
+      }
+      return $vwdata;
+    }
+
+  // function joinheaderdetail($input) {
+  //   $data         = $input["data"];
+  //   $connect      = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where($input["HEADER"]["PK"][0],$input["HEADER"]["PK"][1]);
+  //   $raw           = $input["data"];
+  //   $left          = $input["JOIN"]["LEFT"];
+  //   for ($i=0; $i < count($raw); $i++) {
+  //     if ($raw[$i] == "HEADER" || $raw[$i] == "header") {
+  //       // code...
+  //     } else {
+  //       if(!in_array($raw[$i],$left))
+  //       $other[]   = $raw[$i];
+  //     }
+  //   }
+  //
+  //   foreach ($other as $other) {
+  //     $dataun    = $input[$other];
+  //     $connect->leftJoin($dataun["TABLE"], $dataun["FK"][0], "=",$dataun["FK"][1]);
+  //   }
+  //
+  //   if (!empty($input["JOIN"]["LEFT"])) {
+  //     $data = count($input["JOIN"]["LEFT"]);
+  //     for ($i=0; $i < $data; $i++) {
+  //       $datadtl   = $input[$input["JOIN"]["LEFT"][$i]];
+  //       $connect->leftJoin($datadtl["TABLE"], $datadtl["FK"][0], "=",$datadtl["FK"][1]);
+  //     }
+  //   }
+  //
+  //   return $connect->first();
+  // }
 }
