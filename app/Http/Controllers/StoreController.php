@@ -18,6 +18,7 @@ use App\Helper\ConnectedExternalApps;
 use App\Helper\RealisasiHelper;
 use App\Models\Mdm\TmTruckCompany;
 use App\Helper\PlgRequestBooking;
+use App\Helper\PlgConnectedExternalApps;
 
 class StoreController extends Controller
 {
@@ -205,8 +206,20 @@ class StoreController extends Controller
         return PlgRequestBooking::approvalRequestPLG($input);
       }
 
+      function approvalProformaPLG($input, $request){
+        return PlgRequestBooking::approvalProformaPLG($input);
+      }
+
+      function cekSendInvProforma($input, $request){
+        return PlgConnectedExternalApps::cekSendInvProforma($input);
+      }
+
       function storePaymentPLG($input, $request){
         return PlgRequestBooking::storePaymentPLG($input);
+      }
+      
+      function cekSendInvPay($input, $request){
+        return PlgConnectedExternalApps::cekSendInvPay($input);
       }
     // PLG
 

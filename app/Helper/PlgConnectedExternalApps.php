@@ -5,6 +5,7 @@ namespace App\Helper;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
+use App\Models\OmUster\TxHdrNota;
 
 class PlgConnectedExternalApps{
 	// PLG
@@ -129,20 +130,40 @@ class PlgConnectedExternalApps{
 
 		public static function sendInvProforma($arr){
 			// liat di concet external function sendNotaProforma
-			return 'by passs';
+			return ['Success' => true, 'response' => 'by passs'];
 		}
 
 		public static function cekSendInvProforma($input){
 			// buat funct cek status di simkue kalau behasil update status nota supaya bisa di bayarkan
+			// ini semetara di by passs
+			$getNota = TxHdrNota::find($input['nota_id']);
+			$getNota->nota_status = 3;
+			$getNota->save();
+			return ['result' => 'Success, by pass'];
+        	// ini semetara di by passs
 		}
 
 		public static function sendInvPay($arr){
 			// liat di concet external function sendNotaProforma
-			return 'by passs';
+			return ['Success' => true, 'response' => 'by passs'];
 		}
 
 		public static function cekSendInvPay($input){
 			// buat funct cek status di simkue kalau behasil update status nota supaya bisa telah dibayarkan lalau jalankan funct sendRequestBookingPLG
+
+			// sementara di by pass
+			$getNota = TxHdrNota::find($input['nota_id']);
+			$getNota->nota_status = 5;
+			$getNota->nota_paid = 'Y';
+			$getNota->save();
+        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+			$config = json_decode($config->api_set, true);
+			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
+			$getReq = (array)$getReq;
+            $sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+	    	// sementara di by pass
+
+	    	return ['result' => 'Success, by pass', 'sendRequestBooking' => $sendRequestBooking];
 		}
 
 

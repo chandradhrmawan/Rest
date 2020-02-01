@@ -356,7 +356,7 @@ class PlgRequestBooking{
 			if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
 				return ['result' => "Fail, requst already approved!", "Success" => false];
 			}
-			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [3])->get();
+			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [6])->get();
 			if (count($nota) > 0) {
 				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
 			}
@@ -381,7 +381,7 @@ class PlgRequestBooking{
 
 					$createdUperNo = '';
 					// store head
-						$cekOldNota = TxHdrNota::where('nota_req_no', $find[$config['head_no']])->where('nota_status', 3)->first();
+						$cekOldNota = TxHdrNota::where('nota_req_no', $find[$config['head_no']])->first();
 						if (empty($cekOldNota)) {
 							$headU = new TxHdrNota;
 						}else{
@@ -518,23 +518,26 @@ class PlgRequestBooking{
             	return ['result' => "Fail, proforma not waiting approval!", "Success" => false];
             }
             $getNota = TxHdrNota::find($input['nota_id']);
-            $sendInv = '';
+            if (empty($getNota)) {
+            	return ['result' => "Fail, proforma not found!", "Success" => false];
+            }
+            $sendInvProforma = '';
             if ($input['approved'] == 'true') {
-            	$getNota->nota_status = 2;
-            	$getNota->save();
             	$arr = []; // buat funct kirim proforma ke inv
             	$sendInvProforma = PlgConnectedExternalApps::sendInvProforma($arr); // buat funct kirim proforma ke inv
+            	if ($sendInvProforma['Success'] == true) {
+	            	$getNota->nota_status = 2;
+	            	$getNota->save();
+            	}else{
+            		return ['Success' => false, 'response' => 'Fail, cant send invoice proforma', 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
+            	}
             	$msg='Success, approved!';
-            	// ini semetara di by passs
-            	$getNota->nota_status = 2;
-            	$getNota->save();
-            	// ini semetara di by passs
             }else if ($input['approved'] == 'false') {
-            	$getNota->nota_status = 3;
+            	$getNota->nota_status = 6;
             	$getNota->save();
             	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
 				$config = json_decode($config->api_set, true);
-				$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'=>4]]);
+				$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 4 ]);
             	$msg='Success, rejected!';
             }
             return ['response' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
@@ -555,11 +558,20 @@ class PlgRequestBooking{
             if ($cekNota == 0) {
             	return ['result' => "Fail, proforma not approved!", "Success" => false];
             }
-	    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
-              return ["Success"=>false, "result" => "Fail, file is required"];
-            }
 			$datenow    = Carbon::now()->format('Y-m-d');
-	    	$store = new TxPayment;
+			if (empty($input['pay_id'])) {
+		    	$store = new TxPayment;
+		    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
+	              return ["Success"=>false, "result" => "Fail, file is required"];
+	            }
+			}else{
+				$store = TxPayment::find($input['pay_id']);
+				if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
+					if (file_exists($store->pay_file)){
+						unlink($store->pay_file);
+					}
+	            }
+			}
 	    	// pay_id            number,
 	    	// pay_no            varchar2(20 byte),
 	    	$store->pay_nota_no = $input['pay_nota_no'];
@@ -589,25 +601,22 @@ class PlgRequestBooking{
 	    			]);
 	    		}
 	    	}
-
-	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
-	    	// sementara di by pass
-        	$getNota->nota_paid = 'Y';
-	    	// sementara di by pass
-        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
-        	$getNota->save();
 	    	$pay = TxPayment::find($store->pay_id);
 	    	$arr = []; // buat function kirim pembayaran ke simkue
         	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr); // buat function kirim pembayaran ke simkue
-
-	    	// sementara di by pass
-        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-			$config = json_decode($config->api_set, true);
-			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
-			$getReq = (array)$getReq;
-            $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
-	    	// sementara di by pass
-
+        	if ($sendInvPay['Success'] == false) {
+        		return [
+        			'response' => 'Fail, cant send payment invoice', 
+        			'no_pay' => $pay->pay_no, 
+        			'nota_no' => $getNota->nota_no, 
+        			'no_req' => $pay->pay_req_no, 
+        			'sendInvPay' => $sendInvPay
+        		];
+        	}
+	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
+        	$getNota->nota_status = 4;
+        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+        	$getNota->save();
             return [
 				'result' => "Success, pay proforma!",
 				'no_pay' => $pay->pay_no,

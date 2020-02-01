@@ -141,7 +141,7 @@ class UperRequest{
           $datenow    = Carbon::now()->format('Y-m-d');
           if (isset($input['pay_id']) and !empty($input['pay_id'])) {
             $pay = TxPayment::find($input['pay_id']);
-            if (!empty($input['pay_file']['PATH']) or !empty($input['pay_file']['BASE64']) or !empty($input['pay_file'])) {
+            if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
               if (file_exists($pay->pay_file)){
                 unlink($pay->pay_file);
               }
