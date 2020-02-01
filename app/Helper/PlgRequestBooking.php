@@ -11,9 +11,9 @@ use App\Models\OmUster\TxPayment;
 class PlgRequestBooking{
 	// PLG
 	    public static function sendRequestPLG($input){
-			$input['table'] = strtoupper($input['table']);
-			$config = static::configPLG($input['table']);
-			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+			$config = json_decode($config->api_set, true);
+			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
 			if (empty($find)) {
 				return ['Success' => false, 'result' => "Fail, requst not found!"];
 			}
@@ -187,7 +187,7 @@ class PlgRequestBooking{
 			$insertTxHisContHs = [];
 
 			if ($tariffResp['result_flag'] == 'S') {
-				DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
 				foreach ($detil as $list) {
@@ -243,154 +243,10 @@ class PlgRequestBooking{
 			return $tariffResp;
 	    }
 
-	    public static function configPLG($input){
-	    	$requst_config = [
-	        	"TX_HDR_REC" => [
-					"kegiatan" => 1,
-					"head_primery" => "rec_id",
-					"head_branch" => "rec_branch_id",
-					"head_branch_code" => "rec_branch_code",
-					"head_cust" => "rec_cust_id",
-					"head_cust_name" => "rec_cust_name",
-					"head_cust_addr" => "rec_cust_address",
-					"head_cust_npwp" => "rec_cust_npwp",
-					"head_vvd" => "rec_vvd_id",
-					"head_no" => "rec_no",
-					"head_by" => "rec_create_by",
-					"head_status" => "rec_status",
-					"head_vessel_name" => "rec_vessel_name",
-					"head_date" => "rec_create_date",
-					"head_pbm_id" => "rec_pbm_id",
-					"head_pbm_name" => "rec_pbm_name",
-					"head_shipping_agent_id" => "rec_stackby_id",
-					"head_shipping_agent_name" => "rec_stackby_name",
-					"head_paymethod" => "rec_paymethod",
-					"head_from" => "rec_from",
-					"head_mark" => "rec_msg",
-					"p_tarde" => null,
-					"head_tab_detil" => "TX_DTL_REC",
-					"head_forigen" => "rec_hdr_id",
-					"DTL_VIA" => 'rec_dtl_via',
-					"DTL_VIA_NAME" => 'rec_dtl_via_name',
-					"DTL_BL" => 'rec_dtl_cont',
-					"DTL_PKG_ID" => null,
-					"DTL_CMDTY_ID" => "rec_dtl_cmdty_id",
-					"DTL_CMDTY_NAME" => "rec_dtl_cmdty_name",
-					"DTL_CHARACTER" => "rec_dtl_cont_danger",
-					"DTL_CONT_SIZE" => "rec_dtl_cont_size",
-					"DTL_CONT_TYPE" => "rec_dtl_cont_type",
-					"DTL_CONT_STATUS" => "rec_dtl_cont_status",
-					"DTL_UNIT_ID" => null,
-					"DTL_QTY" => 1,
-					"DTL_TL" => null,
-					"DTL_OWNER" => 'rec_dtl_owner',
-					"DTL_OWNER_NAME" => 'rec_dtl_owner_name',
-					"DTL_DATE_IN" => 'rec_dtl_date_plan',
-					"DTL_DATE_OUT" => null,
-					"DTL_DATE_OUT_OLD" => null
-	        	],
-	        	"TX_HDR_REC_CARGO" => [
-					"head_primery" => "rec_cargo_id",
-					"head_branch" => "rec_cargo_branch_id",
-					"head_branch_code" => "rec_cargo_branch_code",
-					"head_cust" => "rec_cargo_cust_id",
-					"head_no" => "rec_cargo_no",
-					"head_by" => "rec_cargo_create_by",
-					"head_status" => "rec_cargo_status",
-					"p_tarde" => null,
-					"head_tab_detil" => "TX_DTL_REC_CARGO",
-					"head_forigen" => "rec_cargo_hdr_id",
-					"DTL_VIA" => 'rec_cargo_dtl_via',
-					"DTL_BL" => null,
-					"DTL_PKG_ID" => 'rec_cargo_dtl_pkg_id',
-					"DTL_CMDTY_ID" => "rec_cargo_dtl_cmdty_id",
-					"DTL_CHARACTER" => 'rec_cargo_dtl_character_id',
-					"DTL_CONT_SIZE" => null,
-					"DTL_CONT_TYPE" => null,
-					"DTL_CONT_STATUS" => null,
-					"DTL_UNIT_ID" => 'rec_cargo_dtl_unit_id',
-					"DTL_QTY" => 'rec_cargo_dtl_qty',
-					"DTL_TL" => null,
-					"DTL_DATE_IN" => null,
-					"DTL_DATE_OUT" => null,
-					"DTL_DATE_OUT_OLD" => null
-	        	],
-	        	"TX_HDR_DEL" => [
-	        		"kegiatan" => 2,
-					"head_primery" => "del_id",
-					"head_branch" => "del_branch_id",
-					"head_branch_code" => "del_branch_code",
-					"head_cust" => "del_cust_id",
-					"head_cust_name" => "del_cust_name",
-					"head_cust_addr" => "del_cust_address",
-					"head_cust_npwp" => "del_cust_npwp",
-					"head_vvd" => "del_vvd_id",
-					"head_no" => "del_no",
-					"head_by" => "del_create_by",
-					"head_status" => "del_status",
-					"head_vessel_name" => "del_vessel_name",
-					"head_date" => "del_create_date",
-					"head_pbm_id" => "del_pbm_id",
-					"head_pbm_name" => "del_pbm_name",
-					"head_shipping_agent_id" => "del_stackby_id",
-					"head_shipping_agent_name" => "del_stackby_name",
-					"head_paymethod" => "del_paymethod",
-					"head_mark" => "del_msg",
-					"p_tarde" => null,
-					"head_tab_detil" => "TX_DTL_DEL",
-					"head_forigen" => "del_hdr_id",
-					"DTL_VIA" => 'del_dtl_via',
-					"DTL_BL" => 'del_dtl_cont',
-					"DTL_PKG_ID" => null,
-					"DTL_CMDTY_ID" => 'del_dtl_cmdty_id',
-					"DTL_CHARACTER" => 'del_dtl_cont_danger',
-					"DTL_CONT_SIZE" => 'del_dtl_cont_size',
-					"DTL_CONT_TYPE" => 'del_dtl_cont_type',
-					"DTL_CONT_STATUS" => 'del_dtl_cont_status',
-					"DTL_UNIT_ID" => null,
-					"DTL_QTY" => 1,
-					"DTL_TL" => null,
-					"DTL_OWNER" => 'del_dtl_owner',
-					"DTL_OWNER_NAME" => 'del_dtl_owner_name',
-					"DTL_DATE_IN" => null,
-					"DTL_DATE_OUT" => 'del_dtl_date_plan',
-					"DTL_DATE_OUT_OLD" => null
-	        	],
-	        	"TX_HDR_DEL_CARGO" => [
-					"head_primery" => "del_cargo_id",
-					"head_branch" => "del_cargo_branch_id",
-					"head_branch_code" => "del_cargo_branch_code",
-					"head_cust" => "del_cargo_cust_id",
-					"head_no" => "del_cargo_no",
-					"head_by" => "del_cargo_create_by",
-					"head_status" => "del_cargo_status",
-					"p_tarde" => null,
-					"head_tab_detil" => "TX_DTL_DEL_CARGO",
-					"head_forigen" => "del_cargo_hdr_id",
-					"DTL_VIA" => 'del_cargo_dtl_via',
-					"DTL_BL" => null,
-					"DTL_PKG_ID" => 'del_cargo_dtl_pkg_id',
-					"DTL_CMDTY_ID" => 'del_cargo_dtl_cmdty_id',
-					"DTL_CHARACTER" => 'del_cargo_dtl_character_id',
-					"DTL_CONT_SIZE" => null,
-					"DTL_CONT_TYPE" => null,
-					"DTL_CONT_STATUS" => null,
-					"DTL_UNIT_ID" => 'del_cargo_dtl_unit_id',
-					"DTL_QTY" => 'del_cargo_dtl_qty',
-					"DTL_TL" => null,
-					"DTL_DATE_IN" => null,
-					"DTL_DATE_OUT" => null,
-					"DTL_DATE_OUT_OLD" => null
-	        	]
-	        ];
-
-	        return $requst_config[$input];
-	    }
-
-	    public static function viewTempUperPLG($input){
-	    	$input['table'] = strtoupper($input['table']);
-	    	$config = static::configPLG($input['table']);
-	    	$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+	    public static function viewTempTariffPLG($input){
+	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+			$config = json_decode($config->api_set, true);
+	    	$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
 	    	if (count($find) == 0) {
 	    		return ['Success' => false, 'result' => 'fail, not found data!'];
 	    	}
@@ -489,9 +345,9 @@ class PlgRequestBooking{
 		}
 
 	    public static function approvalRequestPLG($input){
-	    	$input['table'] = strtoupper($input['table']);
-			$config = static::configPLG($input['table']);
-			$find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
+			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+			$config = json_decode($config->api_set, true);
+			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
 			if (empty($find)) {
 				return ['result' => "Fail, requst not found!", "Success" => false];
 			}
@@ -504,7 +360,7 @@ class PlgRequestBooking{
 				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
 			}
 			if ($input['approved'] == 'false') {
-				DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 4,
 					$config['head_mark'] => $input['msg']
 				]);
@@ -621,7 +477,7 @@ class PlgRequestBooking{
 				}
 			}
 
-			DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->update([
+			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 3,
 				$config['head_mark'] => $input['msg']
 			]);
@@ -635,7 +491,7 @@ class PlgRequestBooking{
 			}
 
 			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['table' => $input['table'], 'id' => $input['id'] ,'config' => $config ]);
+				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
 			}
 
 			return [
@@ -657,6 +513,7 @@ class PlgRequestBooking{
 	    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
               return ["Success"=>false, "result" => "Fail, file is required"];
             }
+			$datenow    = Carbon::now()->format('Y-m-d');
 	    	$store = new TxPayment;
 	    	// pay_id            number,
 	    	// pay_no            varchar2(20 byte),
@@ -671,10 +528,10 @@ class PlgRequestBooking{
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
 	    	$store->pay_amount = $input['pay_amount'];
-	    	$store->pay_date = $input['pay_date'];
+	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD')");
 	    	$store->pay_note = $input['pay_note'];
-	    	$store->pay_create_by = $input['user'];
-	    	$store->pay_create_date = $input['pay_create_date'];
+	    	$store->pay_create_by = $input['pay_create_by'];
+	    	$store->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
 	    	$store->pay_type = $input['pay_type'];
 	    	$store->save();
 
@@ -687,7 +544,25 @@ class PlgRequestBooking{
 	    			]);
 	    		}
 	    	}
-	    	return 'asd';
+
+	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
+        	$getNota->nota_paid = 'Y';
+        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+        	$getNota->save();
+        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+			$config = json_decode($config->api_set, true);
+			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
+			$getReq = (array)$getReq;
+            $sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+
+	    	$pay = TxPayment::find($store->pay_id);
+            return [
+				'result' => "Success, pay proforma!",
+				'no_pay' => $pay->pay_no,
+				'no_nota' => $input['pay_nota_no'],
+				'no_req' => $pay->pay_req_no,
+				'sendRequestBooking' => $sendRequestBooking
+			];
 	    }
 	// PLG
 }

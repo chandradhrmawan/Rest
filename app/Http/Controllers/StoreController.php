@@ -65,8 +65,7 @@ class StoreController extends Controller
       ]);
     }
 
-    public function storeTsNota($input, $request)
-    {
+    public function storeTsNota($input, $request){
       if ($input['flag_status'] == 'Y') {
         $cekActive = DB::connection('mdm')->table('TS_NOTA')->where([
           "flag_status" => $input['flag_status'],
@@ -118,6 +117,7 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+      return PlgRequestBooking::sendRequestPLG(['nota_id' => 1]);
       $arrCon = [
         "kegiatan" => 1,
         "head_primery" => "rec_id",
@@ -195,6 +195,20 @@ class StoreController extends Controller
       ];
       return ConnectedExternalApps::sendUperPutReceipt(282, (object)$pay);
     }
+
+    // PLG
+      function sendRequestPLG($input, $request){
+        return PlgRequestBooking::sendRequestPLG($input);
+      }
+
+      function approvalRequestPLG($input, $request){
+        return PlgRequestBooking::approvalRequestPLG($input);
+      }
+
+      function storePaymentPLG($input, $request){
+        return PlgRequestBooking::storePaymentPLG($input);
+      }
+    // PLG
 
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
@@ -375,19 +389,6 @@ class StoreController extends Controller
       function approvalRequest($input, $request){
         return RequestBooking::approvalRequest($input);
       }
-
-      function sendRequestPLG($input, $request){
-        return PlgRequestBooking::sendRequestPLG($input);
-      }
-
-      function approvalRequestPLG($input, $request){
-        return PlgRequestBooking::approvalRequestPLG($input);
-      }
-
-      function storePaymentPLG($input, $request){
-        return PlgRequestBooking::storePaymentPLG($input);
-      }
-
     // RequestBooking
 
     // BillingEngine

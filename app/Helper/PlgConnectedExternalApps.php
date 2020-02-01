@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\DB;
 class PlgConnectedExternalApps{
 	// PLG
 	    // send request to TOS
-	      public static function sendRequestBookingPLG($arr)
+	     public static function sendRequestBookingPLG($arr)
 	      {
 	        $endpoint_url=config('endpoint.tosPostPLG');
-	        $toFunct = 'buildJson'.$arr['table'];
+	        $toFunct = 'buildJson'.$arr['config']['head_table'];
 	        $getJson = static::$toFunct($arr);
 
 	        $username="npks";
@@ -59,7 +59,7 @@ class PlgConnectedExternalApps{
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
-	        $head = DB::connection('omuster')->table($arr['table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
 	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
@@ -104,7 +104,7 @@ class PlgConnectedExternalApps{
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
-	        $head = DB::connection('omuster')->table($arr['table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$config['head_no']])->first();
 	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
