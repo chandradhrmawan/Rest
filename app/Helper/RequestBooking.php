@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helper\ConnectedExternalApps;
 use App\Helper\BillingEngine;
 use App\Models\OmCargo\TxHdrUper;
 

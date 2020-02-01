@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helper\PlgConnectedExternalApps;
 use App\Helper\BillingEngine;
 use App\Models\OmUster\TxHdrNota;
 use App\Models\OmUster\TxPayment;
@@ -486,12 +487,12 @@ class PlgRequestBooking{
 			if ($migrateTariff == true) {
 				$pesan = "Created Nota No : ".$createdUperNo;
 			}else if($migrateTariff == false) {
-				// $sendRequestBooking = ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
+				// $sendRequestBooking = PlgConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
 				// $pesan = "Nota Not created, uper percent for this request is 0%";
 			}
 
 			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
+				$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
 			}
 
 			return [
@@ -553,7 +554,7 @@ class PlgRequestBooking{
 			$config = json_decode($config->api_set, true);
 			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
 			$getReq = (array)$getReq;
-            $sendRequestBooking = ConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+            $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
 
 	    	$pay = TxPayment::find($store->pay_id);
             return [
