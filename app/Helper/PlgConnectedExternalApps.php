@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class PlgConnectedExternalApps{
 	// PLG
-	    // send request to TOS
-	     public static function sendRequestBookingPLG($arr)
-	      {
+	    public static function sendRequestBookingPLG($arr){
 	        $endpoint_url=config('endpoint.tosPostPLG');
 	        $toFunct = 'buildJson'.$arr['config']['head_table'];
 	        $getJson = static::$toFunct($arr);
@@ -38,10 +36,9 @@ class PlgConnectedExternalApps{
 	        }
 	        $res = json_decode($res->getBody()->getContents(), true);
 	        return ['request' => $options, 'response' => $res];
-	      }
+		}
 
-	      private static function buildJsonTX_HDR_REC($arr)
-	      {
+	    private static function buildJsonTX_HDR_REC($arr){
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
 	        foreach ($dtls as $dtl) {
@@ -83,10 +80,9 @@ class PlgConnectedExternalApps{
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
-	      }
+		}
 
-	      private static function buildJsonTX_HDR_DEL($arr)
-	      {
+		private static function buildJsonTX_HDR_DEL($arr){
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
 	        foreach ($dtls as $dtl) {
@@ -129,7 +125,24 @@ class PlgConnectedExternalApps{
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
-	      }
-	    // send request to TOS
+		}
+
+		public static function sendInvProforma($arr){
+			// liat di concet external function sendNotaProforma
+		}
+
+		public static function cekSendInvProforma($input){
+			// buat funct cek status di simkue kalau behasil update status nota supaya bisa di bayarkan
+		}
+
+		public static function sendInvPay($arr){
+			// liat di concet external function sendNotaProforma
+		}
+
+		public static function cekSendInvPay($input){
+			// buat funct cek status di simkue kalau behasil update status nota supaya bisa telah dibayarkan lalau jalankan funct sendRequestBookingPLG
+		}
+
+
 	// PLG
 }

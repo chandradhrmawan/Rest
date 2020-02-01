@@ -967,7 +967,7 @@ class ConnectedExternalApps{
       DB::connection('omcargo')->table('TX_HDR_TCA')->where('tca_id', $tca_id)->update([
         "tca_status" => 2
       ]);
-      return ["Success"=>true, "result" => $res['esbBody']['statusMessage']];
+      return ["Success"=>true, "request" => $options, "result" => $res['esbBody']['statusMessage']];
     }
 
     public static function sendNotaProforma($nota_id){

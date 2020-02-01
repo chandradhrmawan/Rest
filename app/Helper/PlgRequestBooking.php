@@ -356,8 +356,8 @@ class PlgRequestBooking{
 			if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
 				return ['result' => "Fail, requst already approved!", "Success" => false];
 			}
-			$uper = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->get();
-			if (count($uper) > 0) {
+			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [3])->get();
+			if (count($nota) > 0) {
 				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
 			}
 			if ($input['approved'] == 'false') {
@@ -381,7 +381,12 @@ class PlgRequestBooking{
 
 					$createdUperNo = '';
 					// store head
-						$headU = new TxHdrNota;
+						$cekOldNota = TxHdrNota::where('nota_req_no', $find[$config['head_no']])->where('nota_status', 3)->first();
+						if (empty($cekOldNota)) {
+							$headU = new TxHdrNota;
+						}else{
+							$headU = TxHdrNota::find($cekOldNota->nota_id);
+						}
 						// $headU->app_id =$find['app_id'];
 						$headU->nota_group_id = $tarif['nota_id'];
 						$headU->nota_org_id = $tarif['branch_org_id'];
@@ -435,6 +440,7 @@ class PlgRequestBooking{
 					$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
 
 					$countLine = 0;
+					DB::connection('omuster')->table('TX_DTL_NOTA')->where('nota_hdr_id',$headU->nota_id)->delete();
 					foreach ($group_tariff as $grpTrf) {
 						$grpTrf = (array)$grpTrf;
 						$tarifD = DB::connection('eng')->table('TX_TEMP_TARIFF_DTL')->where('TEMP_HDR_ID',$tarif['temp_hdr_id'])->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
@@ -503,6 +509,33 @@ class PlgRequestBooking{
 			];
 	    }
 
+	    public static function approvalProformaPLG($input){
+	    	$cekNota = TxHdrNota::where([
+            	'nota_id'=>$input['nota_id'],
+            	'nota_status'=>'1'
+            ])->count();
+            if ($cekNota = 0) {
+            	return ['result' => "Fail, proforma not waiting approval!", "Success" => false];
+            }
+            $getNota = TxHdrNota::find($input['nota_id']);
+            $sendInv = '';
+            if ($input['approved'] == 'true') {
+            	$getNota->nota_status = 2;
+            	$getNota->save();
+            	$arr = []; // buat funct kirim proforma ke inv
+            	$sendInvProforma = PlgConnectedExternalApps::sendInvProforma($arr); // buat funct kirim proforma ke inv
+            	$msg='Success, approved!';
+            }else if ($input['approved'] == 'false') {
+            	$getNota->nota_status = 3;
+            	$getNota->save();
+            	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+				$config = json_decode($config->api_set, true);
+				$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'=>4]]);
+            	$msg='Success, rejected!';
+            }
+            return ['response' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
+	    }
+
 	    public static function storePaymentPLG($input){
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no'],
@@ -510,6 +543,13 @@ class PlgRequestBooking{
             ])->count();
             if ($cekNota > 0) {
             	return ['result' => "Fail, proforma already paid!", "Success" => false];
+            }
+            $cekNota = TxHdrNota::where([
+            	'nota_no'=>$input['pay_nota_no'],
+            	'nota_status'=>3
+            ])->count();
+            if ($cekNota == 0) {
+            	return ['result' => "Fail, proforma not approved!", "Success" => false];
             }
 	    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
               return ["Success"=>false, "result" => "Fail, file is required"];
@@ -550,19 +590,21 @@ class PlgRequestBooking{
         	$getNota->nota_paid = 'Y';
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
         	$getNota->save();
-        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-			$config = json_decode($config->api_set, true);
-			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
-			$getReq = (array)$getReq;
-            $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
-
 	    	$pay = TxPayment::find($store->pay_id);
+	    	$arr = []; // buat function kirim pembayaran ke simkue
+        	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr); // buat function kirim pembayaran ke simkue
+   //      	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+			// $config = json_decode($config->api_set, true);
+			// $getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
+			// $getReq = (array)$getReq;
+   //          $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+
             return [
 				'result' => "Success, pay proforma!",
 				'no_pay' => $pay->pay_no,
 				'no_nota' => $input['pay_nota_no'],
 				'no_req' => $pay->pay_req_no,
-				'sendRequestBooking' => $sendRequestBooking
+				'sendInvPay' => $sendInvPay
 			];
 	    }
 	// PLG
