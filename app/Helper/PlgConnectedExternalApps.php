@@ -129,6 +129,7 @@ class PlgConnectedExternalApps{
 
 		public static function sendInvProforma($arr){
 			// liat di concet external function sendNotaProforma
+			return 'by passs';
 		}
 
 		public static function cekSendInvProforma($input){
@@ -137,6 +138,7 @@ class PlgConnectedExternalApps{
 
 		public static function sendInvPay($arr){
 			// liat di concet external function sendNotaProforma
+			return 'by passs';
 		}
 
 		public static function cekSendInvPay($input){

@@ -525,6 +525,10 @@ class PlgRequestBooking{
             	$arr = []; // buat funct kirim proforma ke inv
             	$sendInvProforma = PlgConnectedExternalApps::sendInvProforma($arr); // buat funct kirim proforma ke inv
             	$msg='Success, approved!';
+            	// ini semetara di by passs
+            	$getNota->nota_status = 2;
+            	$getNota->save();
+            	// ini semetara di by passs
             }else if ($input['approved'] == 'false') {
             	$getNota->nota_status = 3;
             	$getNota->save();
@@ -587,17 +591,22 @@ class PlgRequestBooking{
 	    	}
 
 	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
+	    	// sementara di by pass
         	$getNota->nota_paid = 'Y';
+	    	// sementara di by pass
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
         	$getNota->save();
 	    	$pay = TxPayment::find($store->pay_id);
 	    	$arr = []; // buat function kirim pembayaran ke simkue
         	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr); // buat function kirim pembayaran ke simkue
-   //      	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-			// $config = json_decode($config->api_set, true);
-			// $getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
-			// $getReq = (array)$getReq;
-   //          $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+
+	    	// sementara di by pass
+        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+			$config = json_decode($config->api_set, true);
+			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$pay->pay_req_no)->first();
+			$getReq = (array)$getReq;
+            $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+	    	// sementara di by pass
 
             return [
 				'result' => "Success, pay proforma!",
