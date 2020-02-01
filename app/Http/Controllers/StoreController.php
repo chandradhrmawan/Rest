@@ -17,6 +17,7 @@ use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
 use App\Helper\RealisasiHelper;
 use App\Models\Mdm\TmTruckCompany;
+use App\Helper\PlgRequestBooking;
 
 class StoreController extends Controller
 {
@@ -376,15 +377,15 @@ class StoreController extends Controller
       }
 
       function sendRequestPLG($input, $request){
-        return RequestBooking::sendRequestPLG($input);
+        return PlgRequestBooking::sendRequestPLG($input);
       }
 
       function approvalRequestPLG($input, $request){
-        return RequestBooking::approvalRequestPLG($input);
+        return PlgRequestBooking::approvalRequestPLG($input);
       }
 
       function storePaymentPLG($input, $request){
-        return RequestBooking::storePaymentPLG($input);
+        return PlgRequestBooking::storePaymentPLG($input);
       }
 
     // RequestBooking
