@@ -117,7 +117,7 @@ class PlgConnectedExternalApps{
 	            $arr['pass']
 	          ],
 	          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-	          'body' => $json,
+	          'body' => $arr['json'],
 	          "debug" => false
 	        );
 			try {
