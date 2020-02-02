@@ -323,7 +323,11 @@ class PlgConnectedExternalApps{
 	        	"target" => config('endpoint.esbPutInvoice.target'), 
 	        	"json" => $json
 	        ]);
-			return ['Success' => true, 'sendInvProforma' => $res];
+	        $hsl = true;
+	        if ($res['response']['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
+	        	$hsl = false;
+	        }
+			return ['Success' => $hsl, 'sendInvProforma' => $res];
 		}
 
 		public static function sendInvPay($arr){

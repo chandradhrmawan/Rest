@@ -591,7 +591,7 @@ class PlgRequestBooking{
 	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD')");
 	    	$store->pay_note = $input['pay_note'];
 	    	$store->pay_create_by = $input['pay_create_by'];
-	    	$store->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+	    	$store->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:ss')");
 	    	$store->pay_type = $input['pay_type'];
 	    	$store->save();
 
