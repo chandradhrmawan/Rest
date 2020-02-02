@@ -510,16 +510,16 @@ class PlgRequestBooking{
 	    }
 
 	    public static function approvalProformaPLG($input){
+            $getNota = TxHdrNota::find($input['nota_id']);
+            if (empty($getNota)) {
+            	return ['result' => "Fail, proforma not found!", "Success" => false];
+            }
 	    	$cekNota = TxHdrNota::where([
             	'nota_id'=>$input['nota_id'],
             	'nota_status'=>'1'
             ])->count();
             if ($cekNota = 0) {
-            	return ['result' => "Fail, proforma not waiting approval!", "Success" => false];
-            }
-            $getNota = TxHdrNota::find($input['nota_id']);
-            if (empty($getNota)) {
-            	return ['result' => "Fail, proforma not found!", "Success" => false];
+            	return ['result' => "Fail, proforma not waiting approval!", 'nota_no' => $getNota->nota_no, "Success" => false];
             }
             $sendInvProforma = null;
             if ($input['approved'] == 'true') {
@@ -531,7 +531,7 @@ class PlgRequestBooking{
 	            	$getNota->nota_status = 2;
 	            	$getNota->save();
             	}else{
-            		return ['Success' => false, 'response' => 'Fail, cant send invoice proforma', 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
+            		return ['Success' => false, 'result' => 'Fail, cant send invoice proforma', 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
             	}
             	$msg='Success, approved!';
             }else if ($input['approved'] == 'false') {
@@ -542,7 +542,7 @@ class PlgRequestBooking{
 				$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 4 ]);
             	$msg='Success, rejected!';
             }
-            return ['response' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
+            return ['result' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
 	    }
 
 	    public static function storePaymentPLG($input){

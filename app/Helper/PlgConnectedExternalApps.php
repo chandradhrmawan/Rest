@@ -359,8 +359,8 @@ class PlgConnectedExternalApps{
 						{
 							"header": {
 								"orgId": "'.$branch['branch_org_id'].'",
-								"receiptNumber": "UPER-BTN-002023",
-								"receiptMethod": "UPER",
+								"receiptNumber": "'.$arr['nota']['nota_no'].'",
+								"receiptMethod": "BANK",
 								"receiptAccount": "Mandiri IDR 120.00.4107201.3",
 								"bankId": "105009",
 								"customerNumber": "12777901",
