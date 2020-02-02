@@ -354,11 +354,11 @@ class PlgRequestBooking{
 			}
 			$find = (array)$find[0];
 			if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
-				return ['result' => "Fail, requst already approved!", "Success" => false];
+				return ['result' => "Fail, requst already approved!", 'no_req' => $find[$config['head_no']], "Success" => false];
 			}
-			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [6])->get();
+			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [4])->get();
 			if (count($nota) > 0) {
-				return ['result' => "Fail, request already exist on proforma!", "Success" => false];
+				return ['result' => "Fail, request already exist on proforma!", 'no_req' => $find[$config['head_no']], "Success" => false];
 			}
 			if ($input['approved'] == 'false') {
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
@@ -535,7 +535,7 @@ class PlgRequestBooking{
             	}
             	$msg='Success, approved!';
             }else if ($input['approved'] == 'false') {
-            	$getNota->nota_status = 6;
+            	$getNota->nota_status = 4;
             	$getNota->save();
             	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
 				$config = json_decode($config->api_set, true);
@@ -546,19 +546,20 @@ class PlgRequestBooking{
 	    }
 
 	    public static function storePaymentPLG($input){
+	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no'],
             	'nota_paid'=>'Y'
             ])->count();
             if ($cekNota > 0) {
-            	return ['result' => "Fail, proforma already paid!", "Success" => false];
+            	return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no'],
-            	'nota_status'=>3
+            	'nota_status'=>2
             ])->count();
             if ($cekNota == 0) {
-            	return ['result' => "Fail, proforma not approved!", "Success" => false];
+            	return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
 			$datenow    = Carbon::now()->format('Y-m-d');
 			if (empty($input['pay_id'])) {
@@ -604,7 +605,6 @@ class PlgRequestBooking{
 	    		}
 	    	}
 	    	$pay = TxPayment::find($store->pay_id);
-	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
 	    	$arr = [
 	    		"nota" => (array)$getNota
 	    	];
@@ -618,15 +618,25 @@ class PlgRequestBooking{
         			'sendInvPay' => $sendInvPay
         		];
         	}
-        	$getNota->nota_status = 4;
+        	$getNota->nota_status = 3;
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+        	$getNota->nota_paid = 'Y';
         	$getNota->save();
+        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+			$config = json_decode($config->api_set, true);
+			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
+			$getReq = (array)$getReq;
+			$sendRequestBooking = null;
+			if ($getReq[$config['head_paymethod']] == 1) {
+				$sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+			}
             return [
 				'result' => "Success, pay proforma!",
 				'no_pay' => $pay->pay_no,
 				'no_nota' => $input['pay_nota_no'],
 				'no_req' => $pay->pay_req_no,
-				'sendInvPay' => $sendInvPay
+				'sendInvPay' => $sendInvPay,
+				'sendRequestBooking' => $sendRequestBooking
 			];
 	    }
 	// PLG

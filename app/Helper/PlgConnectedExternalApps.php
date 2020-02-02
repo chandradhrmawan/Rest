@@ -326,15 +326,6 @@ class PlgConnectedExternalApps{
 			return ['Success' => true, 'sendInvProforma' => $res];
 		}
 
-		public static function cekSendInvProforma($input){
-			// ini semetara di by passs
-			$getNota = TxHdrNota::find($input['nota_id']);
-			$getNota->nota_status = 3;
-			$getNota->save();
-			return ['result' => 'Success, by pass'];
-        	// ini semetara di by passs
-		}
-
 		public static function sendInvPay($arr){
 			// di by passs dulu
 			return ['Success' => true, 'response' => 'by passs'];
@@ -349,13 +340,13 @@ class PlgConnectedExternalApps{
 				"arRequestDoc": {
 					"esbHeader": {
 						"internalId": "",
-			        	"externalId": "",
-			        	"timestamp": "",
-			        	"responseTimestamp": "",
-			        	"responseCode": "",
-			        	"responseMessage": ""
-						},
-						"esbBody": [
+						"externalId": "",
+						"timestamp": "",
+						"responseTimestamp": "",
+						"responseCode": "",
+						"responseMessage": ""
+					},
+					"esbBody": [
 						{
 							"header": {
 								"orgId": "'.$branch['branch_org_id'].'",
@@ -411,19 +402,19 @@ class PlgConnectedExternalApps{
 								"norekKoran": ""
 							}
 						}
-						],
-						"esbSecurity": {
-							"orgId": "1822",
-							"batchSourceId": "",
-							"lastUpdateLogin": "",
-							"userId": "",
-							"respId": "",
-							"ledgerId": "",
-							"respApplId": "",
-							"batchSourceName": ""
-						}
+					],
+					"esbSecurity": {
+						"orgId": "1822",
+						"batchSourceId": "",
+						"lastUpdateLogin": "",
+						"userId": "",
+						"respId": "",
+						"ledgerId": "",
+						"respApplId": "",
+						"batchSourceName": ""
 					}
 				}
+			}
 			';
 
 			$res = static::sendRequestToExtJsonMet([ // kirim putReceipt
@@ -433,25 +424,6 @@ class PlgConnectedExternalApps{
 				"json" => $json
 			]);
 			
-		}
-
-		public static function cekSendInvPay($input){
-			// sementara di by pass
-			$getNota = TxHdrNota::find($input['nota_id']);
-			$getNota->nota_status = 5;
-			$getNota->nota_paid = 'Y';
-			$getNota->save();
-        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-			$config = json_decode($config->api_set, true);
-			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
-			$getReq = (array)$getReq;
-			$sendRequestBooking = null;
-			if ($getReq[$config['head_paymethod']] == 1) {
-				$sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
-			}
-	    	// sementara di by pass
-
-	    	return ['result' => 'Success, by pass', 'sendRequestBooking' => $sendRequestBooking];
 		}
 
 
