@@ -160,7 +160,7 @@ class PlgConnectedExternalApps{
 			$config = json_decode($config->api_set, true);
 			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
 			$getReq = (array)$getReq;
-			if ($getReq[$config['head_paymethod']] == 2) {
+			if ($getReq[$config['head_paymethod']] == 1) {
 				$sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
 			}
 	    	// sementara di by pass
