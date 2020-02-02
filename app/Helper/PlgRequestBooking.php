@@ -561,7 +561,6 @@ class PlgRequestBooking{
             if ($cekNota == 0) {
             	return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
-			$datenow    = Carbon::now()->format('Y-m-d');
 			if (empty($input['pay_id'])) {
 		    	$store = new TxPayment;
 		    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
@@ -588,10 +587,10 @@ class PlgRequestBooking{
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
 	    	$store->pay_amount = $input['pay_amount'];
-	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD')");
+	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD  HH24:mi:ss')");
 	    	$store->pay_note = $input['pay_note'];
 	    	$store->pay_create_by = $input['pay_create_by'];
-	    	$store->pay_create_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:ss')");
+	    	$store->pay_create_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD  HH24:mi:ss')");
 	    	$store->pay_type = $input['pay_type'];
 	    	$store->save();
 
@@ -619,7 +618,7 @@ class PlgRequestBooking{
         		];
         	}
         	$getNota->nota_status = 3;
-        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD  HH24:mi:ss')");
         	$getNota->nota_paid = 'Y';
         	$getNota->save();
         	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
