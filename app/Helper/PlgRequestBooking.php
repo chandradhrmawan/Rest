@@ -521,10 +521,12 @@ class PlgRequestBooking{
             if (empty($getNota)) {
             	return ['result' => "Fail, proforma not found!", "Success" => false];
             }
-            $sendInvProforma = '';
+            $sendInvProforma = null;
             if ($input['approved'] == 'true') {
-            	$arr = []; // buat funct kirim proforma ke inv
-            	$sendInvProforma = PlgConnectedExternalApps::sendInvProforma($arr); // buat funct kirim proforma ke inv
+            	$arr = [
+            		'nota' => (array)$getNota,
+            	];
+            	$sendInvProforma = PlgConnectedExternalApps::sendInvProforma($arr);
             	if ($sendInvProforma['Success'] == true) {
 	            	$getNota->nota_status = 2;
 	            	$getNota->save();
@@ -602,8 +604,11 @@ class PlgRequestBooking{
 	    		}
 	    	}
 	    	$pay = TxPayment::find($store->pay_id);
-	    	$arr = []; // buat function kirim pembayaran ke simkue
-        	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr); // buat function kirim pembayaran ke simkue
+	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
+	    	$arr = [
+	    		"nota" => (array)$getNota
+	    	];
+        	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {
         		return [
         			'response' => 'Fail, cant send payment invoice', 
@@ -613,7 +618,6 @@ class PlgRequestBooking{
         			'sendInvPay' => $sendInvPay
         		];
         	}
-	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
         	$getNota->nota_status = 4;
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
         	$getNota->save();
