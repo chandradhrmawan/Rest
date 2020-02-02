@@ -627,7 +627,7 @@ class PlgRequestBooking{
 			$getReq = (array)$getReq;
 			$sendRequestBooking = null;
 			if ($getReq[$config['head_paymethod']] == 1) {
-				$sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+				$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
 			}
             return [
 				'result' => "Success, pay proforma!",
