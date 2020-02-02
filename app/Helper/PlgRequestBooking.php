@@ -394,7 +394,7 @@ class PlgRequestBooking{
 						$headU->nota_cust_name = $tarif['alt_name'];
 						$headU->nota_cust_npwp = $tarif['npwp'];
 						$headU->nota_cust_address = $tarif['address'];
-						$headU->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')");
+						$headU->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')");
 						$headU->nota_amount = $tarif['total'];
 						$headU->nota_currency_code = $tarif['currency'];
 						$headU->nota_status = 1;
@@ -476,7 +476,7 @@ class PlgRequestBooking{
 								"dtl_unit_qty" => $list["unit_qty"],
 								"dtl_unit_name" => $list["unit_name"],
 								"dtl_sub_tariff" => $list["sub_tariff"],
-								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")
+								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')")
 							];
 							DB::connection('omuster')->table('TX_DTL_NOTA')->insert($set_data);
 						}
@@ -587,10 +587,10 @@ class PlgRequestBooking{
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
 	    	$store->pay_amount = $input['pay_amount'];
-	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD  HH24:mi:ss')");
+	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
 	    	$store->pay_note = $input['pay_note'];
 	    	$store->pay_create_by = $input['pay_create_by'];
-	    	$store->pay_create_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD  HH24:mi:ss')");
+	    	$store->pay_create_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
 	    	$store->pay_type = $input['pay_type'];
 	    	$store->save();
 
@@ -617,17 +617,17 @@ class PlgRequestBooking{
         			'sendInvPay' => $sendInvPay
         		];
         	}
-        	$getNota->nota_status = 3;
-        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD  HH24:mi:ss')");
-        	$getNota->nota_paid = 'Y';
-        	$getNota->save();
+        	// $getNota->nota_status = 3;
+        	// $getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
+        	// $getNota->nota_paid = 'Y';
+        	// $getNota->save();
         	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
 			$config = json_decode($config->api_set, true);
 			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
 			$getReq = (array)$getReq;
 			$sendRequestBooking = null;
 			if ($getReq[$config['head_paymethod']] == 1) {
-				$sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+				// $sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
 			}
             return [
 				'result' => "Success, pay proforma!",
