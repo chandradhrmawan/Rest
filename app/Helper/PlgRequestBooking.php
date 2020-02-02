@@ -617,17 +617,17 @@ class PlgRequestBooking{
         			'sendInvPay' => $sendInvPay
         		];
         	}
-        	// $getNota->nota_status = 3;
-        	// $getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
-        	// $getNota->nota_paid = 'Y';
-        	// $getNota->save();
+        	$getNota->nota_status = 3;
+        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
+        	$getNota->nota_paid = 'Y';
+        	$getNota->save();
         	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
 			$config = json_decode($config->api_set, true);
 			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
 			$getReq = (array)$getReq;
 			$sendRequestBooking = null;
 			if ($getReq[$config['head_paymethod']] == 1) {
-				// $sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+				$sendRequestBooking = static::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
 			}
             return [
 				'result' => "Success, pay proforma!",
