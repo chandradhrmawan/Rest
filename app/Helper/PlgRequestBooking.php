@@ -375,6 +375,9 @@ class PlgRequestBooking{
 				return ['result' => "Fail, proforma and tariff not found!", "Success" => false];
 			}
 			$migrateTariff = true;
+			if ($find[$config['head_paymethod']] == 2) {
+				$migrateTariff = false;
+			}
 			if ($migrateTariff == true) {
 				foreach ($tarifs as $tarif) {
 					$tarif = (array)$tarif;
@@ -492,7 +495,7 @@ class PlgRequestBooking{
 				$config['head_mark'] => $input['msg']
 			]);
 
-			$sendRequestBooking = '';
+			$sendRequestBooking = null;
 			if ($migrateTariff == true) {
 				$pesan = "Created Nota No : ".$createdUperNo;
 			}else if($migrateTariff == false) {
