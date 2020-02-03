@@ -15,7 +15,7 @@ class PlgConnectedExternalApps{
 	        	"user" => config('endpoint.tosPostPLG.user'),
 	        	"pass" => config('endpoint.tosPostPLG.pass'), 
 	        	"target" => config('endpoint.tosPostPLG.target'), 
-	        	"json" => static::$toFunct($arr)
+	        	"json" => '{"request": "'.static::$toFunct($arr).'"}'
 	        ]);
 	        return ['sendRequestBookingPLG' => $res];
 		}
@@ -427,9 +427,34 @@ class PlgConnectedExternalApps{
 				"target" => config('endpoint.esbPutReceipt.target'), 
 				"json" => $json
 			]);
-			
 		}
 
-
+		public static function getRealRecPLG($input){
+			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+			$dtl = '';
+			foreach ($dtlLoop as $list) {
+				$dtl .= '
+				{
+					"NO_CONTAINER": "'.$list->rec_dtl_cont.'",
+					"NO_REQUEST": "'.$find->rec_no.'",
+					"BRANCH_ID": "'.$find->rec_branch_id.'"
+				},';
+			}
+	        $dtl = substr($dtl, 0,-1);
+			$json = '
+			{
+				"action" : "generateGetIn",
+				"data": ['.$dtl.']
+			}';
+			$res = static::sendRequestToExtJsonMet([
+	        	"user" => config('endpoint.tosPostPLG.user'),
+	        	"pass" => config('endpoint.tosPostPLG.pass'), 
+	        	"target" => config('endpoint.tosPostPLG.target'), 
+	        	"json" => '{"request": "'.$json.'"}'
+	        ]);
+	        
+	        return ['getRealRecPLG' => $res];
+		}
 	// PLG
 }

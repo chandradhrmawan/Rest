@@ -210,16 +210,12 @@ class StoreController extends Controller
         return PlgRequestBooking::approvalProformaPLG($input);
       }
 
-      function cekSendInvProforma($input, $request){
-        return PlgConnectedExternalApps::cekSendInvProforma($input);
-      }
-
       function storePaymentPLG($input, $request){
         return PlgRequestBooking::storePaymentPLG($input);
       }
-      
-      function cekSendInvPay($input, $request){
-        return PlgConnectedExternalApps::cekSendInvPay($input);
+
+      function getRealRecPLG($input, $request){
+        return PlgConnectedExternalApps::getRealRecPLG($input);
       }
     // PLG
 
