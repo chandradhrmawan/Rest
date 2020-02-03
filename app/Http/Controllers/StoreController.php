@@ -118,9 +118,10 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
-      return PlgRequestBooking::sendRequestPLG(['nota_id' => 1]);
+      // return PlgRequestBooking::sendRequestPLG(['nota_id' => 1]);
       $arrCon = [
         "kegiatan" => 1,
+        "head_table" => "TX_HDR_REC",
         "head_primery" => "rec_id",
         "head_branch" => "rec_branch_id",
         "head_branch_code" => "rec_branch_code",
@@ -163,7 +164,7 @@ class StoreController extends Controller
         "DTL_DATE_OUT" => null,
         "DTL_DATE_OUT_OLD" => null
       ];
-      return ConnectedExternalApps::sendRequestBookingPLG(['table' => 'TX_HDR_REC', 'id' => '137' ,'config' => $arrCon]);
+      return PlgConnectedExternalApps::sendRequestBookingPLG(['table' => 'TX_HDR_REC', 'id' => '168' ,'config' => $arrCon]);
       return ConnectedExternalApps::sendNotifToIBISQA();
       return ConnectedExternalApps::uperSimkeuCek($input);
       // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);

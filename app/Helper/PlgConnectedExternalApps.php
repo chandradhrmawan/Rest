@@ -15,7 +15,7 @@ class PlgConnectedExternalApps{
 	        	"user" => config('endpoint.tosPostPLG.user'),
 	        	"pass" => config('endpoint.tosPostPLG.pass'), 
 	        	"target" => config('endpoint.tosPostPLG.target'), 
-	        	"json" => '{"request": "'.static::$toFunct($arr).'"}'
+	        	"json" => json_encode(json_decode(static::$toFunct($arr),true))
 	        ]);
 	        return ['sendRequestBookingPLG' => $res];
 		}
@@ -41,6 +41,7 @@ class PlgConnectedExternalApps{
 	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
+
 	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
 	          'reff_tr_id' => 5,
 	          'reff_id' => $head[$arr['config']['head_from']]
@@ -117,7 +118,7 @@ class PlgConnectedExternalApps{
 	            $arr['pass']
 	          ],
 	          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-	          'body' => $arr['json'],
+	          'body' => '{ "request" : "'.base64_encode($arr['json']).'"}',
 	          "debug" => false
 	        );
 			try {
@@ -129,7 +130,9 @@ class PlgConnectedExternalApps{
 	          }
 	          return ["Success"=>false, "request" => $options, "response" => $error];
 	        }
-	        return ["Success"=>true, "request" => $options, "response" => json_decode($res->getBody()->getContents(), true)];
+	        $res = json_decode($res->getBody()->getContents(), true);
+	        $res = json_decode(base64_decode($res['result']),true);
+	        return ["Success"=>true, "request" => $arr, "response" => $res];
 		}
 
 		public static function sendInvProforma($arr){
@@ -433,6 +436,7 @@ class PlgConnectedExternalApps{
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
 			$dtl = '';
+			$arrdtl = [];
 			foreach ($dtlLoop as $list) {
 				$dtl .= '
 				{
@@ -440,22 +444,77 @@ class PlgConnectedExternalApps{
 					"NO_REQUEST": "'.$find->rec_no.'",
 					"BRANCH_ID": "'.$find->rec_branch_id.'"
 				},';
+				$arrdtlset = [
+					"NO_CONTAINER" => $list->rec_dtl_cont,
+					"NO_REQUEST" => $find->rec_no,
+					"BRANCH_ID" => $find->rec_branch_id
+				];
+				$arrdtl[] = $arrdtlset;
 			}
+			$head = [
+				"action" => "generateGetIn",
+				"data" => $arrdtl
+			];
 	        $dtl = substr($dtl, 0,-1);
 			$json = '
 			{
 				"action" : "generateGetIn",
 				"data": ['.$dtl.']
 			}';
-			return $arr = [
-	        	"user" => config('endpoint.tosPostPLG.user'),
-	        	"pass" => config('endpoint.tosPostPLG.pass'), 
-	        	"target" => config('endpoint.tosPostPLG.target'), 
-	        	"json" => '{"request": "'.$json.'"}'
+			$arr = [
+	        	"user" => config('endpoint.tosGetPLG.user'),
+	        	"pass" => config('endpoint.tosGetPLG.pass'), 
+	        	"target" => config('endpoint.tosGetPLG.target'), 
+	        	"json" => json_encode(json_decode($json,true))
 	        ];
 			$res = static::sendRequestToExtJsonMet($arr);
-
-	        return ['getRealRecPLG' => $res];
+			if ($res['response']['count'] > 0) {
+				foreach ($res['response']['result'] as $listR) {
+					$findGATI = [
+						'GATEIN_CONT' => $listR['NO_CONTAINER'],
+						'GATEIN_REQ_NO' => $listR['NO_REQUEST'],
+						'GATEIN_BRANCH_ID' => $find->rec_branch_id,
+						'GATEIN_BRANCH_CODE' => $find->rec_branch_code
+					];
+					$cek = DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->first();
+					$datenow    = Carbon::now()->format('Y-m-d');
+					$storeGATI = [
+						"gatein_cont" => $listR['NO_CONTAINER'],
+						"gatein_req_no" => $listR['NO_REQUEST'],
+						"gatein_pol_no" => $listR['NOPOL'],
+						"gatein_cont_status" => $listR['STATUS'],
+						// "gatein_seal_no" => $listR[''],
+						// "gatein_trucking" => $listR[''],
+						// "gatein_yard" => $listR[''],
+						// "gatein_mark" => $listR[''],
+						"gatein_date" => \DB::raw("TO_DATE('".$listR['TGL_IN']."', 'YYYY-MM-DD HH24:MI')"),
+						"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
+						"gatein_create_by" => $input['user']->user_id,
+						"gatein_branch_id" => $find->rec_branch_id,
+						"gatein_branch_code" => $find->rec_branch_code
+					];
+					if (empty($cek)) {
+						DB::connection('omuster')->table('TX_GATEIN')->insert($storeGATI);
+					}else{
+						DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
+					}
+				}
+				$msg = 'Success get realisasion';
+			}else{
+				$msg = 'realisasion not finish';
+			}
+			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
+				->leftJoin('TX_GATEIN', function($join) use ($find){
+					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
+					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
+				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+	        return [
+	        	'result' => $msg,
+	        	'no_rec' =>$find->rec_no,
+	        	'hdr' =>$find,
+	        	'dtl' => $dtl,
+	        	'getRealRecPLG' => $res
+	        ];
 		}
 	// PLG
 }
