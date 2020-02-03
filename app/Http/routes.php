@@ -40,6 +40,10 @@ $app->get('/print/uperPaid2/{id}' ,'ViewController@printUperPaid');
 $app->get('/print/bprp2/{id}'     ,'ViewController@printBprp');
 $app->get('/print/realisasi2/{id}','ViewController@printRealisasi');
 
+// Print NPKS
+$app->get('/print/proformaNpks/{id}','ViewController@proformaNpks');
+$app->get('/print/notaNpks/{id}','ViewController@notaNpks');
+
 // Export
 $app->get('/export/debitur/{branchId}/{notaNo}/{custName}/{layanan}/{startDate}/{endDate}/{branchCode}'      ,'ViewController@ExportDebitur');
 $app->get('/export/rekonsilasi/{branchId}/{vessel}/{ukk}/{nota}/{startDate}/{endDate}/{branchCode}'          ,'ViewController@ExportRekonsilasi');

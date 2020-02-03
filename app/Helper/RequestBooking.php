@@ -671,7 +671,7 @@ class RequestBooking{
 
 			// return $tariffResp = BillingEngine::calculateTariff($set_data);
 			$tariffResp = BillingEngine::calculateTariff($set_data);
-			
+
 			$insertTsContHs = [];
 			$insertTxHisContHs = [];
 

@@ -70,6 +70,11 @@ class GlobalHelper {
             if(!empty($val["WHERE"][0])) {
               $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->where($val["WHERE"])->get();
             } else {
+              if (isset($val["JOIN"])) {
+                foreach ($val["JOIN"] as $list) {
+                  $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+                }
+              }
               $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
             }
             if (empty($detail)) {
@@ -802,10 +807,16 @@ class GlobalHelper {
 
   public static function update($input){
     $connection = DB::connection($input["db"])->table($input["table"]);
-    $connection->where($input["where"]);
+    if (isset($input["where"])) {
+      $connection->where($input["where"]);
+    }
+    if(isset($input["whereNotIn"][0])) {
+    $in        = $input["whereNotIn"];
+    $connection->whereNotIn(strtoupper($in[0]), $in[1]);
+    }
     $connection->update($input["update"]);
     $data = $connection->get();
-    return ["result"=>$data];
+    return ["msg"=>"Success", "result"=>$data];
   }
 
   public static function save($input) {
