@@ -447,13 +447,14 @@ class PlgConnectedExternalApps{
 				"action" : "generateGetIn",
 				"data": ['.$dtl.']
 			}';
-			$res = static::sendRequestToExtJsonMet([
+			return $arr = [
 	        	"user" => config('endpoint.tosPostPLG.user'),
 	        	"pass" => config('endpoint.tosPostPLG.pass'), 
 	        	"target" => config('endpoint.tosPostPLG.target'), 
 	        	"json" => '{"request": "'.$json.'"}'
-	        ]);
-	        
+	        ];
+			$res = static::sendRequestToExtJsonMet($arr);
+
 	        return ['getRealRecPLG' => $res];
 		}
 	// PLG
