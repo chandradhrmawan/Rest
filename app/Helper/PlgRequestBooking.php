@@ -475,6 +475,9 @@ class PlgRequestBooking{
 								"dtl_unit" => $list["unit_id"],
 								"dtl_unit_qty" => $list["unit_qty"],
 								"dtl_unit_name" => $list["unit_name"],
+								"dtl_cont_size" => $list["cont_size"],
+								"dtl_cont_type" => $list["cont_type"],
+								"dtl_cont_status" => $list["cont_status"],
 								"dtl_sub_tariff" => $list["sub_tariff"],
 								"dtl_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')")
 							];
@@ -584,6 +587,7 @@ class PlgRequestBooking{
 	    	$store->pay_bank_code = $input['pay_bank_code'];
 	    	$store->pay_bank_name = $input['pay_bank_name'];
 	    	$store->pay_branch_id = $input['pay_branch_id'];
+	    	$store->pay_branch_code = $getNota->nota_branch_code;
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
 	    	$store->pay_amount = $input['pay_amount'];
