@@ -22,11 +22,11 @@
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
-			<td width="55%">
-				<div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
+			<td width="45%">
+				<div>PT. Pelabuhan Tanjung Priok <br>Jln. Raya Pelabuhan No.9 Tanjung Priok <div style="margin-top:3px;font-size:10px">NPWP. 03.276.305.4-093.000</div></div>
 				</td>
-      <td style="vertical-align:top;text-align:right">
-        <table style="border-collapse:collapse; font-size:10px;">
+      <td style="vertical-align:top;text-align:right" width="42%">
+        <table style="border-collapse:collapse; font-size:10px;width:100%">
           <tr>
             <td>No. Proforma</td>
             <td>: {{$header->nota_no}}</td>
@@ -125,7 +125,7 @@
 <?php if ($penumpukan != "0") { ?>
 	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 		<tr style="text-align:center">
-			<th width="15%">NO BL</th>
+			<th width="15%">NO SI</th>
 			<th width="15%">Kemasan</th>
 			<th width="15%">BARANG</th>
 			<th width="5%">Qty</th>
@@ -176,27 +176,20 @@
 <?php if ($bl != "0") { ?>
 <table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 	<tr style="text-align:center">
-		<th rowspan="2" width="15%">NO BL</th>
-		<th rowspan="2" width="15%">TL</th>
-		<th rowspan="2" width="15%">Kemasan</th>
-		<th rowspan="2" width="15%">BARANG</th>
-    <th rowspan="2" width="5%">Satuan</th>
-    <th colspan="2" width="15%">Qty</th>
-    <th rowspan="2" width="10%">Tarif Dasar</th>
-    <th rowspan="2" width="10%">Total</th>
+		<th  width="15%">NO SI</th>
+		<th  width="15%">Kemasan</th>
+		<th  width="15%">BARANG</th>
+    <th  width="10%">Satuan</th>
+    <th  width="10%">Qty</th>
+    <th  width="10%">Tarif Dasar</th>
+    <th  width="10%">Total</th>
 	</tr>
-  <tr style="text-align:center">
-    <th>Bongkar</th>
-    <th>Muat</th>
-  </tr>
 	@foreach($bl as $bl)
   <tr style="background-color:#ff3030;color:#fff;">
     <td style="border-right: 0;padding-left:9px">{{$bl}}</td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0;text-align:center"></td>
-    <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-right: 0;border-left:0"></td>
     <td style="border-left:  0;"></td>
@@ -204,13 +197,10 @@
 <?php foreach ($handling[$bl] as $value) { ?>
 	<tr>
 		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:center"> -
-		</td>
 		<td>{{$value["dtl_package"]}}</td>
 		<td>{{$value["dtl_commodity"]}}</td>
 		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-			<td style="text-align:center">-</td>
+		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
 		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
