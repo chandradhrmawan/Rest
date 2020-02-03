@@ -33,7 +33,9 @@
             "app/Helper/BillingEngine.php",
             "app/Helper/UserAndRoleManagemnt.php",
             "app/Helper/RealisasiHelper.php",
-            "app/Helper/GlobalHelper.php"
+            "app/Helper/GlobalHelper.php",
+            "app/Helper/PlgRequestBooking.php",
+            "app/Helper/PlgConnectedExternalApps.php"
         ]
     },
     "autoload-dev": {

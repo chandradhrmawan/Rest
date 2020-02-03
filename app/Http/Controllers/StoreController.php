@@ -17,6 +17,8 @@ use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
 use App\Helper\RealisasiHelper;
 use App\Models\Mdm\TmTruckCompany;
+use App\Helper\PlgRequestBooking;
+use App\Helper\PlgConnectedExternalApps;
 
 class StoreController extends Controller
 {
@@ -64,8 +66,7 @@ class StoreController extends Controller
       ]);
     }
 
-    public function storeTsNota($input, $request)
-    {
+    public function storeTsNota($input, $request){
       if ($input['flag_status'] == 'Y') {
         $cekActive = DB::connection('mdm')->table('TS_NOTA')->where([
           "flag_status" => $input['flag_status'],
@@ -117,6 +118,7 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+      return PlgRequestBooking::sendRequestPLG(['nota_id' => 1]);
       $arrCon = [
         "kegiatan" => 1,
         "head_primery" => "rec_id",
@@ -194,6 +196,32 @@ class StoreController extends Controller
       ];
       return ConnectedExternalApps::sendUperPutReceipt(282, (object)$pay);
     }
+
+    // PLG
+      function sendRequestPLG($input, $request){
+        return PlgRequestBooking::sendRequestPLG($input);
+      }
+
+      function approvalRequestPLG($input, $request){
+        return PlgRequestBooking::approvalRequestPLG($input);
+      }
+
+      function approvalProformaPLG($input, $request){
+        return PlgRequestBooking::approvalProformaPLG($input);
+      }
+
+      function cekSendInvProforma($input, $request){
+        return PlgConnectedExternalApps::cekSendInvProforma($input);
+      }
+
+      function storePaymentPLG($input, $request){
+        return PlgRequestBooking::storePaymentPLG($input);
+      }
+      
+      function cekSendInvPay($input, $request){
+        return PlgConnectedExternalApps::cekSendInvPay($input);
+      }
+    // PLG
 
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
@@ -374,19 +402,6 @@ class StoreController extends Controller
       function approvalRequest($input, $request){
         return RequestBooking::approvalRequest($input);
       }
-
-      function sendRequestPLG($input, $request){
-        return RequestBooking::sendRequestPLG($input);
-      }
-
-      function approvalRequestPLG($input, $request){
-        return RequestBooking::approvalRequestPLG($input);
-      }
-
-      function storePaymentPLG($input, $request){
-        return RequestBooking::storePaymentPLG($input);
-      }
-
     // RequestBooking
 
     // BillingEngine

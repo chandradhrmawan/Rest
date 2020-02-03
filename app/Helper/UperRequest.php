@@ -114,107 +114,6 @@ class UperRequest{
       return [ "Success" => true, "result" => $result];
   }
 
-  public static function viewTempUperPLG($input){
-      $input['table'] = strtoupper($input['table']);
-      $config = RequestBooking::configPLG($input['table']);
-      $find = DB::connection('omuster')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
-      if (count($find) == 0) {
-        return ['Success' => false, 'result' => 'fail, not found data!'];
-      }
-      $find = (array)$find[0];
-
-      $result = [];
-
-      $query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
-      $getHS = DB::connection('eng')->select(DB::raw($query));
-      foreach ($getHS as $getH){
-          $comp_notas = DB::connection('mdm')->table('TM_REFF')->where([
-            'reff_tr_id' => 10
-          ])->orderBy('reff_order', 'asc')->get();
-          $nota_view = [];
-
-          foreach ($comp_notas as $comp_nota) {
-            $grArr = DB::connection('mdm')->table('TM_COMP_NOTA')->where([
-              'branch_id' => $getH->branch_id,
-              'branch_code' => $getH->branch_code,
-              'nota_id' => $getH->nota_id,
-              'comp_nota_view' => $comp_nota->reff_id
-            ])->pluck('group_tariff_id');
-
-            $nv = [];
-            if (count($grArr) > 0) {
-              $queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$getH->temp_hdr_id."' AND CUSTOMER_ID = '".$getH->customer_id."'";
-              $group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
-              $resultD = [];
-              foreach ($group_tariff as $grpTrf){
-                  $grpTrf = (array)$grpTrf;
-                  if (in_array($grpTrf['group_tariff_id'], $grArr)) {
-                    $uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL_NPKS')->where('TEMP_HDR_ID',$getH->temp_hdr_id)->where('group_tariff_id',$grpTrf['group_tariff_id'])->get();
-                    $countLine = 0;
-                    foreach ($uperD as $list){
-                        $resultD[] = $list;
-                    }
-                  }
-              }
-              $nv[$comp_nota->reff_name] = $resultD;
-            }
-            if (!empty($nv)) {
-              $nota_view[] = $nv;
-            }
-          }
-
-          // build head
-              $head = [
-                'uper_org_id' => $getH->branch_org_id,
-                'uper_cust_id' => $getH->customer_id,
-                'uper_cust_name' => $getH->alt_name,
-                'uper_cust_npwp' => $getH->npwp,
-                'uper_cust_address' => $getH->address,
-                'uper_amount' => $getH->total_uper,
-                'uper_currency_code' => $getH->currency,
-                'uper_status' => 'P',
-                // Tambahan Mas Adi
-                'uper_service_code' => $getH->nota_service_code,
-                'uper_branch_account' => $getH->branch_account,
-                'uper_context' => $getH->nota_context,
-                'uper_sub_context' => $getH->nota_sub_context,
-                // 'uper_terminal_code' => $find[$config['head_terminal_code']],
-                'uper_branch_id' => $getH->branch_id,
-                'uper_branch_code' => $getH->branch_code,
-                'uper_vessel_name' => $find[$config['head_vessel_name']],
-                'uper_faktur_no' => '-',
-                'uper_trade_type' => $getH->trade_type,
-                'uper_req_no' => $getH->booking_number,
-                'uper_ppn' => $getH->ppn_uper,
-                'uper_percent' => $getH->percent_uper,
-                'uper_dpp' => $getH->dpp_uper,
-                'uper_nota_id' => $getH->nota_id,
-                'uper_req_date' =>  $find[$config['head_date']]
-              ];
-              if ($config['head_pbm_id'] != null) {
-                  $head['uper_pbm_id'] = $find[$config['head_pbm_id']];
-              }
-              if ($config['head_pbm_name'] != null) {
-                  $head['uper_pbm_name'] = $find[$config['head_pbm_name']];
-              }
-              if ($config['head_shipping_agent_id'] != null) {
-                  $head['uper_shipping_agent_id'] = $find[$config['head_shipping_agent_id']];
-              }
-              if ($config['head_shipping_agent_name'] != null) {
-                  $head['uper_shipping_agent_name'] = $find[$config['head_shipping_agent_name']];
-              }
-              // if ($config['head_terminal_name'] != null) {
-              //     $head['uper_terminal_name'] = $find[$config['head_terminal_name']];
-              // }
-              $head['nota_view'] = $nota_view;
-          // build head
-
-          $result[] = $head;
-      }
-
-      return [ "Success" => true, "result" => $result];
-  }
-
 	public static function storePayment($input){
         if (!isset($input['pay_id']) and empty($input['pay_id'])) {
           $cekPayment = TxPayment::where('pay_no', $input['pay_no'])->where('pay_req_no', $input['pay_req_no'])->count();
@@ -242,7 +141,7 @@ class UperRequest{
           $datenow    = Carbon::now()->format('Y-m-d');
           if (isset($input['pay_id']) and !empty($input['pay_id'])) {
             $pay = TxPayment::find($input['pay_id']);
-            if (!empty($input['pay_file']['PATH']) or !empty($input['pay_file']['BASE64']) or !empty($input['pay_file'])) {
+            if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
               if (file_exists($pay->pay_file)){
                 unlink($pay->pay_file);
               }

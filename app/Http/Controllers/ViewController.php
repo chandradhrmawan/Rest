@@ -12,7 +12,7 @@ use App\Helper\UserAndRoleManagemnt;
 use App\Helper\UperRequest;
 use Dompdf\Dompdf;
 use App\Helper\ConnectedExternalApps;
-// use Excel;
+use App\Helper\PlgRequestBooking;
 
 class ViewController extends Controller
 {
@@ -274,8 +274,8 @@ class ViewController extends Controller
         return UperRequest::viewTempUper($input);
     }
 
-    function viewTempUperPLG($input, $request) {
-        return UperRequest::viewTempUperPLG($input);
+    function viewTempTariffPLG($input, $request) {
+        return PlgRequestBooking::viewTempTariffPLG($input);
     }
 
     // BillingEngine
