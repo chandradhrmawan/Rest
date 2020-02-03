@@ -297,11 +297,17 @@ class IndexController extends Controller
 
     function listproforma($input) {
       $data     = [];
-
-      $proforma = DB::connection('omcargo')
+      if (isset($input["db"])) {
+      $proforma = DB::connection($input["db"])
                   ->table("TX_HDR_NOTA")
                   ->join("TM_REFF B", "B.REFF_ID", "=", "TX_HDR_NOTA.NOTA_STATUS")
                   ->orderBy("TX_HDR_NOTA.NOTA_ID", "DESC");
+      } else {
+        $proforma = DB::connection('omcargo')
+        ->table("TX_HDR_NOTA")
+        ->join("TM_REFF B", "B.REFF_ID", "=", "TX_HDR_NOTA.NOTA_STATUS")
+        ->orderBy("TX_HDR_NOTA.NOTA_ID", "DESC");
+      }
 
       if(!empty($input["where"][0])) {
         $proforma->where($input["where"]);
