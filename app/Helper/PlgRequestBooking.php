@@ -130,6 +130,9 @@ class PlgRequestBooking{
 			$no_nota = '';
 			$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
 			$tarifs = DB::connection('eng')->select(DB::raw($query));
+			if (count($tarifs) == 0) {
+				return ['result' => "Fail, proforma and tariff not found!", "Success" => false];
+			}
 			foreach ($tarifs as $tarif) {
 				$tarif = (array)$tarif;
 				$cekOldNota = TxHdrNota::where('nota_req_no', $find[$config['head_no']])->first();
@@ -233,7 +236,7 @@ class PlgRequestBooking{
 					}
 				}
 			}
-			return "Created Nota No : ".$no_nota;
+			return ['result' => "Created Nota No : ".$no_nota, "Success" => true];
 		}
 
 	    public static function sendRequestPLG($input){
@@ -466,9 +469,6 @@ class PlgRequestBooking{
 				return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
 			}
 
-			if (count($tarifs) == 0) {
-				return ['result' => "Fail, proforma and tariff not found!", "Success" => false];
-			}
 			$migrateTariff = true;
 			if ($find[$config['head_paymethod']] == 2) {
 				$migrateTariff = false;
@@ -476,6 +476,9 @@ class PlgRequestBooking{
 			$pesan = '';
 			if ($migrateTariff == true) {
 				$pesan = static::migrateNotaData($find, $config);
+				if ($pesan['Success'] == false) {
+					return $pesan;
+				}
 			}
 
 			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
@@ -490,8 +493,8 @@ class PlgRequestBooking{
 			}
 
 			return [
-				'result' => "Success, approved request! ".$pesan,
-				"note" => $pesan,
+				'result' => "Success, approved request! ".$pesan['result'],
+				"note" => $pesan['result'],
 				'no_req' => $find[$config['head_no']],
 				'sendRequestBooking' => $sendRequestBooking
 			];
@@ -557,14 +560,17 @@ class PlgRequestBooking{
 				// calculate tariff
 				// migrate nota
 					$pesan = static::migrateNotaData($find, $config);
+					if ($pesan['Success'] == false) {
+						return $pesan;
+					}
 				// migrate nota
 			}
 			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 5
 			]);
 			return [
-				'result' => "Success, confirm realisasion! ".$pesan,
-				"note" => $pesan,
+				'result' => "Success, confirm realisasion! ".$pesan['result'],
+				"note" => $pesan['result'],
 				'no_req' => $find[$config['head_no']]
 			];
 	    }
