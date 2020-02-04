@@ -27,7 +27,7 @@ class PlgRequestBooking{
 			}else{
 				$result['P_TRADE'] = $data[$config['p_tarde']];
 			}
-			$setH['P_USER_ID'] = $data[$config['head_by']];
+			$result['P_USER_ID'] = $data[$config['head_by']];
 			return $result;
 		}
 
