@@ -387,7 +387,7 @@ class ConnectedExternalApps{
         $vparam = '';
         if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
           $vparam .= 'REC'; // IF_FLAG
-        } if else ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+        } else if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
           $vparam .= 'DEL'; // IF_FLAG
         }else{
           $vparam .= $req_type; // IF_FLAG
@@ -422,7 +422,7 @@ class ConnectedExternalApps{
         }
         if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
           $vparam .= '^REC'; // IF_FLAG
-        } if else ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+        } else if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
           $vparam .= '^DEL'; // IF_FLAG
         }else{
           $vparam .= '^'.$req_type; // IF_FLAG
