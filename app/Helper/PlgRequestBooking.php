@@ -122,6 +122,7 @@ class PlgRequestBooking{
 			}else{
 				$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT_OLD']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			}
+			return $newD;
 		}
 
 		private static function migrateNotaData($find, $config){
