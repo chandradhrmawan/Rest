@@ -6,17 +6,27 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use App\Models\OmUster\TxHdrNota;
+use App\Helper\PlgRequestBooking;
 
 class PlgConnectedExternalApps{
 	// PLG
+		private static function decodeResultAftrSendToTosNPKS($res){
+			$res['request'] = json_decode($res['request'], true);
+	        $res['request'] = json_decode(base64_decode($res['request']['request']), true);
+	        $res['response'] = json_decode($res['response']->getBody()->getContents(), true);
+	        $res['response'] = json_decode(base64_decode($res['response']['result']),true);
+	        return $res;
+		}
+
 	    public static function sendRequestBookingPLG($arr){
 	        $toFunct = 'buildJson'.$arr['config']['head_table'];
 	        $res = static::sendRequestToExtJsonMet([
 	        	"user" => config('endpoint.tosPostPLG.user'),
 	        	"pass" => config('endpoint.tosPostPLG.pass'), 
 	        	"target" => config('endpoint.tosPostPLG.target'), 
-	        	"json" => json_encode(json_decode(static::$toFunct($arr),true))
+	        	"json" => '{ "request" : "'.base64_encode(json_encode(json_decode(static::$toFunct($arr),true))).'"}'
 	        ]);
+	        $res = static::decodeResultAftrSendToTosNPKS($res);
 	        return ['sendRequestBookingPLG' => $res];
 		}
 
@@ -41,7 +51,12 @@ class PlgConnectedExternalApps{
 	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
-
+	        $nota_no = '';
+	        $nota_date = '';
+	        if (empty($nota)) {
+	        	$nota_no = $nota->nota_no;
+	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+	        }
 	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
 	          'reff_tr_id' => 5,
 	          'reff_id' => $head[$arr['config']['head_from']]
@@ -51,8 +66,8 @@ class PlgConnectedExternalApps{
 	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
-	            "NO_NOTA": "'.$nota->nota_no.'",
-	            "TGL_NOTA": "'.date('m/d/Y', strtotime($nota->nota_date)).'",
+	            "NO_NOTA": "'.$nota_no.'",
+	            "TGL_NOTA": "'.$nota_date.'",
 	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
 	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 	            "REQ_MARK": "",
@@ -130,8 +145,6 @@ class PlgConnectedExternalApps{
 	          }
 	          return ["Success"=>false, "request" => $options, "response" => $error];
 	        }
-	        $res = json_decode($res->getBody()->getContents(), true);
-	        $res = json_decode(base64_decode($res['result']),true);
 	        return ["Success"=>true, "request" => $arr, "response" => $res];
 		}
 
@@ -433,6 +446,8 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealRecPLG($input){
+			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 1)->first();
+			$config = json_decode($config->api_set, true);
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
 			$dtl = '';
@@ -465,9 +480,11 @@ class PlgConnectedExternalApps{
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'), 
 	        	"target" => config('endpoint.tosGetPLG.target'), 
-	        	"json" => json_encode(json_decode($json,true))
+	        	"json" => '{ "request" : "'.base64_encode(json_encode(json_decode($json,true))).'"}'
 	        ];
 			$res = static::sendRequestToExtJsonMet($arr);
+			$res = static::decodeResultAftrSendToTosNPKS($res);
+			$his_cont = [];
 			if ($res['response']['count'] > 0) {
 				foreach ($res['response']['result'] as $listR) {
 					$findGATI = [
@@ -498,11 +515,27 @@ class PlgConnectedExternalApps{
 					}else{
 						DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
 					}
+					$arrStoreTsContAndTxHisCont = [
+						'cont_no' => $listR['NO_CONTAINER'],
+						'branch_id' => $find->rec_branch_id,
+						'branch_code' => $find->rec_branch_code
+						'cont_location' => 'GATI',
+						'cont_size' => null,
+						'cont_type' => null,
+						'cont_counter' => null,
+						'no_request' => $listR['NO_REQUEST'],
+						'kegiatan' => $config['kegiatan'],
+						'id_user' => $input["user"]->user_id,
+						'status_cont' => $listR['STATUS'],
+						'vvd_id' => $find->rec_vvd_id
+					];
+					$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 				}
 				$msg = 'Success get realisasion';
 			}else{
 				$msg = 'realisasion not finish';
 			}
+			$res['his_cont'] = $his_cont;
 			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
 				->leftJoin('TX_GATEIN', function($join) use ($find){
 					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');

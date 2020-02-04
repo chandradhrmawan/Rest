@@ -184,8 +184,7 @@ class PlgRequestBooking{
 			// return $tariffResp = BillingEngine::calculateTariff($set_data);
 			$tariffResp = BillingEngine::calculateTariff($set_data);
 			
-			$insertTsContHs = [];
-			$insertTxHisContHs = [];
+			$his_cont = [];
 
 			if ($tariffResp['result_flag'] == 'S') {
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
@@ -193,54 +192,24 @@ class PlgRequestBooking{
 				]);
 				foreach ($detil as $list) {
 					$list = (array)$list;
-					// history container
-						$insertTsCont = [];
-						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
-							'cont_no' => $list[$config['DTL_BL']],
-							'branch_id' => $find[$config['head_branch']],
-							'branch_code' => $find[$config['head_branch_code']]
-						])->orderBy('cont_counter', 'desc')->get();
-						if (count($cekTsCont) == 0) {
-							$insertTsCont = [
-								'cont_no' => $list[$config['DTL_BL']],
-								'branch_id' => $find[$config['head_branch']],
-								'branch_code' => $find[$config['head_branch_code']],
-								'cont_location' => 'GATO',
-								'cont_size' => $list[$config['DTL_CONT_SIZE']],
-								'cont_type' => $list[$config['DTL_CONT_TYPE']],
-								'cont_counter' => 0
-							];
-							DB::connection('omuster')->table('TS_CONTAINER')->insert($insertTsCont);
-							$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where([
-								'cont_no' => $list[$config['DTL_BL']],
-								'branch_id' => $find[$config['head_branch']],
-								'branch_code' => $find[$config['head_branch_code']]
-							])->orderBy('cont_counter', 'desc')->get();
-						}
-						$cekTsCont = $cekTsCont[0];
-						$insertTsContHs[] = $insertTsCont;
-						$insertTxHisCont = [
-							'no_container' => $list[$config['DTL_BL']],
-							'no_request' => $find[$config['head_no']],
-							'kegiatan' => $config['kegiatan'],
-							'id_user' => $input["user"]->user_id,
-							// 'id_yard' => $list[$config['DTL_BL']], ?
-							'status_cont' => $list[$config['DTL_CONT_STATUS']],
-							'vvd_id' => $find[$config['head_vvd']],
-							'counter' => $cekTsCont->cont_counter+1
-							// 'sub_counter' => $list[$config['DTL_BL']], ?
-							// 'why' => $list[$config['DTL_BL']], ?
-							// 'aktif' => $list[$config['DTL_BL']], ?
-						];
-						DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($insertTxHisCont);
-						$insertTxHisContHs[] = $insertTxHisCont;
-					// history container
+					$arrStoreTsContAndTxHisCont = [
+						'cont_no' => $list[$config['DTL_BL']],
+						'branch_id' => $find[$config['head_branch']],
+						'branch_code' => $find[$config['head_branch_code']],
+						'cont_location' => 'GATO',
+						'cont_size' => $list[$config['DTL_CONT_SIZE']],
+						'cont_type' => $list[$config['DTL_CONT_TYPE']],
+						'cont_counter' => 0,
+						'no_request' => $find[$config['head_no']],
+						'kegiatan' => $config['kegiatan'],
+						'id_user' => $input["user"]->user_id,
+						'status_cont' => $list[$config['DTL_CONT_STATUS']],
+						'vvd_id' => $find[$config['head_vvd']]
+					];
+					$his_cont[] = static::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 				}
 			}
-			$tariffResp['his_cont'] = [
-				'insertTsContHs' => $insertTsContHs,
-				'insertTxHisContHs' => $insertTxHisContHs,
-			];
+			$tariffResp['his_cont'] = $his_cont;
 			return $tariffResp;
 	    }
 
@@ -644,6 +613,54 @@ class PlgRequestBooking{
 				'sendInvPay' => $sendInvPay,
 				'sendRequestBooking' => $sendRequestBooking
 			];
+	    }
+
+	    public static function storeTsContAndTxHisCont($arr){
+	    	// history container
+				$storeTsCont = [];
+				$findTsCont = [
+					'cont_no' => $arr['cont_no'],
+					'branch_id' => $arr['branch_id'],
+					'branch_code' => $arr['branch_code']
+				];
+				$storeTsCont = [
+					'cont_no' => $arr['cont_no'],
+					'branch_id' => $arr['branch_id'],
+					'branch_code' => $arr['branch_code'],
+					'cont_location' => $arr['cont_location']
+				];
+				if (!empty($arr['cont_size'])) {
+					$storeTsCont['cont_size'] = $arr['cont_size'];
+				}
+				if (!empty($arr['cont_type'])) {
+					$storeTsCont['cont_type'] = $arr['cont_type'];
+				}
+				if (!empty($arr['cont_counter'])) {
+					$storeTsCont['cont_counter'] = $arr['cont_counter'];
+				}
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+				if (empty($cekTsCont)) {
+					DB::connection('omuster')->table('TS_CONTAINER')->insert($storeTsCont);
+				}else{
+					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
+				}
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+				$storeTxHisCont = [
+					'no_container' => $arr['cont_no'],
+					'no_request' => $arr['no_request'],
+					'kegiatan' => $arr['kegiatan'],
+					'id_user' => $arr['is_user'],
+					'status_cont' => $arr['status_cont'],
+					'vvd_id' => $arr['vvd_id'],
+					'counter' => $cekTsCont->cont_counter+1
+					// 'id_yard' => $list[$config['DTL_BL']], ?
+					// 'sub_counter' => $list[$config['DTL_BL']], ?
+					// 'why' => $list[$config['DTL_BL']], ?
+					// 'aktif' => $list[$config['DTL_BL']], ?
+				];
+				$TxHis = DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeTxHisCont);
+			// history container
+			return ['storeTsCont' => $cekTsCont, 'storeTxHisCont'=>$TxHis];
 	    }
 	// PLG
 }
