@@ -383,115 +383,227 @@ class ConnectedExternalApps{
       $string_json_arr = [];
       foreach ($detil as $list) {
         $listA = (array)$list;
+        $hsl = [];
 
         $vparam = '';
-        if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
-          $vparam .= 'REC'; // IF_FLAG
-        } else if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
-          $vparam .= 'DEL'; // IF_FLAG
-        }else{
-          $vparam .= $req_type; // IF_FLAG
-        }
-        $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
-        $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT (CASE WHEN B.PACKAGE_NAME IS NULL THEN A.PACKAGE_NAME ELSE B.PACKAGE_NAME END) PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
-        $packageNameParent = $packageNameParent[0];
-        $packageNameParent = $packageNameParent->package_name;
-        $vparam .= '^'.$packageNameParent; // PKG_NAME
-        $paramTon = 0;
-        $paramCub = 0;
-        if ($list->dtl_unit_id == 1 or $list->dtl_unit_id == 2) {
-          $paramTon = $list->dtl_qty;
-        } else if ($list->dtl_unit_id == 3) {
-          $paramCub = $list->dtl_qty;
-        }
-        $vparam .= '^'.$paramTon; // TON
-        $vparam .= '^'.$paramCub; // CUBIC
-        $vparam .= '^0'; // QTY
-        $vparam .= '^'; // ID_INV
-        $vparam .= '^'.$head[$config['head_no']]; // ID_REQ
-        if ($req_type == 'BM') {
-          $vparam .= '^'.date('Ymd', strtotime($head[$config['head_open_stack']])).'235959'; // STACKOUT_DATE
-        }else{
-          $vparam .= '^'.date('Ymd', strtotime($head[$config['head_closing_time']])).'235959'; // STACKOUT_DATE
-        }
-        if ($config['head_tab_detil_tl'] == null) {
-          $vparam .= '^N'; // TL_FLAG
-        }else{
-          $vparam .= '^'.$listA[$config['head_tab_detil_tl']]; // TL_FLAG
+        // first
+          if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+            $vparam .= 'REC'; // IF_FLAG
+          } else{
+            $vparam .= $req_type; // IF_FLAG
+          }
+          $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
+          $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT (CASE WHEN B.PACKAGE_NAME IS NULL THEN A.PACKAGE_NAME ELSE B.PACKAGE_NAME END) PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
+          $packageNameParent = $packageNameParent[0];
+          $packageNameParent = $packageNameParent->package_name;
+          $vparam .= '^'.$packageNameParent; // PKG_NAME
+          $paramTon = 0;
+          $paramCub = 0;
+          if ($list->dtl_unit_id == 1 or $list->dtl_unit_id == 2) {
+            $paramTon = $list->dtl_qty;
+          } else if ($list->dtl_unit_id == 3) {
+            $paramCub = $list->dtl_qty;
+          }
+          $vparam .= '^'.$paramTon; // TON
+          $vparam .= '^'.$paramCub; // CUBIC
+          $vparam .= '^0'; // QTY
+          $vparam .= '^'; // ID_INV
+          $vparam .= '^'.$head[$config['head_no']]; // ID_REQ
+          if ($req_type == 'BM') {
+            $vparam .= '^'.date('Ymd', strtotime($head[$config['head_open_stack']])).'235959'; // STACKOUT_DATE
+          }else{
+            $vparam .= '^'.date('Ymd', strtotime($head[$config['head_closing_time']])).'235959'; // STACKOUT_DATE
+          }
+          if ($config['head_tab_detil_tl'] == null) {
+            $vparam .= '^N'; // TL_FLAG
+          }else{
+            $vparam .= '^'.$listA[$config['head_tab_detil_tl']]; // TL_FLAG
 
-        }
-        if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
-          $vparam .= '^REC'; // IF_FLAG
-        } else if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
-          $vparam .= '^DEL'; // IF_FLAG
-        }else{
-          $vparam .= '^'.$req_type; // IF_FLAG
-        }
-        if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
-        $vparam .= '^'; // OI
-        $vparam .= '^'; // HS_CODE
-        $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
-        if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
+          }
+          if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+            $vparam .= '^REC'; // IF_FLAG
+          } else{
+            $vparam .= '^'.$req_type; // IF_FLAG
+          }
+          if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
+          $vparam .= '^'; // OI
+          $vparam .= '^'; // HS_CODE
+          $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
+          if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
 
-        // $vparam .= '^E'; // EI
-        if ($req_type == 'BM') {
-          if ($list->dtl_bm_type == 'Muat') {
+          // $vparam .= '^E'; // EI
+          if ($req_type == 'BM') {
+            if ($list->dtl_bm_type == 'Muat') {
+              $vparam .= '^E'; // EI
+            } else if ($list->dtl_bm_type == 'Bongkar'){
+              $vparam .= '^I'; // EI
+            }
+          } else if ($req_type == 'REC') {
             $vparam .= '^E'; // EI
-          } else if ($list->dtl_bm_type == 'Bongkar'){
+          } else if ($req_type == 'DEL') {
             $vparam .= '^I'; // EI
           }
-        } else if ($req_type == 'REC') {
-          $vparam .= '^E'; // EI
-        } else if ($req_type == 'DEL') {
-          $vparam .= '^I'; // EI
-        }
-        $vparam .= '^'.$head[$config['head_cust_name']]; // CUSTOMER_NAME
-        $vparam .= '^'.$head[$config['head_cust_addr']]; // CUSTOMER_ADDRESS
-        $vparam .= '^'.date('Ymd', strtotime($paid_date)).'235959'; // DATE_PAID
-        $vparam .= '^'; // DO_NUMBER
-        $vparam .= '^'; // POD
-        $vparam .= '^'; // POL
-        $vparam .= '^'; // POR
-        $vparam .= '^'; // SIZE_
-        $vparam .= '^'; // TYPE_
-        $vparam .= '^'; // STATUS_
-        $vparam .= '^201'; // id_Port
+          $vparam .= '^'.$head[$config['head_cust_name']]; // CUSTOMER_NAME
+          $vparam .= '^'.$head[$config['head_cust_addr']]; // CUSTOMER_ADDRESS
+          $vparam .= '^'.date('Ymd', strtotime($paid_date)).'235959'; // DATE_PAID
+          $vparam .= '^'; // DO_NUMBER
+          $vparam .= '^'; // POD
+          $vparam .= '^'; // POL
+          $vparam .= '^'; // POR
+          $vparam .= '^'; // SIZE_
+          $vparam .= '^'; // TYPE_
+          $vparam .= '^'; // STATUS_
+          $vparam .= '^201'; // id_Port
 
-        $string_json = '{
-            "savecargoNpkInterfaceRequest": {
-                "esbHeader": {
-                    "externalId": "2",
-                    "timestamp": "2"
-                },
-                "esbBody": {
-                    "blNumber": "'.$listA[$config['head_tab_detil_bl']].'",
-                    "cargoName": "'.$list->dtl_cmdty_name.'",
-                    "vvdNumber": "'.$head[$config['head_vvd_id']].'",
-                    "insertData": "'.$vparam.'"
-                }
+          $string_json = '{
+              "savecargoNpkInterfaceRequest": {
+                  "esbHeader": {
+                      "externalId": "2",
+                      "timestamp": "2"
+                  },
+                  "esbBody": {
+                      "blNumber": "'.$listA[$config['head_tab_detil_bl']].'",
+                      "cargoName": "'.$list->dtl_cmdty_name.'",
+                      "vvdNumber": "'.$head[$config['head_vvd_id']].'",
+                      "insertData": "'.$vparam.'"
+                  }
+              }
+          }';
+          $string_json_arr[] = $string_json;
+
+          $username="npk_billing";
+          $password ="npk_billing";
+          $client = new Client();
+          $options= array(
+          'auth' => [
+            $username,
+            $password
+          ],
+            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+            'body' => $string_json,
+            "debug" => false
+          );
+          try {
+            $res = $client->post($endpoint_url, $options);
+          } catch (ClientException $e) {
+            return $e->getResponse();
+          }
+          $hsl[] = json_decode($res->getBody()->getContents(), true);
+        //first
+
+
+        if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+          $vparam = '';
+          if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+            $vparam .= 'REC'; // IF_FLAG
+          } else if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y'){
+            $vparam .= 'DEL'; // IF_FLAG
+          } else{
+            $vparam .= $req_type; // IF_FLAG
+          }
+          $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // ID_CARGO
+          $packageNameParent = DB::connection('mdm')->select(DB::raw('SELECT (CASE WHEN B.PACKAGE_NAME IS NULL THEN A.PACKAGE_NAME ELSE B.PACKAGE_NAME END) PACKAGE_NAME FROM TM_PACKAGE A LEFT JOIN TM_PACKAGE B ON B.PACKAGE_CODE = A.PACKAGE_PARENT_CODE WHERE A.PACKAGE_ID ='.$list->dtl_pkg_id));
+          $packageNameParent = $packageNameParent[0];
+          $packageNameParent = $packageNameParent->package_name;
+          $vparam .= '^'.$packageNameParent; // PKG_NAME
+          $paramTon = 0;
+          $paramCub = 0;
+          if ($list->dtl_unit_id == 1 or $list->dtl_unit_id == 2) {
+            $paramTon = $list->dtl_qty;
+          } else if ($list->dtl_unit_id == 3) {
+            $paramCub = $list->dtl_qty;
+          }
+          $vparam .= '^'.$paramTon; // TON
+          $vparam .= '^'.$paramCub; // CUBIC
+          $vparam .= '^0'; // QTY
+          $vparam .= '^'; // ID_INV
+          $vparam .= '^'.$head[$config['head_no']]; // ID_REQ
+          if ($req_type == 'BM') {
+            $vparam .= '^'.date('Ymd', strtotime($head[$config['head_open_stack']])).'235959'; // STACKOUT_DATE
+          } else{
+            $vparam .= '^'.date('Ymd', strtotime($head[$config['head_closing_time']])).'235959'; // STACKOUT_DATE
+          }
+          if ($config['head_tab_detil_tl'] == null) {
+            $vparam .= '^N'; // TL_FLAG
+          }else{
+            $vparam .= '^'.$listA[$config['head_tab_detil_tl']]; // TL_FLAG
+
+          }
+          if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
+            $vparam .= '^REC'; // IF_FLAG
+          } else if ($req_type == 'BM' and $list->dtl_bm_type == 'Bongkar' and $listA[$config['head_tab_detil_tl']] == 'Y'){
+            $vparam .= '^DEL'; // IF_FLAG
+          } else{
+            $vparam .= '^'.$req_type; // IF_FLAG
+          }
+          if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
+          $vparam .= '^'; // OI
+          $vparam .= '^'; // HS_CODE
+          $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
+          if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
+
+          // $vparam .= '^E'; // EI
+          if ($req_type == 'BM') {
+            if ($list->dtl_bm_type == 'Muat') {
+              $vparam .= '^E'; // EI
+            } else if ($list->dtl_bm_type == 'Bongkar'){
+              $vparam .= '^I'; // EI
             }
-        }';
-        $string_json_arr[] = $string_json;
+          } else if ($req_type == 'REC') {
+            $vparam .= '^E'; // EI
+          } else if ($req_type == 'DEL') {
+            $vparam .= '^I'; // EI
+          }
+          $vparam .= '^'.$head[$config['head_cust_name']]; // CUSTOMER_NAME
+          $vparam .= '^'.$head[$config['head_cust_addr']]; // CUSTOMER_ADDRESS
+          $vparam .= '^'.date('Ymd', strtotime($paid_date)).'235959'; // DATE_PAID
+          $vparam .= '^'; // DO_NUMBER
+          $vparam .= '^'; // POD
+          $vparam .= '^'; // POL
+          $vparam .= '^'; // POR
+          $vparam .= '^'; // SIZE_
+          $vparam .= '^'; // TYPE_
+          $vparam .= '^'; // STATUS_
+          $vparam .= '^201'; // id_Port
 
-        $username="npk_billing";
-        $password ="npk_billing";
-        $client = new Client();
-        $options= array(
-        'auth' => [
-          $username,
-          $password
-        ],
-          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-          'body' => $string_json,
-          "debug" => false
-        );
-        try {
-          $res = $client->post($endpoint_url, $options);
-        } catch (ClientException $e) {
-          return $e->getResponse();
+          $string_json = '{
+              "savecargoNpkInterfaceRequest": {
+                  "esbHeader": {
+                      "externalId": "2",
+                      "timestamp": "2"
+                  },
+                  "esbBody": {
+                      "blNumber": "'.$listA[$config['head_tab_detil_bl']].'",
+                      "cargoName": "'.$list->dtl_cmdty_name.'",
+                      "vvdNumber": "'.$head[$config['head_vvd_id']].'",
+                      "insertData": "'.$vparam.'"
+                  }
+              }
+          }';
+          $string_json_arr[] = $string_json;
+
+          $username="npk_billing";
+          $password ="npk_billing";
+          $client = new Client();
+          $options= array(
+          'auth' => [
+            $username,
+            $password
+          ],
+            'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+            'body' => $string_json,
+            "debug" => false
+          );
+          try {
+            $res = $client->post($endpoint_url, $options);
+          } catch (ClientException $e) {
+            return $e->getResponse();
+          }
+
+          $hsl[] = json_decode($res->getBody()->getContents(), true);
         }
 
-        $respn[] = json_decode($res->getBody()->getContents(), true);
+        $respn[] = $hsl;
       }
       return ['result' => 'Success', 'response' => $respn, 'json' => $string_json_arr];
       // return ['result' => 'Success', 'json' => $string_json_arr];

@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\OmUster\TxHdrNota;
 use App\Helper\PlgRequestBooking;
@@ -502,7 +503,7 @@ class PlgConnectedExternalApps{
 						// "gatein_trucking" => $listR[''],
 						// "gatein_yard" => $listR[''],
 						// "gatein_mark" => $listR[''],
-						"gatein_date" => \DB::raw("TO_DATE('".$listR['TGL_IN']."', 'YYYY-MM-DD HH24:MI')"),
+						"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
 						"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
 						"gatein_create_by" => $input['user']->user_id,
 						"gatein_branch_id" => $find->rec_branch_id,
