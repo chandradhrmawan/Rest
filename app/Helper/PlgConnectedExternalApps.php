@@ -11,8 +11,8 @@ use App\Helper\PlgRequestBooking;
 class PlgConnectedExternalApps{
 	// PLG
 		private static function decodeResultAftrSendToTosNPKS($res){
-			$res['request'] = json_decode($res['request'], true);
-	        $res['request'] = json_decode(base64_decode($res['request']['request']), true);
+			$res['request'] = json_decode($res['request']['json'], true);
+	        $res['request'] = json_decode(base64_decode($res['request']['request']),true);
 	        $res['response'] = json_decode($res['response']->getBody()->getContents(), true);
 	        $res['response'] = json_decode(base64_decode($res['response']['result']),true);
 	        return $res;
@@ -133,7 +133,7 @@ class PlgConnectedExternalApps{
 	            $arr['pass']
 	          ],
 	          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-	          'body' => '{ "request" : "'.base64_encode($arr['json']).'"}',
+	          'body' => $arr['json'],
 	          "debug" => false
 	        );
 			try {
@@ -518,7 +518,7 @@ class PlgConnectedExternalApps{
 					$arrStoreTsContAndTxHisCont = [
 						'cont_no' => $listR['NO_CONTAINER'],
 						'branch_id' => $find->rec_branch_id,
-						'branch_code' => $find->rec_branch_code
+						'branch_code' => $find->rec_branch_code,
 						'cont_location' => 'GATI',
 						'cont_size' => null,
 						'cont_type' => null,
