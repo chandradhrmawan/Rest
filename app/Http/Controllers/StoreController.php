@@ -207,6 +207,10 @@ class StoreController extends Controller
         return PlgRequestBooking::approvalRequestPLG($input);
       }
 
+      function confirmRealisasion($input, $request){
+        return PlgRequestBooking::confirmRealisasion($input);
+      }
+
       function approvalProformaPLG($input, $request){
         return PlgRequestBooking::approvalProformaPLG($input);
       }
