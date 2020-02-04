@@ -192,6 +192,17 @@ class PlgRequestBooking{
 				]);
 				foreach ($detil as $list) {
 					$list = (array)$list;
+					$findTsCont = [
+						'cont_no' => $list[$config['DTL_BL']],
+						'branch_id' => $find[$config['head_branch']],
+						'branch_code' => $find[$config['head_branch_code']]
+					];
+					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+					if (empty($cekTsCont)) {
+						$cont_counter = 0;
+					}else{
+						$cont_counter = $cekTsCont->cont_counter;
+					}
 					$arrStoreTsContAndTxHisCont = [
 						'cont_no' => $list[$config['DTL_BL']],
 						'branch_id' => $find[$config['head_branch']],
@@ -199,7 +210,7 @@ class PlgRequestBooking{
 						'cont_location' => 'GATO',
 						'cont_size' => $list[$config['DTL_CONT_SIZE']],
 						'cont_type' => $list[$config['DTL_CONT_TYPE']],
-						'cont_counter' => 0,
+						'cont_counter' => $cont_counter,
 						'no_request' => $find[$config['head_no']],
 						'kegiatan' => $config['kegiatan'],
 						'id_user' => $input["user"]->user_id,
@@ -645,6 +656,11 @@ class PlgRequestBooking{
 					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+				if ($cekTsCont->cont_counter == 0) {
+					$counter = $cekTsCont->cont_counter+1;
+				}else{
+					$counter = $cekTsCont->cont_counter;
+				}
 				$storeTxHisCont = [
 					'no_container' => $arr['cont_no'],
 					'no_request' => $arr['no_request'],

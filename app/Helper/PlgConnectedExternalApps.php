@@ -446,8 +446,6 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealRecPLG($input){
-			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 1)->first();
-			$config = json_decode($config->api_set, true);
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
 			$dtl = '';
@@ -515,6 +513,17 @@ class PlgConnectedExternalApps{
 					}else{
 						DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
 					}
+					$findTsCont = [
+						'cont_no' => $listR['NO_CONTAINER'],
+						'branch_id' => $find->rec_branch_id,
+						'branch_code' => $find->rec_branch_code
+					];
+					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+					$cont_counter = $cekTsCont->cont_counter+1;
+					$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
+						"reff_tr_id" => 12,
+						"reff_name" => 'GATE IN'
+					])->first();
 					$arrStoreTsContAndTxHisCont = [
 						'cont_no' => $listR['NO_CONTAINER'],
 						'branch_id' => $find->rec_branch_id,
@@ -522,9 +531,9 @@ class PlgConnectedExternalApps{
 						'cont_location' => 'GATI',
 						'cont_size' => null,
 						'cont_type' => null,
-						'cont_counter' => null,
+						'cont_counter' => $cont_counter,
 						'no_request' => $listR['NO_REQUEST'],
-						'kegiatan' => $config['kegiatan'],
+						'kegiatan' => $cekKegiatan->reff_id,
 						'id_user' => $input["user"]->user_id,
 						'status_cont' => $listR['STATUS'],
 						'vvd_id' => $find->rec_vvd_id
