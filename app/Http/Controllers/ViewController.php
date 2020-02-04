@@ -270,6 +270,52 @@ class ViewController extends Controller
       return $data;
     }
 
+    function viewCancelCargo($input) {
+      $type        = $input["type"];
+      $cancel_type = $input["cancelled_type"];
+      $cancel      = DB::connection("omuster")
+                    ->table("TX_HDR_CANCELLED A")
+                    ->join("TX_HDR_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_NO", "=", "A.CANCELLED_REQ_NO")
+                    ->where("A.CANCELLED_TYPE",$cancel_type)
+                    ->where("A.CANCELLED_ID", $input["cancelled_id"])
+                    ->get();
+
+      $newDt["header"] = $cancel;
+
+
+      foreach ($cancel as $value) {
+        if ($type == "rec") {
+          $detail  = DB::connection("omuster")
+          ->table("TX_DTL_CANCELLED A")
+          ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
+          ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
+          ->get();
+        } else {
+          $detail  = DB::connection("omuster")
+          ->table("TX_DTL_CANCELLED A")
+          ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
+          ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
+          ->get();
+        }
+
+        $newDt["detail"][]  = $detail ;
+      }
+
+      if ($type == "rec") {
+        $newDt["file"]    = DB::connection("omuster")
+                          ->table("TX_DOCUMENT")
+                          ->where("REQ_NO", $cancel[0]->rec_cargo_no)
+                          ->get();
+      } else {
+        $newDt["file"]    = DB::connection("omuster")
+                          ->table("TX_DOCUMENT")
+                          ->where("REQ_NO", $cancel[0]->del_cargo_no)
+                          ->get();
+      }
+
+      return $newDt;
+    }
+
     function viewTempUper($input, $request) {
         return UperRequest::viewTempUper($input);
     }

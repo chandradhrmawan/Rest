@@ -212,7 +212,9 @@ class GlobalHelper {
         }
         $result[] = $newDt;
       }
-      return $result;
+
+      $count  = count($result);
+      return ["count"=>$count,"result"=>$result];
     }
 
   public static function index($input) {
@@ -469,7 +471,11 @@ class GlobalHelper {
 
     if (isset($input["leftJoin"])) {
       foreach ($input["leftJoin"] as $list) {
-        $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+        if (isset($list["fieldRaw"])) {
+          $connect->leftJoin(strtoupper($list["table"]), DB::raw($list["fieldRaw"]));
+        } else {
+          $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+        }
       }
     }
 
