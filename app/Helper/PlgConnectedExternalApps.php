@@ -540,8 +540,10 @@ class PlgConnectedExternalApps{
 					];
 					$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 				}
+				$Success = true;
 				$msg = 'Success get realisasion';
 			}else{
+				$Success = false;
 				$msg = 'realisasion not finish';
 			}
 			$res['his_cont'] = $his_cont;
@@ -551,6 +553,7 @@ class PlgConnectedExternalApps{
 					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
 				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
 	        return [
+	        	'Success' => $Success,
 	        	'result' => $msg,
 	        	'no_rec' =>$find->rec_no,
 	        	'hdr' =>$find,
