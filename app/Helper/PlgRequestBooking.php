@@ -503,7 +503,15 @@ class PlgRequestBooking{
 	    public static function confirmRealisasion($input){
 	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 			$config = json_decode($config->api_set, true);
-			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
+			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
+			$find = (array)$find;
+			if ($find[$config['head_status']] == 5) {
+				return [
+					'Success' => false,
+					'result' => "Fail, realisasion is confirmed!",
+					'no_req' => $find[$config['head_no']]
+				];
+			}
 			$pesan = null;
 			if ($find[$config['head_paymethod']] == 2) {
 				// calculate tariff
