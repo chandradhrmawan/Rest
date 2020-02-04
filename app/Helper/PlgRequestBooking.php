@@ -97,6 +97,10 @@ class PlgRequestBooking{
 
 			$newD['DTL_BM_TYPE'] = 'NULL';
 			$DTL_STACK_AREA = 'NULL';
+
+			if ($config['head_table'] == "TX_HDR_DEL") {
+				$DTL_STACK_AREA = '1';
+			}
 					// if (in_array($config['head_nota_id'], ["14", "15", 14, 15])) {
 					// 	$DTL_STACK_AREA = empty($list['dtl_stacking_type_id']) ? 'NULL' : $list['dtl_stacking_type_id'];
 					// }
@@ -108,7 +112,13 @@ class PlgRequestBooking{
 				$newD['DTL_TL'] = empty($list[$config['DTL_TL']]) ? 'NULL' : $list[$config['DTL_TL']];
 			}
 			if (empty($config['DTL_DATE_IN'])) {
-				$newD['DTL_DATE_IN'] = 'NULL';
+				if ($config['head_table'] == "TX_HDR_DEL") {
+					$tglIn 	= DB::connection('omuster')->table('TX_GATEIN')->orderBy("GATEIN_DATE", "DESC")->first();
+					$dateIn = $tglIn->gatein_date;
+					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				} else {
+					$newD['DTL_DATE_IN'] = 'NULL';
+				}
 			}else{
 				$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			}
@@ -247,7 +257,7 @@ class PlgRequestBooking{
 			if ($find[$config['head_status']] == 3) {
 				return ['Success' => false, 'result' => "Fail, requst already send!"];
 			}
-			
+
 			$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
 
 			// build detil
@@ -301,7 +311,7 @@ class PlgRequestBooking{
 
 			// return $tariffResp = BillingEngine::calculateTariff($set_data);
 			$tariffResp = BillingEngine::calculateTariff($set_data);
-			
+
 			$his_cont = [];
 
 			if ($tariffResp['result_flag'] == 'S') {
@@ -606,7 +616,7 @@ class PlgRequestBooking{
 				}else if($getReq[$config['head_paymethod']] == 2) {
 					DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 3 ]);
 				}
-				
+
             	$msg='Success, rejected!';
             }
             return ['result' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
@@ -678,10 +688,10 @@ class PlgRequestBooking{
         	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {
         		return [
-        			'response' => 'Fail, cant send payment invoice', 
-        			'no_pay' => $pay->pay_no, 
-        			'nota_no' => $getNota->nota_no, 
-        			'no_req' => $pay->pay_req_no, 
+        			'response' => 'Fail, cant send payment invoice',
+        			'no_pay' => $pay->pay_no,
+        			'nota_no' => $getNota->nota_no,
+        			'no_req' => $pay->pay_req_no,
         			'sendInvPay' => $sendInvPay
         		];
         	}
