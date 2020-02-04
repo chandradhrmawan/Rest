@@ -553,7 +553,7 @@ class PlgConnectedExternalApps{
 					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
 				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
 	        return [
-	        	'Success' => $Success,
+	        	'response' => $Success,
 	        	'result' => $msg,
 	        	'no_rec' =>$find->rec_no,
 	        	'hdr' =>$find,
