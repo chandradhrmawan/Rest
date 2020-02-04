@@ -483,7 +483,8 @@ class PlgRequestBooking{
 			if ($find[$config['head_paymethod']] == 2) {
 				$migrateTariff = false;
 			}
-			$pesan = '';
+			$pesan = [];
+			$pesan['result'] = null;
 			if ($migrateTariff == true) {
 				$pesan = static::migrateNotaData($find, $config);
 				if ($pesan['Success'] == false) {
@@ -522,7 +523,8 @@ class PlgRequestBooking{
 					'no_req' => $find[$config['head_no']]
 				];
 			}
-			$pesan = null;
+			$pesan = [];
+			$pesan['result'] = null;
 			if ($find[$config['head_paymethod']] == 2) {
 				// calculate tariff
 					$setH = static::calculateTariffBuildHead($find, $input, $config);// build head

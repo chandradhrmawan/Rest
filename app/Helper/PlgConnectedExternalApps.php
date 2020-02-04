@@ -52,11 +52,13 @@ class PlgConnectedExternalApps{
 	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
-	        $nota_no = '';
-	        $nota_date = '';
-	        if (empty($nota)) {
+	        $nota_no = null;
+	        $nota_date = null;
+	        $nota_paid_date = null;
+	        if (!empty($nota)) {
 	        	$nota_no = $nota->nota_no;
 	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
 	        }
 	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
 	          'reff_tr_id' => 5,
@@ -74,7 +76,7 @@ class PlgConnectedExternalApps{
 	            "REQ_MARK": "",
 	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 	            "RECEIVING_DARI": "'.$rec_dr->reff_name.'",
-	            "TANGGAL_LUNAS": "'.date('m/d/Y', strtotime($nota->nota_paid_date)).'",
+	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "DI": ""
 	          },
 	          "arrdetail": ['.$arrdetil.']
