@@ -41,7 +41,7 @@ $app->get('/print/bprp2/{id}'     ,'ViewController@printBprp');
 $app->get('/print/realisasi2/{id}','ViewController@printRealisasi');
 
 // Print NPKS
-$app->get('/print/proformaNpks/{id}','ViewController@proformaNpks');
+$app->get('/print/proformaNPKS/{id}','ViewController@proformaNpks');
 $app->get('/print/notaNpks/{id}','ViewController@notaNpks');
 
 // Export
