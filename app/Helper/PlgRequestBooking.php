@@ -745,7 +745,7 @@ class PlgRequestBooking{
 					'no_container' => $arr['cont_no'],
 					'no_request' => $arr['no_request'],
 					'kegiatan' => $arr['kegiatan'],
-					'id_user' => $arr['is_user'],
+					'id_user' => $arr['id_user'],
 					'status_cont' => $arr['status_cont'],
 					'vvd_id' => $arr['vvd_id'],
 					'counter' => $cekTsCont->cont_counter+1
