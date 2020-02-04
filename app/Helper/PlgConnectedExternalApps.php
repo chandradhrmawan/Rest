@@ -114,7 +114,7 @@ class PlgConnectedExternalApps{
 		      }
 	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
 	          'reff_tr_id' => 5,
-	          'reff_id' => $head[$config['head_from']]
+	          'reff_id' => $head[$arr['config']['head_from']]
 	        ])->first();
 
 					$delivery_date = date("m/d/Y", strtotime($head[$arr['config']['head_date']]));
@@ -122,14 +122,14 @@ class PlgConnectedExternalApps{
 	        return $json_body = '{
 	          "action" : "getDelivery",
 	          "header": {
-	            "REQ_NO": "'.$head[$config['head_no']].'",
-	            "REQ_DELIVERY_DATE": "'.$head[$config['head_date']].'",
+	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+	            "REQ_DELIVERY_DATE": "'.$head[$arr['config']['head_date']].'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
-	            "NM_CONSIGNEE": "'.$head[$config['head_cust_name']].'",
-	            "ALAMAT": "'.$head[$config['head_cust_addr']].'",
+	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
+	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 	            "REQ_MARK": "",
-	            "NPWP": '.$head[$config['head_cust_npwp']].'",
+	            "NPWP": '.$head[$arr['config']['head_cust_npwp']].'",
 	            "DELIVERY_KE": "",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "PERP_DARI": "",
