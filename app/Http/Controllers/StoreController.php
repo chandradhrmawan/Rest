@@ -118,6 +118,9 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+      $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',46)->first();
+      $nota = (array)$nota;
+      return PlgConnectedExternalApps::sendInvProforma(['nota' => $nota]);
       // return PlgRequestBooking::sendRequestPLG(['nota_id' => 1]);
       $arrCon = [
         "kegiatan" => 1,

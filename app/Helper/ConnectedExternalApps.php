@@ -427,7 +427,7 @@ class ConnectedExternalApps{
           }
           if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
           $vparam .= '^'; // OI
-          $vparam .= '^'; // HS_CODE
+          $vparam .= '^HS01'; // HS_CODE
           $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
           if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
 
@@ -538,7 +538,7 @@ class ConnectedExternalApps{
           }
           if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
           $vparam .= '^'; // OI
-          $vparam .= '^'; // HS_CODE
+          $vparam .= '^HS01'; // HS_CODE
           $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
           if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
 

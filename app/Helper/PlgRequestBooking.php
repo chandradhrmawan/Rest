@@ -58,7 +58,9 @@ class PlgRequestBooking{
 					'paysplit' => $setP
 				];
 			// set data
-			return $tariffResp = BillingEngine::calculateTariff($set_data);
+			$tariffResp = BillingEngine::calculateTariff($set_data);
+			$tariffResp['detil_data'] = $detil;
+			return $tariffResp;
 		}
 
 		private static function calculateTariffBuildHead($data, $input, $config){
@@ -175,7 +177,15 @@ class PlgRequestBooking{
 			if (empty($config['DTL_DATE_OUT'])) {
 				$newD['DTL_DATE_OUT'] = 'NULL';
 			}else{
-				$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				if ($hdr[$config['head_table']] == 'TX_HDR_DEL') {
+					if ($hdr[$config['head_paymethod']] == 1 ) {
+						//tx dtl del field gate out
+					}else if ($hdr[$config['head_paymethod']] == 2) {
+						//tx gate out dari realisasi
+					}
+				} else{
+					$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				}
 			}
 			if (empty($config['DTL_DATE_OUT_OLD'])) {
 				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
@@ -320,7 +330,7 @@ class PlgRequestBooking{
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
-				foreach ($detil as $list) {
+				foreach ($tariffResp['detil_data'] as $list) {
 					$list = (array)$list;
 					$findTsCont = [
 						'cont_no' => $list[$config['DTL_BL']],
