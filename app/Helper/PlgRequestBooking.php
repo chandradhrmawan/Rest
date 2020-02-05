@@ -175,7 +175,15 @@ class PlgRequestBooking{
 			if (empty($config['DTL_DATE_OUT'])) {
 				$newD['DTL_DATE_OUT'] = 'NULL';
 			}else{
-				$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				if ($hdr[$config['head_table']] == 'TX_HDR_DEL') {
+					if ($hdr[$config['head_paymethod']] == 1 ) {
+						//tx dtl del field gate out
+					}else if ($hdr[$config['head_paymethod']] == 2) {
+						//tx gate out dari realisasi
+					}
+				} else{
+					$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				}
 			}
 			if (empty($config['DTL_DATE_OUT_OLD'])) {
 				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
