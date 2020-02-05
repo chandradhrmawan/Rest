@@ -12,6 +12,7 @@ use App\Helper\UserAndRoleManagemnt;
 use App\Helper\UperRequest;
 use Dompdf\Dompdf;
 use App\Helper\ConnectedExternalApps;
+use App\Helper\PlgConnectedExternalApps;
 use App\Helper\PlgRequestBooking;
 
 class ViewController extends Controller
@@ -42,6 +43,10 @@ class ViewController extends Controller
       }else{
         return response()->json($response);
       }
+    }
+
+    function getVesselNpks($input, $request){
+      return PlgConnectedExternalApps::getVesselNpks($input);
     }
 
     function splitNota($input, $request){

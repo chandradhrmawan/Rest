@@ -11,10 +11,47 @@ use App\Helper\PlgRequestBooking;
 
 class PlgConnectedExternalApps{
 	// PLG
+		public static function getVesselNpks($input){
+			$json = '
+			{
+				"getVesselNpksRequest": {
+					"esbHeader": {
+						"internalId": "",
+			        	"externalId": "",
+			        	"timestamp": "",
+			        	"responseTimestamp": "",
+			        	"responseCode": "",
+			        	"responseMessage": ""
+						},
+						"esbBody":   {
+							"vessel":"'.$input['query'].'"
+							},
+						"esbSecurity": {
+							"orgId":"",
+							"batchSourceId":"",
+							"lastUpdateLogin":"",
+							"userId":"",
+							"respId":"",
+							"ledgerId":"",
+							"respApplId":"",
+							"batchSourceName":"",
+							"category":""
+						}
+					}
+			}';
+			$json = json_encode(json_decode($json,true));
+			$res = static::sendRequestToExtJsonMet([
+	        	"user" => config('endpoint.esbGetVesselNpks.user'),
+	        	"pass" => config('endpoint.esbGetVesselNpks.pass'), 
+	        	"target" => config('endpoint.esbGetVesselNpks.target'), 
+	        	"json" => $json
+	        ]);
+			return $res;
+		}
+
 		private static function decodeResultAftrSendToTosNPKS($res){
 			$res['request'] = json_decode($res['request']['json'], true);
 	        $res['request'] = json_decode(base64_decode($res['request']['request']),true);
-	        $res['response'] = json_decode($res['response']->getBody()->getContents(), true);
 	        $res['response'] = json_decode(base64_decode($res['response']['result']),true);
 	        return $res;
 		}
@@ -148,6 +185,7 @@ class PlgConnectedExternalApps{
 	          }
 	          return ["Success"=>false, "request" => $options, "response" => $error];
 	        }
+	        $res = json_decode($res->getBody()->getContents(), true);
 	        return ["Success"=>true, "request" => $arr, "response" => $res];
 		}
 
@@ -336,6 +374,8 @@ class PlgConnectedExternalApps{
 			        }
 			    }
 			}';
+			// return json_decode($json, true);
+			$json = json_encode(json_decode($json, true));
 			$res = static::sendRequestToExtJsonMet([
 	        	"user" => config('endpoint.esbPutInvoice.user'),
 	        	"pass" => config('endpoint.esbPutInvoice.pass'), 
