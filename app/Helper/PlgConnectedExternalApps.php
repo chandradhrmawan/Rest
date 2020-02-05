@@ -573,7 +573,7 @@ class PlgConnectedExternalApps{
 						'branch_code' => $find->rec_branch_code
 					];
 					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-					$cont_counter = $cekTsCont->cont_counter+1;
+					$cont_counter = $cekTsCont->cont_counter+1; //kusus gate in
 					$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
 						"reff_tr_id" => 12,
 						"reff_name" => 'GATE IN'
@@ -614,6 +614,143 @@ class PlgConnectedExternalApps{
 	        	'dtl' => $dtl,
 	        	'getRealRecPLG' => $res
 	        ];
+		}
+
+		public static function getRealDelPLG($input){
+			$find 				= DB::connection('omuster')->table('TX_HDR_DEL')->where('DEL_ID', $input['del_id'])->first();
+			$dtlLoop 			= DB::connection('omuster')->table('TX_DTL_DEL')->where('DEL_HDR_ID', $input['del_id'])->where('DEL_DTL_ISACTIVE','Y')->get();
+			$dtl 					= '';
+			$arrdtl 			= [];
+
+			foreach ($dtlLoop as $list) {
+				$dtl .= '
+				{
+					"NO_CONTAINER"	: "'.$list->del_dtl_cont.'",
+					"NO_REQUEST"		: "'.$find->del_no.'",
+					"BRANCH_ID"			: "'.$find->del_branch_id.'"
+				},';
+				$arrdtlset = [
+					"NO_CONTAINER" 	=> $list->del_dtl_cont,
+					"NO_REQUEST"	  => $find->del_no,
+					"BRANCH_ID" 		=> $find->del_branch_id
+				];
+				$arrdtl[]  = $arrdtlset;
+			}
+
+			$head = [
+				"action" 	=> "generateGetOut",
+				"data" 		=> $arrdtl
+			];
+
+		  $dtl 	= substr($dtl, 0,-1);
+			$json = '
+			{
+				"action" : "generateGetOut",
+				"data": ['.$dtl.']
+			}';
+
+			$arr = [
+	        	"user" 		=> config('endpoint.tosGetPLG.user'),
+	        	"pass" 		=> config('endpoint.tosGetPLG.pass'),
+	        	"target" 	=> config('endpoint.tosGetPLG.target'),
+	        	"json" 		=> '{ "request" : "'.base64_encode(json_encode(json_decode($json,true))).'"}'
+	        ];
+
+			$res 			= static::sendRequestToExtJsonMet($arr);
+			$res	 		= static::decodeResultAftrSendToTosNPKS($res);
+			$his_cont = [];
+			if ($res['response']['count'] > 0) {
+				foreach ($res['response']['result'] as $listR) {
+					$findGATO = [
+						'GATEOUT_CONT' 					=> $listR['NO_CONTAINER'],
+						'GATEOUT_REQ_NO' 				=> $listR['NO_REQUEST'],
+						'GATEOUT_BRANCH_ID' 		=> $find->del_branch_id,
+						'GATEOUT_BRANCH_CODE' 	=> $find->del_branch_code
+					];
+
+
+					$cek 				= DB::connection('omuster')->table('TX_GATEOUT')->where($findGATO)->first();
+					$datenow    = Carbon::now()->format('Y-m-d');
+					$storeGATO  = [
+						"gateout_cont" 			 	=> $listR['NO_CONTAINER'],
+						"gateout_req_no" 		 	=> $listR['NO_REQUEST'],
+						"gateout_pol_no" 		 	=> $listR['NOPOL'],
+						"gateout_cont_status" => $listR['STATUS'],
+						// "gateout_seal_no" => $listR[''],
+						// "gateout_trucking" => $listR[''],
+						// "gateout_yard" => $listR[''],
+						// "gateout_mark" => $listR[''],
+						"gateout_date" 				=> date('Y-m-d', strtotime($listR['TGL_OUT'])),
+						"gateout_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
+						"gateout_create_by" 	=> $input['user']->user_id,
+						"gateout_branch_id" 	=> $find->del_branch_id,
+						"gateout_branch_code" => $find->del_branch_code
+					];
+
+
+					if (empty($cek)) {
+						DB::connection('omuster')->table('TX_GATEOUT')->insert($storeGATO);
+					} else {
+						DB::connection('omuster')->table('TX_GATEOUT')->where($findGATO)->update($storeGATO);
+					}
+
+					$findTsCont = [
+						'cont_no' 			=> $listR['NO_CONTAINER'],
+						'branch_id' 		=> $find->del_branch_id,
+						'branch_code' 	=> $find->del_branch_code
+					];
+
+
+					$cekTsCont 				= DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+					$cont_counter 		= $cekTsCont->cont_counter;
+
+					$cekKegiatan 			= DB::connection('omuster')->table('TM_REFF')->where([
+						"reff_tr_id" 		=> 12,
+						"reff_name" 		=> 'GATE OUT'
+					])->first();
+
+
+					$arrStoreTsContAndTxHisCont = [
+						'cont_no' 			=> $listR['NO_CONTAINER'],
+						'branch_id'			=> $find->del_branch_id,
+						'branch_code' 	=> $find->del_branch_code,
+						'cont_location' => 'GATO',
+						'cont_size' 		=> null,
+						'cont_type' 		=> null,
+						'cont_counter'  => $cont_counter,
+						'no_request' 		=> $listR['NO_REQUEST'],
+						'kegiatan' 			=> $cekKegiatan->reff_id,
+						'id_user' 			=> $input["user"]->user_id,
+						'status_cont' 	=> $listR['STATUS'],
+						'vvd_id' 				=> $find->del_vvd_id
+					];
+
+					$his_cont[] 			= PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+				}
+
+				$Success = true;
+				$msg 		 = 'Success get realisasion';
+
+			} else {
+				$Success = false;
+				$msg 		 = 'realisasion not finish';
+			}
+
+			$res['his_cont'] = $his_cont;
+			$dtl 						 = DB::connection('omuster')->table('TX_DTL_DEL')
+												->leftJoin('TX_GATEOUT', function($join) use ($find){
+													$join->on('TX_GATEOUT.gateout_cont', '=', 'TX_DTL_DEL.del_dtl_cont');
+													$join->on('TX_GATEOUT.gateout_req_no', '=', DB::raw("'".$find->del_no."'"));
+												})
+												->where('DEL_HDR_ID', $input['del_id'])->where('DEL_DTL_ISACTIVE','Y')->get();
+      return [
+      	'response' 		 => $Success,
+      	'result' 			 => $msg,
+      	'no_del' 			 => $find->del_no,
+      	'hdr' 				 => $find,
+      	'dtl' 				 => $dtl,
+      	'getRealRecPLG'=> $res
+      ];
 		}
 	// PLG
 }
