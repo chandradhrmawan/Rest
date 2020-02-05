@@ -312,7 +312,7 @@ class PlgRequestBooking{
 			}
 
 			$tariffResp = static::calculateTariffBuild($find, $input, $config);
-			
+
 			$his_cont = [];
 			if (empty($tariffResp['result_flag']) or $tariffResp['result_flag'] != 'S') {
 				return $tariffResp;
