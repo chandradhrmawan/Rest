@@ -42,8 +42,8 @@ class PlgConnectedExternalApps{
 			$json = json_encode(json_decode($json,true));
 			$res = static::sendRequestToExtJsonMet([
 	        	"user" => config('endpoint.esbGetVesselNpks.user'),
-	        	"pass" => config('endpoint.esbGetVesselNpks.pass'), 
-	        	"target" => config('endpoint.esbGetVesselNpks.target'), 
+	        	"pass" => config('endpoint.esbGetVesselNpks.pass'),
+	        	"target" => config('endpoint.esbGetVesselNpks.target'),
 	        	"json" => $json
 	        ]);
 			return $res;
@@ -166,7 +166,7 @@ class PlgConnectedExternalApps{
 	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
 	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 	            "REQ_MARK": "",
-	            "NPWP": '.$head[$arr['config']['head_cust_npwp']].'",
+	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 	            "DELIVERY_KE": "",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "PERP_DARI": "",
