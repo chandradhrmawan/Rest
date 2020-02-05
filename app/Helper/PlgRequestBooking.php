@@ -744,9 +744,9 @@ class PlgRequestBooking{
 					// 'why' => $list[$config['DTL_BL']], ?
 					// 'aktif' => $list[$config['DTL_BL']], ?
 				];
-				$TxHis = DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeTxHisCont);
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeTxHisCont);
 			// history container
-			return ['storeTsCont' => $cekTsCont, 'storeTxHisCont'=>$TxHis];
+			return ['storeTsCont' => $cekTsCont, 'storeTxHisCont'=>$storeTxHisCont];
 	    }
 	// PLG
 }
