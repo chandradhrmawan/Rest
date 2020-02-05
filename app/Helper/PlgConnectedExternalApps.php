@@ -46,7 +46,36 @@ class PlgConnectedExternalApps{
 	        	"target" => config('endpoint.esbGetVesselNpks.target'),
 	        	"json" => $json
 	        ]);
-			return $res;
+			$vesel = $res['response']['getVesselNpksResponse']['esbBody']['results'];
+
+			$result = [];
+			foreach ($vesel as $query) {
+				$query = (object)$query;
+				$result[] = [
+					'vessel' => $query->vessel,
+					'voyageIn' => $query->voyageIn,
+					'voyageOut' => $query->voyageOut,
+					'ata' => (empty($query->ata)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->ata)->format('Y-m-d H:i'),
+					'atd' => (empty($query->atd)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atd)->format('Y-m-d H:i'),
+					'atb' => (empty($query->atb)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atb)->format('Y-m-d H:i'),
+					'eta' => (empty($query->eta)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->eta)->format('Y-m-d H:i'),
+					'etd' => (empty($query->etd)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etd)->format('Y-m-d H:i'),
+					'etb' => (empty($query->etb)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etb)->format('Y-m-d H:i'),
+					'openStack' => (empty($query->openStack)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->openStack)->format('Y-m-d H:i'),
+					'closingTime' => (empty($query->closingTime)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTime)->format('Y-m-d H:i'),
+					'closingTimeDoc' => (empty($query->closingTimeDoc)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTimeDoc)->format('Y-m-d H:i'),
+					'voyage' => $query->voyage,
+					'idUkkSimop' => (empty($query->idUkkSimop)) ? null : $query->idUkkSimop,
+					'idKade' => (empty($query->idKade)) ? null : $query->idKade,
+					'kadeName' => (empty($query->kadeName)) ? null : $query->kadeName,
+					'terminalCode' => (empty($query->terminalCode)) ? null : $query->idKade,
+					'ibisTerminalCode' => (empty($query->ibisTerminalCode)) ? null : $query->idKade,
+					'active' => (empty($query->active)) ? null : $query->idKade,
+					'idVsbVoyage' => $query->idVsbVoyage,
+					'vesselCode'=> $query->vesselCode
+				];
+			}
+			return ["result"=>$result, "count"=>count($result)];
 		}
 
 		private static function decodeResultAftrSendToTosNPKS($res){
