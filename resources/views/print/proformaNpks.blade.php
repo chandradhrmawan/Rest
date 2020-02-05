@@ -125,49 +125,25 @@
 <?php if ($penumpukan != "0") { ?>
 	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 		<tr style="text-align:center">
-			<th width="15%">NO SI</th>
-			<th width="15%">Kemasan</th>
-			<th width="15%">BARANG</th>
-			<th width="5%">Qty</th>
-			<th width="15%">Tgl Masuk<br>Tgl Keluar<br>Jml Hari</th>
-			<th width="15%">Hari Masa 1 <br> Hari Masa 2</th>
-			<th width="15%">Tarif Masa 1<br>Tarif Masa 2</th>
-			<th width="15%">Sewa Masa 1<br>Sewa Masa 2</th>
-			<th width="10%">Jumlah</th>
+			<th width="5%">No SI</th>
+			<th width="25%">Layanan</th>
+			<th width="10%">Kemasan</th>
+			<th width="10%">BARANG</th>
+			<th width="15%">Kontainer</th>
+			<th width="15%" colspan="2">Jumlah</th>
 		</tr>
 		<?php
 			$no = 0;
 		 ?>
 		@foreach($penumpukan as $penumpukan)
 		<tr>
-			<td style="padding-left:9px">{{$penumpukan["dtl_bl"]}}</td>
-			<td style="padding-left:9px">{{$penumpukan["dtl_package"]}}</td>
-			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
-			<td style="text-align:center">
-				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar("BPRP", $header->nota_req_no, $no)}}
-			</td>
-			<td style="text-align:center">
-				<?php if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
-				<?php if(!empty($penumpukan["masa2"])) { echo $penumpukan["masa2"]; } else { echo "0"; } ?>
-			</td>
-			<td style="text-align:right">
-				<?php if(!empty($penumpukan["trf1up"])) { echo number_format($penumpukan["trf1up"]); } else { echo "0"; } ?><br>
-				<?php if(!empty($penumpukan["trf2up"])) { echo number_format($penumpukan["trf2up"]); } else { echo "0"; } ?>
-			</td>
-			<td style="text-align:right">
-				<?php
-					$sewa1 = $penumpukan["masa1"]*$penumpukan["trf1up"]*$penumpukan["dtl_qty"];
-					echo number_format($sewa1)."<br>";
-				 ?>
-				 <?php
-	 				$sewa2 = $penumpukan["masa2"]*$penumpukan["trf2up"]*$penumpukan["dtl_qty"];
-	 				echo number_format($sewa2);
-					$no++;
-					$dpp = $sewa1+$sewa2;
-	 			 ?>
-			 </td>
-			<td style="text-align:right"><?php echo number_format($penumpukan["dtl_dpp"]); ?></td>
+			<td>{{$penumpukan["dtl_bl"]}}</td>
+			<td>{{$penumpukan["dtl_group_tariff_name"]}}</td>
+			<td>{{$penumpukan["dtl_package"]}}<</td>
+			<td>{{$penumpukan["dtl_commodity"]}}</td>
+			<td style="text-align:center">{{$penumpukan["dtl_cont_size"]}}/{{$penumpukan["dtl_cont_type"]}}/{{$penumpukan["dtl_cont_status"]}}</td>
+			<td width="1%" style="border-right:0px">Rp</td>
+			<td width="10%" style="text-align:right;border-left:0px">{{number_format($penumpukan["dtl_amount"])}}</td>
 		</tr>
 		@endforeach
 	</table>

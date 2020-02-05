@@ -1679,7 +1679,23 @@ class ViewController extends Controller
     $payAmount   = 100000;
     $total       = $notaAmount - $payAmount;
     $terbilang   = $this->terbilang($total);
-    $html        = view('print.proformaNpks',["total"=>$total,"uper"=>$uper, "bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat,"terbilang"=>$terbilang]);
+
+    // return $penumpukan;
+
+    $html        = view('print.proformaNpks',
+                        [
+                          "total"=>$total,
+                          "uper"=>$uper,
+                          "bl"=>$bl,
+                          "branch"=>$branch,
+                          "header"=>$header,
+                          "penumpukan"=>$penumpukan,
+                          "label"=>$nota,
+                          "handling"=>$handling,
+                          "alat"=>$alat,
+                          "terbilang"=>$terbilang
+                        ]);
+
     $filename    = $all["header"][0]->nota_no.rand(10,100000);
     $dompdf      = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);

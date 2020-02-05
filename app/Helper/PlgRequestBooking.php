@@ -471,43 +471,42 @@ class PlgRequestBooking{
 				return ['result' => "Fail, requst not found!", "Success" => false];
 			}
 			$find = (array)$find[0];
-			if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
-				return ['result' => "Fail, requst already approved!", 'no_req' => $find[$config['head_no']], "Success" => false];
-			}
-			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [4])->get();
-			if (count($nota) > 0) {
-				return ['result' => "Fail, request already exist on proforma!", 'no_req' => $find[$config['head_no']], "Success" => false];
-			}
-			if ($input['approved'] == 'false') {
-				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
-					$config['head_status'] => 4,
-					$config['head_mark'] => $input['msg']
-				]);
-				return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
-			}
-
-			$migrateTariff = true;
+			// if ($find[$config['head_status']] == 3 and $input['approved'] == 'true') {
+			// 	return ['result' => "Fail, requst already approved!", 'no_req' => $find[$config['head_no']], "Success" => false];
+			// }
+			// $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$find[$config['head_no']])->whereNotIn('nota_status', [4])->get();
+			// if (count($nota) > 0) {
+			// 	return ['result' => "Fail, request already exist on proforma!", 'no_req' => $find[$config['head_no']], "Success" => false];
+			// }
+			// if ($input['approved'] == 'false') {
+			// 	DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
+			// 		$config['head_status'] => 4,
+			// 		$config['head_mark'] => $input['msg']
+			// 	]);
+			// 	return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
+			// }
+			//
+			// $migrateTariff = true;
+			// if ($find[$config['head_paymethod']] == 2) {
+			// 	$migrateTariff = false;
+			// }
+			// $pesan = [];
+			// $pesan['result'] = null;
+			// if ($migrateTariff == true) {
+			// 	$pesan = static::migrateNotaData($find, $config);
+			// 	if ($pesan['Success'] == false) {
+			// 		return $pesan;
+			// 	}
+			// }
+			//
+			// DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
+			// 	$config['head_status'] => 3,
+			// 	$config['head_mark'] => $input['msg']
+			// ]);
+			//
+			// $sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {
-				$migrateTariff = false;
-			}
-			$pesan = [];
-			$pesan['result'] = null;
-			if ($migrateTariff == true) {
-				$pesan = static::migrateNotaData($find, $config);
-				if ($pesan['Success'] == false) {
-					return $pesan;
-				}
-			}
-
-			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
-				$config['head_status'] => 3,
-				$config['head_mark'] => $input['msg']
-			]);
-
-			$sendRequestBooking = null;
-
-			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
+				return $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
 			}
 
 			return [
