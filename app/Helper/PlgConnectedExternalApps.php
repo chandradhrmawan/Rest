@@ -201,7 +201,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function sendInvProforma($arr){
-			return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
+			// return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
 			$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 			if (count($branch) == 0) {
 				return ['Success' =>false, 'response' => 'branch not found!'];
@@ -385,7 +385,7 @@ class PlgConnectedExternalApps{
 			        }
 			    }
 			}';
-			// return json_decode($json, true);
+			return json_decode($json, true);
 			$json = json_encode(json_decode($json, true));
 			$res = static::sendRequestToExtJsonMet([
 	        	"user" => config('endpoint.esbPutInvoice.user'),

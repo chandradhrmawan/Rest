@@ -11,6 +11,56 @@ use App\Models\OmUster\TxPayment;
 
 class PlgRequestBooking{
 	// PLG
+		public static function calculateTariffBuild($find, $input, $config){
+			$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
+			// build detil
+				$setD = [];
+				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
+				foreach ($detil as $list) {
+					$list = (array)$list;
+					$setD[] = static::calculateTariffBuildDetail($find, $list, $input, $config);
+				}
+			// build detil
+			// build eqpt
+				$setE = [];
+				// $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find[$config['head_no']])->get();
+				// foreach ($eqpt as $list) {
+				// 	$newE = [];
+				// 	$list = (array)$list;
+				// 	$newE['EQ_TYPE'] = empty($list['eq_type_id']) ? 'NULL' : $list['eq_type_id'];
+				// 	$newE['EQ_QTY'] = empty($list['eq_qty']) ? 'NULL' : $list['eq_qty'];
+				// 	$newE['EQ_UNIT_ID'] = empty($list['eq_unit_id']) ? 'NULL' : $list['eq_unit_id'];
+				// 	$newE['EQ_GTRF_ID'] = empty($list['group_tariff_id']) ? 'NULL' : $list['group_tariff_id'];
+				// 	$newE['EQ_PKG_ID'] = empty($list['package_id']) ? 'NULL' : $list['package_id'];
+				// 	$newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
+				// 	$setE[] = $newE;
+				// }
+			// build eqpt
+			// build paysplit
+				$setP = [];
+				// if ($find[$config['head_split']] == 'Y') {
+				// 	$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
+				// 	$paysplit = (array)$paysplit;
+				// 	foreach ($paysplit as $list) {
+				// 		$newP = [];
+				// 		$list = (array)$list;
+				// 		$newP['PS_CUST_ID'] = $list['cust_id'];
+				// 		$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
+				// 		$setP[] = $newP;
+				// 	}
+				// }
+			// build paysplit
+			// set data
+				$set_data = [
+					'head' => $setH,
+					'detil' => $setD,
+					'eqpt' => $setE,
+					'paysplit' => $setP
+				];
+			// set data
+			return $tariffResp = BillingEngine::calculateTariff($set_data);
+		}
+
 		private static function calculateTariffBuildHead($data, $input, $config){
 			$result = [];
 			$result['P_SOURCE_ID'] = "NPKS_BILLING";
@@ -261,63 +311,12 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result' => "Fail, requst already send!"];
 			}
 
-			$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
-
-			// build detil
-				$setD = [];
-				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
-				foreach ($detil as $list) {
-					$list = (array)$list;
-					$setD[] = static::calculateTariffBuildDetail($find, $list, $input, $config);
-				}
-			// build detil
-
-			// build eqpt
-				$setE = [];
-				// $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find[$config['head_no']])->get();
-				// foreach ($eqpt as $list) {
-				// 	$newE = [];
-				// 	$list = (array)$list;
-				// 	$newE['EQ_TYPE'] = empty($list['eq_type_id']) ? 'NULL' : $list['eq_type_id'];
-				// 	$newE['EQ_QTY'] = empty($list['eq_qty']) ? 'NULL' : $list['eq_qty'];
-				// 	$newE['EQ_UNIT_ID'] = empty($list['eq_unit_id']) ? 'NULL' : $list['eq_unit_id'];
-				// 	$newE['EQ_GTRF_ID'] = empty($list['group_tariff_id']) ? 'NULL' : $list['group_tariff_id'];
-				// 	$newE['EQ_PKG_ID'] = empty($list['package_id']) ? 'NULL' : $list['package_id'];
-				// 	$newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
-				// 	$setE[] = $newE;
-				// }
-			// build eqpt
-
-			// build paysplit
-				$setP = [];
-				// if ($find[$config['head_split']] == 'Y') {
-				// 	$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
-				// 	$paysplit = (array)$paysplit;
-				// 	foreach ($paysplit as $list) {
-				// 		$newP = [];
-				// 		$list = (array)$list;
-				// 		$newP['PS_CUST_ID'] = $list['cust_id'];
-				// 		$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
-				// 		$setP[] = $newP;
-				// 	}
-				// }
-			// build paysplit
-
-			// set data
-				$set_data = [
-					'head' => $setH,
-					'detil' => $setD,
-					'eqpt' => $setE,
-					'paysplit' => $setP
-				];
-			// set data
-
-			// return $tariffResp = BillingEngine::calculateTariff($set_data);
-			$tariffResp = BillingEngine::calculateTariff($set_data);
-
+			$tariffResp = static::calculateTariffBuild($find, $input, $config);
+			
 			$his_cont = [];
-
-			if ($tariffResp['result_flag'] == 'S') {
+			if (empty($tariffResp['result_flag']) or $tariffResp['result_flag'] != 'S') {
+				return $tariffResp;
+			} else if ($tariffResp['result_flag'] == 'S') {
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
@@ -527,53 +526,7 @@ class PlgRequestBooking{
 			$pesan['result'] = null;
 			if ($find[$config['head_paymethod']] == 2) {
 				// calculate tariff
-					$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
-					// build detil
-						$setD = [];
-						$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
-						foreach ($detil as $list) {
-							$list = (array)$list;
-							$setD[] = static::calculateTariffBuildDetail($find, $list, $input, $config);
-						}
-					// build detil
-					// build eqpt
-						$setE = [];
-						// $eqpt = DB::connection('omcargo')->table('TX_EQUIPMENT')->where('req_no', $find[$config['head_no']])->get();
-						// foreach ($eqpt as $list) {
-						// 	$newE = [];
-						// 	$list = (array)$list;
-						// 	$newE['EQ_TYPE'] = empty($list['eq_type_id']) ? 'NULL' : $list['eq_type_id'];
-						// 	$newE['EQ_QTY'] = empty($list['eq_qty']) ? 'NULL' : $list['eq_qty'];
-						// 	$newE['EQ_UNIT_ID'] = empty($list['eq_unit_id']) ? 'NULL' : $list['eq_unit_id'];
-						// 	$newE['EQ_GTRF_ID'] = empty($list['group_tariff_id']) ? 'NULL' : $list['group_tariff_id'];
-						// 	$newE['EQ_PKG_ID'] = empty($list['package_id']) ? 'NULL' : $list['package_id'];
-						// 	$newE['EQ_QTY_PKG'] = empty($list['unit_qty']) ? 'NULL' : $list['unit_qty'];
-						// 	$setE[] = $newE;
-						// }
-					// build eqpt
-					// build paysplit
-						$setP = [];
-						// if ($find[$config['head_split']] == 'Y') {
-						// 	$paysplit = DB::connection('omcargo')->table('TX_SPLIT_NOTA')->where('req_no', $find[$config['head_no']])->get();
-						// 	$paysplit = (array)$paysplit;
-						// 	foreach ($paysplit as $list) {
-						// 		$newP = [];
-						// 		$list = (array)$list;
-						// 		$newP['PS_CUST_ID'] = $list['cust_id'];
-						// 		$newP['PS_GTRF_ID'] = $list['group_tarif_id'];
-						// 		$setP[] = $newP;
-						// 	}
-						// }
-					// build paysplit
-					// set data
-						$set_data = [
-							'head' => $setH,
-							'detil' => $setD,
-							'eqpt' => $setE,
-							'paysplit' => $setP
-						];
-					// set data
-					$tariffResp = BillingEngine::calculateTariff($set_data);
+					$tariffResp = static::calculateTariffBuild($find, $input, $config);
 					if ($tariffResp['result_flag'] != 'S') {
 						return $tariffResp;
 					}
