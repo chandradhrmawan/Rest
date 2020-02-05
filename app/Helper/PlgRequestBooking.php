@@ -58,7 +58,9 @@ class PlgRequestBooking{
 					'paysplit' => $setP
 				];
 			// set data
-			return $tariffResp = BillingEngine::calculateTariff($set_data);
+			$tariffResp = BillingEngine::calculateTariff($set_data);
+			$tariffResp['detil_data'] = $detil;
+			return $tariffResp;
 		}
 
 		private static function calculateTariffBuildHead($data, $input, $config){
@@ -328,7 +330,7 @@ class PlgRequestBooking{
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
-				foreach ($detil as $list) {
+				foreach ($tariffResp['detil_data'] as $list) {
 					$list = (array)$list;
 					$findTsCont = [
 						'cont_no' => $list[$config['DTL_BL']],
