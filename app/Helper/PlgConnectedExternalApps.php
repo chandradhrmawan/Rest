@@ -11,6 +11,40 @@ use App\Helper\PlgRequestBooking;
 
 class PlgConnectedExternalApps{
 	// PLG
+
+		public static function sendRequestToExtJsonMet($arr){
+	        $client = new Client();
+	        $options= array(
+	          'auth' => [
+	            $arr['user'],
+	            $arr['pass']
+	          ],
+	          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+	          'body' => $arr['json'],
+	          "debug" => false
+	        );
+			try {
+	          $res = $client->post($arr['target'], $options);
+	        } catch (ClientException $e) {
+	          $error = $e->getRequest() . "\n";
+	          if ($e->hasResponse()) {
+	            $error .= $e->getResponse() . "\n";
+	          }
+	          return ["Success"=>false, "request" => $options, "response" => $error];
+	        }
+	        $res = json_decode($res->getBody()->getContents(), true);
+	        return ["Success"=>true, "request" => $arr, "response" => $res];
+		}
+
+		private static function decodeResultAftrSendToTosNPKS($res, $type){
+			$res['request']['json'] = json_decode($res['request']['json'], true);
+			$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
+	        $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
+	        $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
+	        $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
+	        return $res;
+		}
+
 		public static function getVesselNpks($input){
 			$json = '
 			{
@@ -77,16 +111,7 @@ class PlgConnectedExternalApps{
 			}
 			return ["result"=>$result, "count"=>count($result)];
 		}
-
-		private static function decodeResultAftrSendToTosNPKS($res, $type){
-			$res['request']['json'] = json_decode($res['request']['json'], true);
-			$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
-	        $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
-	        $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
-	        $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
-	        return $res;
-		}
-
+		
 	    public static function sendRequestBookingPLG($arr){
 	    	if (!in_array($arr['config']['head_table'], ['TX_HDR_REC','TX_HDR_DEL'])) {
 	    		$res = [
@@ -241,30 +266,6 @@ class PlgConnectedExternalApps{
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
-		}
-
-		public static function sendRequestToExtJsonMet($arr){
-	        $client = new Client();
-	        $options= array(
-	          'auth' => [
-	            $arr['user'],
-	            $arr['pass']
-	          ],
-	          'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-	          'body' => $arr['json'],
-	          "debug" => false
-	        );
-			try {
-	          $res = $client->post($arr['target'], $options);
-	        } catch (ClientException $e) {
-	          $error = $e->getRequest() . "\n";
-	          if ($e->hasResponse()) {
-	            $error .= $e->getResponse() . "\n";
-	          }
-	          return ["Success"=>false, "request" => $options, "response" => $error];
-	        }
-	        $res = json_decode($res->getBody()->getContents(), true);
-	        return ["Success"=>true, "request" => $arr, "response" => $res];
 		}
 
 		public static function sendInvProforma($arr){
@@ -569,6 +570,33 @@ class PlgConnectedExternalApps{
 		public static function getRealRecPLG($input){
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+			$res = static::getRecGATI($find,$dtlLoop);
+			$his_cont = [];
+			if ($res['result']['count'] > 0) {
+				$his_cont = static::storeRecGATI($res['result']['result'], $find);
+				$Success = true;
+				$msg = 'Success get realisasion';
+			}else{
+				$Success = false;
+				$msg = 'realisasion not finish';
+			}
+			$res['his_cont'] = $his_cont;
+			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
+				->leftJoin('TX_GATEIN', function($join) use ($find){
+					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
+					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
+				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+	        return [
+	        	'response' => $Success,
+	        	'result' => $msg,
+	        	'no_rec' =>$find->rec_no,
+	        	'hdr' =>$find,
+	        	'dtl' => $dtl,
+	        	'getRealRecPLG' => $res
+	        ];
+		}
+
+		public static function getRecGATI($find,$dtlLoop){
 			$dtl = '';
 			$arrdtl = [];
 			foreach ($dtlLoop as $list) {
@@ -596,7 +624,6 @@ class PlgConnectedExternalApps{
 				"data": ['.$dtl.']
 			}';
 			$json = base64_encode(json_encode(json_decode($json,true)));
-			// $json = '{ "request" : "'.$json.'"}';
 			$json = '
 				{
 				    "repoGetRequest": {
@@ -624,7 +651,7 @@ class PlgConnectedExternalApps{
 				    }
 				}
 	        ';
-	    $json = json_encode(json_decode($json,true));
+	        $json = json_encode(json_decode($json,true));
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
@@ -632,85 +659,68 @@ class PlgConnectedExternalApps{
 	        	"json" => $json
 	        ];
 			$res = static::sendRequestToExtJsonMet($arr);
-			$res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+			return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		}
+
+		public static function storeRecGATI($data,$hdr){
 			$his_cont = [];
-			if ($res['result']['count'] > 0) {
-				foreach ($res['result']['result'] as $listR) {
-					$findGATI = [
-						'GATEIN_CONT' => $listR['NO_CONTAINER'],
-						'GATEIN_REQ_NO' => $listR['NO_REQUEST'],
-						'GATEIN_BRANCH_ID' => $find->rec_branch_id,
-						'GATEIN_BRANCH_CODE' => $find->rec_branch_code
-					];
-					$cek = DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->first();
-					$datenow    = Carbon::now()->format('Y-m-d');
-					$storeGATI = [
-						"gatein_cont" => $listR['NO_CONTAINER'],
-						"gatein_req_no" => $listR['NO_REQUEST'],
-						"gatein_pol_no" => $listR['NOPOL'],
-						"gatein_cont_status" => $listR['STATUS'],
+			foreach ($data as $listR) {
+				$findGATI = [
+					'GATEIN_CONT' => $listR['NO_CONTAINER'],
+					'GATEIN_REQ_NO' => $listR['NO_REQUEST'],
+					'GATEIN_BRANCH_ID' => $hdr->rec_branch_id,
+					'GATEIN_BRANCH_CODE' => $hdr->rec_branch_code
+				];
+				$cek = DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->first();
+				$datenow    = Carbon::now()->format('Y-m-d');
+				$storeGATI = [
+					"gatein_cont" => $listR['NO_CONTAINER'],
+					"gatein_req_no" => $listR['NO_REQUEST'],
+					"gatein_pol_no" => $listR['NOPOL'],
+					"gatein_cont_status" => $listR['STATUS'],
 						// "gatein_seal_no" => $listR[''],
 						// "gatein_trucking" => $listR[''],
 						// "gatein_yard" => $listR[''],
 						// "gatein_mark" => $listR[''],
-						"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
-						"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
-						"gatein_create_by" => $input['user']->user_id,
-						"gatein_branch_id" => $find->rec_branch_id,
-						"gatein_branch_code" => $find->rec_branch_code
-					];
-					if (empty($cek)) {
-						DB::connection('omuster')->table('TX_GATEIN')->insert($storeGATI);
-					}else{
-						DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
-					}
-					$findTsCont = [
-						'cont_no' => $listR['NO_CONTAINER'],
-						'branch_id' => $find->rec_branch_id,
-						'branch_code' => $find->rec_branch_code
-					];
-					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-					$cont_counter = $cekTsCont->cont_counter+1; //kusus gate in
-					$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
-						"reff_tr_id" => 12,
-						"reff_name" => 'GATE IN'
-					])->first();
-					$arrStoreTsContAndTxHisCont = [
-						'cont_no' => $listR['NO_CONTAINER'],
-						'branch_id' => $find->rec_branch_id,
-						'branch_code' => $find->rec_branch_code,
-						'cont_location' => 'GATI',
-						'cont_size' => null,
-						'cont_type' => null,
-						'cont_counter' => $cont_counter,
-						'no_request' => $listR['NO_REQUEST'],
-						'kegiatan' => $cekKegiatan->reff_id,
-						'id_user' => $input["user"]->user_id,
-						'status_cont' => $listR['STATUS'],
-						'vvd_id' => $find->rec_vvd_id
-					];
-					$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+					"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
+					"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
+					"gatein_create_by" => $input['user']->user_id,
+					"gatein_branch_id" => $hdr->rec_branch_id,
+					"gatein_branch_code" => $hdr->rec_branch_code
+				];
+				if (empty($cek)) {
+					DB::connection('omuster')->table('TX_GATEIN')->insert($storeGATI);
+				}else{
+					DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
 				}
-				$Success = true;
-				$msg = 'Success get realisasion';
-			}else{
-				$Success = false;
-				$msg = 'realisasion not finish';
+				$findTsCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->rec_branch_id,
+					'branch_code' => $hdr->rec_branch_code
+				];
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+				$cont_counter = $cekTsCont->cont_counter+1; //kusus gate in
+				$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
+					"reff_tr_id" => 12,
+					"reff_name" => 'GATE IN'
+				])->first();
+				$arrStoreTsContAndTxHisCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->rec_branch_id,
+					'branch_code' => $hdr->rec_branch_code,
+					'cont_location' => 'GATI',
+					'cont_size' => null,
+					'cont_type' => null,
+					'cont_counter' => $cont_counter,
+					'no_request' => $listR['NO_REQUEST'],
+					'kegiatan' => $cekKegiatan->reff_id,
+					'id_user' => $input["user"]->user_id,
+					'status_cont' => $listR['STATUS'],
+					'vvd_id' => $hdr->rec_vvd_id
+				];
+				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 			}
-			$res['his_cont'] = $his_cont;
-			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
-				->leftJoin('TX_GATEIN', function($join) use ($find){
-					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
-					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
-				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
-	        return [
-	        	'response' => $Success,
-	        	'result' => $msg,
-	        	'no_rec' =>$find->rec_no,
-	        	'hdr' =>$find,
-	        	'dtl' => $dtl,
-	        	'getRealRecPLG' => $res
-	        ];
+			return $his_cont;
 		}
 
 		public static function getRealDelPLG($input){
@@ -774,7 +784,7 @@ class PlgConnectedExternalApps{
 				    }
 				}
 	        ';
-	    $json = json_encode(json_decode($json,true));
+		    $json = json_encode(json_decode($json,true));
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
@@ -868,14 +878,14 @@ class PlgConnectedExternalApps{
 													$join->on('TX_GATEOUT.gateout_req_no', '=', DB::raw("'".$find->del_no."'"));
 												})
 												->where('DEL_HDR_ID', $input['del_id'])->where('DEL_DTL_ISACTIVE','Y')->get();
-      return [
-      	'response' 		 => $Success,
-      	'result' 			 => $msg,
-      	'no_del' 			 => $find->del_no,
-      	'hdr' 				 => $find,
-      	'dtl' 				 => $dtl,
-      	'getRealRecPLG'=> $res
-      ];
+			return [
+				'response' 		 => $Success,
+				'result' 			 => $msg,
+				'no_del' 			 => $find->del_no,
+				'hdr' 				 => $find,
+				'dtl' 				 => $dtl,
+				'getRealRecPLG'=> $res
+			];
 		}
 	// PLG
 }
