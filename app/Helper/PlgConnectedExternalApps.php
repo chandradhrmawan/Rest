@@ -86,14 +86,23 @@ class PlgConnectedExternalApps{
 		}
 
 	    public static function sendRequestBookingPLG($arr){
-	        $toFunct = 'buildJson'.$arr['config']['head_table'];
-	        $res = static::sendRequestToExtJsonMet([
-	        	"user" => config('endpoint.tosPostPLG.user'),
-	        	"pass" => config('endpoint.tosPostPLG.pass'),
-	        	"target" => config('endpoint.tosPostPLG.target'),
-	        	"json" => '{ "request" : "'.base64_encode(json_encode(json_decode(static::$toFunct($arr),true))).'"}'
-	        ]);
-	        $res = static::decodeResultAftrSendToTosNPKS($res);
+	    	if (!in_array($arr['config']['head_table'], ['TX_HDR_REC','TX_HDR_DEL'])) {
+	    		$res = [
+	    			'Success' => false,
+	    			'note' => 'function bulid json send request, not available!'
+	    		];
+	    	}else{
+		        $toFunct = 'buildJson'.$arr['config']['head_table'];
+		        $json = static::$toFunct($arr);
+		        $json = base64_encode(json_encode(json_decode($json,true)));
+		        $res = static::sendRequestToExtJsonMet([
+		        	"user" => config('endpoint.tosPostPLG.user'),
+		        	"pass" => config('endpoint.tosPostPLG.pass'),
+		        	"target" => config('endpoint.tosPostPLG.target'),
+		        	"json" => '{ "request" : "'.$json.'"}'
+		        ]);
+		        $res = static::decodeResultAftrSendToTosNPKS($res);
+	    	}
 	        return ['sendRequestBookingPLG' => $res];
 		}
 
