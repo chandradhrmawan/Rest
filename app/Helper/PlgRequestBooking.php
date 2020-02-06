@@ -491,7 +491,7 @@ class PlgRequestBooking{
 				]);
 				return ['result' => "Success, rejected requst", 'no_req' => $find[$config['head_no']]];
 			}
-			
+
 			$migrateTariff = true;
 			if ($find[$config['head_paymethod']] == 2) {
 				$migrateTariff = false;
@@ -504,12 +504,12 @@ class PlgRequestBooking{
 					return $pesan;
 				}
 			}
-			
+
 			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 3,
 				$config['head_mark'] => $input['msg']
 			]);
-			
+
 			$sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {
 				return $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
