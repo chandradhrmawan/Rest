@@ -134,31 +134,12 @@
 			@foreach($penumpukan as $penumpukan)
 			<tr>
 				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
-				<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
-				<?php if ($noa == 0) { ?>
-					<td rowspan="<?php echo $total; ?>" style="padding-left:9px;text-align:center">
-						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, 0)}}
-						<?php $noa++; ?>
-					</td>
-				<?php } else { ?>
-
-				<?php } ?>
-				<td style="text-align:center">
-					{{number_format($penumpukan["masa1"])}}<br>
-					{{number_format($penumpukan["masa2"])}}
-				</td>
-				<td style="text-align:center">
-					{{number_format($penumpukan["trf1up"])}}<br>
-					{{number_format($penumpukan["trf2up"])}}
-				</td>
-				<td style="text-align:center">
-					<?php
-						echo number_format($penumpukan["masa1"]*$penumpukan["dtl_qty"]*$penumpukan["trf1up"])."<br>";
-						echo number_format($penumpukan["masa2"]*$penumpukan["dtl_qty"]*$penumpukan["trf2up"]);
-					 ?>
-				</td>
+				<td style="padding-left:9px">{{$penumpukan["dtl_group_tariff_name"]}}</td>
+				<td style="text-align:center"> {{$penumpukan["dtl_qty"]}}</td>
+				<td style="text-align:center">{{$penumpukan["dtl_cont_size"]}}/{{$penumpukan["dtl_cont_type"]}}/{{$penumpukan["dtl_cont_status"]}}</td>
+				<td style="text-align:center">{{number_format($penumpukan["dtl_amount"])}}</td>
 				<td style="text-align:left">IDR</td>
-				<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
+				<td style="text-align:right">{{number_format($penumpukan["dtl_amount"])}}</td>
 			</tr>
 			@endforeach
 		<?php } ?>
