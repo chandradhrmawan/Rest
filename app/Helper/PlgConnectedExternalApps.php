@@ -230,7 +230,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function sendInvProforma($arr){
-			// return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
+			return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
 			$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 			if (count($branch) == 0) {
 				return ['Success' =>false, 'response' => 'branch not found!'];
