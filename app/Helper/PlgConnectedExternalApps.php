@@ -46,7 +46,36 @@ class PlgConnectedExternalApps{
 	        	"target" => config('endpoint.esbGetVesselNpks.target'),
 	        	"json" => $json
 	        ]);
-			return $res;
+			$vesel = $res['response']['getVesselNpksResponse']['esbBody']['results'];
+
+			$result = [];
+			foreach ($vesel as $query) {
+				$query = (object)$query;
+				$result[] = [
+					'vessel' => $query->vessel,
+					'voyageIn' => $query->voyageIn,
+					'voyageOut' => $query->voyageOut,
+					'ata' => (empty($query->ata)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->ata)->format('Y-m-d H:i'),
+					'atd' => (empty($query->atd)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atd)->format('Y-m-d H:i'),
+					'atb' => (empty($query->atb)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->atb)->format('Y-m-d H:i'),
+					'eta' => (empty($query->eta)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->eta)->format('Y-m-d H:i'),
+					'etd' => (empty($query->etd)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etd)->format('Y-m-d H:i'),
+					'etb' => (empty($query->etb)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->etb)->format('Y-m-d H:i'),
+					'openStack' => (empty($query->openStack)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->openStack)->format('Y-m-d H:i'),
+					'closingTime' => (empty($query->closingTime)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTime)->format('Y-m-d H:i'),
+					'closingTimeDoc' => (empty($query->closingTimeDoc)) ? null : \Carbon\Carbon::createFromFormat("d-m-Y H:i", $query->closingTimeDoc)->format('Y-m-d H:i'),
+					'voyage' => $query->voyage,
+					'idUkkSimop' => (empty($query->idUkkSimop)) ? null : $query->idUkkSimop,
+					'idKade' => (empty($query->idKade)) ? null : $query->idKade,
+					'kadeName' => (empty($query->kadeName)) ? null : $query->kadeName,
+					'terminalCode' => (empty($query->terminalCode)) ? null : $query->idKade,
+					'ibisTerminalCode' => (empty($query->ibisTerminalCode)) ? null : $query->idKade,
+					'active' => (empty($query->active)) ? null : $query->idKade,
+					'idVsbVoyage' => $query->idVsbVoyage,
+					'vesselCode'=> $query->vesselCode
+				];
+			}
+			return ["result"=>$result, "count"=>count($result)];
 		}
 
 		private static function decodeResultAftrSendToTosNPKS($res){
@@ -57,14 +86,50 @@ class PlgConnectedExternalApps{
 		}
 
 	    public static function sendRequestBookingPLG($arr){
-	        $toFunct = 'buildJson'.$arr['config']['head_table'];
-	        $res = static::sendRequestToExtJsonMet([
-	        	"user" => config('endpoint.tosPostPLG.user'),
-	        	"pass" => config('endpoint.tosPostPLG.pass'),
-	        	"target" => config('endpoint.tosPostPLG.target'),
-	        	"json" => '{ "request" : "'.base64_encode(json_encode(json_decode(static::$toFunct($arr),true))).'"}'
-	        ]);
-	        $res = static::decodeResultAftrSendToTosNPKS($res);
+	    	if (!in_array($arr['config']['head_table'], ['TX_HDR_REC','TX_HDR_DEL'])) {
+	    		$res = [
+	    			'Success' => false,
+	    			'note' => 'function bulid json send request, not available!'
+	    		];
+	    	}else{
+		        $toFunct = 'buildJson'.$arr['config']['head_table'];
+		        $json = static::$toFunct($arr);
+		        $json = base64_encode(json_encode(json_decode($json,true)));
+		        $json = '
+					{
+					    "repoPostRequest": {
+					        "esbHeader": {
+					            "internalId": "",
+					            "externalId": "",
+					            "timestamp": "",
+					            "responseTimestamp": "",
+					            "responseCode": "",
+					            "responseMessage": ""
+					        },
+					        "esbBody": {
+					            "request": "'.$json.'"
+					        },
+					        "esbSecurity": {
+					            "orgId": "",
+					            "batchSourceId": "",
+					            "lastUpdateLogin": "",
+					            "userId": "",
+					            "respId": "",
+					            "ledgerId": "",
+					            "respAppId": "",
+					            "batchSourceName": ""
+					        }
+					    }
+					}
+		        ';
+		        $res = static::sendRequestToExtJsonMet([
+		        	"user" => config('endpoint.tosPostPLG.user'),
+		        	"pass" => config('endpoint.tosPostPLG.pass'),
+		        	"target" => config('endpoint.tosPostPLG.target'),
+		        	"json" => '{ "request" : "'.$json.'"}'
+		        ]);
+		        $res = static::decodeResultAftrSendToTosNPKS($res);
+	    	}
 	        return ['sendRequestBookingPLG' => $res];
 		}
 
@@ -201,7 +266,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function sendInvProforma($arr){
-			// return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
+			return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
 			$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 			if (count($branch) == 0) {
 				return ['Success' =>false, 'response' => 'branch not found!'];
@@ -528,11 +593,39 @@ class PlgConnectedExternalApps{
 				"action" : "generateGetIn",
 				"data": ['.$dtl.']
 			}';
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			$json = '
+				{
+				    "repoGetRequest": {
+				        "esbHeader": {
+				            "internalId": "",
+				            "externalId": "",
+				            "timestamp": "",
+				            "responseTimestamp": "",
+				            "responseCode": "",
+				            "responseMessage": ""
+				        },
+				        "esbBody": {
+				            "request": "'.$json.'"
+				        },
+				        "esbSecurity": {
+				            "orgId": "",
+				            "batchSourceId": "",
+				            "lastUpdateLogin": "",
+				            "userId": "",
+				            "respId": "",
+				            "ledgerId": "",
+				            "respAppId": "",
+				            "batchSourceName": ""
+				        }
+				    }
+				}
+	        ';
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
 	        	"target" => config('endpoint.tosGetPLG.target'),
-	        	"json" => '{ "request" : "'.base64_encode(json_encode(json_decode($json,true))).'"}'
+	        	"json" => '{ "request" : "'.$json.'"}'
 	        ];
 			$res = static::sendRequestToExtJsonMet($arr);
 			$res = static::decodeResultAftrSendToTosNPKS($res);

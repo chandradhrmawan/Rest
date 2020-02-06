@@ -177,7 +177,7 @@ class PlgRequestBooking{
 			if (empty($config['DTL_DATE_OUT'])) {
 				$newD['DTL_DATE_OUT'] = 'NULL';
 			}else{
-				if ($hdr[$config['head_table']] == 'TX_HDR_DEL' and $hdr[$config['head_paymethod']] == 2) {
+				if ($hdr[$config['head_table']] == 'TX_HDR_DEL' and $hdr[$config['head_paymethod']] == 2 and $hdr[$config['head_status']] == 3) {
 						$tglOut = DB::connection('omuster')->table('TX_GATEOUT')->orderBy("GATEOUT_DATE", "DESC")->first();
 						$dateout = $tglOut->gateout_date;
 						$newD['DTL_DATE_OUT'] = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
