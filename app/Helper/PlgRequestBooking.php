@@ -96,7 +96,7 @@ class PlgRequestBooking{
 				$newD['DTL_BL'] = empty($list[$config['DTL_BL']]) ? 'NULL' : strtoupper($list[$config['DTL_BL']]);
 			}
 			if (empty($config['DTL_PKG_ID'])) {
-				$newD['DTL_BL'] = 8;
+				$newD['DTL_PKG_ID'] = 8;
 			}else{
 				$newD['DTL_PKG_ID'] = empty($list[$config['DTL_PKG_ID']]) ? 'NULL' : $list[$config['DTL_PKG_ID']];
 			}
