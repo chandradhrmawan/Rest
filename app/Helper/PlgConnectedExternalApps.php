@@ -128,7 +128,7 @@ class PlgConnectedExternalApps{
 		        	"target" => config('endpoint.tosPostPLG.target'),
 		        	"json" => '{ "request" : "'.$json.'"}'
 		        ]);
-		        $res = static::decodeResultAftrSendToTosNPKS($res);
+		        // $res = static::decodeResultAftrSendToTosNPKS($res);
 	    	}
 	        return ['sendRequestBookingPLG' => $res];
 		}
