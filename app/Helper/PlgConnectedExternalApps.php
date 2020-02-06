@@ -110,7 +110,7 @@ class PlgConnectedExternalApps{
 			}
 			return ["result"=>$result, "count"=>count($result)];
 		}
-		
+
 	    public static function sendRequestBookingPLG($arr){
 	    	if (!in_array($arr['config']['head_table'], ['TX_HDR_REC','TX_HDR_DEL'])) {
 	    		$res = [
@@ -205,7 +205,8 @@ class PlgConnectedExternalApps{
 	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 	            "RECEIVING_DARI": "'.$rec_dr->reff_name.'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-	            "DI": ""
+	            "DI": "",
+	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
