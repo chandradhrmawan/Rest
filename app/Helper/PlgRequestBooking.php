@@ -169,7 +169,13 @@ class PlgRequestBooking{
 			}
 			if (empty($config['DTL_DATE_IN'])) {
 				if ($config['head_table'] == "TX_HDR_DEL") {
-					$tglIn 	= DB::connection('omuster')->table('TX_GATEIN')->orderBy("GATEIN_CREATE_DATE", "DESC")->first();
+					$tglIn 	= DB::connection('omuster')
+										->table('TX_GATEIN')
+										->where('GATEIN_CONT', $list[$config['DTL_BL']])
+										->where('GATEIN_BRANCH_ID', $hdr[$config['head_branch']])
+										->where('GATEIN_BRANCH_CODE', $hdr[$config['head_branch_code']])
+										->orderBy("GATEIN_CREATE_DATE", "DESC")
+										->first();
 					$dateIn = $tglIn->gatein_date;
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				} else {
