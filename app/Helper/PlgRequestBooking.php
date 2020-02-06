@@ -164,6 +164,8 @@ class PlgRequestBooking{
 
 			if (empty($config['DTL_TL'])) {
 				$newD['DTL_TL'] = 'NULL';
+			}else if ($config['DTL_TL'] == 'Y') {
+				$newD['DTL_TL'] = 'Y';
 			}else{
 				$newD['DTL_TL'] = empty($list[$config['DTL_TL']]) ? 'NULL' : $list[$config['DTL_TL']];
 			}
@@ -338,7 +340,7 @@ class PlgRequestBooking{
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
-				if (!in_array($config['kegiatan'], [10,11])) {
+				if (in_array($config['kegiatan'], [1])) {
 					foreach ($tariffResp['detil_data'] as $list) {
 						$list = (array)$list;
 						$findTsCont = [
