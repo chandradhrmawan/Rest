@@ -95,6 +95,33 @@ class PlgConnectedExternalApps{
 		        $toFunct = 'buildJson'.$arr['config']['head_table'];
 		        $json = static::$toFunct($arr);
 		        $json = base64_encode(json_encode(json_decode($json,true)));
+		        $json = '
+					{
+					    "repoPostRequest": {
+					        "esbHeader": {
+					            "internalId": "",
+					            "externalId": "",
+					            "timestamp": "",
+					            "responseTimestamp": "",
+					            "responseCode": "",
+					            "responseMessage": ""
+					        },
+					        "esbBody": {
+					            "request": "'.$json.'"
+					        },
+					        "esbSecurity": {
+					            "orgId": "",
+					            "batchSourceId": "",
+					            "lastUpdateLogin": "",
+					            "userId": "",
+					            "respId": "",
+					            "ledgerId": "",
+					            "respAppId": "",
+					            "batchSourceName": ""
+					        }
+					    }
+					}
+		        ';
 		        $res = static::sendRequestToExtJsonMet([
 		        	"user" => config('endpoint.tosPostPLG.user'),
 		        	"pass" => config('endpoint.tosPostPLG.pass'),
@@ -566,11 +593,39 @@ class PlgConnectedExternalApps{
 				"action" : "generateGetIn",
 				"data": ['.$dtl.']
 			}';
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			$json = '
+				{
+				    "repoGetRequest": {
+				        "esbHeader": {
+				            "internalId": "",
+				            "externalId": "",
+				            "timestamp": "",
+				            "responseTimestamp": "",
+				            "responseCode": "",
+				            "responseMessage": ""
+				        },
+				        "esbBody": {
+				            "request": "'.$json.'"
+				        },
+				        "esbSecurity": {
+				            "orgId": "",
+				            "batchSourceId": "",
+				            "lastUpdateLogin": "",
+				            "userId": "",
+				            "respId": "",
+				            "ledgerId": "",
+				            "respAppId": "",
+				            "batchSourceName": ""
+				        }
+				    }
+				}
+	        ';
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
 	        	"target" => config('endpoint.tosGetPLG.target'),
-	        	"json" => '{ "request" : "'.base64_encode(json_encode(json_decode($json,true))).'"}'
+	        	"json" => '{ "request" : "'.$json.'"}'
 	        ];
 			$res = static::sendRequestToExtJsonMet($arr);
 			$res = static::decodeResultAftrSendToTosNPKS($res);
