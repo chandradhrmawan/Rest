@@ -624,7 +624,7 @@ class PlgConnectedExternalApps{
 				    }
 				}
 	        ';
-	        $json = json_encode(json_decode($json,true));
+	    $json = json_encode(json_decode($json,true));
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
@@ -745,14 +745,42 @@ class PlgConnectedExternalApps{
 				"action" : "generateGetOut",
 				"data": ['.$dtl.']
 			}';
-
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			// $json = '{ "request" : "'.$json.'"}';
+			$json = '
+				{
+				    "repoGetRequest": {
+				        "esbHeader": {
+				            "internalId": "",
+				            "externalId": "",
+				            "timestamp": "",
+				            "responseTimestamp": "",
+				            "responseCode": "",
+				            "responseMessage": ""
+				        },
+				        "esbBody": {
+				            "request": "'.$json.'"
+				        },
+				        "esbSecurity": {
+				            "orgId": "",
+				            "batchSourceId": "",
+				            "lastUpdateLogin": "",
+				            "userId": "",
+				            "respId": "",
+				            "ledgerId": "",
+				            "respAppId": "",
+				            "batchSourceName": ""
+				        }
+				    }
+				}
+	        ';
+	    $json = json_encode(json_decode($json,true));
 			$arr = [
-	        	"user" 		=> config('endpoint.tosGetPLG.user'),
-	        	"pass" 		=> config('endpoint.tosGetPLG.pass'),
-	        	"target" 	=> config('endpoint.tosGetPLG.target'),
-	        	"json" 		=> '{ "request" : "'.base64_encode(json_encode(json_decode($json,true))).'"}'
+	        	"user" => config('endpoint.tosGetPLG.user'),
+	        	"pass" => config('endpoint.tosGetPLG.pass'),
+	        	"target" => config('endpoint.tosGetPLG.target'),
+	        	"json" => $json
 	        ];
-
 			$res 			= static::sendRequestToExtJsonMet($arr);
 			$res	 		= static::decodeResultAftrSendToTosNPKS($res);
 			$his_cont = [];
