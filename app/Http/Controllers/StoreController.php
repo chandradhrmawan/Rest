@@ -118,84 +118,13 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
-      // return PlgRequestBooking::sendRequestPLG(['nota_id' => 1]);
-      $arrCon = [
-        "kegiatan"                => 2,
-        "head_table"              => "TX_HDR_DEL",
-        "head_primery"            => "del_id",
-        "head_no"                 => "del_no",
-        "head_branch"             => "del_branch_id",
-        "head_branch_code"        => "del_branch_code",
-        "head_cust"               => "del_cust_id",
-        "head_cust_name"          => "del_cust_name",
-        "head_cust_addr"          => "del_cust_address",
-        "head_cust_npwp"          => "del_cust_npwp",
-        "head_vvd"                => "del_vvd_id",
-        "head_by"                 => "del_create_by",
-        "head_status"             => "del_status",
-        "head_vessel_name"        => "del_vessel_name",
-        "head_date"               => "del_create_date",
-        "head_pbm_id"             => "del_pbm_id",
-        "head_pbm_name"           => "del_pbm_name",
-        "head_shipping_agent_id"  => "del_stackby_id",
-        "head_shipping_agent_name"=> "del_stackby_name",
-        "head_paymethod"          => "del_paymethod",
-        "head_from"               => "del_to",
-        "head_mark"               => "del_msg",
-        "p_tarde"                 => null,
-        "head_tab_detil"          => "TX_DTL_DEL",
-        "head_forigen"            => "del_hdr_id",
-        "DTL_VIA"                 => "del_dtl_via",
-        "DTL_VIA_NAME"            => "del_dtl_via_name",
-        "DTL_BL"                  => "del_dtl_cont",
-        "DTL_PKG_ID"              => null,
-        "DTL_CMDTY_ID"            => "del_dtl_cmdty_id",
-        "DTL_CMDTY_NAME"          => "del_dtl_cmdty_name",
-        "DTL_CHARACTER"           => "del_dtl_cont_danger",
-        "DTL_CONT_SIZE"           => "del_dtl_cont_size",
-        "DTL_CONT_TYPE"           => "del_dtl_cont_type",
-        "DTL_CONT_STATUS"         => "del_dtl_cont_status",
-        "DTL_UNIT_ID"             => null,
-        "DTL_QTY"                 => 1,
-        "DTL_TL"                  => null,
-        "DTL_OWNER"               => "del_dtl_owner",
-        "DTL_OWNER_NAME"          => "del_dtl_owner_name",
-        "DTL_DATE_IN"             => "10/04/2020",
-        "DTL_DATE_OUT"            => null,
-        "DTL_DATE_OUT_OLD"        => null
-      ];
-      return PlgConnectedExternalApps::buildJsonTX_HDR_DEL(['table' => 'TX_HDR_DEL', 'id' => '189' ,'config' => $arrCon]);
-      // return ConnectedExternalApps::sendNotifToIBISQA();
-      // return ConnectedExternalApps::uperSimkeuCek($input);
-      // return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['paid_date']]);
-      // return ConnectedExternalApps::sendNotaProforma(376);
-      // $pay = [
-      //   "pay_id"=> "306",
-      //   "pay_no"=> "10108020000010",
-      //   "pay_req_no"=> "BMBTN200043",
-      //   "pay_method"=> "2",
-      //   "pay_cust_id"=> "12401095",
-      //   "pay_cust_name"=> "PT. AGRISTAR GRAIN INDONESIA",
-      //   "pay_bank_code"=> "MDR",
-      //   "pay_bank_name"=> "MANDIRI",
-      //   "pay_branch_id"=> "12",
-      //   "pay_account_no"=> "120-00-2018777-4",
-      //   "pay_account_name"=> "PTP MANDIRI 120-00-2018777-4",
-      //   "pay_amount"=> "8552148",
-      //   "pay_date"=> "2020-01-07 13=>39=>00",
-      //   "pay_note"=> "NOTED",
-      //   "pay_create_by"=> "1",
-      //   "pay_create_date"=> "2020-01-07 00=>00=>00",
-      //   "pay_type"=> "1",
-      //   "pay_file"=> "omcargo/tx_payment/306/file-sample_150kB.pdf",
-      //   "pay_sender_bank_code"=> null,
-      //   "pay_sender_bank_name"=> null,
-      //   "pay_sender_account_no"=> null,
-      //   "pay_sender_account_name"=> null,
-      //   "pay_status"=> "1",
-      //   "pay_currency"=> "IDR"
-      // ];
-      // return ConnectedExternalApps::sendUperPutReceipt(282, (object)$pay);
+      $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 1)->first();
+      $config = json_decode($config->api_set, true);
+
+      return PlgConnectedExternalApps::sendRequestBookingPLG([
+        'config' => $config,
+        'id' => 170
+      ]);
     }
 
     // PLG
