@@ -262,7 +262,8 @@ class PlgConnectedExternalApps{
 	            "DELIVERY_KE": "",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "PERP_DARI": "",
-	            "PERP_KE": ""
+	            "PERP_KE": "",
+							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
