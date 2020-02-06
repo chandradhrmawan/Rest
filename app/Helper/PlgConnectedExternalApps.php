@@ -225,7 +225,7 @@ class PlgConnectedExternalApps{
 	          "action" : "getDelivery",
 	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
-	            "REQ_DELIVERY_DATE": "'.$head[$arr['config']['head_date']].'",
+	            "REQ_DELIVERY_DATE": "'.$delivery_date.'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
 	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
