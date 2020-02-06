@@ -15,7 +15,11 @@ class PlgRequestBooking{
 			$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
 			// build detil
 				$setD = [];
-				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']])->get();
+				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
+				if (!empty($config['DTL_IS_ACTIVE'])) {
+					$detil->where($config['DTL_IS_ACTIVE'], 'Y');
+				}
+				$detil = $detil->get();
 				foreach ($detil as $list) {
 					$list = (array)$list;
 					$setD[] = static::calculateTariffBuildDetail($find, $list, $input, $config);
