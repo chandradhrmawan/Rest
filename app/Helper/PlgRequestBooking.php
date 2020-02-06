@@ -169,7 +169,7 @@ class PlgRequestBooking{
 			}
 			if (empty($config['DTL_DATE_IN'])) {
 				if ($config['head_table'] == "TX_HDR_DEL") {
-					$tglIn 	= DB::connection('omuster')->table('TX_GATEIN')->orderBy("GATEIN_DATE", "DESC")->first();
+					$tglIn 	= DB::connection('omuster')->table('TX_GATEIN')->orderBy("GATEIN_CREATE_DATE", "DESC")->first();
 					$dateIn = $tglIn->gatein_date;
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				} else {
@@ -181,11 +181,7 @@ class PlgRequestBooking{
 			if (empty($config['DTL_DATE_OUT'])) {
 				$newD['DTL_DATE_OUT'] = 'NULL';
 			}else{
-				if ($config['head_table'] == 'TX_HDR_DEL' and $hdr[$config['head_paymethod']] == 2 and $hdr[$config['head_status']] == 3) {
-						$tglOut = DB::connection('omuster')->table('TX_GATEOUT')->orderBy("GATEOUT_DATE", "DESC")->first();
-						$dateout = $tglOut->gateout_date;
-						$newD['DTL_DATE_OUT'] = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-				} else if ($config['head_table'] == 'TX_HDR_DEL_CARGO') {
+			 if ($config['head_table'] == 'TX_HDR_DEL_CARGO') {
 						$tglOut = DB::connection('omuster')->table('TX_GATEOUT')->orderBy("GATEOUT_DATE", "DESC")->first();
 						$dateout = $tglOut->gateout_date;
 						$newD['DTL_DATE_OUT'] = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
