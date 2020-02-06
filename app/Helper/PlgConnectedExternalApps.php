@@ -11,7 +11,6 @@ use App\Helper\PlgRequestBooking;
 
 class PlgConnectedExternalApps{
 	// PLG
-
 		public static function sendRequestToExtJsonMet($arr){
 	        $client = new Client();
 	        $options= array(
