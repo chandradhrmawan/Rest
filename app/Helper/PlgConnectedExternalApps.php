@@ -78,10 +78,12 @@ class PlgConnectedExternalApps{
 			return ["result"=>$result, "count"=>count($result)];
 		}
 
-		private static function decodeResultAftrSendToTosNPKS($res){
-			$res['request'] = json_decode($res['request']['json'], true);
-	        $res['request'] = json_decode(base64_decode($res['request']['request']),true);
-	        $res['response'] = json_decode(base64_decode($res['response']['result']),true);
+		private static function decodeResultAftrSendToTosNPKS($res, $type){
+			$res['request']['json'] = json_decode($res['request']['json'], true);
+			$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
+	        $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
+	        $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
+	        $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
 	        return $res;
 		}
 
@@ -128,7 +130,7 @@ class PlgConnectedExternalApps{
 		        	"target" => config('endpoint.tosPostPLG.target'),
 		        	"json" => '{ "request" : "'.$json.'"}'
 		        ]);
-		        // $res = static::decodeResultAftrSendToTosNPKS($res);
+		        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPostRequest');
 	    	}
 	        return ['sendRequestBookingPLG' => $res];
 		}
@@ -593,8 +595,8 @@ class PlgConnectedExternalApps{
 				"action" : "generateGetIn",
 				"data": ['.$dtl.']
 			}';
-			$json = '{ "request" : "'.$json.'"}';
 			$json = base64_encode(json_encode(json_decode($json,true)));
+			// $json = '{ "request" : "'.$json.'"}';
 			$json = '
 				{
 				    "repoGetRequest": {
@@ -629,12 +631,11 @@ class PlgConnectedExternalApps{
 	        	"target" => config('endpoint.tosGetPLG.target'),
 	        	"json" => $json
 	        ];
-			return $res = static::sendRequestToExtJsonMet($arr);
-			// $res = static::decodeResultAftrSendToTosNPKS($res);
-			return 'asdsad';
+			$res = static::sendRequestToExtJsonMet($arr);
+			$res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 			$his_cont = [];
-			if ($res['response']['count'] > 0) {
-				foreach ($res['response']['result'] as $listR) {
+			if ($res['result']['count'] > 0) {
+				foreach ($res['result']['result'] as $listR) {
 					$findGATI = [
 						'GATEIN_CONT' => $listR['NO_CONTAINER'],
 						'GATEIN_REQ_NO' => $listR['NO_REQUEST'],
