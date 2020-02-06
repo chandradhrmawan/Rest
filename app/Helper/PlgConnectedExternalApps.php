@@ -593,6 +593,7 @@ class PlgConnectedExternalApps{
 				"action" : "generateGetIn",
 				"data": ['.$dtl.']
 			}';
+			$json = '{ "request" : "'.$json.'"}';
 			$json = base64_encode(json_encode(json_decode($json,true)));
 			$json = '
 				{
@@ -621,14 +622,16 @@ class PlgConnectedExternalApps{
 				    }
 				}
 	        ';
+	        $json = json_encode(json_decode($json,true));
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
 	        	"target" => config('endpoint.tosGetPLG.target'),
-	        	"json" => '{ "request" : "'.$json.'"}'
+	        	"json" => $json
 	        ];
-			$res = static::sendRequestToExtJsonMet($arr);
-			$res = static::decodeResultAftrSendToTosNPKS($res);
+			return $res = static::sendRequestToExtJsonMet($arr);
+			// $res = static::decodeResultAftrSendToTosNPKS($res);
+			return 'asdsad';
 			$his_cont = [];
 			if ($res['response']['count'] > 0) {
 				foreach ($res['response']['result'] as $listR) {

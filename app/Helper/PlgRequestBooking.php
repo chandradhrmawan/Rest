@@ -332,34 +332,36 @@ class PlgRequestBooking{
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
-				foreach ($tariffResp['detil_data'] as $list) {
-					$list = (array)$list;
-					$findTsCont = [
-						'cont_no' => $list[$config['DTL_BL']],
-						'branch_id' => $find[$config['head_branch']],
-						'branch_code' => $find[$config['head_branch_code']]
-					];
-					$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-					if (empty($cekTsCont)) {
-						$cont_counter = 0;
-					}else{
-						$cont_counter = $cekTsCont->cont_counter;
+				if (!in_array($config['kegiatan'], [10,11])) {
+					foreach ($tariffResp['detil_data'] as $list) {
+						$list = (array)$list;
+						$findTsCont = [
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']]
+						];
+						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+						if (empty($cekTsCont)) {
+							$cont_counter = 0;
+						}else{
+							$cont_counter = $cekTsCont->cont_counter;
+						}
+						$arrStoreTsContAndTxHisCont = [
+							'cont_no' => $list[$config['DTL_BL']],
+							'branch_id' => $find[$config['head_branch']],
+							'branch_code' => $find[$config['head_branch_code']],
+							'cont_location' => 'GATO',
+							'cont_size' => $list[$config['DTL_CONT_SIZE']],
+							'cont_type' => $list[$config['DTL_CONT_TYPE']],
+							'cont_counter' => $cont_counter,
+							'no_request' => $find[$config['head_no']],
+							'kegiatan' => $config['kegiatan'],
+							'id_user' => $input["user"]->user_id,
+							'status_cont' => $list[$config['DTL_CONT_STATUS']],
+							'vvd_id' => $find[$config['head_vvd']]
+						];
+						$his_cont[] = static::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 					}
-					$arrStoreTsContAndTxHisCont = [
-						'cont_no' => $list[$config['DTL_BL']],
-						'branch_id' => $find[$config['head_branch']],
-						'branch_code' => $find[$config['head_branch_code']],
-						'cont_location' => 'GATO',
-						'cont_size' => $list[$config['DTL_CONT_SIZE']],
-						'cont_type' => $list[$config['DTL_CONT_TYPE']],
-						'cont_counter' => $cont_counter,
-						'no_request' => $find[$config['head_no']],
-						'kegiatan' => $config['kegiatan'],
-						'id_user' => $input["user"]->user_id,
-						'status_cont' => $list[$config['DTL_CONT_STATUS']],
-						'vvd_id' => $find[$config['head_vvd']]
-					];
-					$his_cont[] = static::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 				}
 			}
 			$tariffResp['his_cont'] = $his_cont;
