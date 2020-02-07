@@ -568,13 +568,13 @@ class PlgConnectedExternalApps{
 			]);
 		}
 
-		// OnGoing
-		// public static function getRealGati() {
-	  //   $getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
-	  //   foreach ($getIdReal as $value) {
-	  //      static::getRealRecPLG($value->rec_hdr_id);
-	  //   }
-	  // }
+		public static function getRealGati() {
+	    $getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
+	    foreach ($getIdReal as $value) {
+	       $input = ["rec_id"=>$value->rec_hdr_id];
+	       static::getRealRecPLG($input);
+	    }
+	  }
 
 		public static function getRealRecPLG($input){
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
@@ -716,6 +716,7 @@ class PlgConnectedExternalApps{
 				])->first();
 				$arrStoreTsContAndTxHisCont = [
 					'cont_no' => $listR['NO_CONTAINER'],
+					'rec_id' => $hdr->rec_id,
 					'branch_id' => $hdr->rec_branch_id,
 					'branch_code' => $hdr->rec_branch_code,
 					'cont_location' => 'GATI',

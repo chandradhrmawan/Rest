@@ -694,21 +694,21 @@ class PlgRequestBooking{
         	$getNota->nota_paid = 'Y';
         	$getNota->save();
         	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-			$config = json_decode($config->api_set, true);
-			$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
-			$getReq = (array)$getReq;
-			$sendRequestBooking = null;
-			if ($getReq[$config['head_paymethod']] == 1) {
-				$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
-			}
-            return [
-				'result' => "Success, pay proforma!",
-				'no_pay' => $pay->pay_no,
-				'no_nota' => $input['pay_nota_no'],
-				'no_req' => $pay->pay_req_no,
-				'sendInvPay' => $sendInvPay,
-				'sendRequestBooking' => $sendRequestBooking
-			];
+					$config = json_decode($config->api_set, true);
+					$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
+					$getReq = (array)$getReq;
+					$sendRequestBooking = null;
+					if ($getReq[$config['head_paymethod']] == 1) {
+						$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+					}
+		            return [
+						'result' => "Success, pay proforma!",
+						'no_pay' => $pay->pay_no,
+						'no_nota' => $input['pay_nota_no'],
+						'no_req' => $pay->pay_req_no,
+						'sendInvPay' => $sendInvPay,
+						'sendRequestBooking' => $sendRequestBooking
+					];
 	    }
 
 	    public static function storeTsContAndTxHisCont($arr){
@@ -741,7 +741,8 @@ class PlgRequestBooking{
 					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-				if ($cekTsCont->cont_counter == 0) {
+				// if ($cekTsCont->cont_counter == 0) {
+				if ($arr["cont_location"] == "GATI") {
 					$counter = $cekTsCont->cont_counter+1;
 				}else{
 					$counter = $cekTsCont->cont_counter;
@@ -753,13 +754,15 @@ class PlgRequestBooking{
 					'id_user' => $arr['id_user'],
 					'status_cont' => $arr['status_cont'],
 					'vvd_id' => $arr['vvd_id'],
-					'counter' => $cekTsCont->cont_counter+1
+					'counter' => $counter
+					// 'counter' => $cekTsCont->cont_counter+1 //why+1
 					// 'id_yard' => $list[$config['DTL_BL']], ?
 					// 'sub_counter' => $list[$config['DTL_BL']], ?
 					// 'why' => $list[$config['DTL_BL']], ?
 					// 'aktif' => $list[$config['DTL_BL']], ?
 				];
 				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeTxHisCont);
+				DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $arr['rec_id'])->where('REC_DTL_CONT', $arr['cont_no'])->update('REC_FL_REAL', "2");
 			// history container
 			return ['storeTsCont' => $cekTsCont, 'storeTxHisCont'=>$storeTxHisCont];
 	    }
