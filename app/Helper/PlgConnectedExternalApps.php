@@ -568,6 +568,14 @@ class PlgConnectedExternalApps{
 			]);
 		}
 
+		// OnGoing
+		// public static function getRealGati() {
+	  //   $getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
+	  //   foreach ($getIdReal as $value) {
+	  //      static::getRealRecPLG($value->rec_hdr_id);
+	  //   }
+	  // }
+
 		public static function getRealRecPLG($input){
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
@@ -601,6 +609,7 @@ class PlgConnectedExternalApps{
 			$dtl = '';
 			$arrdtl = [];
 			foreach ($dtlLoop as $list) {
+				// Adding udate where('REC_FL_REAL', '0') For Every Detail
 				$dtl .= '
 				{
 					"NO_CONTAINER": "'.$list->rec_dtl_cont.'",
@@ -652,7 +661,7 @@ class PlgConnectedExternalApps{
 				    }
 				}
 	        ';
-	        $json = json_encode(json_decode($json,true));
+	    $json = json_encode(json_decode($json,true));
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
@@ -699,7 +708,7 @@ class PlgConnectedExternalApps{
 					'branch_id' => $hdr->rec_branch_id,
 					'branch_code' => $hdr->rec_branch_code
 				];
-				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first(); //remove ->orderBy('cont_counter', 'desc')
 				$cont_counter = $cekTsCont->cont_counter+1; //kusus gate in
 				$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
 					"reff_tr_id" => 12,
@@ -888,5 +897,6 @@ class PlgConnectedExternalApps{
 				'getRealRecPLG'=> $res
 			];
 		}
+
 	// PLG
 }

@@ -295,12 +295,16 @@ class ViewController extends Controller
             ->table("TX_DTL_CANCELLED A")
             ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
             ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
+            ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
+            ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
             ->get();
           } else {
             $detail  = DB::connection("omuster")
             ->table("TX_DTL_CANCELLED A")
             ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
             ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
+            ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
+            ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
             ->get();
           }
         } else {
@@ -309,16 +313,19 @@ class ViewController extends Controller
             ->table("TX_DTL_".strtoupper($type)."_CARGO B")
             ->leftJoin("TX_DTL_CANCELLED A", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
             ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
+            ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
+            ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
             ->get();
           } else {
             $detail  = DB::connection("omuster")
             ->table("TX_DTL_".strtoupper($type)."_CARGO B")
             ->leftJoin("TX_DTL_CANCELLED A", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
             ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
+            ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
+            ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
             ->get();
           }
         }
-
         $newDt["detail"][]  = $detail ;
       }
 
@@ -1684,16 +1691,16 @@ class ViewController extends Controller
 
     $html        = view('print.proformaNpks',
                         [
-                          "total"=>$total,
-                          "uper"=>$uper,
-                          "bl"=>$bl,
-                          "branch"=>$branch,
-                          "header"=>$header,
+                          "total"     =>$total,
+                          "uper"      =>$uper,
+                          "bl"        =>$bl,
+                          "branch"    =>$branch,
+                          "header"    =>$header,
                           "penumpukan"=>$penumpukan,
-                          "label"=>$nota,
-                          "handling"=>$handling,
-                          "alat"=>$alat,
-                          "terbilang"=>$terbilang
+                          "label"     =>$nota,
+                          "handling"  =>$handling,
+                          "alat"      =>$alat,
+                          "terbilang" =>$terbilang
                         ]);
 
     $filename    = $all["header"][0]->nota_no.rand(10,100000);
@@ -1704,6 +1711,5 @@ class ViewController extends Controller
     $dompdf->render();
     $dompdf->stream($filename, array("Attachment" => false));
   }
-
 
 }

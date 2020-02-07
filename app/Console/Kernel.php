@@ -37,8 +37,11 @@ class Kernel extends ConsoleKernel
              DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_LOGIN" => "", "API_TOKEN" => ""]);
           }
         }
-      })->everyThirtyMinutes();
+      })->hourly();
 
       $schedule->call('App\Helper\ConnectedExternalApps@sendNotifToIBISQA')->everyMinute();
+
+      // $schedule->call('App\Helper\PlgConnectedExternalApps@getRealGati')->everyMinute(); //kalo jadi
+
     }
 }
