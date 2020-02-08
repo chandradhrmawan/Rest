@@ -524,7 +524,7 @@ class PlgRequestBooking{
 
 			$sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {
-				return $sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
+				$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
 			}
 
 			return [
