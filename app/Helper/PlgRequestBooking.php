@@ -92,7 +92,7 @@ class PlgRequestBooking{
 			if (empty($config['DTL_VIA'])) {
 				$newD['DTL_VIA'] = 'NULL';
 			}else{
-				if ($hdr[$config['head_table']]) {
+				if ($config['head_table'] == "TX_HDR_TL") {
 					$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']['rec']]) ? 'NULL' : $list[$config['DTL_VIA']['rec']];
 				}else{
 					$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
