@@ -36,6 +36,7 @@ class PlgConnectedExternalApps{
 		}
 
 		private static function decodeResultAftrSendToTosNPKS($res, $type){
+			// return $res;
 			$res['request']['json'] = json_decode($res['request']['json'], true);
 			$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
 	        $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
@@ -569,12 +570,12 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealGati() {
-	    $getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
-	    foreach ($getIdReal as $value) {
-	       $input = ["rec_id"=>$value->rec_hdr_id];
-	       static::getRealRecPLG($input);
-	    }
-	  }
+			$getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
+			foreach ($getIdReal as $value) {
+				$input = ["rec_id"=>$value->rec_hdr_id];
+				static::getRealRecPLG($input);
+			}
+		}
 
 		public static function getRealRecPLG($input){
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
@@ -662,7 +663,7 @@ class PlgConnectedExternalApps{
 				    }
 				}
 	        ';
-	    $json = json_encode(json_decode($json,true));
+	        $json = json_encode(json_decode($json,true));
 			$arr = [
 	        	"user" => config('endpoint.tosGetPLG.user'),
 	        	"pass" => config('endpoint.tosGetPLG.pass'),
@@ -804,10 +805,10 @@ class PlgConnectedExternalApps{
 	        	"json" => $json
 	        ];
 			$res 			= static::sendRequestToExtJsonMet($arr);
-			$res	 		= static::decodeResultAftrSendToTosNPKS($res);
+			$res	 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 			$his_cont = [];
-			if ($res['response']['count'] > 0) {
-				foreach ($res['response']['result'] as $listR) {
+			if ($res['result']['count'] > 0) {
+				foreach ($res['result']['result'] as $listR) {
 					$findGATO = [
 						'GATEOUT_CONT' 					=> $listR['NO_CONTAINER'],
 						'GATEOUT_REQ_NO' 				=> $listR['NO_REQUEST'],
