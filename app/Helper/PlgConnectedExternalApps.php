@@ -162,7 +162,7 @@ class PlgConnectedExternalApps{
 
 	    private static function buildJsonTX_HDR_REC($arr){
 	        $arrdetil = '';
-	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
+	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
@@ -215,7 +215,7 @@ class PlgConnectedExternalApps{
 
 		private static function buildJsonTX_HDR_DEL($arr){
 	        $arrdetil = '';
-	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
+	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
