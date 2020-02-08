@@ -174,7 +174,9 @@ class PlgRequestBooking{
 				$newD['DTL_TL'] = empty($list[$config['DTL_TL']]) ? 'NULL' : $list[$config['DTL_TL']];
 			}
 			if (empty($config['DTL_DATE_IN'])) {
-				if ($config['head_table'] == "TX_HDR_DEL") {
+				$newD['DTL_DATE_IN'] = 'NULL';
+			}else{
+				if (in_array($config['DTL_DATE_IN'], ["TX_GATEIN"])) {
 					$tglIn 	= DB::connection('omuster')
 										->table('TX_GATEIN')
 										->where('GATEIN_CONT', $list[$config['DTL_BL']])
@@ -184,11 +186,9 @@ class PlgRequestBooking{
 										->first();
 					$dateIn = $tglIn->gatein_date;
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-				} else {
-					$newD['DTL_DATE_IN'] = 'NULL';
+				}else{
+					$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}
-			}else{
-				$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			}
 			if (empty($config['DTL_DATE_OUT'])) {
 				$newD['DTL_DATE_OUT'] = 'NULL';
