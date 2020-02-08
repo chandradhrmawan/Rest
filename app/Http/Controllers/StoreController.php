@@ -222,11 +222,13 @@ class StoreController extends Controller
       ];
       if ($input['type'] == "CREATE") {
         DB::connection('mdm')->table('TM_TRUCK')->insert($set_data_self);
-        return ConnectedExternalApps::truckRegistration($set_data);
+        $res = ConnectedExternalApps::truckRegistration($set_data);
       }else{
         DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->update($set_data_self);
-        return ConnectedExternalApps::updateTid($set_data);
+        $res = ConnectedExternalApps::updateTid($set_data);
       }
+      $res['getTruckPrimaryIdTos'] = ConnectedExternalApps::getTruckPrimaryIdTos($set_data);
+      return $res;
     }
 
     function sendTCA($input, $request){

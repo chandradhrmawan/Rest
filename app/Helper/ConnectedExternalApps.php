@@ -860,7 +860,7 @@ class ConnectedExternalApps{
                 "responseMessage": ""
                 },
                 "esbBody": {
-                    "vTruckId": "'. str_replace(' ','',$input['truck_plat_no']).'",
+                    "vTruckId": "'.str_replace(' ','',$input['truck_plat_no']).'",
                     "vTruckNumber": "'.$input['truck_plat_no'].'",
                     "vRFIDCode": "'.$input['truck_rfid_code'].'",
                     "vCustomerName": "'.$input['customer_name'].'",
@@ -893,7 +893,11 @@ class ConnectedExternalApps{
           echo $e->getResponse() . "\n";
         }
       }
-      return [json_decode($res->getBody()->getContents())];
+      $res = [
+        "request" => json_decode($string_json, true),
+        "response" => json_decode($res->getBody()->getContents(), true)
+      ];
+      return $res;
     }
 
     public static function updateTid($input){
@@ -943,7 +947,74 @@ class ConnectedExternalApps{
           echo $e->getResponse() . "\n";
         }
       }
-      return [json_decode($res->getBody()->getContents())];
+      $res = [
+        "request" => json_decode($string_json, true),
+        "response" => json_decode($res->getBody()->getContents(), true)
+      ];
+      return $res;
+    }
+
+    public static function getTruckPrimaryIdTos($input){
+      $endpoint_url=config('endpoint.getTruckPrimaryIdTos');
+
+      $string_json = '{
+          "getTruckRequest": {
+              "esbHeader": {
+                          "internalId" : "",
+                              "externalId":"",
+                              "timestamp":"",
+                              "responseTimestamp":"",
+                              "responseCode":"",
+                              "responseMessage":""
+              },
+              "esbBody":   {
+                              "idTerminal":"201",
+                              "tid":"'.str_replace(' ','',$input['truck_plat_no']).'",
+                              "truckNumber":"'.str_replace(' ','',$input['truck_plat_no']).'"
+                      },
+              "esbSecurity": {
+                            "orgId":"",
+                              "batchSourceId":"",
+                              "lastUpdateLogin":"",
+                              "userId":"",
+                              "respId":"",
+                              "ledgerId":"",
+                              "respApplId":"",
+                              "batchSourceName":"",
+                              "category":""
+              }
+          }
+      }';
+
+      $username="npk_billing";
+      $password ="npk_billing";
+      $client = new Client();
+      $options= array(
+        'auth' => [
+          $username,
+          $password
+        ],
+        'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+        'body' => $string_json,
+        "debug" => false
+      );
+      try {
+        $res = $client->post($endpoint_url, $options);
+      } catch (ClientException $e) {
+        echo $e->getRequest() . "\n";
+        if ($e->hasResponse()) {
+          echo $e->getResponse() . "\n";
+        }
+      }
+      $results = json_decode($res->getBody()->getContents(), true);
+      DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',str_replace(' ','',$input['truck_plat_no']))->update([
+        "truck_id_seq" => $results['getTruckResponse']['esbBody']['results'][0]['idTruck']
+      ]);
+      $res = [
+        "request" => json_decode($string_json, true),
+        "response" => $results
+      ];
+      return $res;
     }
 
     public static function closeTCA($input){
