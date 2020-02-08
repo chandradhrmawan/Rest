@@ -92,7 +92,11 @@ class PlgRequestBooking{
 			if (empty($config['DTL_VIA'])) {
 				$newD['DTL_VIA'] = 'NULL';
 			}else{
-				$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
+				if ($hdr[$config['head_table']]) {
+					$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']['rec']]) ? 'NULL' : $list[$config['DTL_VIA']['rec']];
+				}else{
+					$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
+				}
 			}
 			if (empty($config['DTL_BL'])) {
 				$newD['DTL_BL'] = 'NULL';
