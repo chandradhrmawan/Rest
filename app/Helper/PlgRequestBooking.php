@@ -92,7 +92,7 @@ class PlgRequestBooking{
 			if (empty($config['DTL_VIA'])) {
 				$newD['DTL_VIA'] = 'NULL';
 			}else{
-				if ($config['head_table'] == "TX_HDR_TL") {
+				if (is_array($config['DTL_VIA'])) {
 					$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']['rec']]) ? 'NULL' : $list[$config['DTL_VIA']['rec']];
 				}else{
 					$newD['DTL_VIA'] = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
@@ -165,9 +165,9 @@ class PlgRequestBooking{
 			if ($config['head_table'] == "TX_HDR_DEL" || $config['head_table'] == 'TX_HDR_DEL_CARGO') {
 				$DTL_STACK_AREA = '1';
 			}
-					// if (in_array($config['head_nota_id'], ["14", "15", 14, 15])) {
-					// 	$DTL_STACK_AREA = empty($list['dtl_stacking_type_id']) ? 'NULL' : $list['dtl_stacking_type_id'];
-					// }
+			// if (in_array($config['head_nota_id'], ["14", "15", 14, 15])) {
+			// 	$DTL_STACK_AREA = empty($list['dtl_stacking_type_id']) ? 'NULL' : $list['dtl_stacking_type_id'];
+			// }
 			$newD['DTL_STACK_AREA'] = $DTL_STACK_AREA;
 
 			if (empty($config['DTL_TL'])) {
