@@ -41,7 +41,9 @@ class Kernel extends ConsoleKernel
 
       $schedule->call('App\Helper\ConnectedExternalApps@sendNotifToIBISQA')->everyMinute();
 
-      $schedule->call('App\Helper\PlgConnectedExternalApps@getRealGati')->everyMinute();
+      $schedule->call('App\Helper\PlgConnectedExternalApps@getRealGati');
+
+      // $schedule->call('App\Helper\PlgConnectedExternalApps@getRealPlacement');
 
     }
 }

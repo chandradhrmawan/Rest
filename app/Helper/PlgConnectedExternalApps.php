@@ -578,9 +578,10 @@ class PlgConnectedExternalApps{
 
 		public static function getRealRecPLG($input){
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
-			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->where('REC_FL_REAL', '1')->get();
 			$res = static::getRecGATI($find,$dtlLoop);
 			$his_cont = [];
+							// echo $input["rec_id"];
 			if ($res['result']['count'] > 0) {
 				$his_cont = static::storeRecGATI($res['result']['result'], $find);
 				$Success = true;
@@ -694,7 +695,7 @@ class PlgConnectedExternalApps{
 						// "gatein_mark" => $listR[''],
 					"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
 					"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
-					"gatein_create_by" => $input['user']->user_id,
+					"gatein_create_by" => "1", //$input["user"]->user_id
 					"gatein_branch_id" => $hdr->rec_branch_id,
 					"gatein_branch_code" => $hdr->rec_branch_code
 				];
@@ -716,7 +717,6 @@ class PlgConnectedExternalApps{
 				])->first();
 				$arrStoreTsContAndTxHisCont = [
 					'cont_no' => $listR['NO_CONTAINER'],
-					'rec_id' => $hdr->rec_id,
 					'branch_id' => $hdr->rec_branch_id,
 					'branch_code' => $hdr->rec_branch_code,
 					'cont_location' => 'GATI',
@@ -725,10 +725,11 @@ class PlgConnectedExternalApps{
 					'cont_counter' => $cont_counter,
 					'no_request' => $listR['NO_REQUEST'],
 					'kegiatan' => $cekKegiatan->reff_id,
-					'id_user' => $input["user"]->user_id,
+					'id_user' => "1", //$input["user"]->user_id
 					'status_cont' => $listR['STATUS'],
 					'vvd_id' => $hdr->rec_vvd_id
 				];
+				DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $hdr->rec_id)->where('REC_DTL_CONT', $listR['NO_CONTAINER'])->update(['REC_FL_REAL'=>"2"]);
 				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 			}
 			return $his_cont;

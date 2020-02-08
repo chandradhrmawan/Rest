@@ -742,7 +742,7 @@ class PlgRequestBooking{
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
 				// if ($cekTsCont->cont_counter == 0) {
-				if ($arr["cont_location"] == "GATI") {
+				if ($arr["cont_location"] == "GATI" && $cekTsCont->cont_counter == 0) {
 					$counter = $cekTsCont->cont_counter+1;
 				}else{
 					$counter = $cekTsCont->cont_counter;
@@ -762,7 +762,6 @@ class PlgRequestBooking{
 					// 'aktif' => $list[$config['DTL_BL']], ?
 				];
 				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeTxHisCont);
-				DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $arr['rec_id'])->where('REC_DTL_CONT', $arr['cont_no'])->update('REC_FL_REAL', "2");
 			// history container
 			return ['storeTsCont' => $cekTsCont, 'storeTxHisCont'=>$storeTxHisCont];
 	    }
