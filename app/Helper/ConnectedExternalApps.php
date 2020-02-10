@@ -873,7 +873,7 @@ class ConnectedExternalApps{
                     "vCustomerId": "'.$input['cdm_customer_id'].'",
                     "vKend": "'.$input['truck_type'].'",
                     "vTgl": "'.$input['date'].'",
-                    "vTerminalCode": "201"
+                    "vTerminalCode": "'.$input['terminal_id'].'"
                 }
             }
       }';
@@ -927,7 +927,7 @@ class ConnectedExternalApps{
                     "customerId": "'.$input['cdm_customer_id'].'",
                     "kend": "'.$input['truck_type'].'",
                     "tgl": "'.$input['date'].'",
-                    "idTerminal": "201"
+                    "idTerminal": "'.$input['terminal_id'].'"
                 }
             }
       }';
