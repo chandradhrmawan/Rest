@@ -159,6 +159,7 @@ class PlgConnectedExternalApps{
 	    	}
 	        return ['sendRequestBookingPLG' => $res];
 		}
+
 		// store request data to tos
 		    private static function buildJsonTX_HDR_REC($arr){
 		        $arrdetil = '';
@@ -270,7 +271,7 @@ class PlgConnectedExternalApps{
 		        }';
 			}
 
-			private static function buildJsonTX_HDR_STUFF($arr){ // not finish
+			private static function buildJsonTX_HDR_STUFF($arr){
 		        $arrdetil = '';
 		        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 		        foreach ($dtls as $dtl) {
@@ -279,16 +280,13 @@ class PlgConnectedExternalApps{
 		            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 		            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 		            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-		            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
 		            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 		            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 		            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 		            "REQ_DTL_REMARK_SP2": "",
-		            "REQ_DTL_ORIGIN": "DEPO",
-		            "TGL_MULAI": "1/29/2020 00:00:00",
-		            "TGL_SELESAI": "1/29/2020 00:00:00",
-		            "REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-		            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'"
+		            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
+		            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+		            "TGL_SELESAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 		          },';
 		        }
 		        $arrdetil = substr($arrdetil, 0,-1);
@@ -308,7 +306,7 @@ class PlgConnectedExternalApps{
 		          'reff_id' => $head[$arr['config']['head_from']]
 		        ])->first();
 		        return $json_body = '{
-		          "action" : "getReceiving",
+		          "action" : "getStuffing",
 		          "header": {
 		            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 		            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
@@ -317,14 +315,71 @@ class PlgConnectedExternalApps{
 		            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
 		            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 		            "REQ_MARK": "",
-		            "NO_UKK": "7310",
-		            "NO_BOOKING": "BSHMAS7310",
+		            "NO_UKK": "'.$head[$arr['config']['head_vvd']].'",
+		            "NO_BOOKING": "",
 		            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 		            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-		            "NO_REQUEST_RECEIVING": "REC1219001617",
+		            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
 		            "STUFFING_DARI": "'.$rec_dr->reff_name.'",
-		            "PERP_DARI": "",
-		            "PERP_KE": "",
+		            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
+		            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
+		            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+		          },
+		          "arrdetail": ['.$arrdetil.']
+		        }';
+			}
+
+			private static function buildJsonTX_HDR_STRIPP($arr){ // not finish
+		        $arrdetil = '';
+		        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
+		        foreach ($dtls as $dtl) {
+		          $dtl = (array)$dtl;
+		          $arrdetil .= '{
+		            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
+		            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+		            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+		            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+		            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+		            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+		            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
+		            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+		            "TGL_SELESAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
+		          },';
+		        }
+		        $arrdetil = substr($arrdetil, 0,-1);
+		        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+		        $head = (array)$head;
+		        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
+		        $nota_no = null;
+		        $nota_date = null;
+		        $nota_paid_date = null;
+		        if (!empty($nota)) {
+		        	$nota_no = $nota->nota_no;
+		        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+		        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+		        }
+		        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
+		          'reff_tr_id' => 5,
+		          'reff_id' => $head[$arr['config']['head_from']]
+		        ])->first();
+		        return $json_body = '{
+		          "action" : "getStripping",
+		          "header": {
+		            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+		            "REQ_STRIP_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+		            "NO_NOTA": "'.$nota_no.'",
+		            "TGL_NOTA": "'.$nota_date.'",
+		            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
+		            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
+		            "REQ_MARK": "",
+		            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
+		            "DO": "'.$head[$arr['config']['head_do']].'",
+		            "BL": "'.$head[$arr['config']['head_bl']].'",
+		            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
+		            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
+		            "STRIP_DARI": "'.$rec_dr->reff_name.'",
+		            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
+		            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
 		            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 		          },
 		          "arrdetail": ['.$arrdetil.']
