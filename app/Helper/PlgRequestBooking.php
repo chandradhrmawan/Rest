@@ -194,18 +194,17 @@ class PlgRequestBooking{
 					$dateIn = $tglIn->gatein_date;
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				} else if (in_array($config['DTL_DATE_IN'], ["TX_HISTORY_CONTAINER"])){
-					if ($config['kegiatan'] == 5) { // stuffing
-						$tglIn 	= DB::connection('omuster')
-							->table('TX_HISTORY_CONTAINER')
-							->where('NO_CONTAINER', $list[$config['DTL_BL']])
-							->where('STATUS_CONT', 'MTY')
-							->whereIn('KEGIATAN', [3,6])
-							->orderBy("TGL_UPDATE", "DESC")
-							->first();
-						$dateIn = $tglIn->tgl_update;
-						DB::connection('omuster')->table('TX_DTL_STUFF')->where('stuff_dtl_id',$list['stuff_dtl_id'])->update(['stuff_dtl_stack_date'=>$dateIn]);
-						$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-					}
+					$in = [3,5,6];
+					$tglIn 	= DB::connection('omuster')
+						->table('TX_HISTORY_CONTAINER')
+						->where('NO_CONTAINER', $list[$config['DTL_BL']])
+						->where('STATUS_CONT', 'MTY')
+						->whereIn('KEGIATAN', )
+						->orderBy("TGL_UPDATE", "DESC")
+						->first();
+					$dateIn = $tglIn->tgl_update;
+					DB::connection('omuster')->table('TX_DTL_STUFF')->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
+					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}else{
 					$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}
