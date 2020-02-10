@@ -203,6 +203,7 @@ class PlgRequestBooking{
 							->orderBy("TGL_UPDATE", "DESC")
 							->first();
 						$dateIn = $tglIn->tgl_update;
+						DB::connection('omuster')->table('TX_DTL_STUFF')->where('stuff_dtl_id',$list['stuff_dtl_id'])->update(['stuff_dtl_stack_date'=>$dateIn]);
 						$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 				}else{
