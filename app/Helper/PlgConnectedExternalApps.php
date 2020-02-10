@@ -1285,7 +1285,7 @@ class PlgConnectedExternalApps{
 		    ];
 
 		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
-		                        // DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
+		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
 		    $storePlacement  	= [
@@ -1325,7 +1325,7 @@ class PlgConnectedExternalApps{
 		      DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->update($storePlacement);
 		    }
 
-		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findPlacement)->first();
+		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
 		    if (empty($cekHistory)) {
 		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
 		    } else {
