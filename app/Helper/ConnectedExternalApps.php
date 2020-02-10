@@ -386,6 +386,11 @@ class ConnectedExternalApps{
         $hsl = [];
 
         $vparam = '';
+        $hscode = '0000';
+        if ($req_type == 'REC' or $req_type == 'BM') {
+          $hscode = DB::connection('mdm')->table('M_CG_HSCODE')->where('COMMODITY_ID', $list->dtl_cmdty_id)->first();
+          $hscode = $hscode->hs_code;
+        }
         // first
           if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
             $vparam .= 'REC'; // IF_FLAG
@@ -427,7 +432,7 @@ class ConnectedExternalApps{
           }
           if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
           $vparam .= '^'; // OI
-          $vparam .= '^HS01'; // HS_CODE
+          $vparam .= '^'.$hscode; // HS_CODE
           $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
           if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
 
@@ -538,7 +543,7 @@ class ConnectedExternalApps{
           }
           if ($list->dtl_character_id == 1) { $vparam .= '^N'; }else{ $vparam .= '^Y'; } // HZ
           $vparam .= '^'; // OI
-          $vparam .= '^HS01'; // HS_CODE
+          $vparam .= '^'.$hscode; // HS_CODE
           $vparam .= '^'.$listA[$config['head_tab_detil_id']]; // CARGO_ID
           if ($list->dtl_character_id == 1) { $vparam .= '^Y'; }else{ $vparam .= '^N'; } // DS
 
@@ -868,7 +873,7 @@ class ConnectedExternalApps{
                     "vCustomerId": "'.$input['cdm_customer_id'].'",
                     "vKend": "'.$input['truck_type'].'",
                     "vTgl": "'.$input['date'].'",
-                    "vTerminalCode": "201"
+                    "vTerminalCode": "'.$input['terminal_id'].'"
                 }
             }
       }';
@@ -922,7 +927,7 @@ class ConnectedExternalApps{
                     "customerId": "'.$input['cdm_customer_id'].'",
                     "kend": "'.$input['truck_type'].'",
                     "tgl": "'.$input['date'].'",
-                    "idTerminal": "201"
+                    "idTerminal": "'.$input['terminal_id'].'"
                 }
             }
       }';

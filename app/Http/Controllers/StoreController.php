@@ -192,7 +192,14 @@ class StoreController extends Controller
         $new->save();
         $input['truck_cust_id'] = $new->comp_id;
       }
+
+      $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where([
+        'branch_id' => $input['truck_branch_id'],
+        'branch_code' => $input['truck_branch_code']
+      ])->first();
+
       $set_data = [
+        "terminal_id" => $terminal->terminal_id,
         "truck_plat_no" => strtoupper($input['truck_plat_no']),
         "truck_rfid_code" => strtoupper($input['truck_rfid']),
         "customer_name" => strtoupper($input['truck_cust_name']),
@@ -213,7 +220,7 @@ class StoreController extends Controller
         "truck_date" => $input['truck_date'],
         "truck_cust_address" => $input['truck_cust_address'],
         "truck_type" => $input['truck_type'],
-        "truck_terminal_code" => $input['truck_terminal_code'],
+        "truck_terminal_code" => $terminal->terminal_code,
         "truck_plat_exp" => $input['truck_plat_exp'],
         "truck_stnk_no" => $input['truck_stnk_no'],
         "truck_stnk_exp" => $input['truck_stnk_exp'],
