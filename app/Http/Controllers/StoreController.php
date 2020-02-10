@@ -413,17 +413,11 @@ class StoreController extends Controller
       return GlobalHelper::update($input);
     }
 
-  function retrievePayment($input) {
-    // DB::connection('omcargo')->table('payment')->insert($input["data"]);
-    return ["Result"=>"Success"];
-  }
-
-  function sendPayment($input) {
-    // DB::connection('omcargo')->table('payment')->insert($input["data"]);
-    return $input["data"];
-  }
-
   function delHeaderDetail($input) {
     return GlobalHelper::delHeaderDetail($input);
   }
+
+  // function getUpdatePlacement($input) {
+  //   return PlgConnectedExternalApps::getUpdatePlacement($input);
+  // }
 }

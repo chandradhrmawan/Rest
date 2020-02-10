@@ -1179,5 +1179,164 @@ class PlgConnectedExternalApps{
 			return $his_cont;
 		}
 
+		public static function getUpdatePlacement(){
+		  $all 						 = [];
+		  $now 						 = Carbon::now()->format('Y-m-d');
+		  $det 						 = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', "2")->get();
+		  foreach ($det as $lista) {
+		    $newDt 				 = [];
+		    foreach ($lista as $key => $value) {
+		      $newDt[$key] = $value;
+		    }
+
+		    $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $lista->rec_hdr_id)->get();
+		    foreach ($hdr as $listS) {
+		      foreach ($listS as $key => $value) {
+		        $newDt[$key] = $value;
+		      }
+		    }
+
+		      $all[] 				= $newDt;
+		    }
+
+		  $dtl 							= '';
+		  $arrdtl 					= [];
+
+		  foreach ($all as $list) {
+		    $dtl .= '
+		    {
+		      "NO_CONTAINER"	: "'.$list["rec_dtl_cont"].'",
+		      "NO_REQUEST"		: "'.$list["rec_no"].'",
+		      "BRANCH_ID"			: "'.$list["rec_branch_id"].'"
+		    },';
+		    $arrdtlset = [
+		      "NO_CONTAINER" 	=> $list["rec_dtl_cont"],
+		      "NO_REQUEST"	  => $list["rec_no"],
+		      "BRANCH_ID" 		=> $list["rec_branch_id"]
+		    ];
+		    $arrdtl[]  = $arrdtlset;
+		  }
+
+		  $head = [
+		    "action" 	=> "generatePlacement",
+		    "data" 		=> $arrdtl
+		  ];
+
+		  $dtl 	= substr($dtl, 0,-1);
+		  $json = '
+		  {
+		    "action" : "generatePlacement",
+		    "data": ['.$dtl.']
+		  }';
+
+		  $json = base64_encode(json_encode(json_decode($json,true)));
+		  $json = '
+		    {
+		        "repoGetRequest": {
+		            "esbHeader": {
+		                "internalId": "",
+		                "externalId": "",
+		                "timestamp": "",
+		                "responseTimestamp": "",
+		                "responseCode": "",
+		                "responseMessage": ""
+		            },
+		            "esbBody": {
+		                "request": "'.$json.'"
+		            },
+		            "esbSecurity": {
+		                "orgId": "",
+		                "batchSourceId": "",
+		                "lastUpdateLogin": "",
+		                "userId": "",
+		                "respId": "",
+		                "ledgerId": "",
+		                "respAppId": "",
+		                "batchSourceName": ""
+		            }
+		        }
+		    }
+		      ';
+		  $json = json_encode(json_decode($json,true));
+		  $arr = [
+		          "user"		 	=> config('endpoint.tosGetPLG.user'),
+		          "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		          "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		          "json" 		 	=> $json
+		        ];
+		  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		  $res				 			 	= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		  foreach ($res["result"]["result"] as $listR) {
+		    $findCont 				= [
+		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
+		      "CONT_LOCATION" => "GATI"
+		    ];
+
+		    $findPlacement 		= [
+		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"]
+		    ];
+
+				$findHistory 			= [
+		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+					"KEGIATAN"			=> "12"
+		    ];
+
+		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
+		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
+		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
+
+		    $storePlacement  	= [
+		      "PLACEMENT_ID"	=> $placementID[0]->nextval,
+		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER"	=> $listR["NO_CONTAINER"],
+		      "YBC_SLOT"			=> $listR["YBC_SLOT"],
+		      "YBC_ROW"				=> $listR["YBC_ROW"],
+		      "YBC_BLOCK_ID"	=> $listR["YBC_BLOCK_ID"],
+		      "TIER"					=> $listR["TIER"],
+		      "ID_YARD"				=> $listR["ID_YARD"],
+		      "ID_USER"				=> $listR["ID_USER"],
+		      "CONT_STATUS"		=> $listR["CONT_STATUS"],
+		      "TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
+		      "BRANCH_ID"			=> $listR["BRANCH_ID"],
+		      "CONT_COUNTER"	=> $tsContainer->cont_counter
+		    ];
+
+		    $storeHistory 		= [
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
+		      "KEGIATAN"			=> "12",
+		      "TGL_UPDATE"		=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
+		      "ID_USER"				=> $listR["ID_USER"],
+		      "ID_YARD"				=> $listR["ID_YARD"],
+		      "STATUS_CONT"		=> $listR["CONT_STATUS"],
+		      "VVD_ID"				=> "",
+		      "COUNTER"				=> $tsContainer->cont_counter,
+		      "SUB_COUNTER"		=> "",
+		      "WHY"						=> ""
+		    ];
+
+		    $cekPlacement 		= DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->first();
+		    if (empty($cekPlacement)) {
+		      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
+		    } else {
+		      DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->update($storePlacement);
+		    }
+
+		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+		    if (empty($cekHistory)) {
+		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+		    } else {
+		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+		    }
+		  }
+
+		  $updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "3")->get();
+		  foreach ($updateDetail as $updateVal) {
+		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"2"]);
+		  }
+		}
 	// PLG
 }
