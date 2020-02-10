@@ -202,7 +202,7 @@ class PlgRequestBooking{
 							->whereIn('KEGIATAN', [3,6])
 							->orderBy("TGL_UPDATE", "DESC")
 							->first();
-						$dateIn = $tglIn->gatein_date;
+						$dateIn = $tglIn->tgl_update;
 						$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
 				}else{
