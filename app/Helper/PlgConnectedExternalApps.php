@@ -159,6 +159,7 @@ class PlgConnectedExternalApps{
 	    	}
 	        return ['sendRequestBookingPLG' => $res];
 		}
+
 		// store request data to tos
 		    private static function buildJsonTX_HDR_REC($arr){
 		        $arrdetil = '';
@@ -270,7 +271,7 @@ class PlgConnectedExternalApps{
 		        }';
 			}
 
-			private static function buildJsonTX_HDR_STUFF($arr){ // not finish
+			private static function buildJsonTX_HDR_STUFF($arr){
 		        $arrdetil = '';
 		        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 		        foreach ($dtls as $dtl) {
@@ -279,16 +280,13 @@ class PlgConnectedExternalApps{
 		            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 		            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 		            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-		            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
 		            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 		            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 		            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 		            "REQ_DTL_REMARK_SP2": "",
-		            "REQ_DTL_ORIGIN": "DEPO",
-		            "TGL_MULAI": "1/29/2020 00:00:00",
-		            "TGL_SELESAI": "1/29/2020 00:00:00",
-		            "REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-		            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'"
+		            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
+		            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+		            "TGL_SELESAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 		          },';
 		        }
 		        $arrdetil = substr($arrdetil, 0,-1);
@@ -308,7 +306,7 @@ class PlgConnectedExternalApps{
 		          'reff_id' => $head[$arr['config']['head_from']]
 		        ])->first();
 		        return $json_body = '{
-		          "action" : "getReceiving",
+		          "action" : "getStuffing",
 		          "header": {
 		            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 		            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
@@ -317,14 +315,71 @@ class PlgConnectedExternalApps{
 		            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
 		            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 		            "REQ_MARK": "",
-		            "NO_UKK": "7310",
-		            "NO_BOOKING": "BSHMAS7310",
+		            "NO_UKK": "'.$head[$arr['config']['head_vvd']].'",
+		            "NO_BOOKING": "",
 		            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 		            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-		            "NO_REQUEST_RECEIVING": "REC1219001617",
+		            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
 		            "STUFFING_DARI": "'.$rec_dr->reff_name.'",
-		            "PERP_DARI": "",
-		            "PERP_KE": "",
+		            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
+		            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
+		            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+		          },
+		          "arrdetail": ['.$arrdetil.']
+		        }';
+			}
+
+			private static function buildJsonTX_HDR_STRIPP($arr){
+		        $arrdetil = '';
+		        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
+		        foreach ($dtls as $dtl) {
+		          $dtl = (array)$dtl;
+		          $arrdetil .= '{
+		            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
+		            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+		            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+		            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+		            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+		            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+		            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
+		            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+		            "TGL_SELESAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
+		          },';
+		        }
+		        $arrdetil = substr($arrdetil, 0,-1);
+		        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+		        $head = (array)$head;
+		        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
+		        $nota_no = null;
+		        $nota_date = null;
+		        $nota_paid_date = null;
+		        if (!empty($nota)) {
+		        	$nota_no = $nota->nota_no;
+		        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+		        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+		        }
+		        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
+		          'reff_tr_id' => 5,
+		          'reff_id' => $head[$arr['config']['head_from']]
+		        ])->first();
+		        return $json_body = '{
+		          "action" : "getStripping",
+		          "header": {
+		            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+		            "REQ_STRIP_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+		            "NO_NOTA": "'.$nota_no.'",
+		            "TGL_NOTA": "'.$nota_date.'",
+		            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
+		            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
+		            "REQ_MARK": "",
+		            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
+		            "DO": "'.$head[$arr['config']['head_do']].'",
+		            "BL": "'.$head[$arr['config']['head_bl']].'",
+		            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
+		            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
+		            "STRIP_DARI": "'.$rec_dr->reff_name.'",
+		            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
+		            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
 		            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 		          },
 		          "arrdetail": ['.$arrdetil.']
@@ -640,18 +695,19 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealRecPLG($input){
+			$his_cont = [];
+			$Success = true;
+			$msg = 'Success get realisasion';
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->where('REC_FL_REAL', '1')->get();
-			$res = static::getRecGATI($find,$dtlLoop);
-			$his_cont = [];
-							// echo $input["rec_id"];
-			if ($res['result']['count'] > 0) {
-				$his_cont = static::storeRecGATI($res['result']['result'], $find);
-				$Success = true;
-				$msg = 'Success get realisasion';
-			}else{
-				$Success = false;
-				$msg = 'realisasion not finish';
+			if (count($dtlLoop) > 0) {
+				$res = static::getRecGATI($find,$dtlLoop);
+				if ($res['result']['count'] > 0) {
+					$his_cont = static::storeRecGATI($res['result']['result'], $find);
+				}else{
+					$Success = false;
+					$msg = 'realisasion not finish';
+				}
 			}
 			$res['his_cont'] = $his_cont;
 			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
@@ -737,12 +793,6 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function storeRecGATI($data,$hdr){
-			if (isset($input["user"]->user_id)) {
-				$user = $input["user"]->user_id;
-			} else {
-				$user = "Scheduller";
-			}
-
 			$his_cont = [];
 			foreach ($data as $listR) {
 				$findGATI = [
@@ -764,7 +814,7 @@ class PlgConnectedExternalApps{
 						// "gatein_mark" => $listR[''],
 					"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
 					"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
-					"gatein_create_by" => $user,
+					"gatein_create_by" => "1", //$input["user"]->user_id
 					"gatein_branch_id" => $hdr->rec_branch_id,
 					"gatein_branch_code" => $hdr->rec_branch_code
 				];
@@ -794,7 +844,7 @@ class PlgConnectedExternalApps{
 					'cont_counter' => $cont_counter,
 					'no_request' => $listR['NO_REQUEST'],
 					'kegiatan' => $cekKegiatan->reff_id,
-					'id_user' => $user,
+					'id_user' => "1", //$input["user"]->user_id
 					'status_cont' => $listR['STATUS'],
 					'vvd_id' => $hdr->rec_vvd_id
 				];
@@ -969,5 +1019,318 @@ class PlgConnectedExternalApps{
 			];
 		}
 
+		public static function getRealStuffPLG($input){
+			$his_cont = [];
+			$Success = true;
+			$msg = 'Success get realisasion';
+			$find = DB::connection('omuster')->table('TX_HDR_STUFF')->where('stuff_id', $input['stuff_id'])->first();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_STUFF')->where('stuff_hdr_id', $input['stuff_id'])->get();
+			if (count($dtlLoop) > 0) {
+				$res = static::getStuffGATI($find,$dtlLoop);
+				if ($res['result']['count'] > 0) {
+					$his_cont = static::storeStuffGATI($res['result']['result'], $find);
+				}else{
+					$Success = false;
+					$msg = 'realisasion not finish';
+				}
+			}
+			$res['his_cont'] = $his_cont;
+			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
+				->leftJoin('TX_GATEIN', function($join) use ($find){
+					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
+					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
+				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+	        return [
+	        	'response' => $Success,
+	        	'result' => $msg,
+	        	'no_rec' =>$find->rec_no,
+	        	'hdr' =>$find,
+	        	'dtl' => $dtl,
+	        	'getRealRecPLG' => $res
+	        ];
+		}
+
+		public static function getStuffGATI($find,$dtlLoop){
+			$dtl = '';
+			$arrdtl = [];
+			foreach ($dtlLoop as $list) {
+				// Adding udate where('REC_FL_REAL', '0') For Every Detail
+				$dtl .= '
+				{
+					"NO_CONTAINER": "'.$list->rec_dtl_cont.'",
+					"NO_REQUEST": "'.$find->rec_no.'",
+					"BRANCH_ID": "'.$find->rec_branch_id.'"
+				},';
+				$arrdtlset = [
+					"NO_CONTAINER" => $list->rec_dtl_cont,
+					"NO_REQUEST" => $find->rec_no,
+					"BRANCH_ID" => $find->rec_branch_id
+				];
+				$arrdtl[] = $arrdtlset;
+			}
+			$head = [
+				"action" => "generateGetIn",
+				"data" => $arrdtl
+			];
+	        $dtl = substr($dtl, 0,-1);
+			$json = '
+			{
+				"action" : "generateGetIn",
+				"data": ['.$dtl.']
+			}';
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			$json = '
+				{
+				    "repoGetRequest": {
+				        "esbHeader": {
+				            "internalId": "",
+				            "externalId": "",
+				            "timestamp": "",
+				            "responseTimestamp": "",
+				            "responseCode": "",
+				            "responseMessage": ""
+				        },
+				        "esbBody": {
+				            "request": "'.$json.'"
+				        },
+				        "esbSecurity": {
+				            "orgId": "",
+				            "batchSourceId": "",
+				            "lastUpdateLogin": "",
+				            "userId": "",
+				            "respId": "",
+				            "ledgerId": "",
+				            "respAppId": "",
+				            "batchSourceName": ""
+				        }
+				    }
+				}
+	        ';
+	        $json = json_encode(json_decode($json,true));
+			$arr = [
+	        	"user" => config('endpoint.tosGetPLG.user'),
+	        	"pass" => config('endpoint.tosGetPLG.pass'),
+	        	"target" => config('endpoint.tosGetPLG.target'),
+	        	"json" => $json
+	        ];
+			$res = static::sendRequestToExtJsonMet($arr);
+			return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		}
+
+		public static function storeStuffGATI($data,$hdr){
+			$his_cont = [];
+			foreach ($data as $listR) {
+				$findGATI = [
+					'GATEIN_CONT' => $listR['NO_CONTAINER'],
+					'GATEIN_REQ_NO' => $listR['NO_REQUEST'],
+					'GATEIN_BRANCH_ID' => $hdr->rec_branch_id,
+					'GATEIN_BRANCH_CODE' => $hdr->rec_branch_code
+				];
+				$cek = DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->first();
+				$datenow    = Carbon::now()->format('Y-m-d');
+				$storeGATI = [
+					"gatein_cont" => $listR['NO_CONTAINER'],
+					"gatein_req_no" => $listR['NO_REQUEST'],
+					"gatein_pol_no" => $listR['NOPOL'],
+					"gatein_cont_status" => $listR['STATUS'],
+						// "gatein_seal_no" => $listR[''],
+						// "gatein_trucking" => $listR[''],
+						// "gatein_yard" => $listR[''],
+						// "gatein_mark" => $listR[''],
+					"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
+					"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
+					"gatein_create_by" => "1", //$input["user"]->user_id
+					"gatein_branch_id" => $hdr->rec_branch_id,
+					"gatein_branch_code" => $hdr->rec_branch_code
+				];
+				if (empty($cek)) {
+					DB::connection('omuster')->table('TX_GATEIN')->insert($storeGATI);
+				}else{
+					DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
+				}
+				$findTsCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->rec_branch_id,
+					'branch_code' => $hdr->rec_branch_code
+				];
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first(); //remove ->orderBy('cont_counter', 'desc')
+				$cont_counter = $cekTsCont->cont_counter+1; //kusus gate in
+				$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
+					"reff_tr_id" => 12,
+					"reff_name" => 'GATE IN'
+				])->first();
+				$arrStoreTsContAndTxHisCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->rec_branch_id,
+					'branch_code' => $hdr->rec_branch_code,
+					'cont_location' => 'GATI',
+					'cont_size' => null,
+					'cont_type' => null,
+					'cont_counter' => $cont_counter,
+					'no_request' => $listR['NO_REQUEST'],
+					'kegiatan' => $cekKegiatan->reff_id,
+					'id_user' => "1", //$input["user"]->user_id
+					'status_cont' => $listR['STATUS'],
+					'vvd_id' => $hdr->rec_vvd_id
+				];
+				DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $hdr->rec_id)->where('REC_DTL_CONT', $listR['NO_CONTAINER'])->update(['REC_FL_REAL'=>"2"]);
+				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+			}
+			return $his_cont;
+		}
+
+		public static function getUpdatePlacement(){
+		  $all 						 = [];
+		  $now 						 = Carbon::now()->format('Y-m-d');
+		  $det 						 = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', "2")->get();
+		  foreach ($det as $lista) {
+		    $newDt 				 = [];
+		    foreach ($lista as $key => $value) {
+		      $newDt[$key] = $value;
+		    }
+
+		    $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $lista->rec_hdr_id)->get();
+		    foreach ($hdr as $listS) {
+		      foreach ($listS as $key => $value) {
+		        $newDt[$key] = $value;
+		      }
+		    }
+
+		      $all[] 				= $newDt;
+		    }
+
+		  $dtl 							= '';
+		  $arrdtl 					= [];
+
+		  foreach ($all as $list) {
+		    $dtl .= '
+		    {
+		      "NO_CONTAINER"	: "'.$list["rec_dtl_cont"].'",
+		      "NO_REQUEST"		: "'.$list["rec_no"].'",
+		      "BRANCH_ID"			: "'.$list["rec_branch_id"].'"
+		    },';
+		    $arrdtlset = [
+		      "NO_CONTAINER" 	=> $list["rec_dtl_cont"],
+		      "NO_REQUEST"	  => $list["rec_no"],
+		      "BRANCH_ID" 		=> $list["rec_branch_id"]
+		    ];
+		    $arrdtl[]  = $arrdtlset;
+		  }
+
+		  $head = [
+		    "action" 	=> "generatePlacement",
+		    "data" 		=> $arrdtl
+		  ];
+
+		  $dtl 	= substr($dtl, 0,-1);
+		  $json = '
+		  {
+		    "action" : "generatePlacement",
+		    "data": ['.$dtl.']
+		  }';
+
+		  $json = base64_encode(json_encode(json_decode($json,true)));
+		  $json = '
+		    {
+		        "repoGetRequest": {
+		            "esbHeader": {
+		                "internalId": "",
+		                "externalId": "",
+		                "timestamp": "",
+		                "responseTimestamp": "",
+		                "responseCode": "",
+		                "responseMessage": ""
+		            },
+		            "esbBody": {
+		                "request": "'.$json.'"
+		            },
+		            "esbSecurity": {
+		                "orgId": "",
+		                "batchSourceId": "",
+		                "lastUpdateLogin": "",
+		                "userId": "",
+		                "respId": "",
+		                "ledgerId": "",
+		                "respAppId": "",
+		                "batchSourceName": ""
+		            }
+		        }
+		    }
+		      ';
+		  $json = json_encode(json_decode($json,true));
+		  $arr = [
+		          "user"		 	=> config('endpoint.tosGetPLG.user'),
+		          "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		          "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		          "json" 		 	=> $json
+		        ];
+		  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		  $res				 			 	= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		  foreach ($res["result"]["result"] as $listR) {
+		    $findCont 				= [
+		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
+		      "CONT_LOCATION" => "GATI"
+		    ];
+
+		    $findPlacement 		= [
+		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"]
+		    ];
+
+		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
+		                        // DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
+		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
+
+		    $storePlacement  	= [
+		      "PLACEMENT_ID"	=> $placementID[0]->nextval,
+		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER"	=> $listR["NO_CONTAINER"],
+		      "YBC_SLOT"			=> $listR["YBC_SLOT"],
+		      "YBC_ROW"				=> $listR["YBC_ROW"],
+		      "YBC_BLOCK_ID"	=> $listR["YBC_BLOCK_ID"],
+		      "TIER"					=> $listR["TIER"],
+		      "ID_YARD"				=> $listR["ID_YARD"],
+		      "ID_USER"				=> $listR["ID_USER"],
+		      "CONT_STATUS"		=> $listR["CONT_STATUS"],
+		      "TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
+		      "BRANCH_ID"			=> $listR["BRANCH_ID"],
+		      "CONT_COUNTER"	=> $tsContainer->cont_counter
+		    ];
+
+		    $storeHistory 		= [
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
+		      "KEGIATAN"			=> "12",
+		      "TGL_UPDATE"		=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
+		      "ID_USER"				=> $listR["ID_USER"],
+		      "ID_YARD"				=> $listR["ID_YARD"],
+		      "STATUS_CONT"		=> $listR["CONT_STATUS"],
+		      "VVD_ID"				=> "",
+		      "COUNTER"				=> $tsContainer->cont_counter,
+		      "SUB_COUNTER"		=> "",
+		      "WHY"						=> ""
+		    ];
+
+		    $cekPlacement 		= DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->first();
+		    if (empty($cekPlacement)) {
+		      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
+		    } else {
+		      DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->update($storePlacement);
+		    }
+
+		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findPlacement)->first();
+		    if (empty($cekHistory)) {
+		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+		    } else {
+		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findPlacement)->update($storeHistory);
+		    }
+		  }
+
+		  $updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "3")->get();
+		  foreach ($updateDetail as $updateVal) {
+		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"2"]);
+		  }
+		}
 	// PLG
 }
