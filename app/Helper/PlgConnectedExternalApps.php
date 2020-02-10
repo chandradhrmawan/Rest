@@ -1278,6 +1278,12 @@ class PlgConnectedExternalApps{
 		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"]
 		    ];
 
+				$findHistory 			= [
+		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+					"KEGIATAN"			=> "12"
+		    ];
+
 		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
 		                        // DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
@@ -1323,7 +1329,7 @@ class PlgConnectedExternalApps{
 		    if (empty($cekHistory)) {
 		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
 		    } else {
-		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findPlacement)->update($storeHistory);
+		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
 		    }
 		  }
 
