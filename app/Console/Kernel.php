@@ -43,7 +43,7 @@ class Kernel extends ConsoleKernel
 
       $schedule->call('App\Helper\PlgConnectedExternalApps@getRealGati');
 
-      // $schedule->call('App\Helper\PlgConnectedExternalApps@getRealPlacement');
+      $schedule->call('App\Helper\PlgConnectedExternalApps@getUpdatePlacement');
 
     }
 }
