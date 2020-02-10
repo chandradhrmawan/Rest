@@ -695,18 +695,19 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealRecPLG($input){
+			$his_cont = [];
+			$Success = true;
+			$msg = 'Success get realisasion';
 			$find = DB::connection('omuster')->table('TX_HDR_REC')->where('REC_ID', $input['rec_id'])->first();
 			$dtlLoop = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->where('REC_FL_REAL', '1')->get();
-			$res = static::getRecGATI($find,$dtlLoop);
-			$his_cont = [];
-							// echo $input["rec_id"];
-			if ($res['result']['count'] > 0) {
-				$his_cont = static::storeRecGATI($res['result']['result'], $find);
-				$Success = true;
-				$msg = 'Success get realisasion';
-			}else{
-				$Success = false;
-				$msg = 'realisasion not finish';
+			if (count($dtlLoop) > 0) {
+				$res = static::getRecGATI($find,$dtlLoop);
+				if ($res['result']['count'] > 0) {
+					$his_cont = static::storeRecGATI($res['result']['result'], $find);
+				}else{
+					$Success = false;
+					$msg = 'realisasion not finish';
+				}
 			}
 			$res['his_cont'] = $his_cont;
 			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
@@ -1016,6 +1017,166 @@ class PlgConnectedExternalApps{
 				'dtl' 				 => $dtl,
 				'getRealRecPLG'=> $res
 			];
+		}
+
+		public static function getRealStuffPLG($input){
+			$his_cont = [];
+			$Success = true;
+			$msg = 'Success get realisasion';
+			$find = DB::connection('omuster')->table('TX_HDR_STUFF')->where('stuff_id', $input['stuff_id'])->first();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_STUFF')->where('stuff_hdr_id', $input['stuff_id'])->get();
+			if (count($dtlLoop) > 0) {
+				$res = static::getStuffGATI($find,$dtlLoop);
+				if ($res['result']['count'] > 0) {
+					$his_cont = static::storeStuffGATI($res['result']['result'], $find);
+				}else{
+					$Success = false;
+					$msg = 'realisasion not finish';
+				}
+			}
+			$res['his_cont'] = $his_cont;
+			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
+				->leftJoin('TX_GATEIN', function($join) use ($find){
+					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
+					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
+				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+	        return [
+	        	'response' => $Success,
+	        	'result' => $msg,
+	        	'no_rec' =>$find->rec_no,
+	        	'hdr' =>$find,
+	        	'dtl' => $dtl,
+	        	'getRealRecPLG' => $res
+	        ];
+		}
+
+		public static function getStuffGATI($find,$dtlLoop){
+			$dtl = '';
+			$arrdtl = [];
+			foreach ($dtlLoop as $list) {
+				// Adding udate where('REC_FL_REAL', '0') For Every Detail
+				$dtl .= '
+				{
+					"NO_CONTAINER": "'.$list->rec_dtl_cont.'",
+					"NO_REQUEST": "'.$find->rec_no.'",
+					"BRANCH_ID": "'.$find->rec_branch_id.'"
+				},';
+				$arrdtlset = [
+					"NO_CONTAINER" => $list->rec_dtl_cont,
+					"NO_REQUEST" => $find->rec_no,
+					"BRANCH_ID" => $find->rec_branch_id
+				];
+				$arrdtl[] = $arrdtlset;
+			}
+			$head = [
+				"action" => "generateGetIn",
+				"data" => $arrdtl
+			];
+	        $dtl = substr($dtl, 0,-1);
+			$json = '
+			{
+				"action" : "generateGetIn",
+				"data": ['.$dtl.']
+			}';
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			$json = '
+				{
+				    "repoGetRequest": {
+				        "esbHeader": {
+				            "internalId": "",
+				            "externalId": "",
+				            "timestamp": "",
+				            "responseTimestamp": "",
+				            "responseCode": "",
+				            "responseMessage": ""
+				        },
+				        "esbBody": {
+				            "request": "'.$json.'"
+				        },
+				        "esbSecurity": {
+				            "orgId": "",
+				            "batchSourceId": "",
+				            "lastUpdateLogin": "",
+				            "userId": "",
+				            "respId": "",
+				            "ledgerId": "",
+				            "respAppId": "",
+				            "batchSourceName": ""
+				        }
+				    }
+				}
+	        ';
+	        $json = json_encode(json_decode($json,true));
+			$arr = [
+	        	"user" => config('endpoint.tosGetPLG.user'),
+	        	"pass" => config('endpoint.tosGetPLG.pass'),
+	        	"target" => config('endpoint.tosGetPLG.target'),
+	        	"json" => $json
+	        ];
+			$res = static::sendRequestToExtJsonMet($arr);
+			return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		}
+
+		public static function storeStuffGATI($data,$hdr){
+			$his_cont = [];
+			foreach ($data as $listR) {
+				$findGATI = [
+					'GATEIN_CONT' => $listR['NO_CONTAINER'],
+					'GATEIN_REQ_NO' => $listR['NO_REQUEST'],
+					'GATEIN_BRANCH_ID' => $hdr->rec_branch_id,
+					'GATEIN_BRANCH_CODE' => $hdr->rec_branch_code
+				];
+				$cek = DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->first();
+				$datenow    = Carbon::now()->format('Y-m-d');
+				$storeGATI = [
+					"gatein_cont" => $listR['NO_CONTAINER'],
+					"gatein_req_no" => $listR['NO_REQUEST'],
+					"gatein_pol_no" => $listR['NOPOL'],
+					"gatein_cont_status" => $listR['STATUS'],
+						// "gatein_seal_no" => $listR[''],
+						// "gatein_trucking" => $listR[''],
+						// "gatein_yard" => $listR[''],
+						// "gatein_mark" => $listR[''],
+					"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
+					"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
+					"gatein_create_by" => "1", //$input["user"]->user_id
+					"gatein_branch_id" => $hdr->rec_branch_id,
+					"gatein_branch_code" => $hdr->rec_branch_code
+				];
+				if (empty($cek)) {
+					DB::connection('omuster')->table('TX_GATEIN')->insert($storeGATI);
+				}else{
+					DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
+				}
+				$findTsCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->rec_branch_id,
+					'branch_code' => $hdr->rec_branch_code
+				];
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first(); //remove ->orderBy('cont_counter', 'desc')
+				$cont_counter = $cekTsCont->cont_counter+1; //kusus gate in
+				$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
+					"reff_tr_id" => 12,
+					"reff_name" => 'GATE IN'
+				])->first();
+				$arrStoreTsContAndTxHisCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->rec_branch_id,
+					'branch_code' => $hdr->rec_branch_code,
+					'cont_location' => 'GATI',
+					'cont_size' => null,
+					'cont_type' => null,
+					'cont_counter' => $cont_counter,
+					'no_request' => $listR['NO_REQUEST'],
+					'kegiatan' => $cekKegiatan->reff_id,
+					'id_user' => "1", //$input["user"]->user_id
+					'status_cont' => $listR['STATUS'],
+					'vvd_id' => $hdr->rec_vvd_id
+				];
+				DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $hdr->rec_id)->where('REC_DTL_CONT', $listR['NO_CONTAINER'])->update(['REC_FL_REAL'=>"2"]);
+				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+			}
+			return $his_cont;
 		}
 
 	// PLG
