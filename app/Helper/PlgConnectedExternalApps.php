@@ -1284,6 +1284,9 @@ class PlgConnectedExternalApps{
 		    ];
 
 		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
+				if (empty($tsContainer)) {
+					return "Placement is uptodate";
+				}
 		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
