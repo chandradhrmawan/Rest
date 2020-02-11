@@ -1479,7 +1479,146 @@ class PlgConnectedExternalApps{
 			$setReal 						= DB::connection('omuster')->table('TX_DTL_STUFF')->where($findDtlStuff)->update(["STUFF_DTL_REAL_DATE"=>$stuffDate,"STUFF_FL_REAL"=>4]);
 			echo "Realization Stuffing Done";
 		 }
-	}
+		}
 
+		public static function getRealStripping() {
+			$all 						 = [];
+		 $det 						 = DB::connection('omuster')->table('TX_DTL_STRIP')->where('STRIP_FL_REAL', "1")->get();
+		 foreach ($det as $lista) {
+			 $newDt 				 = [];
+			 foreach ($lista as $key => $value) {
+				 $newDt[$key] = $value;
+			 }
+
+			 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STRIP')->where('STRIP_ID', $lista->stuff_hdr_id)->get();
+			 foreach ($hdr as $listS) {
+				 foreach ($listS as $key => $value) {
+					 $newDt[$key] = $value;
+				 }
+			 }
+
+				 $all[] 				= $newDt;
+			 }
+
+		 $dtl 							= '';
+		 $arrdtl 						= [];
+
+		 foreach ($all as $list) {
+			 $dtl .= '
+			 {
+				 "NO_CONTAINER"		: "'.$list["stuff_dtl_cont"].'",
+				 "NO_REQUEST"			: "'.$list["stuff_no"].'",
+				 "BRANCH_ID"			: "'.$list["stuff_branch_id"].'"
+			 },';
+			 $arrdtlset = [
+				 "NO_CONTAINER" 	=> $list["stuff_dtl_cont"],
+				 "NO_REQUEST"	  	=> $list["stuff_no"],
+				 "BRANCH_ID" 			=> $list["stuff_branch_id"]
+			 ];
+			 $arrdtl[]  				= $arrdtlset;
+		 }
+
+		 $head = [
+			 "action" 					=> "generateRealStuffing",
+			 "data" 						=> $arrdtl
+		 ];
+
+		 $dtl 	= substr($dtl, 0,-1);
+		 $json = '
+		 {
+			 "action" : "generateRealStuffing",
+			 "data": ['.$dtl.']
+		 }';
+
+		 $json = base64_encode(json_encode(json_decode($json,true)));
+		 $json = '
+			 {
+					 "repoGetRequest": {
+							 "esbHeader": {
+									 "internalId": "",
+									 "externalId": "",
+									 "timestamp": "",
+									 "responseTimestamp": "",
+									 "responseCode": "",
+									 "responseMessage": ""
+							 },
+							 "esbBody": {
+									 "request": "'.$json.'"
+							 },
+							 "esbSecurity": {
+									 "orgId": "",
+									 "batchSourceId": "",
+									 "lastUpdateLogin": "",
+									 "userId": "",
+									 "respId": "",
+									 "ledgerId": "",
+									 "respAppId": "",
+									 "batchSourceName": ""
+							 }
+					 }
+			 }
+				 ';
+		 $json = json_encode(json_decode($json,true));
+		 $arr = [
+						 "user"		 		=> config('endpoint.tosGetPLG.user'),
+						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+						 "json" 		 	=> $json
+					 ];
+		 $res 							 	= static::sendRequestToExtJsonMet($arr);
+		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 // return $res["result"]["result"];
+		 foreach ($res["result"]["result"] as $value) {
+			$stufBranch 				= $value["REAL_STRIP_BRANCH_ID"];
+			$stuffReq 					= $value["REAL_STRIP_NOREQ"];
+			$stuffCont 					= $value["REAL_STRIP_CONT"];
+			$stuffDate 					= date('Y-m-d', strtotime($value["REAL_STRIP_DATE"]));
+
+			$findHdrStuff 			= [
+				"STRIP_BRANCH_ID" => $stufBranch,
+				"STRIP_NO"				=> $stuffReq
+			];
+
+			$stuffHDR 					= DB::connection('omuster')->table('TX_HDR_STRIP')->where($findHdrStuff)->first();
+
+			$findDtlStuff 			= [
+				"STRIP_HDR_ID"		=> $stuffHDR->stuff_id,
+				"STRIP_DTL_CONT"	=> $stuffCont
+			];
+
+			$findHistory 				= [
+				"NO_REQUEST" 			=> $stuffReq,
+				"NO_CONTAINER" 		=> $stuffCont,
+				"KEGIATAN"				=> "13"
+			];
+
+			$storeHistory 			= [
+				"NO_CONTAINER" 		=> $stuffCont,
+				"NO_REQUEST"			=> $stuffReq,
+				"KEGIATAN"				=> "13",
+				"TGL_UPDATE"			=> date('Y-m-d h:i:s', strtotime($stuffDate)),
+				"ID_USER"					=> $value["REAL_STRIP_OPERATOR"],
+				"ID_YARD"					=> "",
+				"STATUS_CONT"			=> "",
+				"VVD_ID"					=> "",
+				"COUNTER"					=> $value["REAL_STRIP_COUNTER"],
+				"SUB_COUNTER"			=> "",
+				"WHY"							=> ""
+			];
+
+
+			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+
+			if (empty($cekHistory)) {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+			} else {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+			}
+
+			$setReal 						= DB::connection('omuster')->table('TX_DTL_STRIP')->where($findDtlStuff)->update(["STRIP_DTL_REAL_DATE"=>$stuffDate,"STRIP_FL_REAL"=>4]);
+			echo "Realization Stuffing Done";
+		 }
+		}
 	// PLG
 }
