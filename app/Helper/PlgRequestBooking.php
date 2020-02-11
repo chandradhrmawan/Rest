@@ -103,6 +103,11 @@ class PlgRequestBooking{
 			}else{
 				$newD['DTL_BL'] = empty($list[$config['DTL_BL']]) ? 'NULL' : strtoupper($list[$config['DTL_BL']]);
 			}
+			if (empty($config['DTL_FUMI_TYPE'])) {
+				$newD['DTL_FUMI_TYPE'] = 'NULL';
+			}else{
+				$newD['DTL_FUMI_TYPE'] = empty($list[$config['DTL_FUMI_TYPE']]) ? 'NULL' : strtoupper($list[$config['DTL_FUMI_TYPE']]);
+			}
 			if (empty($config['DTL_PKG_ID'])) {
 				$newD['DTL_PKG_ID'] = 8;
 			}else{

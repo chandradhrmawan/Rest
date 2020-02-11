@@ -846,6 +846,11 @@ class BillingEngine{
         $setD = '';
         foreach ($detil as $list) {
           $countD++;
+          if ($list['DTL_FUMI_TYPE'] == NULL or $list['DTL_FUMI_TYPE'] == 'NULL') {
+            $setD .= ' detail.DTL_FUMI_TYPE := '.$list['DTL_FUMI_TYPE'].';';
+          }else{
+            $setD .= ' detail.DTL_FUMI_TYPE := \''.$list['DTL_FUMI_TYPE'].'\';';
+          }
           if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
             $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
           }else{
