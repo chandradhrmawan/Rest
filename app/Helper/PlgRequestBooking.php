@@ -199,7 +199,7 @@ class PlgRequestBooking{
 						->table('TX_HISTORY_CONTAINER')
 						->where('NO_CONTAINER', $list[$config['DTL_BL']])
 						->where('STATUS_CONT', 'MTY')
-						->whereIn('KEGIATAN', )
+						->whereIn('KEGIATAN', $in)
 						->orderBy("TGL_UPDATE", "DESC")
 						->first();
 					$dateIn = $tglIn->tgl_update;
