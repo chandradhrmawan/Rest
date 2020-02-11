@@ -143,7 +143,7 @@ class PlgConnectedExternalApps{
 		}
 
 	    public static function sendRequestBookingPLG($arr){
-	    	$in_array = ['TX_HDR_REC','TX_HDR_DEL','TX_HDR_STUFF','TX_HDR_STRIPP'];
+	    	$in_array = ['TX_HDR_REC','TX_HDR_DEL','TX_HDR_STUFF','TX_HDR_STRIPP', 'TX_HDR_FUMI'];
 	    	if (!in_array($arr['config']['head_table'], $in_array)) {
 	    		$res = [
 	    			'Success' => false,
@@ -411,6 +411,43 @@ class PlgConnectedExternalApps{
 		            "STRIP_DARI": "'.$rec_dr->reff_name.'",
 		            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 		            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
+		            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+		          },
+		          "arrdetail": ['.$arrdetil.']
+		        }';
+			}
+
+			private static function buildJsonTX_HDR_FUMI($arr){
+		        $arrdetil = '';
+		        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
+		        foreach ($dtls as $dtl) {
+		          $dtl = (array)$dtl;
+			        $getCountCounter = DB::connection('omuster')->table('TS_CONTAINER')->where('cont_no',$dtl[$arr['config']['DTL_BL']])->orderBy('cont_counter','desc')->first();
+		          $arrdetil .= '{
+		            "FUMI_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
+		            "FUMI_DTL_CONT_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+		            "FUMI_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+		            "FUMI_DTL_STATUS": "",
+		            "FUMI_DTL_CANCELLED": "'.$dtl[$arr['config']['DTL_IS_CANCEL']].'",
+		            "FUMI_DTL_ACTIVE": "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
+		            "FUMI_DTL_START_FUMI_PLAN": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+		            "FUMI_DTL_END_FUMI_PLAN": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+		            "FUMI_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_ID']].'",
+		            "FUMI_DTL_COUNTER": "'.$getCountCounter->cont_counter.'"
+		          },';
+		        }
+		        $arrdetil = substr($arrdetil, 0,-1);
+		        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+		        $head = (array)$head;
+		        
+		        return $json_body = '{
+		          "action" : "getFumigasi",
+		          "header": {
+		          	"FUMI_ID" : "",
+		            "FUMI_NO": "'.$head[$arr['config']['head_no']].'",
+		            "FUMI_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
+		            "FUMI_CREATE_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+		            "FUMI_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
 		            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 		          },
 		          "arrdetail": ['.$arrdetil.']
