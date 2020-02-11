@@ -418,6 +418,6 @@ class StoreController extends Controller
   }
 
   function getUpdateStuffing($input) {
-    return PlgConnectedExternalApps::getRealStuffing($input);
+    return PlgConnectedExternalApps::getRealStripping($input);
   }
 }
