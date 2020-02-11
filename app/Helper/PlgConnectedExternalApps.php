@@ -476,7 +476,7 @@ class PlgConnectedExternalApps{
 		        $arrdetil = substr($arrdetil, 0,-1);
 		        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 		        $head = (array)$head;
-		        
+
 		        return $json_body = '{
 		          "action" : "getPlugging",
 		          "header": {
