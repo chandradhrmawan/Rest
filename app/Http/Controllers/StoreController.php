@@ -417,7 +417,7 @@ class StoreController extends Controller
     return GlobalHelper::delHeaderDetail($input);
   }
 
-  // function getUpdatePlacement($input) {
-  //   return PlgConnectedExternalApps::getUpdatePlacement($input);
-  // }
+  function getUpdateStuffing($input) {
+    return PlgConnectedExternalApps::getRealStuffing($input);
+  }
 }

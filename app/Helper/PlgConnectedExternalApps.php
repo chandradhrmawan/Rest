@@ -1181,7 +1181,6 @@ class PlgConnectedExternalApps{
 
 		public static function getUpdatePlacement(){
 		  $all 						 = [];
-		  $now 						 = Carbon::now()->format('Y-m-d');
 		  $det 						 = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', "2")->get();
 		  foreach ($det as $lista) {
 		    $newDt 				 = [];
@@ -1338,5 +1337,145 @@ class PlgConnectedExternalApps{
 		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"2"]);
 		  }
 		}
+
+		public static function getRealStuffing() {
+			$all 						 = [];
+		 $det 						 = DB::connection('omuster')->table('TX_DTL_STUFF')->where('STUFF_FL_REAL', "1")->get();
+		 foreach ($det as $lista) {
+			 $newDt 				 = [];
+			 foreach ($lista as $key => $value) {
+				 $newDt[$key] = $value;
+			 }
+
+			 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STUFF')->where('STUFF_ID', $lista->stuff_hdr_id)->get();
+			 foreach ($hdr as $listS) {
+				 foreach ($listS as $key => $value) {
+					 $newDt[$key] = $value;
+				 }
+			 }
+
+				 $all[] 				= $newDt;
+			 }
+
+		 $dtl 							= '';
+		 $arrdtl 						= [];
+
+		 foreach ($all as $list) {
+			 $dtl .= '
+			 {
+				 "NO_CONTAINER"		: "'.$list["stuff_dtl_cont"].'",
+				 "NO_REQUEST"			: "'.$list["stuff_no"].'",
+				 "BRANCH_ID"			: "'.$list["stuff_branch_id"].'"
+			 },';
+			 $arrdtlset = [
+				 "NO_CONTAINER" 	=> $list["stuff_dtl_cont"],
+				 "NO_REQUEST"	  	=> $list["stuff_no"],
+				 "BRANCH_ID" 			=> $list["stuff_branch_id"]
+			 ];
+			 $arrdtl[]  				= $arrdtlset;
+		 }
+
+		 $head = [
+			 "action" 					=> "generateRealStuffing",
+			 "data" 						=> $arrdtl
+		 ];
+
+		 $dtl 	= substr($dtl, 0,-1);
+		 $json = '
+		 {
+			 "action" : "generateRealStuffing",
+			 "data": ['.$dtl.']
+		 }';
+
+		 $json = base64_encode(json_encode(json_decode($json,true)));
+		 $json = '
+			 {
+					 "repoGetRequest": {
+							 "esbHeader": {
+									 "internalId": "",
+									 "externalId": "",
+									 "timestamp": "",
+									 "responseTimestamp": "",
+									 "responseCode": "",
+									 "responseMessage": ""
+							 },
+							 "esbBody": {
+									 "request": "'.$json.'"
+							 },
+							 "esbSecurity": {
+									 "orgId": "",
+									 "batchSourceId": "",
+									 "lastUpdateLogin": "",
+									 "userId": "",
+									 "respId": "",
+									 "ledgerId": "",
+									 "respAppId": "",
+									 "batchSourceName": ""
+							 }
+					 }
+			 }
+				 ';
+		 $json = json_encode(json_decode($json,true));
+		 $arr = [
+						 "user"		 		=> config('endpoint.tosGetPLG.user'),
+						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+						 "json" 		 	=> $json
+					 ];
+		 $res 							 	= static::sendRequestToExtJsonMet($arr);
+		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 // return $res["result"]["result"];
+		 foreach ($res["result"]["result"] as $value) {
+			$stufBranch 				= $value["REAL_STUFF_BRANCH_ID"];
+		 	$stuffReq 					= $value["REAL_STUFF_NOREQ"];
+			$stuffCont 					= $value["REAL_STUFF_CONT"];
+			$stuffDate 					= date('Y-m-d', strtotime($value["REAL_STUFF_DATE"]));
+
+			$findHdrStuff 			= [
+				"STUFF_BRANCH_ID" => $stufBranch,
+				"STUFF_NO"				=> $stuffReq
+			];
+
+			$stuffHDR 					= DB::connection('omuster')->table('TX_HDR_STUFF')->where($findHdrStuff)->first();
+
+			$findDtlStuff 			= [
+				"STUFF_HDR_ID"		=> $stuffHDR->stuff_id,
+				"STUFF_DTL_CONT"	=> $stuffCont
+			];
+
+			$findHistory 			= [
+				"NO_REQUEST" 		=> $stuffReq,
+				"NO_CONTAINER" 	=> $stuffCont,
+				"KEGIATAN"			=> "13"
+			];
+
+			$storeHistory 		= [
+				"NO_CONTAINER" 	=> $stuffCont,
+				"NO_REQUEST"		=> $stuffReq,
+				"KEGIATAN"			=> "13",
+				"TGL_UPDATE"		=> date('Y-m-d h:i:s', strtotime($stuffDate)),
+				"ID_USER"				=> $value["REAL_STUFF_OPERATOR"],
+				"ID_YARD"				=> "",
+				"STATUS_CONT"		=> "",
+				"VVD_ID"				=> "",
+				"COUNTER"				=> $value["REAL_STUFF_COUNTER"],
+				"SUB_COUNTER"		=> "",
+				"WHY"						=> ""
+			];
+
+
+			$cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+			if (empty($cekHistory)) {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+			} else {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+			}
+
+			$setReal 						= DB::connection('omuster')->table('TX_DTL_STUFF')->where($findDtlStuff)->update(["STUFF_DTL_REAL_DATE"=>$stuffDate,"STUFF_FL_REAL"=>4]);
+			echo "Realization Stuffing Done";
+		 }
+	}
+
 	// PLG
 }
