@@ -978,6 +978,7 @@ class BillingEngine{
 
     // set data
         $set_data = [
+          'inputH' => $input['head'],
           'b_no' => $head['P_BOOKING_NUMBER'],
           'head' => $setH,
           'detil' => $setD,
@@ -1000,17 +1001,23 @@ class BillingEngine{
       }
       $getConfLink = config('database.connections.eng');
       $link = oci_connect($getConfLink['username'], $getConfLink['password'], $getConfLink['host'].'/'.$getConfLink['database']);
+      $getServCode = DB::connection('mdm')->table('TM_NOTA')->where('nota_id',$input['inputH']['P_NOTA_ID'])->first();
+      if ($getServCode->service_code == 1) {
+        $procPKG = 'PKG_BILLING';
+      }else if ($getServCode->service_code == 2) {
+        $procPKG = 'PKG_BILLING_NPKS';
+      }
       $sql = " DECLARE
-        detail PKG_BILLING.BOOKING_DTL;
-        equip PKG_BILLING.BOOKING_EQUIP;
-        paysplit PKG_BILLING.BOOKING_PAYSPLIT;
-        list_detail PKG_BILLING.BOOKING_DTL_TBL;
-        list_equip PKG_BILLING.BOOKING_EQUIP_TBL;
-        list_paysplit PKG_BILLING.BOOKING_PAYSPLIT_TBL;
+        detail ".$procPKG.".BOOKING_DTL;
+        equip ".$procPKG.".BOOKING_EQUIP;
+        paysplit ".$procPKG.".BOOKING_PAYSPLIT;
+        list_detail ".$procPKG.".BOOKING_DTL_TBL;
+        list_equip ".$procPKG.".BOOKING_EQUIP_TBL;
+        list_paysplit ".$procPKG.".BOOKING_PAYSPLIT_TBL;
         P_RESULT_FLAG VARCHAR2(200);
         P_RESULT_MSG VARCHAR2(200);
         BEGIN ".$input['detil']." ".$input['eqpt']." ".$input['paysplit'];
-      $sql .= " PKG_BILLING.GET_TARIFF( ".$input['head']." );END;";
+      $sql .= " ".$procPKG.".GET_TARIFF( ".$input['head']." );END;";
 
       // return $sql;
       $stmt = oci_parse($link,$sql);
