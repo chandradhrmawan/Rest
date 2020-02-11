@@ -1492,18 +1492,6 @@ class PlgConnectedExternalApps{
 				 "NO_REQUEST"			: "'.$list["stuff_no"].'",
 				 "BRANCH_ID"			: "'.$list["stuff_branch_id"].'"
 			 },';
-			 $arrdtlset = [
-				 "NO_CONTAINER" 	=> $list["stuff_dtl_cont"],
-				 "NO_REQUEST"	  	=> $list["stuff_no"],
-				 "BRANCH_ID" 			=> $list["stuff_branch_id"]
-			 ];
-			 $arrdtl[]  				= $arrdtlset;
-		 }
-
-		 $head = [
-			 "action" 					=> "generateRealStuffing",
-			 "data" 						=> $arrdtl
-		 ];
 
 		 $dtl 	= substr($dtl, 0,-1);
 		 $json = '
@@ -1600,11 +1588,12 @@ class PlgConnectedExternalApps{
 
 			$setReal 						= DB::connection('omuster')->table('TX_DTL_STUFF')->where($findDtlStuff)->update(["STUFF_DTL_REAL_DATE"=>$stuffDate,"STUFF_FL_REAL"=>4]);
 			echo "Realization Stuffing Done";
-		 }
+		 	}
 		}
+	}
 
 		public static function getRealStripping() {
-			$all 						 = [];
+		 $all 						 = [];
 		 $det 						 = DB::connection('omuster')->table('TX_DTL_STRIPP')->where('STRIPP_FL_REAL', "1")->get();
 		 foreach ($det as $lista) {
 			 $newDt 				 = [];
@@ -1634,18 +1623,6 @@ class PlgConnectedExternalApps{
 				 "NO_REQUEST"			: "'.$list["stripp_no"].'",
 				 "BRANCH_ID"			: "'.$list["stripp_branch_id"].'"
 			 },';
-			 $arrdtlset = [
-				 "NO_CONTAINER" 	=> $list["stripp_dtl_cont"],
-				 "NO_REQUEST"	  	=> $list["stripp_no"],
-				 "BRANCH_ID" 			=> $list["stripp_branch_id"]
-			 ];
-			 $arrdtl[]  				= $arrdtlset;
-		 }
-
-		 $head = [
-			 "action" 					=> "generateRealStripping",
-			 "data" 						=> $arrdtl
-		 ];
 
 		 $dtl 	= substr($dtl, 0,-1);
 		 $json = '
@@ -1739,10 +1716,70 @@ class PlgConnectedExternalApps{
 				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
 			}
 
-			$setReal 						= DB::connection('omuster')->table('TX_DTL_STRIPP')->where($findDtlStuff)->update(["STRIPP_DTL_REAL_DATE"=>$stripDate,"STRIPP_FL_REAL"=>5]);
-			echo "Realization Stripping Done";
-		 }
+				$setReal 						= DB::connection('omuster')->table('TX_DTL_STRIPP')->where($findDtlStuff)->update(["STRIPP_DTL_REAL_DATE"=>$stripDate,"STRIPP_FL_REAL"=>5]);
+				echo "Realization Stripping Done";
+			 	}
+			}
 		}
 
+		// OTW
+		public static function getRealFumigasi() {
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->join('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('A.FUMI_FL_REAL', "1")->get();
+ 		 $dtl 							= '';
+ 		 $arrdtl 						= [];
+
+		 foreach ($all as $list) {
+			 $dtl .= '
+			 {
+				 "NO_CONTAINER"		: "'.$list["stripp_dtl_cont"].'",
+				 "NO_REQUEST"			: "'.$list["stripp_no"].'",
+				 "BRANCH_ID"			: "'.$list["stripp_branch_id"].'"
+			 },';
+
+		 $dtl 	= substr($dtl, 0,-1);
+		 $json = '
+		 {
+			 "action" : "generateRealStripping",
+			 "data": ['.$dtl.']
+		 }';
+
+		 $json = base64_encode(json_encode(json_decode($json,true)));
+		 $json = '
+			 {
+					 "repoGetRequest": {
+							 "esbHeader": {
+									 "internalId": "",
+									 "externalId": "",
+									 "timestamp": "",
+									 "responseTimestamp": "",
+									 "responseCode": "",
+									 "responseMessage": ""
+							 },
+							 "esbBody": {
+									 "request": "'.$json.'"
+							 },
+							 "esbSecurity": {
+									 "orgId": "",
+									 "batchSourceId": "",
+									 "lastUpdateLogin": "",
+									 "userId": "",
+									 "respId": "",
+									 "ledgerId": "",
+									 "respAppId": "",
+									 "batchSourceName": ""
+							 }
+					 }
+			 }
+				 ';
+		 $json = json_encode(json_decode($json,true));
+		 $arr = [
+						 "user"		 		=> config('endpoint.tosGetPLG.user'),
+						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+						 "json" 		 	=> $json
+					 ];
+		 $res 							 	= static::sendRequestToExtJsonMet($arr);
+		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		}
 	// PLG
 }
