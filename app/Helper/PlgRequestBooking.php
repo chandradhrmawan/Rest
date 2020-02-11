@@ -348,6 +348,9 @@ class PlgRequestBooking{
 
 	    public static function sendRequestPLG($input){
 			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+			if ($config->flag_status == 'N') {
+				return ['Success' => false, 'result' => "Fail, nota not active!"];
+			}
 			$config = json_decode($config->api_set, true);
 			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
 			if (empty($find)) {
