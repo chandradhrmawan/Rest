@@ -838,10 +838,13 @@ class PlgConnectedExternalApps{
 					'cont_counter' => $cont_counter,
 					'no_request' => $listR['NO_REQUEST'],
 					'kegiatan' => $cekKegiatan->reff_id,
-					'id_user' => "1", //$input["user"]->user_id
+					'id_user' => "1",
 					'status_cont' => $listR['STATUS'],
 					'vvd_id' => $hdr->rec_vvd_id
 				];
+				if (!empty($input["user"])) {
+					$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
+				}
 				DB::connection('omuster')->table('TX_DTL_REC')->where('REC_HDR_ID', $hdr->rec_id)->where('REC_DTL_CONT', $listR['NO_CONTAINER'])->update(['REC_FL_REAL'=>"2"]);
 				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 			}
@@ -1018,7 +1021,11 @@ class PlgConnectedExternalApps{
 			$Success = true;
 			$msg = 'Success get realisasion';
 			$find = DB::connection('omuster')->table('TX_HDR_STUFF')->where('stuff_id', $input['stuff_id'])->first();
-			$dtlLoop = DB::connection('omuster')->table('TX_DTL_STUFF')->where('stuff_hdr_id', $input['stuff_id'])->get();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_STUFF')->where([
+				'stuff_hdr_id' => $input['stuff_id'],
+				'stuff_dtl_isactive' => 'Y',
+				'STUFF_FL_REAL' => 1
+			])->get();
 			if (count($dtlLoop) > 0) {
 				$res = static::getStuffInYard($find,$dtlLoop);
 				if ($res['result']['count'] > 0) {
@@ -1029,18 +1036,18 @@ class PlgConnectedExternalApps{
 				}
 			}
 			$res['his_cont'] = $his_cont;
-			$dtl = DB::connection('omuster')->table('TX_DTL_REC')
-				->leftJoin('TX_GATEIN', function($join) use ($find){
-					$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
-					$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find->rec_no."'"));
-				})->where('REC_HDR_ID', $input['rec_id'])->where('REC_DTL_ISACTIVE','Y')->get();
+			$dtl = DB::connection('omuster')->table('TX_DTL_STUFF')->where([
+				'stuff_hdr_id' => $input['stuff_id'],
+				'stuff_dtl_isactive' => 'Y',
+				'STUFF_FL_REAL' => 4
+			])->get();
 	        return [
 	        	'response' => $Success,
 	        	'result' => $msg,
-	        	'no_rec' =>$find->rec_no,
+	        	'no_rec' =>$find->stuff_no,
 	        	'hdr' =>$find,
 	        	'dtl' => $dtl,
-	        	'getRealRecPLG' => $res
+	        	'getRealStuffPLG' => $res
 	        ];
 		}
 
@@ -1092,19 +1099,127 @@ class PlgConnectedExternalApps{
 					'cont_no' => $listR['NO_CONTAINER'],
 					'branch_id' => $hdr->stuff_branch_id,
 					'branch_code' => $hdr->stuff_branch_code,
-					'cont_location' => 'GATI',
+					'cont_location' => 'IN_YARD',
 					'cont_size' => null,
 					'cont_type' => null,
 					'cont_counter' => $cont_counter,
 					'no_request' => $listR['NO_REQUEST'],
 					'kegiatan' => $cekKegiatan->reff_id,
-					'id_user' => "1", //$input["user"]->user_id
+					'id_user' => "1",
 					'status_cont' => $listR['STATUS'],
 					'vvd_id' => $hdr->stuff_vvd_id
 				];
+				if (!empty($input["user"])) {
+					$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
+				}
 				DB::connection('omuster')->table('TX_DTL_STUFF')->where('STUFF_HDR_ID', $hdr->stuff_id)->where('STUFF_DTL_CONT', $listR['NO_CONTAINER'])->update([
 					"STUFF_DTL_REAL_DATE"=>date('Y-m-d', strtotime($listR["REAL_STUFF_DATE"])),
 					"STUFF_FL_REAL"=>4
+				]);
+				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+			}
+			return $his_cont;
+		}
+
+		public static function getRealStrippPLG($input){
+			$his_cont = [];
+			$Success = true;
+			$msg = 'Success get realisasion';
+			$find = DB::connection('omuster')->table('TX_HDR_STRIPP')->where('stripp_id', $input['stripp_id'])->first();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_STRIPP')->where([
+				'stripp_hdr_id' => $input['stripp_id'],
+				'stripp_dtl_isactive' => 'Y',
+				'STRIPP_FL_REAL' => 1
+			])->get();
+			if (count($dtlLoop) > 0) {
+				$res = static::getStrippInYard($find,$dtlLoop);
+				if ($res['result']['count'] > 0) {
+					$his_cont = static::storeStrippHisCont($res['result']['result'], $find);
+				}else{
+					$Success = false;
+					$msg = 'realisasion not finish';
+				}
+			}
+			$res['his_cont'] = $his_cont;
+			$dtl = DB::connection('omuster')->table('TX_DTL_STRIPP')->where([
+				'stripp_hdr_id' => $input['stripp_id'],
+				'stripp_dtl_isactive' => 'Y',
+				'STRIPP_FL_REAL' => 5
+			])->get();
+	        return [
+	        	'response' => $Success,
+	        	'result' => $msg,
+	        	'no_rec' =>$find->stripp_no,
+	        	'hdr' =>$find,
+	        	'dtl' => $dtl,
+	        	'getRealStrippPLG' => $res
+	        ];
+		}
+
+		public static function getStrippInYard($find,$dtlLoop){
+			$dtl = '';
+			$arrdtl = [];
+			foreach ($dtlLoop as $list) {
+				$dtl .= '
+				{
+					"NO_CONTAINER": "'.$list->stripp_dtl_cont.'",
+					"NO_REQUEST": "'.$find->stripp_no.'",
+					"BRANCH_ID": "'.$find->stripp_branch_id.'"
+				},';
+			}
+	        $dtl = substr($dtl, 0,-1);
+			$json = '
+			{
+				"action" : "generateRealStripping",
+				"data": ['.$dtl.']
+			}';
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			$json = static::jsonGetTOS($json);
+	        $json = json_encode(json_decode($json,true));
+			$arr = [
+	        	"user" => config('endpoint.tosGetPLG.user'),
+	        	"pass" => config('endpoint.tosGetPLG.pass'),
+	        	"target" => config('endpoint.tosGetPLG.target'),
+	        	"json" => $json
+	        ];
+			$res = static::sendRequestToExtJsonMet($arr);
+			return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		}
+
+		public static function storeStrippHisCont($data,$hdr){
+			$his_cont = [];
+			foreach ($data as $listR) {
+				$findTsCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->stripp_branch_id,
+					'branch_code' => $hdr->stripp_branch_code
+				];
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first();
+				$cont_counter = $cekTsCont->cont_counter;
+				$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
+					"reff_tr_id" => 12,
+					"reff_name" => 'REQ STRIPPING'
+				])->first();
+				$arrStoreTsContAndTxHisCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->stripp_branch_id,
+					'branch_code' => $hdr->stripp_branch_code,
+					'cont_location' => 'IN_YARD',
+					'cont_size' => null,
+					'cont_type' => null,
+					'cont_counter' => $cont_counter,
+					'no_request' => $listR['NO_REQUEST'],
+					'kegiatan' => $cekKegiatan->reff_id,
+					'id_user' => "1",
+					'status_cont' => $listR['STATUS'],
+					'vvd_id' => $hdr->stripp_vvd_id
+				];
+				if (!empty($input["user"])) {
+					$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
+				}
+				DB::connection('omuster')->table('TX_DTL_STRIPP')->where('STRIPP_HDR_ID', $hdr->stripp_id)->where('STRIPP_DTL_CONT', $listR['NO_CONTAINER'])->update([
+					"STRIPP_DTL_REAL_DATE"=>date('Y-m-d', strtotime($listR["REAL_STRIP_DATE"])),
+					"STRIPP_FL_REAL"=>5
 				]);
 				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 			}
