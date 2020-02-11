@@ -439,7 +439,7 @@ class PlgConnectedExternalApps{
 		        $arrdetil = substr($arrdetil, 0,-1);
 		        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 		        $head = (array)$head;
-		        
+
 		        return $json_body = '{
 		          "action" : "getFumigasi",
 		          "header": {
@@ -1684,24 +1684,24 @@ class PlgConnectedExternalApps{
 			}
 		}
 
-		// OTW
 		public static function getRealFumigasi() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->join('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('A.FUMI_FL_REAL', "1")->get();
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->leftJoin('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('A.FUMI_FL_REAL', "1")->get();
  		 $dtl 							= '';
  		 $arrdtl 						= [];
+		 $all 							= json_decode(json_encode($all),TRUE);
 
 		 foreach ($all as $list) {
 			 $dtl .= '
 			 {
-				 "NO_CONTAINER"		: "'.$list["stripp_dtl_cont"].'",
-				 "NO_REQUEST"			: "'.$list["stripp_no"].'",
-				 "BRANCH_ID"			: "'.$list["stripp_branch_id"].'"
+				 "NO_CONTAINER"		: "'.$list["fumi_dtl_cont"].'",
+				 "NO_REQUEST"			: "'.$list["fumi_no"].'",
+				 "BRANCH_ID"			: "'.$list["fumi_branch_id"].'"
 			 },';
 
 		 $dtl 	= substr($dtl, 0,-1);
 		 $json = '
 		 {
-			 "action" : "generateRealStripping",
+			 "action" : "generateFumi",
 			 "data": ['.$dtl.']
 		 }';
 
@@ -1742,6 +1742,59 @@ class PlgConnectedExternalApps{
 					 ];
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		 // return $res["result"]["result"];
+		 foreach ($res["result"]["result"] as $value) {
+			$fumiBranch 				= $value["REAL_FUMI_BRANCH_ID"];
+		 	$fumiReq 						= $value["REAL_FUMI_NOREQ"];
+			$fumiCont 					= $value["REAL_FUMI_CONT"];
+			$fumiDate 					= date('Y-m-d', strtotime($value["REAL_FUMI_DATE"]));
+
+			$findHdrFumi 			= [
+				"FUMI_BRANCH_ID" => $fumiBranch,
+				"FUMI_NO"				=> $fumiReq
+			];
+
+			$fumiHDR 					= DB::connection('omuster')->table('TX_HDR_FUMI')->where($findHdrFumi)->first();
+
+			$findDtlFumi 			= [
+				"FUMI_HDR_ID"		=> $fumiHDR->fumi_id,
+				"FUMI_DTL_CONT"	=> $fumiCont
+			];
+
+			$findHistory 				= [
+				"NO_REQUEST" 			=> $fumiReq,
+				"NO_CONTAINER" 		=> $fumiCont,
+				"KEGIATAN"				=> "15"
+			];
+
+			$storeHistory 			= [
+				"NO_CONTAINER" 		=> $fumiCont,
+				"NO_REQUEST"			=> $fumiReq,
+				"KEGIATAN"				=> "15",
+				"TGL_UPDATE"			=> date('Y-m-d h:i:s', strtotime($fumiDate)),
+				"ID_USER"					=> $value["REAL_FUMI_OPERATOR"],
+				"ID_YARD"					=> "",
+				"STATUS_CONT"			=> "",
+				"VVD_ID"					=> "",
+				"COUNTER"					=> $value["REAL_FUMI_COUNTER"],
+				"SUB_COUNTER"			=> "",
+				"WHY"							=> ""
+			];
+
+
+			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+
+			// return $findDtlFumi;
+			if (empty($cekHistory)) {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+			} else {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+			}
+
+			$setReal 						= DB::connection('omuster')->table('TX_DTL_FUMI')->where($findDtlFumi)->update(["FUMI_DTL_REAL_DATE"=>$fumiDate,"FUMI_FL_REAL"=>5]);
+			echo "Realization Fumigasi Done";
+		 	}
 		}
+	}
 	// PLG
 }
