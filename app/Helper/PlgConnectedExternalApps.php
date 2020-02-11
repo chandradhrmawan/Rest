@@ -113,7 +113,8 @@ class PlgConnectedExternalApps{
 		}
 
 	    public static function sendRequestBookingPLG($arr){
-	    	if (!in_array($arr['config']['head_table'], ['TX_HDR_REC','TX_HDR_DEL'])) {
+	    	$in_array = ['TX_HDR_REC','TX_HDR_DEL','TX_HDR_STUFF','TX_HDR_STRIPP'];
+	    	if (!in_array($arr['config']['head_table'], $in_array)) {
 	    		$res = [
 	    			'Success' => false,
 	    			'note' => 'function bulid json send request, not available!'
