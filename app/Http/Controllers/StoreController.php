@@ -57,9 +57,23 @@ class StoreController extends Controller
     }
 
     function saveLogs($action,$input, $response, $user){
-      DB::connection('omcargo')->table('TH_LOGS_API_STORE')->insert([
+      if (empty($input['service_branch_id'])) {
+        $branch_id = $user->user_branch_id;
+        $branch_code = $user->user_branch_code;
+      }else{
+        $branch_id = $input['service_branch_id'];
+        $branch_code = $input['service_branch_code'];
+      }
+      if ($branch_id == 12) {
+        $connection = 'omcargo';
+      }else if ($branch_id == 4) {
+        $connection = 'omuster';
+      }
+      DB::connection($connection)->table('TH_LOGS_API_STORE')->insert([
         "create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
         "action" => $action,
+        "branch_id" => $branch_id,
+        "branch_code" => $branch_code,
         "json_request" => json_encode($input),
         "json_response" => json_encode($response),
         "create_name" => $user->user_full_name
