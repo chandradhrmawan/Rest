@@ -1444,28 +1444,29 @@ class PlgConnectedExternalApps{
 				"STUFF_DTL_CONT"	=> $stuffCont
 			];
 
-			$findHistory 			= [
-				"NO_REQUEST" 		=> $stuffReq,
-				"NO_CONTAINER" 	=> $stuffCont,
-				"KEGIATAN"			=> "13"
+			$findHistory 				= [
+				"NO_REQUEST" 			=> $stuffReq,
+				"NO_CONTAINER" 		=> $stuffCont,
+				"KEGIATAN"				=> "13"
 			];
 
-			$storeHistory 		= [
-				"NO_CONTAINER" 	=> $stuffCont,
-				"NO_REQUEST"		=> $stuffReq,
-				"KEGIATAN"			=> "13",
-				"TGL_UPDATE"		=> date('Y-m-d h:i:s', strtotime($stuffDate)),
-				"ID_USER"				=> $value["REAL_STUFF_OPERATOR"],
-				"ID_YARD"				=> "",
-				"STATUS_CONT"		=> "",
-				"VVD_ID"				=> "",
-				"COUNTER"				=> $value["REAL_STUFF_COUNTER"],
-				"SUB_COUNTER"		=> "",
-				"WHY"						=> ""
+			$storeHistory 			= [
+				"NO_CONTAINER" 		=> $stuffCont,
+				"NO_REQUEST"			=> $stuffReq,
+				"KEGIATAN"				=> "13",
+				"TGL_UPDATE"			=> date('Y-m-d h:i:s', strtotime($stuffDate)),
+				"ID_USER"					=> $value["REAL_STUFF_OPERATOR"],
+				"ID_YARD"					=> "",
+				"STATUS_CONT"			=> "",
+				"VVD_ID"					=> "",
+				"COUNTER"					=> $value["REAL_STUFF_COUNTER"],
+				"SUB_COUNTER"			=> "",
+				"WHY"							=> ""
 			];
 
 
-			$cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+
 			if (empty($cekHistory)) {
 				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
 			} else {
