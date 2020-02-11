@@ -462,6 +462,9 @@ class PlgRequestBooking{
 
 	          // build head
 	    		$head = [
+	    			'dpp' => $getH->dpp,
+	    			'ppn' => $getH->ppn,
+	    			'total' => $getH->total,
 	    			'uper_org_id' => $getH->branch_org_id,
 	    			'uper_cust_id' => $getH->customer_id,
 	    			'uper_cust_name' => $getH->alt_name,
