@@ -1285,6 +1285,9 @@ class PlgConnectedExternalApps{
 		    ];
 
 		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
+				if (empty($tsContainer)) {
+					return "Placement is uptodate";
+				}
 		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
@@ -1477,7 +1480,148 @@ class PlgConnectedExternalApps{
 			$setReal 						= DB::connection('omuster')->table('TX_DTL_STUFF')->where($findDtlStuff)->update(["STUFF_DTL_REAL_DATE"=>$stuffDate,"STUFF_FL_REAL"=>4]);
 			echo "Realization Stuffing Done";
 		 }
-	}
+		}
+
+		public static function getRealStripping() {
+			$all 						 = [];
+		 $det 						 = DB::connection('omuster')->table('TX_DTL_STRIPP')->where('STRIPP_FL_REAL', "1")->get();
+		 foreach ($det as $lista) {
+			 $newDt 				 = [];
+			 foreach ($lista as $key => $value) {
+				 $newDt[$key] = $value;
+			 }
+
+			 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STRIPP')->where('STRIPP_ID', $lista->stripp_hdr_id)->get();
+			 foreach ($hdr as $listS) {
+				 foreach ($listS as $key => $value) {
+					 $newDt[$key] = $value;
+				 }
+			 }
+
+				 $all[] 				= $newDt;
+			 }
+
+		 $dtl 							= '';
+		 $arrdtl 						= [];
+
+		 // return $all;
+
+		 foreach ($all as $list) {
+			 $dtl .= '
+			 {
+				 "NO_CONTAINER"		: "'.$list["stripp_dtl_cont"].'",
+				 "NO_REQUEST"			: "'.$list["stripp_no"].'",
+				 "BRANCH_ID"			: "'.$list["stripp_branch_id"].'"
+			 },';
+			 $arrdtlset = [
+				 "NO_CONTAINER" 	=> $list["stripp_dtl_cont"],
+				 "NO_REQUEST"	  	=> $list["stripp_no"],
+				 "BRANCH_ID" 			=> $list["stripp_branch_id"]
+			 ];
+			 $arrdtl[]  				= $arrdtlset;
+		 }
+
+		 $head = [
+			 "action" 					=> "generateRealStripping",
+			 "data" 						=> $arrdtl
+		 ];
+
+		 $dtl 	= substr($dtl, 0,-1);
+		 $json = '
+		 {
+			 "action" : "generateRealStripping",
+			 "data": ['.$dtl.']
+		 }';
+
+		 $json = base64_encode(json_encode(json_decode($json,true)));
+		 $json = '
+			 {
+					 "repoGetRequest": {
+							 "esbHeader": {
+									 "internalId": "",
+									 "externalId": "",
+									 "timestamp": "",
+									 "responseTimestamp": "",
+									 "responseCode": "",
+									 "responseMessage": ""
+							 },
+							 "esbBody": {
+									 "request": "'.$json.'"
+							 },
+							 "esbSecurity": {
+									 "orgId": "",
+									 "batchSourceId": "",
+									 "lastUpdateLogin": "",
+									 "userId": "",
+									 "respId": "",
+									 "ledgerId": "",
+									 "respAppId": "",
+									 "batchSourceName": ""
+							 }
+					 }
+			 }
+				 ';
+		 $json = json_encode(json_decode($json,true));
+		 $arr = [
+						 "user"		 		=> config('endpoint.tosGetPLG.user'),
+						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+						 "json" 		 	=> $json
+					 ];
+		 $res 							 	= static::sendRequestToExtJsonMet($arr);
+		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 // return $res["result"]["result"];
+		 foreach ($res["result"]["result"] as $value) {
+			$stripBranch 				= $value["REAL_STRIP_BRANCH_ID"];
+			$stripReq 					= $value["REAL_STRIP_NOREQ"];
+			$stripCont 					= $value["REAL_STRIP_CONT"];
+			$stripDate 					= date('Y-m-d', strtotime($value["REAL_STRIP_DATE"]));
+
+			$findHdrStrip 			= [
+				"STRIPP_BRANCH_ID"=> $stripBranch,
+				"STRIPP_NO"				=> $stripReq
+			];
+
+			$stripHDR 					= DB::connection('omuster')->table('TX_HDR_STRIPP')->where($findHdrStrip)->first();
+
+			$findDtlStuff 			= [
+				"STRIPP_HDR_ID"		=> $stripHDR->stripp_id,
+				"STRIPP_DTL_CONT"	=> $stripCont
+			];
+
+			$findHistory 				= [
+				"NO_REQUEST" 			=> $stripReq,
+				"NO_CONTAINER" 		=> $stripCont,
+				"KEGIATAN"				=> "14"
+			];
+
+			$storeHistory 			= [
+				"NO_CONTAINER" 		=> $stripCont,
+				"NO_REQUEST"			=> $stripReq,
+				"KEGIATAN"				=> "14",
+				"TGL_UPDATE"			=> date('Y-m-d h:i:s', strtotime($stripDate)),
+				"ID_USER"					=> $value["REAL_STRIP_OPERATOR"],
+				"ID_YARD"					=> "",
+				"STATUS_CONT"			=> "",
+				"VVD_ID"					=> "",
+				"COUNTER"					=> $value["REAL_STRIP_COUNTER"],
+				"SUB_COUNTER"			=> "",
+				"WHY"							=> ""
+			];
+
+			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+
+			if (empty($cekHistory)) {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+			} else {
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+			}
+
+			$setReal 						= DB::connection('omuster')->table('TX_DTL_STRIPP')->where($findDtlStuff)->update(["STRIPP_DTL_REAL_DATE"=>$stripDate,"STRIPP_FL_REAL"=>5]);
+			echo "Realization Stripping Done";
+		 }
+		}
 
 	// PLG
 }
