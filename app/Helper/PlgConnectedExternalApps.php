@@ -1490,6 +1490,10 @@ class PlgConnectedExternalApps{
 		  $res 							 	= static::sendRequestToExtJsonMet($arr);
 		  $res				 			 	= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
+			if (empty($res["result"]["result"])) {
+				return "Placement is uptodate";
+			}
+
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
 		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
@@ -1641,7 +1645,10 @@ class PlgConnectedExternalApps{
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
-		 return $res["result"]["result"];
+		 if (empty($res["result"]["result"])) {
+			 return "STUFF is uptodate";
+		 }
+
 		 foreach ($res["result"]["result"] as $value) {
 			$stufBranch 				= $value["REAL_STUFF_BRANCH_ID"];
 		 	$stuffReq 					= $value["REAL_STUFF_NOREQ"];
@@ -1771,6 +1778,10 @@ class PlgConnectedExternalApps{
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
+		 if (empty($res["result"]["result"])) {
+			 return "STRIPP is uptodate";
+		 }
+
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$stripBranch 				= $value["REAL_STRIP_BRANCH_ID"];
@@ -1882,6 +1893,11 @@ class PlgConnectedExternalApps{
 					 ];
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 if (empty($res["result"]["result"])) {
+			 return "Fumi is uptodate";
+		 }
+
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$fumiBranch 				= $value["REAL_FUMI_BRANCH_ID"];
@@ -1998,6 +2014,10 @@ class PlgConnectedExternalApps{
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
+		 if (empty($res["result"]["result"])) {
+			 return "PLUG Start is uptodate";
+		 }
+
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
@@ -2108,6 +2128,10 @@ class PlgConnectedExternalApps{
 					 ];
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 if (empty($res["result"]["result"])) {
+			 return "PLUG END is uptodate";
+		 }
 
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
