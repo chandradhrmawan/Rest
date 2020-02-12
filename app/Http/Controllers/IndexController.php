@@ -412,10 +412,10 @@ class IndexController extends Controller
         }
       }
 
-      $result  = $connect->get();
-      $count   = count($result);
-
-      return ["count"=>$count, "result"=>$result];
+      $detail  = $connect->get();
+      $header  = DB::connection('omuster')->table('TX_HDR_REC_CARGO')->where("REC_CARGO_ID", $detail[0]->rec_cargo_hdr_id)->first();
+      $file    = DB::connection('omuster')->table('TX_DOCUMENT')->where('REQ_NO', $header->rec_cargo_no)->get();
+      return ["HEADER"=>$header, "DETAIL"=>$detail, "FILE"=>$file];
     }
 
     function listDelBatalCargo($input) {
@@ -490,9 +490,9 @@ class IndexController extends Controller
         }
       }
 
-      $result  = $connect->get();
-      $count   = count($result);
-
-      return ["count"=>$count, "result"=>$result];
+      $detail  = $connect->get();
+      $header  = DB::connection('omuster')->table('TX_HDR_DEL_CARGO')->where("DEL_CARGO_ID", $detail[0]->del_cargo_hdr_id)->first();
+      $file    = DB::connection('omuster')->table('TX_DOCUMENT')->where('REQ_NO', $header->del_cargo_no)->get();
+      return ["HEADER"=>$header, "DETAIL"=>$detail, "FILE"=>$file];
     }
 }
