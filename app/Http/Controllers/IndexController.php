@@ -52,17 +52,6 @@ class IndexController extends Controller
       return BillingEngine::listProfileTariffDetil($input);
     }
 
-    function validasi($action, $request) {
-      $latest   = DB::connection("mdm")->table('JS_VALIDATION')->where('action', 'like', $action."%")->select(["field", "mandatori"])->get();
-      $decode   = json_decode(json_encode($latest), true);
-      $s        = array();
-      foreach ($decode as $data) {
-      $s[$data["field"]] = $data["mandatori"];
-      }
-      $this->validate($request, $s);
-      return response($latest);
-    }
-
     function listTmNota($input, $request){
       $data = DB::connection('mdm')->table('TM_NOTA')
         ->leftJoin('TS_NOTA', function($join) use ($input)
@@ -96,8 +85,7 @@ class IndexController extends Controller
       return ["result"=>$data, "count"=>$count];
     }
 
-    function listRoleBranch($input, $request)
-    {
+    function listRoleBranch($input, $request) {
       return UserAndRoleManagemnt::listRoleBranch($input);
     }
 
@@ -160,28 +148,6 @@ class IndexController extends Controller
 
     function joinMdmOrder($input) {
       return GlobalHelper::joinMdmOrder($input);
-    }
-
-    function testjoin($input) {
-      $a = "SELECT tr.*, tr2.REFF_NAME AS SERVICE, tr3.REFF_NAME AS STATUS FROM TR_ROLE tr, TM_REFF tr2, TM_REFF tr3 WHERE tr.ROLE_SERVICE = tr2.REFF_ID AND tr2.REFF_TR_ID = 1 AND tr.ROLE_STATUS = tr3.REFF_ID AND tr3.REFF_TR_ID = 3";
-      $b = DB::connection("omuster")->select(DB::raw($a));
-      return $b;
-      // $detail   = [];
-      // $b = [];
-      // $data_a = DB::connection("omuster")->table('TR_ROLE as tr')
-      // ->join("TM_REFF as tr2", "tr2.REFF_ID", "=", "tr.ROLE_STATUS")
-      // ->join("TM_REFF as tr3", "tr3.REFF_ID", "=", "tr.ROLE_SERVICE")
-      // ->get();
-      //
-      // foreach ($data_a as $list) {
-      //   $newDt = [];
-      //   foreach ($list as $key => $value) {
-      //     $newDt[$key] = $value;
-      //   }
-      //   $detail[] = $newDt;
-      // }
-      //
-      // return $detail;
     }
 
     function other($input) {
@@ -347,9 +313,9 @@ class IndexController extends Controller
         }
 
       return ["result"=>$result, "count"=>$count];
-  }
+    }
 
-  function listProfileCustomer($input) {
+    function listProfileCustomer($input) {
     $tsUper = DB::connection('eng')->table('TS_UPER')->get();
     $newDt = [];
 
@@ -378,192 +344,155 @@ class IndexController extends Controller
     return ["result" =>$newDt, "count"=>$count];
   }
 
-  function viewDetail($input){
-      $field      = DB::connection($input["db"])->table('USER_TAB_COLUMNS')->select('column_name')->where('table_name', 'TX_GATEIN')->get();
-      $data       = [];
-      foreach ($field as $value) {
-        $data[$value->column_name] = "";
-      }
-  }
+    function listRecBatalCargo($input) {
+      $select   =
+        "A.REC_CARGO_DTL_ID,
+        A.REC_CARGO_HDR_ID,
+        A.REC_CARGO_DTL_SI_NO,
+        A.REC_CARGO_DTL_QTY,
+        A.REC_CARGO_DTL_VIA,
+        A.REC_CARGO_DTL_PKG_ID,
+        A.REC_CARGO_DTL_PKG_NAME,
+        A.REC_CARGO_DTL_UNIT_ID,
+        A.REC_CARGO_DTL_UNIT_NAME,
+        A.REC_CARGO_DTL_CMDTY_ID,
+        A.REC_CARGO_DTL_CMDTY_NAME,
+        A.REC_CARGO_DTL_CHARACTER_ID,
+        A.REC_CARGO_DTL_CHARACTER_NAME,
+        A.REC_CARGO_DTL_REC_DATE,
+        A.REC_CARGO_DTL_CREATE_DATE,
+        A.REC_CARGO_DTL_VIA_NAME,
+        A.REC_CARGO_DTL_OWNER,
+        A.REC_CARGO_DTL_OWNER_NAME,
+        A.REC_CARGO_DTL_PKG_PARENT_ID,
+        A.REC_CARGO_DTL_ISCANCELLED,
+        (CASE WHEN SUM(B.CANCL_QTY) IS NULL THEN 0 ELSE SUM(B.CANCL_QTY) END) AS jumlah_batal";
 
-  public static function viewDetailTes($input) {
-      $data    = $input["data"];
-      $count   = count($input["data"]);
-      $pk      = $input["HEADER"]["PK"][0];
-      $pkVal   = $input["HEADER"]["PK"][1];
-      foreach ($data as $data) {
-        $val     = $input[$data];
-        $connect  = DB::connection($val["DB"])->table($val["TABLE"]);
-          if ($data == "HEADER") {
-             $header   = $connect->where(strtoupper($pk), "like", strtoupper($pkVal))->get();
-             $header   = json_decode(json_encode($header), TRUE);
-             $vwdata = ["HEADER" => $header];
-          }
+      $leftJoinDTLCancelled    =
+        "A.REC_CARGO_DTL_SI_NO = B.CANCL_SI AND
+         B.CANCL_CMDTY_ID      = A.REC_CARGO_DTL_CMDTY_ID AND
+         B.CANCL_PKG_ID        = A.REC_CARGO_DTL_PKG_ID AND
+         B.CANCL_PKG_PARENT_ID = A.REC_CARGO_DTL_PKG_PARENT_ID";
 
-          else if($data == "FILE") {
-            if (isset($input[$data]["BASE64"])) {
-              if ($input[$data]["BASE64"] == "N" || $input[$data]["BASE64"] == "n" ) {
-                $fil     = [];
-                $fk      = $val["FK"][0];
-                $fkhdr   = $header[0][$val["FK"][1]];
-                $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
-                foreach ($detail as $list) {
-                  $newDt = [];
-                  foreach ($list as $key => $value) {
-                    $newDt[$key] = $value;
-                  }
-                  $fil[] = $newDt;
-                  $vwdata[$data] = $fil;
-                  }
-                  if (empty($detail)) {
-                    $vwdata[$data] = [];
-                    }
-              }
-            } else {
-            $fil     = [];
-            $fk      = $val["FK"][0];
-            $fkhdr   = $header[0][$val["FK"][1]];
-            $detail  = json_decode(json_encode($connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get()), TRUE);
-            foreach ($detail as $list) {
-              $newDt = [];
-              foreach ($list as $key => $value) {
-                $newDt[$key] = $value;
-              }
-              $dataUrl = "http://10.88.48.33/api/public/".$detail[0]["doc_path"];
-              $url     = str_replace(" ", "%20", $dataUrl);
-              $file = file_get_contents($url);
-              $newDt["base64"]  =  base64_encode($file);
-              $fil[] = $newDt;
-              $vwdata[$data] = $fil;
-              }
-              if (empty($detail)) {
-                $vwdata[$data] = [];
-                }
-              }
-            }
+      $leftJoinDTLCancelledType = "B.CANCL_HDR_ID = C.CANCELLED_ID AND C.CANCELLED_TYPE = '10'";
 
-          else {
-            $fk      = $val["FK"][0];
-            $fkhdr   = $header[0][$val["FK"][1]];
-            if(!empty($val["WHERE"][0])) {
-              $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->where($val["WHERE"])->get();
-            } else {
-              $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
-            }
-            if (empty($detail)) {
-              $field      = DB::connection($val["DB"])->table('USER_TAB_COLUMNS')->select('column_name')->where('table_name', $val["TABLE"])->get();
-              $empty      = [];
-              foreach ($field as $value) {
-                $empty[$value->column_name] = "";
-              }
-              $vwdata[$data] = $empty;
-            } else {
-              $vwdata[$data] = $detail;
-            }
-          }
-      }
+      $groupByRaw               =
+          "A.REC_CARGO_DTL_ID,
+           A.REC_CARGO_HDR_ID,
+           A.REC_CARGO_DTL_SI_NO,
+           A.REC_CARGO_DTL_QTY,
+           A.REC_CARGO_DTL_VIA,
+           A.REC_CARGO_DTL_PKG_ID,
+           A.REC_CARGO_DTL_PKG_NAME,
+           A.REC_CARGO_DTL_UNIT_ID,
+           A.REC_CARGO_DTL_UNIT_NAME,
+           A.REC_CARGO_DTL_CMDTY_ID,
+           A.REC_CARGO_DTL_CMDTY_NAME,
+           A.REC_CARGO_DTL_CHARACTER_ID,
+           A.REC_CARGO_DTL_CHARACTER_NAME,
+           A.REC_CARGO_DTL_REC_DATE,
+           A.REC_CARGO_DTL_CREATE_DATE,
+           A.REC_CARGO_DTL_VIA_NAME,
+           A.REC_CARGO_DTL_OWNER,
+           A.REC_CARGO_DTL_OWNER_NAME,
+           A.REC_CARGO_DTL_PKG_PARENT_ID,
+           A.REC_CARGO_DTL_ISCANCELLED";
 
-      if (!empty($input["changeKey"])) {
-        $result  = $vwdata;
-        $data    = json_encode($result);
-        $change  = str_replace($input["changeKey"][0], $input["changeKey"][1], $data);
-        $vwdata  = json_decode($change);
-      }
+      $connect = DB::connection($input["db"])
+                ->table($input["table"])
+                ->where($input["where"])
+                ->leftJoin("TX_DTL_CANCELLED B", DB::raw($leftJoinDTLCancelled))
+                ->leftJoin("TX_HDR_CANCELLED C", DB::raw($leftJoinDTLCancelledType))
+                ->groupBy($groupByRaw)
+                ->select(DB::raw($select));
 
-      if (isset($input["spesial"])) {
-        if ($input["spesial"] == "TM_LUMPSUM") {
-          $id       = $input["HEADER"]["PK"][1];
-          $detail   = [];
-          $cust     = [];
-          $fil      = [];
-          $data_a   = DB::connection("omcargo")->table('TS_LUMPSUM_AREA')->where("LUMPSUM_ID", "=", $id)->get();
-          foreach ($data_a as $list) {
-            $newDt = [];
-            foreach ($list as $key => $value) {
-              $newDt[$key] = $value;
-            }
-
-            $data_c = DB::connection("omcargo")->table('TM_REFF')->where([["REFF_TR_ID", "=", "11"],["REFF_ID", "=", $list->lumpsum_stacking_type]])->get();
-            foreach ($data_c as $listc) {
-              $newDt = [];
-              foreach ($listc as $key => $value) {
-                $newDt[$key] = $value;
-              }
-            }
-
-          if ($list->lumpsum_stacking_type == "2") {
-            $data_b = DB::connection("mdm")->table('TM_STORAGE')->where("storage_code", $list->lumpsum_area_code)->get();
-          } else {
-            $data_b = DB::connection("mdm")->table('TM_YARD')->where("yard_code", $list->lumpsum_area_code)->get();
-          }
-          foreach ($data_b as $listS) {
-            foreach ($listS as $key => $value) {
-              $newDt[$key] = $value;
-            }
-          }
-          $detail[] = $newDt;
-         }
-
-         $data_d   = DB::connection("omcargo")->table('TS_LUMPSUM_CUST')->where("LUMPSUM_ID", "=", $id)->get();
-         foreach ($data_d as $listD) {
-           $custo = [];
-           foreach ($listD as $key => $value) {
-             $custo[$key] = $value;
-           }
-             $cust[] = $custo;
-         }
-
-         $vwdata["DETAIL"] = $detail;
-         $vwdata["CUSTOMER"] = $cust;
-         $no       = $vwdata["HEADER"][0]["lumpsum_no"];
-         $data_e   = DB::connection("omcargo")->table('TX_DOCUMENT')->where("REQ_NO", "=", $id)->get();
-         foreach ($data_e as $list) {
-           $newDt = [];
-           foreach ($list as $key => $value) {
-             $newDt[$key] = $value;
-           }
-           $dataUrl = "http://10.88.48.33/api/public/".$list->doc_path;
-           $url     = str_replace(" ", "%20", $dataUrl);
-           $file = file_get_contents($url);
-           $newDt["base64"]  =  base64_encode($file);
-           $fil[] = $newDt;
-           $vwdata["FILE"] = $fil;
-           }
-           if (empty($data_e)) {
-             $vwdata["FILE"] = [];
-           }
+      if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['limit'])) {
+          $connect->skip($input['start'])->take($input['limit']);
         }
       }
-      return $vwdata;
+
+      $result  = $connect->get();
+      $count   = count($result);
+
+      return ["count"=>$count, "result"=>$result];
     }
 
-  // function joinheaderdetail($input) {
-  //   $data         = $input["data"];
-  //   $connect      = DB::connection($input["HEADER"]["DB"])->table($input["HEADER"]["TABLE"])->where($input["HEADER"]["PK"][0],$input["HEADER"]["PK"][1]);
-  //   $raw           = $input["data"];
-  //   $left          = $input["JOIN"]["LEFT"];
-  //   for ($i=0; $i < count($raw); $i++) {
-  //     if ($raw[$i] == "HEADER" || $raw[$i] == "header") {
-  //       // code...
-  //     } else {
-  //       if(!in_array($raw[$i],$left))
-  //       $other[]   = $raw[$i];
-  //     }
-  //   }
-  //
-  //   foreach ($other as $other) {
-  //     $dataun    = $input[$other];
-  //     $connect->leftJoin($dataun["TABLE"], $dataun["FK"][0], "=",$dataun["FK"][1]);
-  //   }
-  //
-  //   if (!empty($input["JOIN"]["LEFT"])) {
-  //     $data = count($input["JOIN"]["LEFT"]);
-  //     for ($i=0; $i < $data; $i++) {
-  //       $datadtl   = $input[$input["JOIN"]["LEFT"][$i]];
-  //       $connect->leftJoin($datadtl["TABLE"], $datadtl["FK"][0], "=",$datadtl["FK"][1]);
-  //     }
-  //   }
-  //
-  //   return $connect->first();
-  // }
+    function listDelBatalCargo($input) {
+      $select   =
+        "A.DEL_CARGO_DTL_ID,
+         A.DEL_CARGO_HDR_ID,
+         A.DEL_CARGO_DTL_SI_NO,
+         A.DEL_CARGO_DTL_QTY,
+         A.DEL_CARGO_DTL_VIA,
+         A.DEL_CARGO_DTL_PKG_ID,
+         A.DEL_CARGO_DTL_PKG_NAME,
+         A.DEL_CARGO_DTL_UNIT_ID,
+         A.DEL_CARGO_DTL_UNIT_NAME,
+         A.DEL_CARGO_DTL_CMDTY_ID,
+         A.DEL_CARGO_DTL_CMDTY_NAME,
+         A.DEL_CARGO_DTL_CHARACTER_ID,
+         A.DEL_CARGO_DTL_CHARACTER_NAME,
+         A.DEL_CARGO_DTL_DEL_DATE,
+         A.DEL_CARGO_DTL_CREATE_DATE,
+         A.DEL_CARGO_DTL_STACK_DATE,
+         A.DEL_CARGO_DTL_EXT_DATE,
+         A.DEL_CARGO_DTL_VIA_NAME,
+         A.DEL_CARGO_DTL_OWNER,
+         A.DEL_CARGO_DTL_OWNER_NAME,
+         A.DEL_CARGO_DTL_PKG_PARENT_ID,
+         A.DEL_CARGO_DTL_ISCANCELLED,
+         (CASE WHEN SUM(B.CANCL_QTY) IS NULL THEN 0 ELSE SUM(B.CANCL_QTY) END) AS jumlah_batal";
+
+      $leftJoinDTLCancelled    =
+        "A.DEL_CARGO_DTL_SI_NO = B.CANCL_SI AND
+         B.CANCL_CMDTY_ID      = A.DEL_CARGO_DTL_CMDTY_ID AND
+         B.CANCL_PKG_ID        = A.DEL_CARGO_DTL_PKG_ID AND
+         B.CANCL_PKG_PARENT_ID = A.DEL_CARGO_DTL_PKG_PARENT_ID";
+
+      $leftJoinDTLCancelledType = "B.CANCL_HDR_ID = C.CANCELLED_ID AND C.CANCELLED_TYPE = '11'";
+
+      $groupByRaw               =
+          "A.DEL_CARGO_DTL_ID,
+           A.DEL_CARGO_HDR_ID,
+           A.DEL_CARGO_DTL_SI_NO,
+           A.DEL_CARGO_DTL_QTY,
+           A.DEL_CARGO_DTL_VIA,
+           A.DEL_CARGO_DTL_PKG_ID,
+           A.DEL_CARGO_DTL_PKG_NAME,
+           A.DEL_CARGO_DTL_UNIT_ID,
+           A.DEL_CARGO_DTL_UNIT_NAME,
+           A.DEL_CARGO_DTL_CMDTY_ID,
+           A.DEL_CARGO_DTL_CMDTY_NAME,
+           A.DEL_CARGO_DTL_CHARACTER_ID,
+           A.DEL_CARGO_DTL_CHARACTER_NAME,
+           A.DEL_CARGO_DTL_DEL_DATE,
+           A.DEL_CARGO_DTL_CREATE_DATE,
+           A.DEL_CARGO_DTL_STACK_DATE,
+           A.DEL_CARGO_DTL_EXT_DATE,
+           A.DEL_CARGO_DTL_VIA_NAME,
+           A.DEL_CARGO_DTL_OWNER,
+           A.DEL_CARGO_DTL_OWNER_NAME,
+           A.DEL_CARGO_DTL_PKG_PARENT_ID,
+           A.DEL_CARGO_DTL_ISCANCELLED";
+
+      $connect = DB::connection($input["db"])
+                ->table($input["table"])
+                ->where($input["where"])
+                ->leftJoin("TX_DTL_CANCELLED B", DB::raw($leftJoinDTLCancelled))
+                ->leftJoin("TX_HDR_CANCELLED C", DB::raw($leftJoinDTLCancelledType))
+                ->groupBy($groupByRaw)
+                ->select(DB::raw($select));
+
+      if (!empty($input['start']) || $input["start"] == '0') {
+        if (!empty($input['limit'])) {
+          $connect->skip($input['start'])->take($input['limit']);
+        }
+      }
+
+      $result  = $connect->get();
+      $count   = count($result);
+
+      return ["count"=>$count, "result"=>$result];
+    }
 }

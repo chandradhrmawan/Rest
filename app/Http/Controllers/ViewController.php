@@ -372,6 +372,8 @@ class ViewController extends Controller
     }
     // UserAndRoleManagemnt
 
+
+  // Belum Ke PIndah Ke Helper
   function printGetPass($id) {
       $data = DB::connection("omcargo")
                 ->table("TX_HDR_TCA")
