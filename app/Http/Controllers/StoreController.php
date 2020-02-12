@@ -443,7 +443,7 @@ class StoreController extends Controller
     return GlobalHelper::delHeaderDetail($input);
   }
 
-  function getUpdateStuffing($input) {
-    return PlgConnectedExternalApps::getRealFumigasi($input);
+  function getRealPlug($input) {
+    return PlgConnectedExternalApps::getRealPlug($input);
   }
 }
