@@ -1113,8 +1113,7 @@ class PlgConnectedExternalApps{
 			$res['his_cont'] = $his_cont;
 			$dtl = DB::connection('omuster')->table('TX_DTL_STUFF')->where([
 				'stuff_hdr_id' => $input['stuff_id'],
-				'stuff_dtl_isactive' => 'Y',
-				'STUFF_FL_REAL' => 4
+				'stuff_dtl_isactive' => 'Y'
 			])->get();
 	        return [
 	        	'response' => $Success,
