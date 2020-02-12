@@ -169,6 +169,18 @@ class StoreController extends Controller
       function getRealDelPLG($input, $request){
         return PlgConnectedExternalApps::getRealDelPLG($input);
       }
+
+      function getRealStuffPLG($input, $request){
+        return PlgConnectedExternalApps::getRealStuffPLG($input);
+      }
+
+      function getRealStrippPLG($input, $request){
+        return PlgConnectedExternalApps::getRealStrippPLG($input);
+      }
+
+      function getRealFumigPLG($input, $request){
+        return PlgConnectedExternalApps::getRealFumigPLG($input);
+      }
     // PLG
 
     public function testview_file(){
