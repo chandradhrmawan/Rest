@@ -1217,8 +1217,7 @@ class PlgConnectedExternalApps{
 			$res['his_cont'] = $his_cont;
 			$dtl = DB::connection('omuster')->table('TX_DTL_STRIPP')->where([
 				'stripp_hdr_id' => $input['stripp_id'],
-				'stripp_dtl_isactive' => 'Y',
-				'STRIPP_FL_REAL' => 5
+				'stripp_dtl_isactive' => 'Y'
 			])->get();
 	        return [
 	        	'response' => $Success,
@@ -1322,8 +1321,7 @@ class PlgConnectedExternalApps{
 			$res['his_cont'] = $his_cont;
 			$dtl = DB::connection('omuster')->table('TX_DTL_FUMI')->where([
 				'fumi_hdr_id' => $input['fumi_id'],
-				'fumi_dtl_isactive' => 'Y',
-				'FUMI_FL_REAL' => 5
+				'fumi_dtl_isactive' => 'Y'
 			])->get();
 	        return [
 	        	'response' => $Success,
