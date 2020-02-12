@@ -1825,7 +1825,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealFumigasi() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->leftJoin('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('A.FUMI_FL_REAL', "1")->get();
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->leftJoin('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('B.FUMI_FL_REAL', "1")->get();
  		 $dtl 							= '';
  		 $arrdtl 						= [];
 		 $all 							= json_decode(json_encode($all),TRUE);
@@ -1938,7 +1938,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealPlugStart() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->where('A.PLUG_FL_REAL', "1")->get();
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->where('B.PLUG_FL_REAL', "1")->get();
  		 $dtl 							= '';
  		 $arrdtl 						= [];
 		 $all 							= json_decode(json_encode($all),TRUE);
@@ -1959,8 +1959,6 @@ class PlgConnectedExternalApps{
 			 "data": ['.$dtl.']
 		 }';
 
-		 return $json;
-
 		 $json = base64_encode(json_encode(json_decode($json,true)));
 		 $json = '
 			 {
@@ -2043,14 +2041,14 @@ class PlgConnectedExternalApps{
 
 			DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
 
-			// $setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_DATE"=>$plugDate,"PLUG_FL_REAL"=>7]);
+			$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_START_DATE"=>$plugDate,"PLUG_FL_REAL"=>7]);
 			echo "Realization Fumigasi Done";
 			 	// }
 			}
 		}
 
 		public static function getRealPlugEnd() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->where('A.PLUG_FL_REAL', "7")->get();
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->where('B.PLUG_FL_REAL', "7")->get();
  		 $dtl 							= '';
  		 $arrdtl 						= [];
 		 $all 							= json_decode(json_encode($all),TRUE);
@@ -2071,7 +2069,6 @@ class PlgConnectedExternalApps{
 			 "data": ['.$dtl.']
 		 }';
 
-		 return $json;
 
 		 $json = base64_encode(json_encode(json_decode($json,true)));
 		 $json = '
@@ -2155,9 +2152,9 @@ class PlgConnectedExternalApps{
 
 			DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
 
-			// $setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_DATE"=>$plugDate,"PLUG_FL_REAL"=>8]);
-			echo "Realization Fumigasi Done";
-			 	// }
+			$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_END_DATE"=>$plugDate,"PLUG_FL_REAL"=>8]);
+
+			echo "Realization Pluggin End Done";
 			}
 		}
 
