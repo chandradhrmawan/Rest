@@ -1301,6 +1301,111 @@ class PlgConnectedExternalApps{
 			return $his_cont;
 		}
 
+		public static function getRealFumigPLG($input){
+			$his_cont = [];
+			$Success = true;
+			$msg = 'Success get realisasion';
+			$find = DB::connection('omuster')->table('TX_HDR_FUMI')->where('fumi_id', $input['fumi_id'])->first();
+			$dtlLoop = DB::connection('omuster')->table('TX_DTL_FUMI')->where([
+				'fumi_hdr_id' => $input['fumi_id'],
+				'fumi_dtl_isactive' => 'Y',
+				'FUMI_FL_REAL' => 1
+			])->get();
+			if (count($dtlLoop) > 0) {
+				$res = static::getFumigInYard($find,$dtlLoop);
+				if ($res['result']['count'] > 0) {
+					$his_cont = static::storeFumigHisCont($res['result']['result'], $find);
+				}else{
+					$Success = false;
+					$msg = 'realisasion not finish';
+				}
+			}
+			$res['his_cont'] = $his_cont;
+			$dtl = DB::connection('omuster')->table('TX_DTL_FUMI')->where([
+				'fumi_hdr_id' => $input['fumi_id'],
+				'fumi_dtl_isactive' => 'Y',
+				'FUMI_FL_REAL' => 5
+			])->get();
+	        return [
+	        	'response' => $Success,
+	        	'result' => $msg,
+	        	'no_rec' =>$find->fumi_no,
+	        	'hdr' =>$find,
+	        	'dtl' => $dtl,
+	        	'getRealFumigPLG' => $res
+	        ];
+		}
+
+		public static function getFumigInYard($find,$dtlLoop){
+			$dtl = '';
+			$arrdtl = [];
+			foreach ($dtlLoop as $list) {
+				$dtl .= '
+				{
+					"NO_CONTAINER": "'.$list->fumi_dtl_cont.'",
+					"NO_REQUEST": "'.$find->fumi_no.'",
+					"BRANCH_ID": "'.$find->fumi_branch_id.'"
+				},';
+			}
+	        $dtl = substr($dtl, 0,-1);
+			$json = '
+			{
+				"action" : "generateFumi",
+				"data": ['.$dtl.']
+			}';
+			$json = base64_encode(json_encode(json_decode($json,true)));
+			$json = static::jsonGetTOS($json);
+	        $json = json_encode(json_decode($json,true));
+			$arr = [
+	        	"user" => config('endpoint.tosGetPLG.user'),
+	        	"pass" => config('endpoint.tosGetPLG.pass'),
+	        	"target" => config('endpoint.tosGetPLG.target'),
+	        	"json" => $json
+	        ];
+			$res = static::sendRequestToExtJsonMet($arr);
+			return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		}
+
+		public static function storeFumigHisCont($data,$hdr){
+			$his_cont = [];
+			foreach ($data as $listR) {
+				$findTsCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->fumi_branch_id,
+					'branch_code' => $hdr->fumi_branch_code
+				];
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first();
+				$cont_counter = $cekTsCont->cont_counter;
+				$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
+					"reff_tr_id" => 12,
+					"reff_name" => 'REAL FUMIGATION'
+				])->first();
+				$arrStoreTsContAndTxHisCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr->fumi_branch_id,
+					'branch_code' => $hdr->fumi_branch_code,
+					'cont_location' => 'IN_YARD',
+					'cont_size' => null,
+					'cont_type' => null,
+					'cont_counter' => $cont_counter,
+					'no_request' => $listR['NO_REQUEST'],
+					'kegiatan' => $cekKegiatan->reff_id,
+					'id_user' => "1",
+					'status_cont' => $listR['STATUS'],
+					'vvd_id' => $hdr->fumi_vvd_id
+				];
+				if (!empty($input["user"])) {
+					$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
+				}
+				DB::connection('omuster')->table('TX_DTL_FUMI')->where('FUMI_HDR_ID', $hdr->fumi_id)->where('FUMI_DTL_CONT', $listR['NO_CONTAINER'])->update([
+					"FUMI_DTL_REAL_DATE"=>date('Y-m-d', strtotime($listR["REAL_FUMI_DATE"])),
+					"FUMI_FL_REAL"=>5
+				]);
+				$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+			}
+			return $his_cont;
+		}
+
 		public static function getUpdatePlacement(){
 		  $all 						 = [];
 		  $det 						 = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', "2")->get();
