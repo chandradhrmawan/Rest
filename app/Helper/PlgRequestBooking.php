@@ -11,7 +11,22 @@ use App\Models\OmUster\TxPayment;
 
 class PlgRequestBooking{
 	// PLG
+		private static function calculateHours($st,$ed){
+			$st = strtotime($st);
+			$ed = strtotime($ed);
+			$difference = abs($ed - $st)/3600;
+			return ceil($difference);
+		}
+
 		public static function calculateTariffBuild($find, $input, $config){
+			if (in_array($config['kegiatan'], [7,8]) and $find[$config['head_status']] == 1) {
+				return [
+					"result_flag"=>"S",
+					"result_msg"=>"Success",
+					"no_req"=>$find[$config['head_no']],
+					"Success"=>true
+				];
+			}
 			$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
 			// build detil
 				$setD = [];
@@ -63,7 +78,9 @@ class PlgRequestBooking{
 				];
 			// set data
 			$tariffResp = BillingEngine::calculateTariff($set_data);
-			$tariffResp['detil_data'] = $detil;
+			if (in_array($config['kegiatan'], [1])){
+				$tariffResp['detil_data'] = $detil;
+			}
 			return $tariffResp;
 		}
 
@@ -146,6 +163,8 @@ class PlgRequestBooking{
 			}
 			if (empty($config['DTL_UNIT_ID'])) {
 				$newD['DTL_UNIT_ID'] = 'NULL';
+			}else if ($config['DTL_UNIT_ID'] == 6) {
+				$newD['DTL_UNIT_ID'] = 6;
 			}else{
 				$newD['DTL_UNIT_ID'] = empty($list[$config['DTL_UNIT_ID']]) ? 'NULL' : $list[$config['DTL_UNIT_ID']];
 			}
@@ -153,6 +172,12 @@ class PlgRequestBooking{
 				$newD['DTL_QTY'] = 'NULL';
 			}else if ($config['DTL_QTY'] == 1) {
 				$newD['DTL_QTY'] = 1;
+			}else if (is_array($config['DTL_QTY'])) {
+				if (!empty($config['DTL_QTY']['func'])) {
+					$newD['DTL_QTY'] = static::$config['DTL_QTY']['func']($config['DTL_QTY']['start'],$config['DTL_QTY']['end']);
+				}else{
+					$newD['DTL_QTY'] = 'NULL';
+				}
 			}else{
 				$newD['DTL_QTY'] = empty($list[$config['DTL_QTY']]) ? 'NULL' : $list[$config['DTL_QTY']];
 			}
@@ -229,15 +254,28 @@ class PlgRequestBooking{
 					}
 				}
 			}
-			if (empty($config['DTL_DATE_OUT_OLD'])) {
-				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+
+			if (!empty($config['head_ext_status']) and $hdr[$config['head_ext_status']] == 'Y') {
+				$getOldIdHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$hdr[$config['head_no']])->first();
+				$getOldIdHdr = (array)$getOldIdHdr;
+				$getOldIdHdr = $getOldIdHdr[$config['head_primery']];
+				$getOldDtDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+					$config['head_forigen'] => $hdr[$config['head_primery']],
+					$config['DTL_BL'] => $list[$config['DTL_BL']]
+				])->first();
+				$getOldDtDtl = (array)$getOldDtDtl;
+				$newD['DTL_DATE_OUT_OLD'] = 'to_date(\''.\Carbon\Carbon::parse($getOldDtDtl[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			}else{
-				$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT_OLD']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 			}
+			
 			return $newD;
 		}
 
 		private static function migrateNotaData($find, $config){
+			if (in_array($config['kegiatan'], [7,8]) and $find[$config['head_status']] == 2) {
+				return ['result' => null, "Success" => true];
+			}
 			$datenow = Carbon::now()->format('Y-m-d');
 			$no_nota = '';
 			$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
@@ -366,9 +404,8 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result' => "Fail, requst already send!"];
 			}
 
-			$tariffResp = static::calculateTariffBuild($find, $input, $config);
-
 			$his_cont = [];
+			$tariffResp = static::calculateTariffBuild($find, $input, $config);
 			if (empty($tariffResp['result_flag']) or $tariffResp['result_flag'] != 'S') {
 				return $tariffResp;
 			} else if ($tariffResp['result_flag'] == 'S') {
