@@ -254,11 +254,21 @@ class PlgRequestBooking{
 					}
 				}
 			}
-			if (empty($config['DTL_DATE_OUT_OLD'])) {
-				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
+
+			if (!empty($config['head_ext_status']) and $hdr[$config['head_ext_status']] == 'Y') {
+				$getOldIdHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$hdr[$config['head_no']])->first();
+				$getOldIdHdr = (array)$getOldIdHdr;
+				$getOldIdHdr = $getOldIdHdr[$config['head_primery']];
+				$getOldDtDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+					$config['head_forigen'] => $hdr[$config['head_primery']],
+					$config['DTL_BL'] => $list[$config['DTL_BL']]
+				])->first();
+				$getOldDtDtl = (array)$getOldDtDtl;
+				$newD['DTL_DATE_OUT_OLD'] = 'to_date(\''.\Carbon\Carbon::parse($getOldDtDtl[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			}else{
-				$newD['DTL_DATE_OUT_OLD'] = empty($list[$config['DTL_DATE_OUT_OLD']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT_OLD']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				$newD['DTL_DATE_OUT_OLD'] = 'NULL';
 			}
+			
 			return $newD;
 		}
 
