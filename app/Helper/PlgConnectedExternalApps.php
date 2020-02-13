@@ -842,7 +842,7 @@ class PlgConnectedExternalApps{
 					"BRANCH_ID": "'.$find->rec_branch_id.'"
 				},';
 			}
-	        $dtl = substr($dtl, 0,-1);
+	    $dtl = substr($dtl, 0,-1);
 			$json = '
 			{
 				"action" : "generateGetIn",
@@ -1494,11 +1494,14 @@ class PlgConnectedExternalApps{
 				return "Placement is uptodate";
 			}
 
+			return $res["result"]["result"];
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
 		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
-		      "CONT_LOCATION" => "GATI"
+		      "CONT_LOCATION" => "GATI",
+					"BRANCH_ID"			=> $listR["BRANCH_ID"]
 		    ];
+
 
 		    $findPlacement 		= [
 		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
@@ -1512,9 +1515,6 @@ class PlgConnectedExternalApps{
 		    ];
 
 		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
-				if (empty($tsContainer)) {
-					return "Placement is uptodate";
-				}
 		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
@@ -1563,9 +1563,9 @@ class PlgConnectedExternalApps{
 		    }
 		  }
 
-		  $updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "3")->get();
+		  $updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "2")->get();
 		  foreach ($updateDetail as $updateVal) {
-		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"2"]);
+		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"3"]);
 		  }
 		}
 
