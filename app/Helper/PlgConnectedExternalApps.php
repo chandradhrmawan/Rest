@@ -1299,7 +1299,7 @@ class PlgConnectedExternalApps{
 			return $his_cont;
 		}
 
-		public static function getRealFumigPLG($input){
+		public static function getRealFumiPLG($input){
 			$his_cont = [];
 			$Success = true;
 			$msg = 'Success get realisasion';
@@ -1310,9 +1310,9 @@ class PlgConnectedExternalApps{
 				'FUMI_FL_REAL' => 1
 			])->get();
 			if (count($dtlLoop) > 0) {
-				$res = static::getFumigInYard($find,$dtlLoop);
+				$res = static::getFumiInYard($find,$dtlLoop);
 				if ($res['result']['count'] > 0) {
-					$his_cont = static::storeFumigHisCont($res['result']['result'], $find);
+					$his_cont = static::storeFumiHisCont($res['result']['result'], $find);
 				}else{
 					$Success = false;
 					$msg = 'realisasion not finish';
@@ -1329,11 +1329,11 @@ class PlgConnectedExternalApps{
 	        	'no_rec' =>$find->fumi_no,
 	        	'hdr' =>$find,
 	        	'dtl' => $dtl,
-	        	'getRealFumigPLG' => $res
+	        	'getRealFumiPLG' => $res
 	        ];
 		}
 
-		public static function getFumigInYard($find,$dtlLoop){
+		public static function getFumiInYard($find,$dtlLoop){
 			$dtl = '';
 			$arrdtl = [];
 			foreach ($dtlLoop as $list) {
@@ -1363,7 +1363,7 @@ class PlgConnectedExternalApps{
 			return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 		}
 
-		public static function storeFumigHisCont($data,$hdr){
+		public static function storeFumiHisCont($data,$hdr){
 			$his_cont = [];
 			foreach ($data as $listR) {
 				$findTsCont = [
