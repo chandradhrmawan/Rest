@@ -1496,6 +1496,11 @@ class PlgConnectedExternalApps{
 
 			static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
+			$updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "2")->get();
+		  foreach ($updateDetail as $updateVal) {
+		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"3"]);
+		  }
+
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
 		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
@@ -1564,10 +1569,6 @@ class PlgConnectedExternalApps{
 		    }
 		  }
 
-		  $updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "2")->get();
-		  foreach ($updateDetail as $updateVal) {
-		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"3"]);
-		  }
 		}
 
 		public static function getRealStuffing() {
