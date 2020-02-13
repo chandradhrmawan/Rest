@@ -449,6 +449,6 @@ class StoreController extends Controller
   }
 
   function storeHistory($input) {
-    return $input;
+    
   }
 }

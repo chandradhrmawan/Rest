@@ -820,6 +820,12 @@ class GlobalHelper {
     $in        = $input["whereNotIn"];
     $connection->whereNotIn(strtoupper($in[0]), $in[1]);
     }
+
+    if(!empty($input["whereIn"][0])) {
+    $in        = $input["whereIn"];
+    $connection->whereIn(strtoupper($in[0]), $in[1]);
+    }
+
     $connection->update($input["update"]);
     $data = $connection->get();
     return ["msg"=>"Success", "result"=>$data];

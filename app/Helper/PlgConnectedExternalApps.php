@@ -258,7 +258,7 @@ class PlgConnectedExternalApps{
 		            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 		            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 		            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-		            "REQ_DTL_DEL_DATE": "",
+		            "REQ_DTL_DEL_DATE": "'.$dtl[$arr['config']['DEL_DTL_DATE_PLAN']].'",
 		            "REQ_DTL_NO_SEAL": ""
 		          },';
 		        }
@@ -295,7 +295,7 @@ class PlgConnectedExternalApps{
 		            "DELIVERY_KE": "",
 		            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 		            "PERP_DARI": "",
-		            "PERP_KE": "",
+		            "PERP_KE": "'.$rec_dr->reff_name.'",
 								"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 		          },
 		          "arrdetail": ['.$arrdetil.']
