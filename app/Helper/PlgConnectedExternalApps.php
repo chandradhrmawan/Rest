@@ -1494,7 +1494,12 @@ class PlgConnectedExternalApps{
 				return "Placement is uptodate";
 			}
 
-			return $res["result"]["result"];
+			$request 						= json_decode($json,true);
+			$service["request"] = base64_decode($request["repoGetRequest"]["esbBody"]["request"]);
+			$service["response"]=  json_encode($res["result"]["result"]);
+
+			return $service;
+
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
 		      "CONT_NO" 			=> $listR["NO_CONTAINER"],

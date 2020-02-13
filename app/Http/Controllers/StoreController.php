@@ -447,4 +447,8 @@ class StoreController extends Controller
   function getRealPlug($input) {
     return PlgConnectedExternalApps::getUpdatePlacement($input);
   }
+
+  function storeHistory($input) {
+    return $input;
+  }
 }
