@@ -132,11 +132,12 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
-      $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 1)->first();
-      $config = json_decode($config->api_set, true);
-
-      return PlgConnectedExternalApps::sendRequestBookingPLG([
-        'config' => $config,
+      // $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 1)->first();
+      // $config = json_decode($config->api_set, true);
+      $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',114)->first();
+      $nota = (array)$nota;
+      return PlgConnectedExternalApps::sendInvProforma([
+        'nota' => $nota,
         'id' => 170
       ]);
     }
@@ -178,8 +179,8 @@ class StoreController extends Controller
         return PlgConnectedExternalApps::getRealStrippPLG($input);
       }
 
-      function getRealFumigPLG($input, $request){
-        return PlgConnectedExternalApps::getRealFumigPLG($input);
+      function getRealFumiPLG($input, $request){
+        return PlgConnectedExternalApps::getRealFumiPLG($input);
       }
     // PLG
 
