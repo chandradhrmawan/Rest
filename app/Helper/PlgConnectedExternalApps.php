@@ -1494,11 +1494,7 @@ class PlgConnectedExternalApps{
 				return "Placement is uptodate";
 			}
 
-			$request 						= json_decode($json,true);
-			$service["request"] = base64_decode($request["repoGetRequest"]["esbBody"]["request"]);
-			$service["response"]=  json_encode($res["result"]["result"]);
-
-			return $service;
+			static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
@@ -1654,6 +1650,8 @@ class PlgConnectedExternalApps{
 			 return "STUFF is uptodate";
 		 }
 
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
 		 foreach ($res["result"]["result"] as $value) {
 			$stufBranch 				= $value["REAL_STUFF_BRANCH_ID"];
 		 	$stuffReq 					= $value["REAL_STUFF_NOREQ"];
@@ -1787,6 +1785,8 @@ class PlgConnectedExternalApps{
 			 return "STRIPP is uptodate";
 		 }
 
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$stripBranch 				= $value["REAL_STRIP_BRANCH_ID"];
@@ -1902,6 +1902,8 @@ class PlgConnectedExternalApps{
 		 if (empty($res["result"]["result"])) {
 			 return "Fumi is uptodate";
 		 }
+
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
@@ -2023,6 +2025,8 @@ class PlgConnectedExternalApps{
 			 return "PLUG Start is uptodate";
 		 }
 
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
@@ -2138,6 +2142,8 @@ class PlgConnectedExternalApps{
 			 return "PLUG END is uptodate";
 		 }
 
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
@@ -2185,6 +2191,22 @@ class PlgConnectedExternalApps{
 
 			echo "Realization Pluggin End Done";
 			}
+		}
+
+		public static function storeTxServices($json, $jsonRequest, $jsonResponse) {
+			$request 									= json_decode($json,true);
+			$service["request"] 			= base64_decode($jsonRequest);
+			$service["response"]			= json_encode($jsonResponse);
+
+			$storeService 						= [
+				"SERVICES_ID"						=> "",
+				"SERVICES_BRANCH_ID"		=> "4",
+				"SERVICES_TIME"					=> date('Y-m-d H:i'),
+				"SERVICES_REQUEST"			=> $service["request"],
+				"SERVICES_RESPONSE"			=> $service["response"]
+			];
+
+			$insert 									= DB::connection('omuster')->table('TX_SERVICES')->insert($storeService);
 		}
 
 	// PLG
