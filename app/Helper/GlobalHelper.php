@@ -70,8 +70,8 @@ class GlobalHelper {
             if(!empty($val["WHERE"][0])) {
               $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->where($val["WHERE"])->get();
             } else {
-              if (isset($val["INNERJOIN"])) {
-                foreach ($val["INNERJOIN"] as $list) {
+              if (isset($val["JOIN"])) {
+                foreach ($val["JOIN"] as $list) {
                   $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
                 }
               }
