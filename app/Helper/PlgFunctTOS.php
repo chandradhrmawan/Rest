@@ -284,6 +284,17 @@ class PlgFunctTOS{
 		]);
 	}
 
+	public static function storeRealDateSE($listR,$hdr,$config,$input){
+		DB::connection('omuster')->table($config['head_tab_detil'])->where([
+			$config['head_forigen'] => $hdr[$config['head_primery']],
+			$config['DTL_BL'] => $listR['NO_CONTAINER']
+		])->update([
+			$config['DTL_REAL_DATE']['uster']['usterStart'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosStart']])),
+			$config['DTL_REAL_DATE']['uster']['usterEnd'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosEnd']])),
+			$config['DTL_FL_REAL'] => $config['DTL_FL_REAL_V']
+		]);
+	}
+
 	// store request data to tos
 	    private static function buildJsonTX_HDR_REC($arr){
 	        $arrdetil = '';
