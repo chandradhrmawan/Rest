@@ -19,6 +19,8 @@
 <body>
 		@foreach($header as $header)
 		@foreach($kapal as $kapal)
+		@foreach($sign as $sign)
+
 		<?php if ($header->nota_paid == "I") { ?>
 			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(-30deg);margin-top:300px;width:80%">
 		<?php } ?>
@@ -252,16 +254,11 @@
 			<div><?php echo DNS2D::getBarcodeHTML($qrcode, "QRCODE", 2,2); ?></div>
 		</td>
 		<td style="vertical-align:top">
-			<table style="border-collapse:collapse; font-size:11px;float:right;text-align:center">
-				<tr><td>Banten,
-        <?php
-        $originalDate = $header->nota_date;
-        $newDate = date("d-M-y", strtotime($originalDate));
-        echo strtoupper($newDate);
-        ?></td></tr>
-				<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
-				<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
-				<tr><td>NIPP. 285047354</td></tr>
+			<table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
+				<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
+				<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+				<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
+				<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 			</table>
 		</td>
 	</tr>
@@ -277,6 +274,8 @@
 	@endforeach
 	@endforeach
 	@endforeach
+	@endforeach
+
 </body>
 </html>
 

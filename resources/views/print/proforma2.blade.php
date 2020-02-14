@@ -20,14 +20,14 @@
 		@foreach($header as $header)
 		@foreach($branch as $branch)
 		@foreach($kapal as $kapal)
-		@foreach($uper 	as $uper)
+		@foreach($sign as $sign)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
-			<td width="55%">
+			<td width="45%">
 				<div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
 				</td>
-      <td style="vertical-align:top;text-align:right">
+      <td width="42%" style="vertical-align:top;text-align:right">
         <table style="border-collapse:collapse; font-size:10px;">
           <tr>
             <td>No. Proforma</td>
@@ -293,9 +293,9 @@
   </tr>
 	<tr>
 		<td style="border-right: 0;border-top: 0;border-bottom:0;width:50%" colspan="5"></td>
-		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Jumlah Pembayaran</td>
+		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0" colspan="2">Jumlah Uper</td>
 		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format($uper->pay_amount)}}</td>
+		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format($uper)}}</td>
 	</tr>
 	<tr>
 		<td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
@@ -305,16 +305,11 @@
 	</tr>
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
-<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
-	<tr><td>Banten,
-	<?php
-	$originalDate = $header->nota_date;
-	$newDate = date("d-M-y", strtotime($originalDate));
-	echo strtoupper($newDate);
-	?></td></tr>
-	<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
-	<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
-	<tr><td>NIPP. 285047354</td></tr>
+<table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
+	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
+	<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
+	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 </table>
 
 <div style="position:absolute;bottom:20px;font-size:11px; width:100%">
@@ -323,7 +318,7 @@
 			{{$header->nota_no}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach

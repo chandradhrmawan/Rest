@@ -547,10 +547,22 @@ class ViewController extends Controller
                   AND A.UPER_REQ_NO = '".$header[0]->nota_req_no."'";
     $uper        = DB::connection('omcargo')->select($query);
     $notaAmount  = $header[0]->nota_amount;
-    $payAmount   = $uper[0]->pay_amount;
+    if (empty($uper)) {
+      $payAmount   = 0;
+      $uper        = 0;
+    } else {
+      $payAmount   = $uper[0]->pay_amount;
+      $uper        = $uper[0]->pay_amount;
+    }
     $total       = $notaAmount - $payAmount;
     $terbilang   = $this->terbilang($total);
-    $html        = view('print.proforma2',["total"=>$total,"uper"=>$uper, "bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+
+    if($terbilang == 0) {
+      $terbilang  = "Nol";
+    }
+
+    $sign        = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_TYPE', "3")->where('SIGN_BRANCH_ID', $branch[0]->branch_id)->where('SIGN_BRANCH_CODE', $branch[0]->branch_code)->get();
+    $html        = view('print.proforma2',["sign"=>$sign,"total"=>$total,"uper"=>$uper, "bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
     $filename    = $all["header"][0]->nota_no.rand(10,100000);
     $dompdf      = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
@@ -748,13 +760,15 @@ class ViewController extends Controller
                         ";
     $a                 = DB::connection('omcargo')->select($querya);
     $b                 = DB::connection('omcargo')->select($queryb);
+
     if (!empty($a[0]->rec_id)) {
       $data            = json_encode($a);
       $change          = str_replace("rec", "req", $data);
       $a               = json_decode($change);
       $all["request"]  = $a;
       $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $a[0]->req_branch_id)->where('BRANCH_CODE', $a[0]->req_branch_code)->get();
-      $html            = view('print.bprp',["branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
+      $sign            = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_BRANCH_ID', $a[0]->req_branch_id)->where('SIGN_BRANCH_CODE', $a[0]->req_branch_code)->get();
+      $html            = view('print.bprp',["sign"=>$sign, "branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
     } else if (!empty($b[0]->del_id)) {
       $data            = json_encode($b);
@@ -762,7 +776,8 @@ class ViewController extends Controller
       $b               = json_decode($change);
       $all["request"]  = $b;
       $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $b[0]->req_branch_id)->where('BRANCH_CODE', $b[0]->req_branch_code)->get();
-      $html            = view('print.bprp',["branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
+      $sign            = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_BRANCH_ID', $a[0]->req_branch_id)->where('SIGN_BRANCH_CODE', $a[0]->req_branch_code)->get();
+      $html            = view('print.bprp',["sign"=>$sign, "branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
     }
 
@@ -1026,11 +1041,12 @@ class ViewController extends Controller
       }
     }
 
+    $sign        = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_TYPE', "4")->where('SIGN_BRANCH_ID', $branch[0]->branch_id)->where('SIGN_BRANCH_CODE', $branch[0]->branch_code)->get();
     if (!empty($dat["handling"])) {
       $handlingbm  = $dat["handling"];
-      $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handlingbm, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      $html       = view('print.invoice',["sign"=>$sign,"label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handlingbm, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
     } else {
-      $html       = view('print.invoice',["label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+      $html       = view('print.invoice',["sign"=>$sign,"label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
     }
     $filename   = "Test";
     $dompdf     = new Dompdf();
