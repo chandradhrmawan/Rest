@@ -22,6 +22,7 @@
 		@foreach($header as $header)
     @foreach($request as $request)
 		@foreach($branch as $branch)
+		@foreach($sign as $sign)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="10%"><img src="{{ url('/other/logo.jpg') }}" height="110"></td>
@@ -138,7 +139,7 @@
         </tr>
         <tr>
           <td>8.</td>
-          <td>Agen Kapal</td>
+          <td>Kade</td>
           <td>:</td>
           <td>{{$header->bprp_kade_name}}</td>
         </tr>
@@ -183,8 +184,8 @@
   @foreach($detail as $detail)
   <tr>
     <td>{{$no}}</td>
-    <td>{{$detail->dtl_cmdty_name}}</td>
     <td>{{$detail->dtl_bl}}</td>
+    <td>{{$detail->dtl_cmdty_name}}</td>
     <td>{{$detail->dtl_character_name}}</td>
     <td>{{$detail->dtl_stacking_type_name}}</td>
     <td>{{$detail->dtl_stacking_area_name}}</td>
@@ -200,9 +201,9 @@
 </table>
 <table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
 	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->bprp_date))); ?></td></tr>
-	<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
-	<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
-	<tr><td>NIPP. 285047354</td></tr>
+	<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
+	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 </table>
 
 	<div style="position:absolute;bottom:20px;font-size:12px; width:100%">
@@ -215,6 +216,8 @@
 	@endforeach
   @endforeach
 	@endforeach
+	@endforeach
+
 </body>
 </html>
 

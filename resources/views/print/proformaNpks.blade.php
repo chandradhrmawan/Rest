@@ -19,6 +19,8 @@
 <body>
 		@foreach($header as $header)
 		@foreach($branch as $branch)
+		@foreach($sign as $sign)
+
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
@@ -249,16 +251,11 @@
 	</tr>
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
-<table style="border-collapse:collapse; font-size:8px;float:right;text-align:center">
-	<tr><td>Banten,
-	<?php
-	$originalDate = $header->nota_date;
-	$newDate = date("d-M-y", strtotime($originalDate));
-	echo strtoupper($newDate);
-	?></td></tr>
-	<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & SDM</td></tr>
-	<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
-	<tr><td>NIPP. 285047354</td></tr>
+<table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
+	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
+	<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
+	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 </table>
 
 <div style="position:absolute;bottom:20px;font-size:11px; width:100%">
@@ -270,6 +267,8 @@
 <p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
+@endforeach
+
 </body>
 </html>
 
