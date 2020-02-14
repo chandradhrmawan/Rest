@@ -62,17 +62,27 @@ class UperRequest{
             }
           }
 
+          $total_uper = $getH->total_uper;
+          $cekTsUper = DB::connection('eng')->table('TS_UPER')->where([
+            'UPER_CUST_ID' => $getH->customer_id,
+            'UPER_NOTA' => $getH->nota_id,
+            'branch_id' => $getH->branch_id,
+            'branch_code' => $getH->branch_code
+          ])->first();
+          if (!empty($cekTsUper) and $cekTsUper->uper_presentase == 0 and empty($cekTsUper->uper_presentase)) {
+            $total_uper = 0;
+          }
           // build head
               $head = [
+                'total_amount' => $getH->total,
                 'uper_org_id' => $getH->branch_org_id,
                 'uper_cust_id' => $getH->customer_id,
                 'uper_cust_name' => $getH->alt_name,
                 'uper_cust_npwp' => $getH->npwp,
                 'uper_cust_address' => $getH->address,
-                'uper_amount' => $getH->total_uper,
+                'uper_amount' => $total_uper,
                 'uper_currency_code' => $getH->currency,
                 'uper_status' => 'P',
-                // Tambahan Mas Adi
                 'uper_service_code' => $getH->nota_service_code,
                 'uper_branch_account' => $getH->branch_account,
                 'uper_context' => $getH->nota_context,
