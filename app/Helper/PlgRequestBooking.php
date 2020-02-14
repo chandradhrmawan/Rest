@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helper\PlgFunctTOS;
 use App\Helper\PlgConnectedExternalApps;
 use App\Helper\BillingEngine;
 use App\Models\OmUster\TxHdrNota;
@@ -392,15 +393,18 @@ class PlgRequestBooking{
 
 	    public static function sendRequestPLG($input){
 			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+			if (empty($config) or empty($config->api_set)) {
+				return ['Success' => false, 'result' => "Fail, nota not set!"];
+			}
 			if ($config->flag_status == 'N') {
 				return ['Success' => false, 'result' => "Fail, nota not active!"];
 			}
 			$config = json_decode($config->api_set, true);
-			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
+			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
 			if (empty($find)) {
 				return ['Success' => false, 'result' => "Fail, requst not found!"];
 			}
-			$find = (array)$find[0];
+			$find = (array)$find;
 			if ($find[$config['head_status']] == 3) {
 				return ['Success' => false, 'result' => "Fail, requst already send!"];
 			}
@@ -596,7 +600,7 @@ class PlgRequestBooking{
 
 			$sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
+				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
 			}
 
 			return [
@@ -771,7 +775,7 @@ class PlgRequestBooking{
 					$getReq = (array)$getReq;
 					$sendRequestBooking = null;
 					if ($getReq[$config['head_paymethod']] == 1) {
-						$sendRequestBooking = PlgConnectedExternalApps::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
+						$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
 					}
 		            return [
 						'result' => "Success, pay proforma!",

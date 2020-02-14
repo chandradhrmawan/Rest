@@ -19,6 +19,7 @@ use App\Helper\RealisasiHelper;
 use App\Models\Mdm\TmTruckCompany;
 use App\Helper\PlgRequestBooking;
 use App\Helper\PlgConnectedExternalApps;
+use App\Helper\PlgFunctTOS;
 
 class StoreController extends Controller
 {
@@ -163,25 +164,10 @@ class StoreController extends Controller
         return PlgRequestBooking::storePaymentPLG($input);
       }
 
-      function getRealRecPLG($input, $request){
-        return PlgConnectedExternalApps::getRealRecPLG($input);
+      function getRealPLG($input, $request){
+        return PlgFunctTOS::getRealPLG($input);
       }
-
-      function getRealDelPLG($input, $request){
-        return PlgConnectedExternalApps::getRealDelPLG($input);
-      }
-
-      function getRealStuffPLG($input, $request){
-        return PlgConnectedExternalApps::getRealStuffPLG($input);
-      }
-
-      function getRealStrippPLG($input, $request){
-        return PlgConnectedExternalApps::getRealStrippPLG($input);
-      }
-
-      function getRealFumiPLG($input, $request){
-        return PlgConnectedExternalApps::getRealFumiPLG($input);
-      }
+      
     // PLG
 
     public function testview_file(){
