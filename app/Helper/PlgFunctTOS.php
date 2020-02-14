@@ -284,107 +284,15 @@ class PlgFunctTOS{
 		]);
 	}
 
-	public static function getRealPlugPLG($input){
-		$his_cont = [];
-		$Success = true;
-		$msg = 'Success get realisasion';
-		$find = DB::connection('omuster')->table('TX_HDR_PLUG')->where('plug_id', $input['plug_id'])->first();
-		$dtlLoop = DB::connection('omuster')->table('TX_DTL_PLUG')->where([
-			'plug_hdr_id' => $input['plug_id'],
-			'plug_dtl_isactive' => 'Y'
-		])->whereIn('PLUG_FL_REAL', [1,7])->get();
-		if (count($dtlLoop) > 0) {
-			$res = static::getPlugInYard($find,$dtlLoop);
-			if ($res['result']['count'] > 0) {
-				$his_cont = static::storePlugHisCont($res['result']['result'], $find);
-			}else{
-				$Success = false;
-				$msg = 'realisasion not finish';
-			}
-		}
-		$res['his_cont'] = $his_cont;
-		$dtl = DB::connection('omuster')->table('TX_DTL_PLUG')->where([
-			'plug_hdr_id' => $input['plug_id'],
-			'plug_dtl_isactive' => 'Y'
-		])->get();
-        return [
-        	'response' => $Success,
-        	'result' => $msg,
-        	'no_rec' =>$find->fumi_no,
-        	'hdr' =>$find,
-        	'dtl' => $dtl,
-        	'getRealPlugPLG' => $res
-        ];
-	}
-
-	public static function getPlugInYard($find,$dtlLoop){
-		$dtl = '';
-		$arrdtl = [];
-		foreach ($dtlLoop as $list) {
-			$dtl .= '
-			{
-				"NO_CONTAINER": "'.$list->fumi_dtl_cont.'",
-				"NO_REQUEST": "'.$find->fumi_no.'",
-				"BRANCH_ID": "'.$find->fumi_branch_id.'"
-			},';
-		}
-        $dtl = substr($dtl, 0,-1);
-		$json = '
-		{
-			"action" : "generateFumi",
-			"data": ['.$dtl.']
-		}';
-		$json = base64_encode(json_encode(json_decode($json,true)));
-		$json = static::jsonGetTOS($json);
-        $json = json_encode(json_decode($json,true));
-		$arr = [
-        	"user" => config('endpoint.tosGetPLG.user'),
-        	"pass" => config('endpoint.tosGetPLG.pass'),
-        	"target" => config('endpoint.tosGetPLG.target'),
-        	"json" => $json
-        ];
-		$res = static::sendRequestToExtJsonMet($arr);
-		return $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-	}
-
-	public static function storePlugHisCont($data,$hdr){
-		$his_cont = [];
-		foreach ($data as $listR) {
-			$findTsCont = [
-				'cont_no' => $listR['NO_CONTAINER'],
-				'branch_id' => $hdr->fumi_branch_id,
-				'branch_code' => $hdr->fumi_branch_code
-			];
-			$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first();
-			$cont_counter = $cekTsCont->cont_counter;
-			$cekKegiatan = DB::connection('omuster')->table('TM_REFF')->where([
-				"reff_tr_id" => 12,
-				"reff_name" => 'REAL FUMIGATION'
-			])->first();
-			$arrStoreTsContAndTxHisCont = [
-				'cont_no' => $listR['NO_CONTAINER'],
-				'branch_id' => $hdr->fumi_branch_id,
-				'branch_code' => $hdr->fumi_branch_code,
-				'cont_location' => 'IN_YARD',
-				'cont_size' => null,
-				'cont_type' => null,
-				'cont_counter' => $cont_counter,
-				'no_request' => $listR['NO_REQUEST'],
-				'kegiatan' => $cekKegiatan->reff_id,
-				'id_user' => "1",
-				'status_cont' => $listR['STATUS'],
-				'vvd_id' => $hdr->fumi_vvd_id
-			];
-			if (!empty($input["user"])) {
-				$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
-			}
-			DB::connection('omuster')->table('TX_DTL_FUMI')->where('FUMI_HDR_ID', $hdr->fumi_id)->where('FUMI_DTL_CONT', $listR['NO_CONTAINER'])->update([
-				"FUMI_DTL_REAL_DATE"=>date('Y-m-d', strtotime($listR["REAL_FUMI_DATE"])),
-				"FUMI_FL_REAL"=>5
-			]);
-			$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
-		}
-		return $his_cont;
+	public static function storeRealDateSE($listR,$hdr,$config,$input){
+		DB::connection('omuster')->table($config['head_tab_detil'])->where([
+			$config['head_forigen'] => $hdr[$config['head_primery']],
+			$config['DTL_BL'] => $listR['NO_CONTAINER']
+		])->update([
+			$config['DTL_REAL_DATE']['uster']['usterStart'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosStart']])),
+			$config['DTL_REAL_DATE']['uster']['usterEnd'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosEnd']])),
+			$config['DTL_FL_REAL'] => $config['DTL_FL_REAL_V']
+		]);
 	}
 
 	// store request data to tos
