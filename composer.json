@@ -36,7 +36,10 @@
             "app/Helper/GlobalHelper.php",
             "app/Helper/PlgFunctTOS.php",
             "app/Helper/PlgRequestBooking.php",
-            "app/Helper/PlgConnectedExternalApps.php"
+            "app/Helper/PlgConnectedExternalApps.php",
+            "app/Helper/PrintAndExport.php",
+            "app/Helper/ListIndexExt.php",
+            "app/Helper/ViewExt.php"
         ]
     },
     "autoload-dev": {
