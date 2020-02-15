@@ -167,7 +167,7 @@ class StoreController extends Controller
       function getRealPLG($input, $request){
         return PlgFunctTOS::getRealPLG($input);
       }
-      
+
     // PLG
 
     public function testview_file(){
@@ -434,7 +434,4 @@ class StoreController extends Controller
     return PlgConnectedExternalApps::getUpdatePlacement($input);
   }
 
-  function storeHistory($input) {
-    
-  }
 }
