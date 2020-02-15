@@ -143,18 +143,6 @@
           <td>:</td>
           <td>{{$header->bprp_kade_name}}</td>
         </tr>
-        <!-- <tr>
-          <td>11.</td>
-          <td>No. BPRP Lanjutan</td>
-          <td>:</td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>12.</td>
-          <td>Keterangan Lain</td>
-          <td>:</td>
-          <td></td>
-        </tr> -->
       </table>
     </td>
 	</tr>
