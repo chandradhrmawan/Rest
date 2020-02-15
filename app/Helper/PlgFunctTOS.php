@@ -151,7 +151,7 @@ class PlgFunctTOS{
 				'branch_code' => $hdr[$config['head_branch_code']]
 			];
 			$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first();
-			$cont_counter = $cekTsCont->cont_counter; 
+			$cont_counter = $cekTsCont->cont_counter;
 			if ($config['kegiatan_real'] == 3) { //kusus gate in
 				$cont_counter++;
 			}
@@ -420,8 +420,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_REMARK_SP2": "",
 	            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
-	            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
-	            "TGL_SELESAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
+	            "TGL_MULAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+	            "TGL_SELESAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
