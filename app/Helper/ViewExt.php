@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Firebase\JWT\JWT;
 use App\Helper\FileUpload;
 
@@ -293,6 +294,119 @@ class ViewExt{
     }
 
     return $newDt;
+  }
+
+  public static function getNota($input) {
+    $selectraw = "
+                  A.COMP_NOTA_ID,
+                  A.NOTA_ID,
+                  B.NOTA_NAME,
+                  A.BRANCH_ID,
+                  A.BRANCH_CODE,
+                  C.BRANCH_NAME,
+                  A.GROUP_TARIFF_ID,
+                  A.COMP_NOTA_NAME GROUP_TARIFF_NAME,
+                  A.COMP_NOTA_ORDER,
+                  A.COMP_NOTA_VIA,
+                  D.REFF_NAME COMP_NOTA_VIA_NAME,
+                  A.COMP_NOTA_TL,
+                  E.REFF_NAME COMP_NOTA_TL_NAME,
+                  A.COMP_NOTA_VIEW,
+                  F.REFF_NAME COMP_NOTA_VIEW_NAME
+                 ";
+
+    $grupbyraw = "
+                  A.COMP_NOTA_ID,
+                  A.NOTA_ID,
+                  B.NOTA_NAME,
+                  A.BRANCH_ID,
+                  A.BRANCH_CODE,
+                  C.BRANCH_NAME,
+                  A.GROUP_TARIFF_ID,
+                  A.COMP_NOTA_NAME,
+                  A.COMP_NOTA_ORDER,
+                  A.COMP_NOTA_VIA,
+                  D.REFF_NAME,
+                  A.COMP_NOTA_TL,
+                  E.REFF_NAME,
+                  A.COMP_NOTA_VIEW,
+                  F.REFF_NAME
+                  ";
+
+    $tableraw  = "
+                  TM_COMP_NOTA A
+                  LEFT JOIN
+                  TM_REFF D ON A.COMP_NOTA_VIA = D.REFF_ID AND D.REFF_TR_ID = '4'
+                  LEFT JOIN
+                  TM_REFF E ON A.COMP_NOTA_TL = E.REFF_ID AND E.REFF_TR_ID = '9'
+                  LEFT JOIN
+                  TM_REFF F ON A.COMP_NOTA_VIEW = F.REFF_ID AND F.REFF_TR_ID = '10'
+                 ";
+
+    $data = DB::connection('mdm')
+                ->table(DB::raw($tableraw))
+                ->selectraw($selectraw)
+                ->join('TM_NOTA B', 'A.NOTA_ID', '=', 'B.NOTA_ID')
+                ->join('TM_BRANCH C', 'A.BRANCH_CODE', '=', 'C.BRANCH_CODE')
+                ->groupBy($grupbyraw);
+
+    if(!empty($input["where"][0])) {
+      $data->where($input["where"]);
+    }
+
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $data->skip($input['start'])->take($input['limit']);
+      }
+    }
+
+    $result   = $data->get();
+    $count    = count($result);
+
+    return ["result"=>$result, "count"=>$count];
+  }
+
+  public static function einvoiceLink($input) {
+    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+    $string_json = '{
+                   "getDataCetakRequest":{
+                      "esbHeader":{
+                         "internalId":"",
+                         "externalId":"EDI-2910201921570203666",
+                         "timestamp":"2019-10-29 21:57:020.36665400",
+                         "responseTimestamp":"",
+                         "responseCode":"",
+                         "responseMessage":""
+                      },
+                      "esbBody":{
+                         "kode":"billingedii",
+                         "tipe":"nota",
+                         "nota":"'.$input["nota_no"].'"
+                      }
+                   }
+                }';
+
+    $username="billing";
+    $password ="b1Llin9";
+    $client = new Client();
+    $options= array(
+      'auth' => [
+        $username,
+        $password
+      ],
+      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
+      'body' => $string_json,
+      "debug" => false
+    );
+    try {
+      $res = $client->post($endpoint_url, $options);
+    } catch (ClientException $e) {
+      return $e->getResponse();
+    }
+    $results  = json_decode($res->getBody()->getContents(), true);
+    $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+
+    return ["link" => $qrcode];
   }
 
 }
