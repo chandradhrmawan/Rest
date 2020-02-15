@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
+use App\Models\OmUster\TmUser;
+use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
 use App\Helper\FileUpload;
 

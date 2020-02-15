@@ -408,11 +408,11 @@ class PlgConnectedExternalApps{
 				$input = ["nota_id"=>1,"id"=>$value->rec_id];
 				PlgFunctTOS::getRealPLG($input);
 			}
-			$getIdReal = DB::connection('omuster')->table('TX_DTL_DEL')->where('DEL_FL_REAL', '1')->select(DB::raw("DISTINCT DEL_HDR_ID"))->get();
-			foreach ($getIdReal as $value) {
-				$input = ["nota_id"=>2,"id"=>$value->rec_id];
-				PlgFunctTOS::getRealPLG($input);
-			}
+			// $getIdReal = DB::connection('omuster')->table('TX_DTL_DEL')->where('DEL_FL_REAL', '1')->select(DB::raw("DISTINCT DEL_HDR_ID"))->get();
+			// foreach ($getIdReal as $value) {
+			// 	$input = ["nota_id"=>2,"id"=>$value->rec_id];
+			// 	PlgFunctTOS::getRealPLG($input);
+			// }
 		}
 
 		public static function getUpdatePlacement(){
