@@ -288,158 +288,18 @@ class ViewController extends Controller
   }
 
   function ExportDebitur($a,$b,$c,$d,$e,$f,$g) {
-    $branchId    = $a;
-    $notaNo      = $b;
-    $custName    = $c;
-    $layanan     = $d;
-    $start       = $e;
-    $end         = $f;
-    $branchCode  = $g;
-
-    $startDate   = date("Y-m-d", strtotime($start));
-    $endDate     = date("Y-m-d", strtotime($end));
-
-    $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
-    if (!empty($branchId)) {
-      $getRpt->where('NOTA_BRANCH_ID',$branchId);
-    }
-    if (!empty($branchCode)) {
-      $getRpt->where('BRANCH_CODE',$branchCode);
-    }
-    if (!empty($notaNo)) {
-      $getRpt->where('NOTA_NO',$notaNo);
-    }
-    if (!empty($custName)) {
-      $getRpt->where('NOTA_CUST_NAME',$custName);
-    }
-    if (!empty($layanan)) {
-      $getRpt->where('LAYANAN',$layanan);
-    }
-    if (!empty($start) AND !empty($end)) {
-      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-    } else if (!empty($start) AND empty($end)) {
-      $getRpt->where('TGL_NOTA', '>', $startDate);
-    } else if (empty($start) AND !empty($end)) {
-      $getRpt->where('TGL_NOTA', '<', $endDate);
-    }
-
-    $count  = $getRpt->count();
-    $result = $getRpt->get();
-    return view('print.debitur',[
-                "result"=>$result,
-                "start"=>$start,
-                "end"=>$end
-              ]);
+    return PrintAndExport::ExportDebiturNPK($a,$b,$c,$d,$e,$f,$g);
   }
 
   function ExportRekonsilasi($a,$b,$c,$d,$e,$f,$g) {
-    $branchId    = $a;
-    $vessel      = $b;
-    $ukk         = $c;
-    $nota        = $d;
-    $start       = $e;
-    $end         = $f;
-    $branchCode  = $g;
-
-    $startDate = date("Y-m-d", strtotime($start));
-    $endDate = date("Y-m-d", strtotime($end));
-
-    $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
-    if (!empty($branchId)) {
-      $getRpt->where('NOTA_BRANCH_ID',$branchId);
-    }
-    if (!empty($branchCode)) {
-      $getRpt->where('BRANCH_CODE',$branchCode);
-    }
-    if (!empty($vessel)) {
-      $getRpt->where('VESSEL',$vessel);
-    }
-    if (!empty($ukk)) {
-      $getRpt->where('UKK',$ukk);
-    }
-    if (!empty($nota)) {
-      $getRpt->where('NOTA',$nota);
-    }
-    if (!empty($start) AND !empty($end)) {
-      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
-    } else if (!empty($start) AND empty($end)) {
-      $getRpt->where('NOTA_DATE', '>', $startDate);
-    } else if (empty($start) AND !empty($end)) {
-      $getRpt->where('NOTA_DATE', '<', $endDate);
-    }
-
-    $result = $getRpt->get();
-
-    return view('print.rekonsilasi',[
-                "result"=>$result,
-                "start"=>$start,
-                "end"=>$end
-              ]);
+    return PrintAndExport::ExportRekonsilasiNPK($a,$b,$c,$d,$e,$f,$g);
   }
 
   function ExportPendapatan($a,$b,$c,$d,$e,$f,$g) {
-    $branchId    = $a;
-    $kemasan     = $b;
-    $komoditi    = $c;
-    $satuan      = $d;
-    $start       = $e;
-    $end         = $f;
-    $branchCode  = $g;
-
-    $startDate = date("Y-m-d", strtotime($start));
-    $endDate = date("Y-m-d", strtotime($end));
-
-    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
-    if (!empty($branchId)) {
-      $getRpt->where('REAL_BRANCH_ID',$branchId);
-    }
-    if (!empty($branchCode)) {
-      $getRpt->where('REAL_BRANCH_CODE',$branchCode);
-    }
-    if (!empty($kemasan)) {
-      $getRpt->where('KEMASAN',$kemasan);
-    }
-    if (!empty($komoditi)) {
-      $getRpt->where('KOMODITI',$komoditi);
-    }
-    if (!empty($satuan)) {
-      $getRpt->where('SATUAN',$satuan);
-    }
-    if (!empty($start) AND !empty($end)) {
-      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-    } else if (!empty($start) AND empty($end)) {
-      $getRpt->where('TGL_NOTA', '>', $startDate);
-    } else if (empty($start) AND !empty($end)) {
-      $getRpt->where('TGL_NOTA', '<', $endDate);
-    }
-
-    $raw    = $getRpt;
-    $result = $getRpt->get();
-
-    $kemasan = [];
-    for ($i=0; $i < count($result); $i++) {
-      if (!in_array($result[$i]->kemasan,$kemasan)) {
-        $kemasan[] = $result[$i]->kemasan;
-      }
-    }
-
-    $newDt = [];
-    foreach ($result as $key => $value) {
-      $newDt[$value->kemasan][] = $value;
-    }
-
-    $data = $newDt;
-
-    return view('print.pendapatan',[
-      "data"=>$data,
-      "kemasan" =>$kemasan,
-      "start"=>$start,
-      "end"=>$end
-    ]);
+    return PrintAndExport::ExportPendapatanNPK($a,$b,$c,$d,$e,$f,$g);
   }
 
   function getNota($input) {
-
     $selectraw = "
                   A.COMP_NOTA_ID,
                   A.NOTA_ID,
