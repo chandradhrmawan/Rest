@@ -296,7 +296,7 @@ class PlgFunctTOS{
 	}
 
 	// store request data to tos
-	    private static function buildJsonTX_HDR_REC($arr){
+	  private static function buildJsonTX_HDR_REC($arr) {
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
@@ -347,7 +347,7 @@ class PlgFunctTOS{
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
-		}
+				}
 
 		private static function buildJsonTX_HDR_DEL($arr){
 	        $arrdetil = '';
@@ -396,10 +396,10 @@ class PlgFunctTOS{
 	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 	            "REQ_MARK": "",
 	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-	            "DELIVERY_KE": "",
+	            "DELIVERY_KE": "'.$rec_dr->reff_name.'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "PERP_DARI": "",
-	            "PERP_KE": "'.$rec_dr->reff_name.'",
+	            "PERP_KE": "",
 							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -596,5 +596,69 @@ class PlgFunctTOS{
 	          "arrdetail": ['.$arrdetil.']
 	        }';
 		}
+
+		private static function buildJsonTX_HDR_REC_CARGO($arr) {
+					$arrdetil = '';
+					$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+					$head = (array)$head;
+					$dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
+					foreach ($dtls as $dtl) {
+						$dtl = (array)$dtl;
+						$arrdetil .= '{
+							"REQUEST_DTL_SI": "'.$dtl[$arr['config']['DTL_BL']].'",
+							"REQUEST_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+							"REQUEST_DTL_DANGER": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+							"REQUEST_DTL_VOY": "",
+							"REQUEST_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQUEST_DTL__VESSEL_CODE": "",
+							"REQUEST_DTL_CALL_SIGN": "",
+							"REQUEST_DTL_DEST_DEPO": "",
+							"REQUEST_DTL_STATUS": "",
+							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
+							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']].'",
+							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_ID']].'"
+						},';
+					}
+					$arrdetil = substr($arrdetil, 0,-1);
+					$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
+					$nota_no = null;
+					$nota_date = null;
+					$nota_paid_date = null;
+					if (!empty($nota)) {
+						$nota_no = $nota->nota_no;
+						$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+						$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+					}
+					$rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
+						'reff_tr_id' => 5,
+						'reff_id' => $head[$arr['config']['head_from']]
+					])->first();
+					return $json_body = '{
+						"action" : "getReceivingBrg",
+						"header": {
+							"REQUEST_NO": "'.$head[$arr['config']['head_no']].'",
+							"REQUEST_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
+							"REQUEST_MARK": "'.$head[$arr['config']['head_mark']].'",
+							"REQUEST_CREATE_DATE": "'.date('d-M-y').'",
+							"REQUEST_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
+							"REQUEST_NOTA": "'.$nota_no.'",
+							"REQUEST_NO_TPK": "",
+							"REQUEST_DO_NO": "",
+							"REQUEST_BL_NO": "",
+							"REQUEST_SPPB_NO": "",
+							"REQUEST_SPPB_DATE": "",
+							"REQUEST_RECEIVING_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
+							"REQUEST_NOTA_DATE": "'.date('d-M-y', strtotime($nota_date)).'",
+							"REQUEST_PAID_DATE": "'.date('d-M-y', strtotime($nota_paid_date)).'",
+							"REQUEST_FROM": "'.$rec_dr->reff_name.'",
+							"REQUEST_STATUS": "'.$head[$arr['config']['head_status']].'",
+							"REQUEST_DI": "",
+							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+						},
+						"arrdetail": ['.$arrdetil.']
+					}';
+				}
+
 	// store request data to tos
 }
