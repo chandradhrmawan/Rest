@@ -1040,7 +1040,7 @@ class PlgConnectedExternalApps{
 		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
 		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"]] as $value) {
+		 foreach ($res["result"]["result"] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
 		 	$plugReq 						= $value["REAL_PLUG_NOREQ"];
 			$plugCont 					= $value["REAL_PLUG_CONT"];

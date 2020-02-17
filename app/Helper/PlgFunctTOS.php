@@ -44,6 +44,7 @@ class PlgFunctTOS{
 		$res['request']['json'] = json_decode($res['request']['json'], true);
 		$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
         $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
+		// return $res;
         $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
         $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
         return $res;
@@ -103,7 +104,7 @@ class PlgFunctTOS{
 		$config = json_decode($config->api_set, true);
 		$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
 		$find = (array)$find;
-		$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_primery'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
+		$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
 		$his_cont = [];
 		$Success = true;
 		$msg = 'Success get realisasion';
