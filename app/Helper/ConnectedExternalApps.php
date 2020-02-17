@@ -1186,7 +1186,7 @@ class ConnectedExternalApps{
         $branchCode = $find->nota_branch_code;
       }
 
-      $branchAccount = $find->branch_account;
+      $branchAccount = $branch->branch_account_erp;
       $notaDateNoHour= date('Y-m-d', strtotime($find->nota_date));
       $notaDate      = $find->nota_date;
 
