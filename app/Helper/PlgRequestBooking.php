@@ -826,8 +826,7 @@ class PlgRequestBooking{
 					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-				// if ($cekTsCont->cont_counter == 0) {
-				if ($arr["cont_location"] == "GATI" && $cekTsCont->cont_counter == 0) {
+				if ($arr["cont_location"] == "GATI" and $cekTsCont->cont_counter == 0) {
 					$counter = $cekTsCont->cont_counter+1;
 				}else{
 					$counter = $cekTsCont->cont_counter;
@@ -840,7 +839,6 @@ class PlgRequestBooking{
 					'status_cont' => $arr['status_cont'],
 					'vvd_id' => $arr['vvd_id'],
 					'counter' => $counter
-					// 'counter' => $cekTsCont->cont_counter+1 //why+1
 					// 'id_yard' => $list[$config['DTL_BL']], ?
 					// 'sub_counter' => $list[$config['DTL_BL']], ?
 					// 'why' => $list[$config['DTL_BL']], ?
