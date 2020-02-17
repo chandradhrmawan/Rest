@@ -277,6 +277,10 @@ class PlgFunctTOS{
 			DB::connection('omuster')->table('TX_GATEOUT')->where($findGATO)->update($storeGATO);
 		}
 
+		DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update([
+			$config['DTL_REAL_DATE'] =>date('Y-m-d', strtotime($listR['TGL_OUT']))
+		]);
+
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR['TGL_OUT']];
 	}
 
