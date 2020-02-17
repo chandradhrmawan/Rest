@@ -229,11 +229,10 @@ class PlgRequestBooking{
 					$tglIn 	= DB::connection('omuster')
 						->table('TX_HISTORY_CONTAINER')
 						->where('NO_CONTAINER', $list[$config['DTL_BL']])
-						->where('STATUS_CONT', 'MTY')
 						->whereIn('KEGIATAN', $in)
-						->orderBy("TGL_UPDATE", "DESC")
+						->orderBy("HISTORY_DATE", "DESC")
 						->first();
-					$dateIn = $tglIn->tgl_update;
+					$dateIn = $tglIn->history_date;
 					DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}else{
@@ -432,6 +431,7 @@ class PlgRequestBooking{
 							$cont_counter = $cekTsCont->cont_counter;
 						}
 						$arrStoreTsContAndTxHisCont = [
+							'history_date' => Carbon::now()->format('Y-m-d h:i:s'),
 							'cont_no' => $list[$config['DTL_BL']],
 							'branch_id' => $find[$config['head_branch']],
 							'branch_code' => $find[$config['head_branch_code']],
@@ -826,13 +826,13 @@ class PlgRequestBooking{
 					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-				// if ($cekTsCont->cont_counter == 0) {
-				if ($arr["cont_location"] == "GATI" && $cekTsCont->cont_counter == 0) {
+				if ($arr["cont_location"] == "GATI" and $cekTsCont->cont_counter == 0) {
 					$counter = $cekTsCont->cont_counter+1;
 				}else{
 					$counter = $cekTsCont->cont_counter;
 				}
 				$storeTxHisCont = [
+					'history_date' => date('Y-m-d h:i:s', strtotime($arr['history_date'])),
 					'no_container' => $arr['cont_no'],
 					'no_request' => $arr['no_request'],
 					'kegiatan' => $arr['kegiatan'],
@@ -840,7 +840,6 @@ class PlgRequestBooking{
 					'status_cont' => $arr['status_cont'],
 					'vvd_id' => $arr['vvd_id'],
 					'counter' => $counter
-					// 'counter' => $cekTsCont->cont_counter+1 //why+1
 					// 'id_yard' => $list[$config['DTL_BL']], ?
 					// 'sub_counter' => $list[$config['DTL_BL']], ?
 					// 'why' => $list[$config['DTL_BL']], ?
