@@ -1175,7 +1175,7 @@ class ConnectedExternalApps{
       $findU = TxHdrUper::where('uper_req_no', $find->nota_req_no)->where('uper_cust_id', $find->nota_cust_id)->first();
       if (!empty($findU)) {
         $findU_uper_no = $findU->uper_no;
-        $findU_uper_terminal_code = $findU->uper_terminal_code;
+        // $findU_uper_terminal_code = $findU->uper_terminal_code;
         $findP = DB::connection('omcargo')->table('TX_PAYMENT')->where('pay_no',$findU_uper_no)->where('pay_branch_code',$findU->uper_branch_code)->get();
         $findU_uper_amount = $findP[0]->pay_amount;
       }
