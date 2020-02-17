@@ -39,7 +39,7 @@ class PlgFunctTOS{
         ';
 	}
 
-	private static function decodeResultAftrSendToTosNPKS($res, $type){
+	public static function decodeResultAftrSendToTosNPKS($res, $type){
 		// return $res;
 		$res['request']['json'] = json_decode($res['request']['json'], true);
 		$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
@@ -174,7 +174,7 @@ class PlgFunctTOS{
 			}
 			$real_val = static::$config['funct_REAL_STR']($listR,$hdr,$config,$input);
 			$upSttDtl = [
-				$config['DTL_FL_REAL']=>$real_val;
+				$config['DTL_FL_REAL']=>$real_val
 			];
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update($upSttDtl);
 			$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);

@@ -972,8 +972,8 @@ class PlgConnectedExternalApps{
 			}
 		}
 
-		public static function getRealPlugStart() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->where('B.PLUG_FL_REAL', "1")->get();
+		public static function getRealPlug() {
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->whereIn('B.PLUG_FL_REAL', "1")->get();
  		 $dtl 							= '';
  		 $arrdtl 						= [];
 		 $all 							= json_decode(json_encode($all),TRUE);
@@ -1031,7 +1031,9 @@ class PlgConnectedExternalApps{
 						 "json" 		 	=> $json
 					 ];
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 return $res["result"]["result"];
 
 		 if (empty($res["result"]["result"])) {
 			 return "PLUG Start is uptodate";
@@ -1039,7 +1041,7 @@ class PlgConnectedExternalApps{
 
 		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
-		 // return $res["result"]["result"];
+		 return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
 		 	$plugReq 						= $value["REAL_PLUG_NOREQ"];
