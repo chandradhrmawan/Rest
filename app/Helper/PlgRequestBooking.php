@@ -247,9 +247,9 @@ class PlgRequestBooking{
 						$dateout = $tglOut->gateout_date;
 						$newD['DTL_DATE_OUT'] = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				} else {
-					if (in_array($config['kegiatan'], [5,6]) and $hdr[$config['head_paymethod']] == 2) {
-						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-						// $newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_REAL']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_REAL']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					if (is_array($config['DTL_DATE_OUT'])) {
+						$dtlOut = $list[$config['DTL_DATE_OUT']['paymethod'.$hdr[$config['head_paymethod']]]];
+						$newD['DTL_DATE_OUT'] = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}else{
 						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}
@@ -624,8 +624,8 @@ class PlgRequestBooking{
 				];
 			}
 			$notIN = [$config['DTL_FL_REAL_F'][count($config['DTL_FL_REAL_F'])-1]];
-			$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_primery'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereNotIn($config['DTL_FL_REAL'], $notIN)->count();
-			if ($dtl > 0) {
+			$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereNotIn($config['DTL_FL_REAL'], $notIN)->get();
+			if (count($dtl) > 0) {
 				return [
 					'Success' => false,
 					'result' => "Fail, realisasion is not finish!",

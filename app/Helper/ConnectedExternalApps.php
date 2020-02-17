@@ -1169,7 +1169,7 @@ class ConnectedExternalApps{
       $branch = $branch[0];
 
       $findU_uper_no = null;
-      $findU_uper_terminal_code = null;
+      $findU_uper_terminal_code = '00';
       $findU_uper_amount = null;
 
       $findU = TxHdrUper::where('uper_req_no', $find->nota_req_no)->where('uper_cust_id', $find->nota_cust_id)->first();
