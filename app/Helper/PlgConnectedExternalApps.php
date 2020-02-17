@@ -973,7 +973,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function getRealPlug() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->whereIn('B.PLUG_FL_REAL', "1")->get();
+ 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->whereIn('B.PLUG_FL_REAL', ["1","7"])->get();
  		 $dtl 							= '';
  		 $arrdtl 						= [];
 		 $all 							= json_decode(json_encode($all),TRUE);
@@ -1033,136 +1033,18 @@ class PlgConnectedExternalApps{
 		 $res 							 	= static::sendRequestToExtJsonMet($arr);
 		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
-		 return $res["result"]["result"];
-
 		 if (empty($res["result"]["result"])) {
 			 return "PLUG Start is uptodate";
 		 }
 
 		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
-		 return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
-			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
-		 	$plugReq 						= $value["REAL_PLUG_NOREQ"];
-			$plugCont 					= $value["REAL_PLUG_CONT"];
-			$plugDate 					= date('Y-m-d', strtotime($value["REAL_PLUG_DATE"]));
-
-			$findHdrPlug 			= [
-				"PLUG_BRANCH_ID" => $plugBranch,
-				"PLUG_NO"				=> $plugReq
-			];
-
-
-			$plugHDR 					= DB::connection('omuster')->table('TX_HDR_PLUG')->where($findHdrPlug)->first();
-
-			$findDtlPlug 			= [
-				"PLUG_HDR_ID"		=> $plugHDR->plug_id,
-				"PLUG_DTL_CONT"	=> $plugCont
-			];
-
-			$findHistory 				= [
-				"NO_REQUEST" 			=> $plugReq,
-				"NO_CONTAINER" 		=> $plugCont,
-				"KEGIATAN"				=> "16"
-			];
-
-
-			$storeHistory 			= [
-				"NO_CONTAINER" 		=> $plugCont,
-				"NO_REQUEST"			=> $plugReq,
-				"KEGIATAN"				=> "16",
-				"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($plugDate)),
-				"ID_USER"					=> $value["REAL_PLUG_OPERATOR"],
-				"ID_YARD"					=> "",
-				"STATUS_CONT"			=> "",
-				"VVD_ID"					=> "",
-				"COUNTER"					=> $value["REAL_PLUG_COUNTER"],
-				"SUB_COUNTER"			=> "",
-				"WHY"							=> ""
-			];
-
-			DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
-
-			$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_START_DATE"=>$plugDate,"PLUG_FL_REAL"=>7]);
-			echo "Realization Fumigasi Done";
-			 	// }
-			}
-		}
-
-		public static function getRealPlugEnd() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->where('B.PLUG_FL_REAL', "7")->get();
- 		 $dtl 							= '';
- 		 $arrdtl 						= [];
-		 $all 							= json_decode(json_encode($all),TRUE);
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["plug_dtl_cont"].'",
-				 "NO_REQUEST"			: "'.$list["plug_no"].'",
-				 "BRANCH_ID"			: "'.$list["plug_branch_id"].'"
-			 },';
-		 }
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generatePlugEnd",
-			 "data": ['.$dtl.']
-		 }';
-
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return "PLUG END is uptodate";
-		 }
-
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
 		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
+		 foreach ($res["result"]["result"]] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
 		 	$plugReq 						= $value["REAL_PLUG_NOREQ"];
 			$plugCont 					= $value["REAL_PLUG_CONT"];
+			$plugStatus 				= $value["REAL_PLUG_STATUS"];
 			$plugDate 					= date('Y-m-d', strtotime($value["REAL_PLUG_DATE"]));
 
 			$findHdrPlug 			= [
@@ -1178,13 +1060,6 @@ class PlgConnectedExternalApps{
 				"PLUG_DTL_CONT"	=> $plugCont
 			];
 
-			$findHistory 				= [
-				"NO_REQUEST" 			=> $plugReq,
-				"NO_CONTAINER" 		=> $plugCont,
-				"KEGIATAN"				=> "16"
-			];
-
-
 			$storeHistory 			= [
 				"NO_CONTAINER" 		=> $plugCont,
 				"NO_REQUEST"			=> $plugReq,
@@ -1199,11 +1074,13 @@ class PlgConnectedExternalApps{
 				"WHY"							=> ""
 			];
 
-			DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+				if ($plugStatus == "1") {
+					$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_START_DATE"=>$plugDate,"PLUG_FL_REAL"=>7]);
+				} else {
+					$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_END_DATE"=>$plugDate,"PLUG_FL_REAL"=>8]);
+				}
 
-			$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_END_DATE"=>$plugDate,"PLUG_FL_REAL"=>8]);
-
-			echo "Realization Pluggin End Done";
 			}
 		}
 
