@@ -405,7 +405,7 @@ class PlgConnectedExternalApps{
 		public static function getRealGati() {
 			$getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
 			foreach ($getIdReal as $value) {
-				$input = ["nota_id"=>1,"id"=>$value->rec_id];
+				$input = ["nota_id"=>1,"id"=>$getIdReal[0]->rec_hdr_id];
 				PlgFunctTOS::getRealPLG($input);
 			}
 			// $getIdReal = DB::connection('omuster')->table('TX_DTL_DEL')->where('DEL_FL_REAL', '1')->select(DB::raw("DISTINCT DEL_HDR_ID"))->get();
@@ -1040,7 +1040,7 @@ class PlgConnectedExternalApps{
 		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
 		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"]] as $value) {
+		 foreach ($res["result"]["result"] as $value) {
 			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
 		 	$plugReq 						= $value["REAL_PLUG_NOREQ"];
 			$plugCont 					= $value["REAL_PLUG_CONT"];

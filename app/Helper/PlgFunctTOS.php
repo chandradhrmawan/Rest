@@ -567,7 +567,7 @@ class PlgFunctTOS{
 	          	"FUMI_ID" : "",
 	            "FUMI_NO": "'.$head[$arr['config']['head_no']].'",
 	            "FUMI_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-	            "FUMI_CREATE_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "FUMI_CREATE_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 	            "FUMI_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
@@ -588,8 +588,8 @@ class PlgFunctTOS{
 	            "PLUG_DTL_STATUS": "",
 	            "PLUG_DTL_CANCELLED": "'.$dtl[$arr['config']['DTL_IS_CANCEL']].'",
 	            "PLUG_DTL_ACTIVE": "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
-	            "PLUG_DTL_START_PLUG_PLAN": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
-	            "PLUG_DTL_END_PLUG_PLAN": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+	            "PLUG_DTL_START_PLUG_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+	            "PLUG_DTL_END_PLUG_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
 	            "PLUG_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_ID']].'",
 	            "PLUG_DTL_COUNTER": "'.$getCountCounter->cont_counter.'"
 	          },';
@@ -604,7 +604,7 @@ class PlgFunctTOS{
 	          	"PLUG_ID" : "",
 	            "PLUG_NO": "'.$head[$arr['config']['head_no']].'",
 	            "PLUG_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-	            "PLUG_CREATE_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "PLUG_CREATE_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 	            "PLUG_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
 	            "PLUG_STATUS" : "",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
