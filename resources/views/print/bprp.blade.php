@@ -107,13 +107,13 @@
           <td></td>
           <td>Dari</td>
           <td>:</td>
-          <td>{{$header->bprp_voyin}}</td>
+          <td>-</td>
         </tr>
         <tr>
           <td></td>
           <td>Ke</td>
           <td>:</td>
-          <td>{{$header->bprp_voyout}}</td>
+          <td>-</td>
         </tr>
         <tr>
           <td>5.</td>
@@ -129,7 +129,7 @@
         </tr>
         <tr>
           <td>7.</td>
-          <td>Tgl. Tiba / Berangkat</td>
+          <td>Kapal Tiba / Berangkat</td>
           <td>:</td>
           <td>
             <?php
