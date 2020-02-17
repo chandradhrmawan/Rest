@@ -247,9 +247,7 @@ class PlgRequestBooking{
 						$dateout = $tglOut->gateout_date;
 						$newD['DTL_DATE_OUT'] = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				} else {
-					if (in_array($config['kegiatan'], [5,6]) and $hdr[$config['head_paymethod']] == 2) {
-						$newD['DTL_DATE_OUT'] = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-					}else if (is_array($config['DTL_DATE_OUT'])) {
+					if (is_array($config['DTL_DATE_OUT'])) {
 						$dtlOut = $list[$config['DTL_DATE_OUT']['paymethod'.$hdr[$config['head_paymethod']]]];
 						$newD['DTL_DATE_OUT'] = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 					}else{
