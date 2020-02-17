@@ -172,9 +172,9 @@ class PlgFunctTOS{
 			if (!empty($input["user"])) {
 				$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
 			}
-			static::$config['funct_REAL_STR']($listR,$hdr,$config,$input);
+			$real_val = static::$config['funct_REAL_STR']($listR,$hdr,$config,$input);
 			$upSttDtl = [
-				$config['DTL_FL_REAL']=>$config['DTL_FL_REAL_V']
+				$config['DTL_FL_REAL']=>$real_val;
 			];
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update($upSttDtl);
 			$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
@@ -239,6 +239,8 @@ class PlgFunctTOS{
 		}else{
 			DB::connection('omuster')->table('TX_GATEIN')->where($findGATI)->update($storeGATI);
 		}
+
+		return $config['DTL_FL_REAL_V'];
 	}
 
 	public static function storeGATO($listR,$hdr,$config,$input){
@@ -272,6 +274,8 @@ class PlgFunctTOS{
 		} else {
 			DB::connection('omuster')->table('TX_GATEOUT')->where($findGATO)->update($storeGATO);
 		}
+
+		return $config['DTL_FL_REAL_V'];
 	}
 
 	public static function storeRealDate($listR,$hdr,$config,$input){
@@ -279,20 +283,32 @@ class PlgFunctTOS{
 			$config['head_forigen'] => $hdr[$config['head_primery']],
 			$config['DTL_BL'] => $listR['NO_CONTAINER']
 		])->update([
-			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tos']])),
-			$config['DTL_FL_REAL'] => $config['DTL_FL_REAL_V']
+			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tos']]))
 		]);
+
+		return $config['DTL_FL_REAL_V'];
 	}
 
 	public static function storeRealDateSE($listR,$hdr,$config,$input){
+		if (empty($listR[$config['DTL_REAL_DATE']['tosEnd']])) {
+			$ret =  $config['DTL_FL_REAL_V'][0];
+			$st = date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosStart']]));
+			$en = null;
+		}else{
+			$ret = $config['DTL_FL_REAL_V'][1];
+			$st = date('Y-m-d H:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tosStart']]));
+			$en = date('Y-m-d H:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tosEnd']]));
+		}
+
 		DB::connection('omuster')->table($config['head_tab_detil'])->where([
 			$config['head_forigen'] => $hdr[$config['head_primery']],
 			$config['DTL_BL'] => $listR['NO_CONTAINER']
 		])->update([
-			$config['DTL_REAL_DATE']['uster']['usterStart'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosStart']])),
-			$config['DTL_REAL_DATE']['uster']['usterEnd'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tosEnd']])),
-			$config['DTL_FL_REAL'] => $config['DTL_FL_REAL_V']
+			$config['DTL_REAL_DATE']['uster']['usterStart'] => $st,
+			$config['DTL_REAL_DATE']['uster']['usterEnd'] => $en
 		]);
+
+		return $ret;
 	}
 
 	// store request data to tos
