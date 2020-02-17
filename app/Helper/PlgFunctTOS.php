@@ -147,7 +147,7 @@ class PlgFunctTOS{
 		foreach ($data as $listR) {
 			$real_val = static::$config['funct_REAL_STR']($listR,$hdr,$config,$input);
 			$upSttDtl = [
-				$config['DTL_FL_REAL']=>$real_val['real_val'];
+				$config['DTL_FL_REAL']=>$real_val['real_val']
 			];
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update($upSttDtl);
 
