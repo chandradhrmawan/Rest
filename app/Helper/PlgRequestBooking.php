@@ -626,8 +626,8 @@ class PlgRequestBooking{
 				];
 			}
 			$notIN = [$config['DTL_FL_REAL_F'][count($config['DTL_FL_REAL_F'])-1]];
-			$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_primery'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereNotIn($config['DTL_FL_REAL'], $notIN)->count();
-			if ($dtl > 0) {
+			$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereNotIn($config['DTL_FL_REAL'], $notIN)->get();
+			if (count($dtl) > 0) {
 				return [
 					'Success' => false,
 					'result' => "Fail, realisasion is not finish!",
