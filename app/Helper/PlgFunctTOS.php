@@ -40,11 +40,9 @@ class PlgFunctTOS{
 	}
 
 	private static function decodeResultAftrSendToTosNPKS($res, $type){
-		// return $res;
 		$res['request']['json'] = json_decode($res['request']['json'], true);
 		$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
         $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
-		// return $res;
         $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
         $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
         return $res;
@@ -116,18 +114,18 @@ class PlgFunctTOS{
 				$Success = false;
 				$msg = 'realisasion not finish';
 			}else{
-				$his_cont = static::storeRealPLG($res,$find,$config,$input);
+				$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
 			}
 		}
 		$res['his_cont'] = $his_cont;
 		$dtl = DB::connection('omuster')->table($config['head_tab_detil']);
 		if ($input['nota_id'] == 1) {
-			$dtl->leftJoin('TX_GATEIN', function($join) use ($find){
+			$dtl->leftJoin('TX_GATEIN', function($join) use ($find, $config){
 				$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
 				$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find[$config['head_no']]."'"));
 			});
 		}else if ($input['nota_id'] == 2) {
-			$dtl->leftJoin('TX_GATEOUT', function($join) use ($find){
+			$dtl->leftJoin('TX_GATEOUT', function($join) use ($find, $config){
 				$join->on('TX_GATEOUT.gateout_cont', '=', 'TX_DTL_DEL.del_dtl_cont');
 				$join->on('TX_GATEOUT.gateout_req_no', '=', DB::raw("'".$find[$config['head_no']]."'"));
 			});
@@ -146,9 +144,10 @@ class PlgFunctTOS{
 	private static function storeRealPLG($data,$hdr,$config,$input){
 		$his_cont = [];
 		foreach ($data as $listR) {
-			$real_val = static::$config['funct_REAL_STR']($listR,$hdr,$config,$input);
+			$funfun = $config['funct_REAL_STR'];
+			$real_value = static::$funfun($listR,$hdr,$config,$input);
 			$upSttDtl = [
-				$config['DTL_FL_REAL']=>$real_val['real_val']
+				$config['DTL_FL_REAL']=>$real_value['real_val']
 			];
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update($upSttDtl);
 
@@ -163,7 +162,7 @@ class PlgFunctTOS{
 				$cont_counter++;
 			}
 			$arrStoreTsContAndTxHisCont = [
-				'history_date' => date('Y-m-d h:i:s', strtotime($real_val['real_date'])),
+				'history_date' => date('Y-m-d h:i:s', strtotime($real_value['real_date'])),
 				'cont_no' => $listR['NO_CONTAINER'],
 				'branch_id' => $hdr[$config['head_branch']],
 				'branch_code' => $hdr[$config['head_branch_code']],
@@ -309,7 +308,6 @@ class PlgFunctTOS{
 		])->update($up);
 
 		return ["real_val" => $ret_val, "real_date" => $ret_date];
-
 	}
 
 	// store request data to tos
