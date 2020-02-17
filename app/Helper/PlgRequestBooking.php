@@ -225,7 +225,7 @@ class PlgRequestBooking{
 					$dateIn = $tglIn->gatein_date;
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				} else if (in_array($config['DTL_DATE_IN'], ["TX_HISTORY_CONTAINER"])){
-					$in = [3,5,6];
+					$in = [3,13,14];
 					$tglIn 	= DB::connection('omuster')
 						->table('TX_HISTORY_CONTAINER')
 						->where('NO_CONTAINER', $list[$config['DTL_BL']])
