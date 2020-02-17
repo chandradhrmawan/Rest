@@ -233,7 +233,9 @@ class PlgRequestBooking{
 						->orderBy("HISTORY_DATE", "DESC")
 						->first();
 					$dateIn = $tglIn->history_date;
-					DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
+					if (!empty($config['DTL_STACK_DATE'])) {
+						DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
+					}
 					$newD['DTL_DATE_IN'] = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}else{
 					$newD['DTL_DATE_IN'] = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
