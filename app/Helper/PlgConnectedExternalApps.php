@@ -1013,7 +1013,7 @@ class PlgConnectedExternalApps{
 			$insert 									= DB::connection('omuster')->table('TX_SERVICES')->insert($storeService);
 		}
 
-		public static function flagRealisation(){
+		public static function flagRealisationRequest(){
 			$nota = DB::connection('mdm')->table('TS_NOTA')->where('flag_status','Y')->get();
 			foreach ($nota as $notaData) {
 				$config = json_decode($notaData->api_set, true);
@@ -1037,18 +1037,48 @@ class PlgConnectedExternalApps{
 							"nota_id"=>$notaData->nota_id,
 							"id"=>$list[$config['head_primery']]
 						];
-						PlgFunctTOS::getRealPLG($input);
+						$response = PlgFunctTOS::getRealPLG($input);
+
+						$storeHistory = [
+							"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
+							"action" => 'flagRealisationDtlRequest',
+							"branch_id" => 4,
+							"branch_code" => 'PLG',
+							"json_request" => json_encode($input),
+							"json_response" => json_encode($response),
+							"create_name" => 'sceduler'
+						];
+						static::storeHistory($storeHistory);
 					}
 					if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
 						$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
 							$config['head_forigen'] => $list[$config['head_primery']],
 						])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
 						if (count($dtl) == 0) {
-							DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>4]);
+							DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>5]);
+							$trackInpt = [
+								"tab"=>$config['head_table'],
+								"id"=>$list[$config['head_primery']],
+								"update"=>[$config['head_status']=>5]
+							];
+							$storeHistory = [
+								"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
+								"action" => 'flagRealisationHdrRequest',
+								"branch_id" => 4,
+								"branch_code" => 'PLG',
+								"json_request" => json_encode($trackInpt),
+								"json_response" => json_encode($trackInpt),
+								"create_name" => 'sceduler'
+							];
+							static::storeHistory($storeHistory);
 						}
 					}
 				}
 			}
+		}
+
+		public static function storeHistory($inp){
+			DB::connection('omuster')->table('TH_LOGS_API_STORE')->insert($inp);
 		}
 	// PLG
 }
