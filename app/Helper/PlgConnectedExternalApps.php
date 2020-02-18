@@ -1013,5 +1013,42 @@ class PlgConnectedExternalApps{
 			$insert 									= DB::connection('omuster')->table('TX_SERVICES')->insert($storeService);
 		}
 
+		public static function flagRealDtl(){
+			$nota = DB::connection('mdm')->table('ts_nota')->where('nota_flag','Y')->get();
+			foreach ($nota as $notaData) {
+				$config = json_decode($notaData->api_set, true);
+				$getIdReal = DB::connection('omuster')->table($config['head_tab_detil'])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->where($config['DTL_IS_ACTIVE'],'Y')->get();
+				foreach ($getIdReal as $value) {
+					$value = (array)$value;
+					$input = [
+						"sceduler"=>true,
+						"nota_id"=>$notaData->nota_id,
+						"id"=>$value[$config['head_primery']]
+					];
+					PlgFunctTOS::getRealPLG($input);
+				}
+			}
+		}
+
+		public static function flagRealHdr(){
+			$nota = DB::connection('mdm')->table('ts_nota')->where('nota_flag','Y')->get();
+			foreach ($nota as $notaData) {
+				$config = json_decode($notaData->api_set, true);
+
+				$hdr = DB::connection('omuster')->table('TX_HDR_REC')->where([
+					'req_statu' => 3,
+					'paymethod' => 1
+				])->get();
+				foreach ($hdr as $list) {
+					$dtl = DB::connection('omuster')->table('TX_DTL_REC')->where([
+						'forigen' => $list->primery,
+					])->whereIn('fl_real', [1,7])->get();
+					if (count($dtl) == 0) {
+						DB::connection('omuster')->table('TX_HDR_REC')->where('primery',$list->primery)->update(['req_status'=>4]);
+					}
+				}
+			}
+		}
+
 	// PLG
 }
