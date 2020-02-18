@@ -141,6 +141,7 @@ class PlgEInvo{
 		            "tanggalKoreksi": null,
 		            "keteranganKoreksi": ""
 		        }';
+		return json_encode(json_decode($hdr,true));
 	}
 
 	private static function getDtlInvAR($arr){
@@ -187,7 +188,7 @@ class PlgEInvo{
 			},';
 		}
         $lines = substr($lines, 0,-1);
-        return $lines;
+        return json_encode(json_decode($lines,true));
 	}
 
 	public static function sendInvProforma($arr){
