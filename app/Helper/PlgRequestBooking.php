@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helper\PlgEInvo;
 use App\Helper\PlgFunctTOS;
 use App\Helper\PlgConnectedExternalApps;
 use App\Helper\BillingEngine;
@@ -677,7 +678,7 @@ class PlgRequestBooking{
             	$arr = [
             		'nota' => (array)$getNota,
             	];
-            	$sendInvProforma = PlgConnectedExternalApps::sendInvProforma($arr);
+            	$sendInvProforma = PlgEInvo::sendInvProforma($arr);
             	if ($sendInvProforma['Success'] == true) {
 	            	$getNota->nota_status = 2;
 	            	$getNota->save();
@@ -766,7 +767,7 @@ class PlgRequestBooking{
 	    	$arr = [
 	    		"nota" => (array)$getNota
 	    	];
-        	$sendInvPay = PlgConnectedExternalApps::sendInvPay($arr);
+        	$sendInvPay = PlgEInvo::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {
         		return [
         			'response' => 'Fail, cant send payment invoice',
