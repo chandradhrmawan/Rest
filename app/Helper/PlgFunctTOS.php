@@ -297,11 +297,11 @@ class PlgFunctTOS{
 
 	public static function storeRealDateSE($listR,$hdr,$config,$input){
 		if ($listR[$config['DTL_REAL_DATE']['status']] == 1) {
-			$ret =  $config['DTL_FL_REAL_V'][0];
+			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
 			$up = [ $config['DTL_REAL_DATE']['uster']['usterStart'] => date('Y-m-d', strtotime($ret_date)) ];
 		}else{
-			$ret = $config['DTL_FL_REAL_V'][1];
+			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
 			$up = [ $config['DTL_REAL_DATE']['uster']['usterEnd'] => date('Y-m-d', strtotime($ret_date)) ];
 		}
