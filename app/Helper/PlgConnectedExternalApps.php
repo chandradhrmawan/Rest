@@ -1196,7 +1196,6 @@ class PlgConnectedExternalApps{
 													->where('B.DEL_CARGO_FL_REAL', "1")
 													->get();
 
-		 return $all;
 
  		 $dtl 							= '';
  		 $arrdtl 						= [];
@@ -1205,16 +1204,16 @@ class PlgConnectedExternalApps{
 		 foreach ($all as $list) {
 			 $dtl .= '
 			 {
-				 "NO_CONTAINER"		: "'.$list["rec_cargo_dtl_si_no"].'",
-				 "NO_REQUEST"			: "'.$list["rec_cargo_no"].'",
-				 "BRANCH_ID"			: "'.$list["rec_cargo_branch_id"].'"
+				 "NO_CONTAINER"		: "'.$list["del_cargo_dtl_si_no"].'",
+				 "NO_REQUEST"			: "'.$list["del_cargo_no"].'",
+				 "BRANCH_ID"			: "'.$list["del_cargo_branch_id"].'"
 			 },';
 		 }
 
 		 $dtl 	= substr($dtl, 0,-1);
 		 $json = '
 		 {
-			 "action" : "generateRecRealStorage",
+			 "action" : "generateDelRealStorage",
 			 "data": ['.$dtl.']
 		 }';
 
@@ -1261,38 +1260,37 @@ class PlgConnectedExternalApps{
 			 return " Real Receiving Cargo is uptodate ";
 		 }
 
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		 // static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
 		 // return $res["result"]["result"];
 		 foreach ($res["result"]["result"] as $value) {
-			$recBrgBranch 				= $value["BRANCH_ID"];
-		 	$recBrgReq 						= $value["NO_REQUEST"];
-			$recBrgCont 					= $value["NO_CONTAINER"];
-			$recBrgJml 						= $value["JUMLAH"];
+			$delBrgBranch 				= $value["BRANCH_ID"];
+		 	$delBrgReq 						= $value["NO_REQUEST"];
+			$delBrgCont 					= $value["NO_CONTAINER"];
+			$delBrgJml 						= $value["JUMLAH"];
 
-			$findHdrRecBrg 				= [
-				"REC_CARGO_BRANCH_ID" => $recBrgBranch,
-				"REC_CARGO_NO"				=> $recBrgReq
+			$findHdrDelBrg 				= [
+				"DEL_CARGO_BRANCH_ID" => $delBrgBranch,
+				"DEL_CARGO_NO"				=> $delBrgReq
 			];
 
+			$delBrgHDR 					= DB::connection('omuster')->table('TX_HDR_DEL_CARGO')->where($findHdrDelBrg)->first();
 
-			$recBrgHDR 					= DB::connection('omuster')->table('TX_HDR_REC_CARGO')->where($findHdrRecBrg)->first();
-
-			$findDtlRecBrg 			= [
-				"REC_CARGO_HDR_ID"		=> $recBrgHDR->rec_cargo_id,
-				"REC_CARGO_DTL_SI_NO"	=> $recBrgCont
+			$findDtlDelBrg 			= [
+				"DEL_CARGO_HDR_ID"		=> $delBrgHDR->del_cargo_id,
+				"DEL_CARGO_DTL_SI_NO"	=> $delBrgCont
 				];
 		 	}
 
-		 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
-			$qty 								= $dataDetail->rec_cargo_dtl_qty;
-			$qtyReal 						= $dataDetail->rec_cargo_dtl_real_qty;
+			$dataDetail 				= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_DTL_REAL_QTY"=>$delBrgJml]);
+
+			$dataDetail 				= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->first();
+			$qty 								= $dataDetail->del_cargo_dtl_qty;
+			$qtyReal 						= $dataDetail->del_cargo_dtl_real_qty;
 
 
-			if ($qty != $qtyReal) {
-				$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_DTL_REAL_QTY"=>$recBrgJml, "REC_CARGO_REMAINING_QTY"=>$recBrgJml]);
-			} else {
-				$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>10]);
+			if ($qty <= $qtyReal) {
+				$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>11]);
 			}
 		}
 
