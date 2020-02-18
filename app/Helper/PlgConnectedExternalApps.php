@@ -1084,6 +1084,218 @@ class PlgConnectedExternalApps{
 			}
 		}
 
+		public static function getRealRecBRG() {
+ 		 $all 						  = DB::connection('omuster')
+		 											->table('TX_HDR_REC_CARGO A')
+													->join('TX_DTL_REC_CARGO B', 'B.REC_CARGO_HDR_ID', '=', 'A.REC_CARGO_ID')
+													->where('B.REC_CARGO_FL_REAL', "1")
+													->get();
+
+ 		 $dtl 							= '';
+ 		 $arrdtl 						= [];
+		 $all 							= json_decode(json_encode($all),TRUE);
+
+		 foreach ($all as $list) {
+			 $dtl .= '
+			 {
+				 "NO_CONTAINER"		: "'.$list["rec_cargo_dtl_si_no"].'",
+				 "NO_REQUEST"			: "'.$list["rec_cargo_no"].'",
+				 "BRANCH_ID"			: "'.$list["rec_cargo_branch_id"].'"
+			 },';
+		 }
+
+		 $dtl 	= substr($dtl, 0,-1);
+		 $json = '
+		 {
+			 "action" : "generateRecRealStorage",
+			 "data": ['.$dtl.']
+		 }';
+
+		 $json = base64_encode(json_encode(json_decode($json,true)));
+		 $json = '
+			 {
+					 "repoGetRequest": {
+							 "esbHeader": {
+									 "internalId": "",
+									 "externalId": "",
+									 "timestamp": "",
+									 "responseTimestamp": "",
+									 "responseCode": "",
+									 "responseMessage": ""
+							 },
+							 "esbBody": {
+									 "request": "'.$json.'"
+							 },
+							 "esbSecurity": {
+									 "orgId": "",
+									 "batchSourceId": "",
+									 "lastUpdateLogin": "",
+									 "userId": "",
+									 "respId": "",
+									 "ledgerId": "",
+									 "respAppId": "",
+									 "batchSourceName": ""
+							 }
+					 }
+			 }
+				 ';
+
+		 $json = json_encode(json_decode($json,true));
+		 $arr = [
+						 "user"		 		=> config('endpoint.tosGetPLG.user'),
+						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+						 "json" 		 	=> $json
+					 ];
+		 $res 							 	= static::sendRequestToExtJsonMet($arr);
+		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 if (empty($res["result"]["result"])) {
+			 return " Real Receiving Cargo is uptodate ";
+		 }
+
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
+		 // return $res["result"]["result"];
+		 foreach ($res["result"]["result"] as $value) {
+			$recBrgBranch 				= $value["BRANCH_ID"];
+		 	$recBrgReq 						= $value["NO_REQUEST"];
+			$recBrgCont 					= $value["NO_CONTAINER"];
+			$recBrgJml 						= $value["JUMLAH"];
+
+			$findHdrRecBrg 				= [
+				"REC_CARGO_BRANCH_ID" => $recBrgBranch,
+				"REC_CARGO_NO"				=> $recBrgReq
+			];
+
+
+			$recBrgHDR 					= DB::connection('omuster')->table('TX_HDR_REC_CARGO')->where($findHdrRecBrg)->first();
+
+			$findDtlRecBrg 			= [
+				"REC_CARGO_HDR_ID"		=> $recBrgHDR->rec_cargo_id,
+				"REC_CARGO_DTL_SI_NO"	=> $recBrgCont
+				];
+		 	}
+
+			$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_DTL_REAL_QTY"=>$recBrgJml, "REC_CARGO_REMAINING_QTY"=>$recBrgJml]);
+
+		 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
+			$qty 								= $dataDetail->rec_cargo_dtl_qty;
+			$qtyReal 						= $dataDetail->rec_cargo_dtl_real_qty;
+
+
+			if ($qty <= $qtyReal) {
+				$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>10]);
+			}
+		}
+
+		public static function getRealDelBRG() {
+ 		 $all 						  = DB::connection('omuster')
+		 											->table('TX_HDR_DEL_CARGO A')
+													->join('TX_DTL_DEL_CARGO B', 'B.DEL_CARGO_HDR_ID', '=', 'A.DEL_CARGO_ID')
+													->where('B.DEL_CARGO_FL_REAL', "1")
+													->get();
+
+		 return $all;
+
+ 		 $dtl 							= '';
+ 		 $arrdtl 						= [];
+		 $all 							= json_decode(json_encode($all),TRUE);
+
+		 foreach ($all as $list) {
+			 $dtl .= '
+			 {
+				 "NO_CONTAINER"		: "'.$list["rec_cargo_dtl_si_no"].'",
+				 "NO_REQUEST"			: "'.$list["rec_cargo_no"].'",
+				 "BRANCH_ID"			: "'.$list["rec_cargo_branch_id"].'"
+			 },';
+		 }
+
+		 $dtl 	= substr($dtl, 0,-1);
+		 $json = '
+		 {
+			 "action" : "generateRecRealStorage",
+			 "data": ['.$dtl.']
+		 }';
+
+		 $json = base64_encode(json_encode(json_decode($json,true)));
+		 $json = '
+			 {
+					 "repoGetRequest": {
+							 "esbHeader": {
+									 "internalId": "",
+									 "externalId": "",
+									 "timestamp": "",
+									 "responseTimestamp": "",
+									 "responseCode": "",
+									 "responseMessage": ""
+							 },
+							 "esbBody": {
+									 "request": "'.$json.'"
+							 },
+							 "esbSecurity": {
+									 "orgId": "",
+									 "batchSourceId": "",
+									 "lastUpdateLogin": "",
+									 "userId": "",
+									 "respId": "",
+									 "ledgerId": "",
+									 "respAppId": "",
+									 "batchSourceName": ""
+							 }
+					 }
+			 }
+				 ';
+
+		 $json = json_encode(json_decode($json,true));
+		 $arr = [
+						 "user"		 		=> config('endpoint.tosGetPLG.user'),
+						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+						 "json" 		 	=> $json
+					 ];
+		 $res 							 	= static::sendRequestToExtJsonMet($arr);
+		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+		 if (empty($res["result"]["result"])) {
+			 return " Real Receiving Cargo is uptodate ";
+		 }
+
+		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
+		 // return $res["result"]["result"];
+		 foreach ($res["result"]["result"] as $value) {
+			$recBrgBranch 				= $value["BRANCH_ID"];
+		 	$recBrgReq 						= $value["NO_REQUEST"];
+			$recBrgCont 					= $value["NO_CONTAINER"];
+			$recBrgJml 						= $value["JUMLAH"];
+
+			$findHdrRecBrg 				= [
+				"REC_CARGO_BRANCH_ID" => $recBrgBranch,
+				"REC_CARGO_NO"				=> $recBrgReq
+			];
+
+
+			$recBrgHDR 					= DB::connection('omuster')->table('TX_HDR_REC_CARGO')->where($findHdrRecBrg)->first();
+
+			$findDtlRecBrg 			= [
+				"REC_CARGO_HDR_ID"		=> $recBrgHDR->rec_cargo_id,
+				"REC_CARGO_DTL_SI_NO"	=> $recBrgCont
+				];
+		 	}
+
+		 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
+			$qty 								= $dataDetail->rec_cargo_dtl_qty;
+			$qtyReal 						= $dataDetail->rec_cargo_dtl_real_qty;
+
+
+			if ($qty != $qtyReal) {
+				$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_DTL_REAL_QTY"=>$recBrgJml, "REC_CARGO_REMAINING_QTY"=>$recBrgJml]);
+			} else {
+				$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>10]);
+			}
+		}
+
 		public static function storeTxServices($json, $jsonRequest, $jsonResponse) {
 			$request 									= json_decode($json,true);
 			$service["request"] 			= base64_decode($jsonRequest);
