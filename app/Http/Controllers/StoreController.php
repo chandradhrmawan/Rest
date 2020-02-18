@@ -20,6 +20,7 @@ use App\Models\Mdm\TmTruckCompany;
 use App\Helper\PlgRequestBooking;
 use App\Helper\PlgConnectedExternalApps;
 use App\Helper\PlgFunctTOS;
+use App\Helper\PlgEInvo;
 
 class StoreController extends Controller
 {
