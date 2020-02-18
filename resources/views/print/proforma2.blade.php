@@ -5,15 +5,17 @@
 		 body{
 			 width:100%;
 			 margin:0 auto;
-			 font-family: 'Courier';
+			 font-family: "Arial", Sans-serif;
+			 line-height: 1.5;
 		 }
 		 @media print {
         body {
 					width:100%;
 					margin:0 auto;
-					font-family: 'Courier';
+					font-family: "Arial", Sans-serif;
 				}
       }
+			@page { margin: 20px; }
 	</style>
 </head>
 <body>
@@ -21,14 +23,14 @@
 		@foreach($branch as $branch)
 		@foreach($kapal as $kapal)
 		@foreach($sign as $sign)
-  <table width="100%" style="font-size:10px">
+  <table width="100%" style="font-size:11px">
     <tr>
-      <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
+      <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="60"></td>
 			<td width="45%">
 				<div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
 				</td>
       <td width="42%" style="vertical-align:top;text-align:right">
-        <table style="border-collapse:collapse; font-size:10px;">
+        <table style="border-collapse:collapse; font-size:11px;">
           <tr>
             <td>No. Proforma</td>
             <td>: {{$header->nota_no}}</td>
@@ -38,7 +40,7 @@
             <td>:
 							<?php
 							$originalDate = $header->nota_date;
-							$newDate = date("d-M-y", strtotime($originalDate));
+							$newDate = date("d F Y", strtotime($originalDate));
 							echo strtoupper($newDate);
 							?>
 						</td>
@@ -55,64 +57,64 @@
 	@foreach($label as $label)
 	<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800"> PROFORMA {{$label->nota_name}}</center>
 	@endforeach
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:12px;margin-top:20px">
 	<tr style="text-align:center">
 		<td style="vertical-align:top">
-      <table style="border-collapse:collapse; font-size:11px;">
+      <table style="border-collapse:collapse; font-size:12px;">
         <tr>
           <td colspan="3">
-            <font style="font-size:11px;text-align:left"><b>Pengguna Jasa</b></font><br>
+            <font style="font-size:12px;text-align:left"><b>Pengguna Jasa</b></font><br>
           </td>
         </tr>
         <tr>
-          <td>Nama</td>
-          <td>: </td>
+          <td width="20%" style="vertical-align:top;">Nama</td>
+          <td width="1%" style="vertical-align:top;">: </td>
           <td>{{$header->nota_cust_name}}</td>
         </tr>
 				<tr>
-					<td>No Account</td>
-					<td>: </td>
+					<td style="vertical-align:top;">No Account</td>
+					<td style="vertical-align:top;">: </td>
 					<td>{{$header->nota_cust_id}}</td>
 				</tr>
         <tr>
-          <td>Alamat</td>
-          <td>: </td>
+          <td style="vertical-align:top;">Alamat</td>
+          <td style="vertical-align:top;">: </td>
           <td>{{$header->nota_cust_address}}</td>
         </tr>
         <tr>
-          <td>NPWP</td>
-          <td>: </td>
+          <td style="vertical-align:top;">NPWP</td>
+          <td style="vertical-align:top;">: </td>
           <td>{{$header->nota_cust_npwp}}</td>
         </tr>
       </table>
     </td>
 		<td>
-      <table style="border-collapse:collapse; font-size:11px;">
+      <table style="border-collapse:collapse; font-size:12px;">
 				<?php if (!empty($kapal->pbm_name)) { ?>
 					<tr>
-						<td>Nama.PBM </td>
-						<td>: </td>
+						<td style="vertical-align:top;">Nama.PBM </td>
+						<td style="vertical-align:top;">: </td>
 						<td>{{$kapal->pbm_name}}</td>
 					</tr>
 					<?php } ?>
 				<tr>
-          <td>Nama Kapal</td>
-          <td>: </td>
+          <td style="vertical-align:top;">Nama Kapal</td>
+          <td style="vertical-align:top;">: </td>
           <td>{{$header->nota_vessel_name}}</td>
         </tr>
 				<tr>
-          <td>Periode Kunjungan</td>
-          <td>: </td>
+          <td style="vertical-align:top;">Periode Kunjungan</td>
+          <td style="vertical-align:top;">: </td>
         <td>{{$kapal->periode}}</td>
         </tr>
 				<tr>
-          <td>Kade</td>
-          <td>: </td>
+          <td style="vertical-align:top;">Kade</td>
+          <td style="vertical-align:top;">: </td>
         <td>{{$kapal->kade}}</td>
         </tr>
 				<tr>
-          <td>Tipe Perdagangan</td>
-          <td>: </td>
+          <td style="vertical-align:top;">Tipe Perdagangan</td>
+          <td style="vertical-align:top;">: </td>
         <td>
 					<?php
 					if ($kapal->nota_trade_type == "D") {
@@ -123,8 +125,8 @@
 				</td>
         </tr>
 				<tr>
-					<td>No. Request </td>
-					<td>:</td>
+					<td style="vertical-align:top;">No. Request </td>
+					<td style="vertical-align:top;">:</td>
 					<td>{{$header->nota_req_no}}</td>
 				</tr>
       </table>
@@ -133,7 +135,7 @@
 </table>
 
 <?php if ($penumpukan != "0") { ?>
-	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 		<tr style="text-align:center">
 			<th width="15%">NO BL</th>
 			<th width="15%">Kemasan</th>
@@ -184,12 +186,12 @@
 <?php } ?>
 
 <?php if ($bl != "0") { ?>
-<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr style="text-align:center">
 		<th rowspan="2" width="15%">NO BL</th>
-		<th rowspan="2" width="15%">TL</th>
+		<th rowspan="2" width="5%">TL</th>
 		<th rowspan="2" width="15%">Kemasan</th>
-		<th rowspan="2" width="15%">BARANG</th>
+		<th rowspan="2" width="10%">BARANG</th>
     <th rowspan="2" width="5%">Satuan</th>
     <th colspan="2" width="15%">Qty</th>
     <th rowspan="2" width="10%">Tarif Dasar</th>
@@ -233,7 +235,7 @@
 			<td style="text-align:center">-</td>
 			<td style="text-align:center">{{$value["dtl_qty"]}}</td>
 		<?php } ?>
-		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
+		<td style="text-align:right">{{$value["dtl_tariff"]}}</td>
 		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
 <?php } ?>
@@ -242,7 +244,7 @@
 </table>
 
 <?php if ($alat != "0") { ?>
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr style="text-align:center">
 		<th width="15%">Layanan</th>
 		<th width="15%">Nama Alat</th>
@@ -259,17 +261,17 @@
 			<td style="padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
 			<td style="text-align:center"><?php echo $alat["dtl_unit_name"]; ?></td>
 			<td style="text-align:center"><?php echo number_format($alat["dtl_eq_qty"]) ?></td>
-			<td style="text-align:center"><?php echo number_format($alat["dtl_qty"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_tariff"]); ?></td>
+			<td style="text-align:center"><?php echo $alat["dtl_qty"]; ?></td>
+			<td style="text-align:right"><?php echo $alat["dtl_tariff"]; ?></td>
 			<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
 		</tr>
 <?php }} ?>
 </table>
 
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
   <tr>
     <td style="border-right: 0;border-bottom: 0;width:50%" colspan="5"></td>
-    <td style="border-right: 0;border-bottom: 0;border-left:0" colspan="2">DPP</td>
+    <td style="border-right: 0;border-bottom: 0;border-left:0;padding-top:5px" colspan="2">DPP</td>
     <td style="border-right: 0;border-bottom: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
     <td style="border-left:  0;border-bottom: 0;text-align:right">{{number_format($header->nota_dpp)}}</td>
   </tr>
@@ -297,28 +299,36 @@
 		<td style="border-right: 0;border-top: 0;border-bottom:0;border-left:0;text-align:right;padding-right:9px">IDR</td>
 		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format($uper)}}</td>
 	</tr>
-	<tr>
+	<tr style="font-weight:800">
 		<td style="border-right: 0;border-top: 0;width:50%" colspan="5"></td>
-		<td style="border-right: 0;border-top: 0;border-left:0" colspan="2">Grand Total</td>
+		<td style="border-right: 0;border-top: 0;border-left:0" colspan="2">
+			<?php
+			if ($total < 0) {
+				echo "Sisa Uper";
+			} else {
+				echo "Piutang";
+			}
+			?>
+		</td>
 		<td style="border-right: 0;border-top: 0;border-left:0;text-align:right;padding-right:9px">IDR</td>
-		<td style="border-left:  0;border-top: 0;text-align:right">{{number_format($total)}}</td>
+		<td style="border-left:  0;border-top: 0;text-align:right;padding-bottom:5px">{{number_format(abs($total))}}</td>
 	</tr>
 </table>
-<p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
-<table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
-	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
-	<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+<p style="font-size:10px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
+<table style="border-collapse:collapse; font-size:12px;margin-top:60px;float:right;text-align:center">
+	<tr><td>Banten, <?php  echo strtoupper(date("d F Y", strtotime($header->nota_date))); ?></td></tr>
+	<tr><td>{{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
 	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
 	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 </table>
 
-<div style="position:absolute;bottom:20px;font-size:11px; width:100%">
+<div style="position:absolute;bottom:150px;font-size:12px; width:100%">
 	{{$branch->branch_name}} <br>{{$branch->branch_address}}
-	<div style="margin-top:50px;font-size:8px">
+	<div style="margin-top:10px;font-size:8px">
 			{{$header->nota_no}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;bottom:155px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach

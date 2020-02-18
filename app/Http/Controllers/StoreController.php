@@ -432,7 +432,7 @@ class StoreController extends Controller
   }
 
   function getRealPlug($input) {
-    return PlgConnectedExternalApps::getRealGati($input);
+    return PlgConnectedExternalApps::getRealRecBRG($input);
   }
 
 }

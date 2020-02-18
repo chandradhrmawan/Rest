@@ -47,6 +47,8 @@ class Kernel extends ConsoleKernel
       $schedule->call('App\Helper\PlgConnectedExternalApps@getRealFumigasi');
       $schedule->call('App\Helper\PlgConnectedExternalApps@getRealPlugStart');
       $schedule->call('App\Helper\PlgConnectedExternalApps@getRealPlugEnd');
+      $schedule->call('App\Helper\PlgConnectedExternalApps@getRealRecBRG');
+
 
     }
 }

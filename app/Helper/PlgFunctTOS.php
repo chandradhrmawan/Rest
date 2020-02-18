@@ -39,7 +39,7 @@ class PlgFunctTOS{
         ';
 	}
 
-	private static function decodeResultAftrSendToTosNPKS($res, $type){
+	public static function decodeResultAftrSendToTosNPKS($res, $type){
 		$res['request']['json'] = json_decode($res['request']['json'], true);
 		$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
         $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
