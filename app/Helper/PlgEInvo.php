@@ -7,15 +7,48 @@ use Illuminate\Support\Facades\DB;
 use App\Helper\PlgConnectedExternalApps;
 
 class PlgEInvo{
-	private static function getHdrInvAR{
+
+	private static function getJsonInvAR($arr){
+		$hdr = static::getDtlInvAR($arr);
+		$lines = static::getDtlInvAR($arr);
+		$json = '
+		{
+		    "arRequestDoc": {
+		        "esbHeader": {
+		        	"internalId": "",
+		        	"externalId": "",
+		        	"timestamp": "",
+		        	"responseTimestamp": "",
+		        	"responseCode": "",
+		        	"responseMessage": ""
+		        },
+		        "esbBody": [
+		            { '.$hdr.', "lines": ['.$lines.'] }
+		        ],
+		        "esbSecurity": {
+		            "orgId": "'.$arr['branch']['branch_org_id'].'",
+		            "batchSourceId": "",
+		            "lastUpdateLogin": "",
+		            "userId": "",
+		            "respId": "",
+		            "ledgerId": "",
+		            "respApplId": "",
+		            "batchSourceName": ""
+		        }
+		    }
+		}';
+		return json_encode(json_decode($json,true));
+	}
+
+	private static function getHdrInvAR($arr){
 		$hdr = '"header": {
 		        	"billerRequestId":"'.$arr['nota']['nota_req_no'].'",
-		        	"orgId":"'.$branch['branch_org_id'].'",
+		        	"orgId":"'.$arr['branch']['branch_org_id'].'",
 		        	"trxNumber":"'.$arr['nota']['nota_no'].'",
 		        	"trxNumberOrig":"",
 		        	"trxNumberPrev":"",
 		        	"trxTaxNumber":"",
-		        	"trxDate":"'.$nota_date.'",
+		        	"trxDate":"'.$arr['nDateWitHour'].'",
 		        	"trxClass":"INV",
 		        	"trxTypeId":"-1",
 		        	"paymentReferenceNumber":"",
@@ -41,9 +74,9 @@ class PlgEInvo{
 		            "errorMessage": "",
 		            "apiMessage": "",
 		            "createdBy": "-1",
-		            "creationDate": "'.$nota_date.'",
+		            "creationDate": "'.$arr['nDateWitHour'].'",
 		            "lastUpdatedBy": "-1",
-		            "lastUpdateDate": "'.$nota_date.'",
+		            "lastUpdateDate": "'.$arr['nDateWitHour'].'",
 		            "lastUpdateLogin": "-1",
 		            "customerTrxIdOut": null,
 		            "processFlag": "",
@@ -89,7 +122,7 @@ class PlgEInvo{
 		            "jenisPerdagangan": "",
 		            "docNum": "",
 		            "statusLunas": "",
-		            "tglPelunasan": "'.$nota_date_noHour.'",
+		            "tglPelunasan": "'.$arr['nDateNotHour'].'",
 		            "amountTerbilang": "",
 		            "ppnDipungutSendiri": "'.$arr['nota']['nota_ppn'].'",
 		            "ppnDipungutPemungut": "",
@@ -129,12 +162,12 @@ class PlgEInvo{
 				"locationTerminal": "",
 				"amount": "'.$list->dtl_dpp.'",
 				"taxAmount": "'.$list->dtl_ppn.'",
-				"startDate": "'.$arr['nota']['nDateNotHour'].'",
-				"endDate": "'.$arr['nota']['nDateNotHour'].'",
+				"startDate": "'.$arr['nDateNotHour'].'",
+				"endDate": "'.$arr['nDateNotHour'].'",
 				"createdBy": "-1",
-				"creationDate": "'.$arr['nota']['nDateNotHour'].'",
+				"creationDate": "'.$arr['nDateNotHour'].'",
 				"lastUpdatedBy": "-1",
-				"lastUpdatedDate": "'.$arr['nota']['nDateNotHour'].'",
+				"lastUpdatedDate": "'.$arr['nDateNotHour'].'",
 				"interfaceLineAttribute1": "",
 				"interfaceLineAttribute2": "'.$list->dtl_service_type.'",
 				"interfaceLineAttribute3": "",
@@ -166,38 +199,11 @@ class PlgEInvo{
 		$branch = (array)$branch[0];
 		$nota_date = $arr['nota']['nota_date'];
 		$nota_date_noHour = date('Y-m-d', strtotime($arr['nota']['nota_date']));
-
 		$sendArr = $arr;
 		$sendArr['nDateWitHour'] = $nota_date;
 		$sendArr['nDateNotHour'] = $nota_date_noHour;
-		$lines = static::getDtlInvAR($sendArr);
-
-		$json = '
-		{
-		    "arRequestDoc": {
-		        "esbHeader": {
-		        	"internalId": "",
-		        	"externalId": "",
-		        	"timestamp": "",
-		        	"responseTimestamp": "",
-		        	"responseCode": "",
-		        	"responseMessage": ""
-		        },
-		        "esbBody": [
-		            { '.$hdr.', "lines": ['.$lines.'] }
-		        ],
-		        "esbSecurity": {
-		            "orgId": "'.$branch['branch_org_id'].'",
-		            "batchSourceId": "",
-		            "lastUpdateLogin": "",
-		            "userId": "",
-		            "respId": "",
-		            "ledgerId": "",
-		            "respApplId": "",
-		            "batchSourceName": ""
-		        }
-		    }
-		}';
+		$sendArr['branch'] = $branch;
+		$json = static::getJsonInvAR($sendArr);
 		return json_decode($json, true);
 		$json = json_encode(json_decode($json, true));
 		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
