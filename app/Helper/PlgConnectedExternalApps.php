@@ -1013,42 +1013,42 @@ class PlgConnectedExternalApps{
 			$insert 									= DB::connection('omuster')->table('TX_SERVICES')->insert($storeService);
 		}
 
-		public static function flagRealDtl(){
-			$nota = DB::connection('mdm')->table('ts_nota')->where('nota_flag','Y')->get();
+		public static function flagRealisation(){
+			$nota = DB::connection('mdm')->table('TS_NOTA')->where('flag_status','Y')->get();
 			foreach ($nota as $notaData) {
 				$config = json_decode($notaData->api_set, true);
-				$getIdReal = DB::connection('omuster')->table($config['head_tab_detil'])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->where($config['DTL_IS_ACTIVE'],'Y')->get();
-				foreach ($getIdReal as $value) {
-					$value = (array)$value;
-					$input = [
-						"sceduler"=>true,
-						"nota_id"=>$notaData->nota_id,
-						"id"=>$value[$config['head_primery']]
-					];
-					PlgFunctTOS::getRealPLG($input);
-				}
-			}
-		}
-
-		public static function flagRealHdr(){
-			$nota = DB::connection('mdm')->table('ts_nota')->where('nota_flag','Y')->get();
-			foreach ($nota as $notaData) {
-				$config = json_decode($notaData->api_set, true);
-
-				$hdr = DB::connection('omuster')->table('TX_HDR_REC')->where([
-					'req_statu' => 3,
-					'paymethod' => 1
-				])->get();
+				$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_status'], 3)->get();
 				foreach ($hdr as $list) {
-					$dtl = DB::connection('omuster')->table('TX_DTL_REC')->where([
-						'forigen' => $list->primery,
-					])->whereIn('fl_real', [1,7])->get();
-					if (count($dtl) == 0) {
-						DB::connection('omuster')->table('TX_HDR_REC')->where('primery',$list->primery)->update(['req_status'=>4]);
+					$list = (array)$list;
+					$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
+					if ( 
+						( // jika cash maka cek nota harus ada dan dibayarkan
+							!empty($cekNota) 
+							and $cekNota->nota_status == 3 
+							and $cekNota->nota_paid == 'Y' 
+							and  $list[$config['head_paymethod']] == 1
+						) or ( // jika pihutang maka tidak wajib ada NOTA
+							empty($cekNota)
+							and  $list[$config['head_paymethod']] == 2
+						)
+					) {
+						$input = [
+							"sceduler"=>true,
+							"nota_id"=>$notaData->nota_id,
+							"id"=>$list[$config['head_primery']]
+						];
+						PlgFunctTOS::getRealPLG($input);
+					}
+					if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
+						$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+							$config['head_forigen'] => $list[$config['head_primery']],
+						])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
+						if (count($dtl) == 0) {
+							DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>4]);
+						}
 					}
 				}
 			}
 		}
-
 	// PLG
 }
