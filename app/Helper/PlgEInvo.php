@@ -392,6 +392,6 @@ class PlgEInvo{
 		$sendInvPutApply = static::sendInvApply($arr);
 		$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
 
-		return [ "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
+		return [ "Success" => true, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }
