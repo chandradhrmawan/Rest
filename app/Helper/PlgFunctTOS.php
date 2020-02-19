@@ -317,6 +317,48 @@ class PlgFunctTOS{
 		return ["real_val" => $ret_val, "real_date" => $ret_date];
 	}
 
+	public static function storeRealDateRec($listR,$hdr,$config,$input) {
+		$recBrgJml 									= $listR["JUMLAH"];
+		$findDtlRecBrg 							= [
+			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
+			"REC_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]
+			];
+
+		$updateVal 						 			= [
+			"REC_CARGO_DTL_REAL_QTY"	=>$recBrgJml,
+			"REC_CARGO_REMAINING_QTY"	=>$recBrgJml
+		];
+
+		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update($updateVal);
+		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
+		$qty 												= $dataDetail->rec_cargo_dtl_qty;
+		$qtyReal 										= $dataDetail->rec_cargo_dtl_real_qty;
+
+		if ($qty <= $qtyReal) {
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+		}
+	}
+
+	public static function storeRealDateDel($listR,$hdr,$config,$input) {
+		$delBrgJml 									= $listR["JUMLAH"];
+		$findDtlRecBrg 							= [
+			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
+			"REC_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]
+			];
+
+		$updateVal 						 			= [
+			"DEL_CARGO_DTL_REAL_QTY"	=>$delBrgJml
+		];
+
+		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update($updateVal);
+		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->first();
+		$qty 												= $dataDetail->del_cargo_dtl_qty;
+		$qtyReal 										= $dataDetail->del_cargo_dtl_real_qty;
+
+		if ($qty <= $qtyReal) {
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+		}
+	}
 	// store request data to tos
 	  private static function buildJsonTX_HDR_REC($arr) {
 	        $arrdetil = '';
