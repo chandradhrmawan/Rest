@@ -359,6 +359,7 @@ class PlgFunctTOS{
 			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
 		}
 	}
+
 	// store request data to tos
 	  private static function buildJsonTX_HDR_REC($arr) {
 	        $arrdetil = '';
