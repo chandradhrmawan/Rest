@@ -769,8 +769,8 @@ class PlgRequestBooking{
 	    		}
 	    	}
 	    	$arr = [
-	    		"nota" => (array)$getNota,
-	    		"payment" => (array)$pay
+	    		"nota" => (array)$getNota['attributes'],
+	    		"payment" => (array)$pay['attributes']
 	    	];
         	$sendInvPay = PlgEInvo::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {

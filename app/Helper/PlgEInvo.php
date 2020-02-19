@@ -213,6 +213,7 @@ class PlgEInvo{
         if ($res['response']['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
         	$hsl = false;
         }
+		$res['request']['json'] = json_decode($res['request']['json'],true);
 		return ['Success' => $hsl, 'sendInvProformaAR' => $res];
 	}
 
@@ -327,27 +328,27 @@ class PlgEInvo{
 								"paymentCode":"'.$arr['nota']['nota_no'].'",
 								"trxNumber":"'.$arr['nota']['nota_no'].'",
 								"orgId":"'.$arr['branch']['branch_org_id'].'",
-								"amountApplied":"1542550",
+								"amountApplied":"'.$arr['payment']['pay_amount'].'",
 								"cashReceiptId":null,
-								"customerTrxId":null,
+								"customerTrxId":"'.$arr['payment']['pay_cust_id'].'",
 								"paymentScheduleId":null,
-								"bankId":"124009",
-								"receiptSource":"CMS",
-								"legacySystem":"INVOICE",
+								"bankId":"'.$arr['bank']['bank_id'].'",
+								"receiptSource":"ESB",
+								"legacySystem":"NPKSBILLING",
 								"statusTransfer":"N",
 								"errorMessage":null,
 								"requestIdApply":null,
-								"createdBy":"309",
-								"creationDate":"2019-10-15",
-								"lastUpdateBy":"309",
-								"lastUpdateDate":"2019-10-15",
-								"amountPaid":"1542550",
+								"createdBy":"-1",
+								"creationDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
+								"lastUpdateBy":"-1",
+								"lastUpdateDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
+								"amountPaid":"'.$arr['payment']['pay_amount'].'",
 								"epay":"N"
 							}
 						}
 						],
 						"esbSecurity":{
-							"orgId":"1827",
+							"orgId":"'.$arr['branch']['branch_org_id'].'",
 							"batchSourceId":"",
 							"lastUpdateLogin":"",
 							"userId":"",
@@ -390,7 +391,9 @@ class PlgEInvo{
 		$bank = (array)$bank;
 		$arr['bank'] = $bank;
 		$sendInvPutReceipt = static::sendInvReceipt($arr);
+		$sendInvPutReceipt['request']['json'] = json_decode($sendInvPutReceipt['request']['json'],true);
 		$sendInvPutApply = static::sendInvApply($arr);
+		$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
 
 		return [ "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
