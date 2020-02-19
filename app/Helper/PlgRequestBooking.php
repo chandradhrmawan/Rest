@@ -834,7 +834,7 @@ class PlgRequestBooking{
 					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-				if ($arr["cont_location"] == "GATI" and $cekTsCont->cont_counter == 0) {
+				if ($arr["cont_location"] == "GATO" and $cekTsCont->cont_counter == 0) {
 					$counter = $cekTsCont->cont_counter+1;
 				}else{
 					$counter = $cekTsCont->cont_counter;
