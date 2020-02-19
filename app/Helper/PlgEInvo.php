@@ -145,6 +145,7 @@ class PlgEInvo{
 	}
 
 	private static function getDtlInvAR($arr){
+		$lines = '';
 		$getNotaDtl = DB::connection('omuster')->table('TX_DTL_NOTA')->where('nota_hdr_id',$arr['nota']['nota_id'])->get();
 		foreach ($getNotaDtl as $list) {
 			$lines .= '
@@ -192,7 +193,6 @@ class PlgEInvo{
 	}
 
 	public static function sendInvProforma($arr){
-		// return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
@@ -205,7 +205,6 @@ class PlgEInvo{
 		$sendArr['nDateNotHour'] = $nota_date_noHour;
 		$sendArr['branch'] = $branch;
 		$json = static::getJsonInvAR($sendArr);
-		// return json_decode($json, true);
 		$json = json_encode(json_decode($json, true));
 		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
         	"user" => config('endpoint.esbInvoicePutAR.user'),
@@ -253,7 +252,7 @@ class PlgEInvo{
 								"receiptType":"",
 								"receiptSubType":"",
 								"createdBy":"-1",
-								"creationDate":"'.date('Y-m-d', strtotime($pay->pay_create_date)).'",
+								"creationDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
 								"terminal":"",
 								"attribute1":"'.$arr['nota']['nota_no'].'",
 								"attribute2":"'.$arr['nota']['nota_cust_id'].'",
@@ -275,14 +274,14 @@ class PlgEInvo{
 								"statusReceiptMsg":"",
 								"invoiceNum":"",
 								"amountOrig":null,
-								"lastUpdateDate":"'.date('Y-m-d', strtotime($pay->pay_create_date)).'",
+								"lastUpdateDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
 								"lastUpdateBy":"-1",
 								"branchCode":"'.$arr['branch']['branch_code'].'",
 								"branchAccount":"'.$arr['branch']['branch_account'].'",
 								"sourceInvoiceType":"NPKSBILLING",
 								"remarkToBankId":"BANK_ACCOUNT_ID",
-								"sourceSystem":"NPKBILLING",
-								"comments":"Pembayaran uper",
+								"sourceSystem":"NPKSBILLING",
+								"comments":"'.$arr['payment']['pay_note'].'",
 								"cmsYn":"N",
 								"tanggalTerima":null,
 								"norekKoran":""
@@ -290,7 +289,7 @@ class PlgEInvo{
 						}
 						],
 						"esbSecurity":{
-							"orgId":"1822",
+							"orgId":"'.$arr['branch']['branch_org_id'].'",
 							"batchSourceId":"",
 							"lastUpdateLogin":"",
 							"userId":"",
@@ -328,9 +327,9 @@ class PlgEInvo{
 						"esbBody":[
 						{
 							"header":{
-								"paymentCode":"010.804.19-60.001501",
-								"trxNumber":"010.804.19-60.001511",
-								"orgId":"1827",
+								"paymentCode":"'.$arr['nota']['nota_no'].'",
+								"trxNumber":"'.$arr['nota']['nota_no'].'",
+								"orgId":"'.$arr['branch']['branch_org_id'].'",
 								"amountApplied":"1542550",
 								"cashReceiptId":null,
 								"customerTrxId":null,
@@ -393,6 +392,9 @@ class PlgEInvo{
 		}
 		$bank = (array)$bank;
 		$arr['bank'] = $bank;
-		$sendInvReceipt = static::sendInvReceipt($arr);
+		$sendInvPutReceipt = static::sendInvReceipt($arr);
+		$sendInvPutApply = static::sendInvApply($arr);
+
+		return [ "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }
