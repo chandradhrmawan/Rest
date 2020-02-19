@@ -666,7 +666,7 @@ class PlgRequestBooking{
 	    }
 
 	    public static function approvalProformaPLG($input){
-            $getNota = TxHdrNota::find($input['nota_id']);
+            $getNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',$input['nota_id'])->first();
             if (empty($getNota)) {
             	return ['result' => "Fail, proforma not found!", "Success" => false];
             }
@@ -758,6 +758,7 @@ class PlgRequestBooking{
 	    	$store->pay_type = $input['pay_type'];
 	    	$store->save();
 
+	    	$pay = TxPayment::find($store->pay_id);
 	    	if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
 	    		$directory  = 'omuster/TX_PAYMENT/'.date('d-m-Y').'/';
 	    		$response   = FileUpload::upload_file($input['pay_file'], $directory, "TX_PAYMENT", $store->pay_id);
@@ -767,9 +768,9 @@ class PlgRequestBooking{
 	    			]);
 	    		}
 	    	}
-	    	$pay = TxPayment::find($store->pay_id);
 	    	$arr = [
-	    		"nota" => (array)$getNota
+	    		"nota" => (array)$getNota,
+	    		"payment" => (array)$pay
 	    	];
         	$sendInvPay = PlgEInvo::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {
@@ -833,7 +834,7 @@ class PlgRequestBooking{
 					DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 				}
 				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-				if ($arr["cont_location"] == "GATI" and $cekTsCont->cont_counter == 0) {
+				if ($arr["cont_location"] == "GATO" and $cekTsCont->cont_counter == 0) {
 					$counter = $cekTsCont->cont_counter+1;
 				}else{
 					$counter = $cekTsCont->cont_counter;

@@ -145,6 +145,7 @@ class PlgEInvo{
 	}
 
 	private static function getDtlInvAR($arr){
+		$lines = '';
 		$getNotaDtl = DB::connection('omuster')->table('TX_DTL_NOTA')->where('nota_hdr_id',$arr['nota']['nota_id'])->get();
 		foreach ($getNotaDtl as $list) {
 			$lines .= '
@@ -192,7 +193,6 @@ class PlgEInvo{
 	}
 
 	public static function sendInvProforma($arr){
-		return ['Success' => true, 'sendInvProforma' => 'by pass dulu']; // by pass dulu
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
@@ -205,117 +205,196 @@ class PlgEInvo{
 		$sendArr['nDateNotHour'] = $nota_date_noHour;
 		$sendArr['branch'] = $branch;
 		$json = static::getJsonInvAR($sendArr);
-		return json_decode($json, true);
 		$json = json_encode(json_decode($json, true));
 		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
-        	"user" => config('endpoint.esbPutInvoice.user'),
-        	"pass" => config('endpoint.esbPutInvoice.pass'),
-        	"target" => config('endpoint.esbPutInvoice.target'),
+        	"user" => config('endpoint.esbInvoicePutAR.user'),
+        	"pass" => config('endpoint.esbInvoicePutAR.pass'),
+        	"target" => config('endpoint.esbInvoicePutAR.target'),
         	"json" => $json
         ]);
         $hsl = true;
         if ($res['response']['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
         	$hsl = false;
         }
-		return ['Success' => $hsl, 'sendInvProforma' => $res];
+		return ['Success' => $hsl, 'sendInvProformaAR' => $res];
+	}
+
+	private static function sendInvReceipt($arr){
+		$json ='
+			{
+				"arRequestDoc":{
+					"esbHeader":{
+						"internalId":"",
+						"externalId":"",
+						"timestamp":"",
+						"responseTimestamp":"",
+						"responseCode":"",
+						"responseMessage":""
+						},
+						"esbBody":[
+						{
+							"header":{
+								"orgId":"'.$arr['branch']['branch_org_id'].'",
+								"receiptNumber":"'.$arr['nota']['nota_no'].'",
+								"receiptMethod":"BANK",
+								"receiptAccount":"'.$arr['payment']['pay_account_name'].' '.$arr['payment']['pay_bank_code'].' '.$arr['payment']['pay_account_no'].'",
+								"bankId":"'.$arr['bank']['bank_id'].'",
+								"customerNumber":"'.$arr['payment']['pay_cust_id'].'",
+								"receiptDate":"'.date('Y-m-d H:i:s', strtotime($arr['payment']['pay_date'])).'",
+								"currencyCode":"'.$arr['payment']['pay_currency'].'",
+								"status":"P",
+								"amount":"'.$arr['payment']['pay_amount'].'",
+								"processFlag":"",
+								"errorMessage":"",
+								"apiMessage":"",
+								"attributeCategory":"BANK",
+								"referenceNum":"",
+								"receiptType":"",
+								"receiptSubType":"",
+								"createdBy":"-1",
+								"creationDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
+								"terminal":"",
+								"attribute1":"'.$arr['nota']['nota_no'].'",
+								"attribute2":"'.$arr['nota']['nota_cust_id'].'",
+								"attribute3":"'.$arr['nota']['nota_cust_name'].'",
+								"attribute4":"'.$arr['nota']['nota_cust_address'].'",
+								"attribute5":"'.$arr['nota']['nota_cust_npwp'].'",
+								"attribute6":"",
+								"attribute7":"'.$arr['nota']['nota_currency_code'].'",
+								"attribute8":"'.$arr['nota']['nota_vessel_name'].'",
+								"attribute9":"",
+								"attribute10":"",
+								"attribute11":"",
+								"attribute12":"",
+								"attribute13":"",
+								"attribute14":"'.$arr['nota']['nota_sub_context'].'",
+								"attribute15":"",
+								"statusReceipt":"N",
+								"sourceInvoice":"BRG",
+								"statusReceiptMsg":"",
+								"invoiceNum":"",
+								"amountOrig":null,
+								"lastUpdateDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
+								"lastUpdateBy":"-1",
+								"branchCode":"'.$arr['branch']['branch_code'].'",
+								"branchAccount":"'.$arr['branch']['branch_account'].'",
+								"sourceInvoiceType":"NPKSBILLING",
+								"remarkToBankId":"BANK_ACCOUNT_ID",
+								"sourceSystem":"NPKSBILLING",
+								"comments":"'.$arr['payment']['pay_note'].'",
+								"cmsYn":"N",
+								"tanggalTerima":null,
+								"norekKoran":""
+							}
+						}
+						],
+						"esbSecurity":{
+							"orgId":"'.$arr['branch']['branch_org_id'].'",
+							"batchSourceId":"",
+							"lastUpdateLogin":"",
+							"userId":"",
+							"respId":"",
+							"ledgerId":"",
+							"respApplId":"",
+							"batchSourceName":""
+						}
+					}
+				}
+		';
+
+		$json = json_encode(json_decode($json,true));
+
+		return $res = PlgConnectedExternalApps::sendRequestToExtJsonMet([ // kirim putReceipt
+			"user" => config('endpoint.esbInvoicePutReceipt.user'),
+			"pass" => config('endpoint.esbInvoicePutReceipt.pass'),
+			"target" => config('endpoint.esbInvoicePutReceipt.target'),
+			"json" => $json
+		]);
+	}
+
+	private static function sendInvApply($arr){
+		$json ='
+			{
+				"arRequestDoc":{
+					"esbHeader":{
+						"internalId":"",
+						"externalId":"",
+						"timestamp":"",
+						"responseTimestamp":"",
+						"responseCode":"",
+						"responseMessage":""
+						},
+						"esbBody":[
+						{
+							"header":{
+								"paymentCode":"'.$arr['nota']['nota_no'].'",
+								"trxNumber":"'.$arr['nota']['nota_no'].'",
+								"orgId":"'.$arr['branch']['branch_org_id'].'",
+								"amountApplied":"1542550",
+								"cashReceiptId":null,
+								"customerTrxId":null,
+								"paymentScheduleId":null,
+								"bankId":"124009",
+								"receiptSource":"CMS",
+								"legacySystem":"INVOICE",
+								"statusTransfer":"N",
+								"errorMessage":null,
+								"requestIdApply":null,
+								"createdBy":"309",
+								"creationDate":"2019-10-15",
+								"lastUpdateBy":"309",
+								"lastUpdateDate":"2019-10-15",
+								"amountPaid":"1542550",
+								"epay":"N"
+							}
+						}
+						],
+						"esbSecurity":{
+							"orgId":"1827",
+							"batchSourceId":"",
+							"lastUpdateLogin":"",
+							"userId":"",
+							"respId":"",
+							"ledgerId":"",
+							"respApplId":"",
+							"batchSourceName":""
+						}
+					}
+				}
+		';
+
+		$json = json_encode(json_decode($json,true));
+
+		return $res = PlgConnectedExternalApps::sendRequestToExtJsonMet([ // kirim putReceipt
+			"user" => config('endpoint.esbInvoicePutApply.user'),
+			"pass" => config('endpoint.esbInvoicePutApply.pass'),
+			"target" => config('endpoint.esbInvoicePutApply.target'),
+			"json" => $json
+		]);
 	}
 
 	public static function sendInvPay($arr){
 		// di by passs dulu
 		return ['Success' => true, 'response' => 'by passs'];
 		// di by passs dulu
-		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
-		if (count($branch) == 0) {
+		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->first();
+		if (empty($branch)) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
 		}
-		$branch = (array)$branch[0];
-		$json = '
-		{
-			"arRequestDoc": {
-				"esbHeader": {
-					"internalId": "",
-					"externalId": "",
-					"timestamp": "",
-					"responseTimestamp": "",
-					"responseCode": "",
-					"responseMessage": ""
-				},
-				"esbBody": [
-					{
-						"header": {
-							"orgId": "'.$branch['branch_org_id'].'",
-							"receiptNumber": "'.$arr['nota']['nota_no'].'",
-							"receiptMethod": "BANK",
-							"receiptAccount": "Mandiri IDR 120.00.4107201.3",
-							"bankId": "105009",
-							"customerNumber": "12777901",
-							"receiptDate": "2019-11-28 20:15:08",
-							"currencyCode": "IDR",
-							"status": "P",
-							"amount": "20000",
-							"processFlag": "",
-							"errorMessage": "",
-							"apiMessage": "",
-							"attributeCategory": "UPER",
-							"referenceNum": "",
-							"receiptType": "",
-							"receiptSubType": "",
-							"createdBy": "-1",
-							"creationDate": "2019-11-28",
-							"terminal": "",
-							"attribute1": "",
-							"attribute2": "",
-							"attribute3": "",
-							"attribute4": "",
-							"attribute5": "",
-							"attribute6": "",
-							"attribute7": "",
-							"attribute8": "",
-							"attribute9": "",
-							"attribute10": "",
-							"attribute11": "",
-							"attribute12": "",
-							"attribute13": "",
-							"attribute14": "BRG10",
-							"attribute15": "",
-							"statusReceipt": "N",
-							"sourceInvoice": "BRG",
-							"statusReceiptMsg": "",
-							"invoiceNum": "",
-							"amountOrig": null,
-							"lastUpdateDate": "2019-11-28",
-							"lastUpdateBy": "-1",
-							"branchCode": "BTN",
-							"branchAccount": "081",
-							"sourceInvoiceType": "NPKBILLING",
-							"remarkToBankId": "BANK_ACCOUNT_ID",
-							"sourceSystem": "NPKBILLING",
-							"comments": "Pembayaran uper",
-							"cmsYn": "N",
-							"tanggalTerima": null,
-							"norekKoran": ""
-						}
-					}
-				],
-				"esbSecurity": {
-					"orgId": "1822",
-					"batchSourceId": "",
-					"lastUpdateLogin": "",
-					"userId": "",
-					"respId": "",
-					"ledgerId": "",
-					"respApplId": "",
-					"batchSourceName": ""
-				}
-			}
+		$branch = (array)$branch;
+		$bank = DB::connection('mdm')->table('TM_BANK')->where([
+			'bank_code' => $arr['payment']['pay_bank_code'],
+			'branch_id' => $arr['payment']['pay_branch_id'],
+			'branch_code' => $arr['payment']['pay_branch_code']
+		])->first();
+		if (empty($bank)) {
+			return ['Success' =>false, 'response' => 'bank not found!'];
 		}
-		';
+		$bank = (array)$bank;
+		$arr['bank'] = $bank;
+		$sendInvPutReceipt = static::sendInvReceipt($arr);
+		$sendInvPutApply = static::sendInvApply($arr);
 
-		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([ // kirim putReceipt
-			"user" => config('endpoint.esbPutReceipt.user'),
-			"pass" => config('endpoint.esbPutReceipt.pass'),
-			"target" => config('endpoint.esbPutReceipt.target'),
-			"json" => $json
-		]);
+		return [ "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }
