@@ -666,7 +666,7 @@ class PlgRequestBooking{
 	    }
 
 	    public static function approvalProformaPLG($input){
-            $getNota = TxHdrNota::find($input['nota_id']);
+            $getNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',$input['nota_id'])->first();
             if (empty($getNota)) {
             	return ['result' => "Fail, proforma not found!", "Success" => false];
             }
