@@ -191,6 +191,7 @@ class PlgEInvo{
 	}
 
 	public static function sendInvProforma($arr){
+		// return ['Success' =>true, 'response' => 'by pass dulu!']; // by pass
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
@@ -377,6 +378,7 @@ class PlgEInvo{
 			return ['Success' =>false, 'response' => 'branch not found!'];
 		}
 		$branch = (array)$branch;
+		$arr['branch'] = $branch;
 		$bank = DB::connection('mdm')->table('TM_BANK')->where([
 			'bank_code' => $arr['payment']['pay_bank_code'],
 			'branch_id' => $arr['payment']['pay_branch_id'],
