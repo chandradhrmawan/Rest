@@ -240,7 +240,7 @@ class PlgEInvo{
 								"bankId":"'.$arr['bank']['bank_id'].'",
 								"customerNumber":"'.$arr['payment']['pay_cust_id'].'",
 								"receiptDate":"'.date('Y-m-d H:i:s', strtotime($arr['payment']['pay_date'])).'",
-								"currencyCode":"'.$arr['payment']['pay_currency'].'",
+								"currencyCode":"'.$arr['nota']['nota_currency_code'].'",
 								"status":"P",
 								"amount":"'.$arr['payment']['pay_amount'].'",
 								"processFlag":"",
