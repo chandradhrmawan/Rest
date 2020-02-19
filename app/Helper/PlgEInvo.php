@@ -191,6 +191,7 @@ class PlgEInvo{
 	}
 
 	public static function sendInvProforma($arr){
+		// return ['Success' =>true, 'response' => 'by pass dulu!']; // by pass
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
@@ -239,7 +240,7 @@ class PlgEInvo{
 								"bankId":"'.$arr['bank']['bank_id'].'",
 								"customerNumber":"'.$arr['payment']['pay_cust_id'].'",
 								"receiptDate":"'.date('Y-m-d H:i:s', strtotime($arr['payment']['pay_date'])).'",
-								"currencyCode":"'.$arr['payment']['pay_currency'].'",
+								"currencyCode":"'.$arr['nota']['nota_currency_code'].'",
 								"status":"P",
 								"amount":"'.$arr['payment']['pay_amount'].'",
 								"processFlag":"",
@@ -377,6 +378,7 @@ class PlgEInvo{
 			return ['Success' =>false, 'response' => 'branch not found!'];
 		}
 		$branch = (array)$branch;
+		$arr['branch'] = $branch;
 		$bank = DB::connection('mdm')->table('TM_BANK')->where([
 			'bank_code' => $arr['payment']['pay_bank_code'],
 			'branch_id' => $arr['payment']['pay_branch_id'],
