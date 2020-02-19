@@ -758,6 +758,7 @@ class PlgRequestBooking{
 	    	$store->pay_type = $input['pay_type'];
 	    	$store->save();
 
+	    	$pay = TxPayment::find($store->pay_id);
 	    	if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
 	    		$directory  = 'omuster/TX_PAYMENT/'.date('d-m-Y').'/';
 	    		$response   = FileUpload::upload_file($input['pay_file'], $directory, "TX_PAYMENT", $store->pay_id);
@@ -767,9 +768,9 @@ class PlgRequestBooking{
 	    			]);
 	    		}
 	    	}
-	    	$pay = TxPayment::find($store->pay_id);
 	    	$arr = [
-	    		"nota" => (array)$getNota
+	    		"nota" => (array)$getNota,
+	    		"payment" => (array)$pay
 	    	];
         	$sendInvPay = PlgEInvo::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {

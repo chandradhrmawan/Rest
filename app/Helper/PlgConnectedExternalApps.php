@@ -30,7 +30,7 @@ class PlgConnectedExternalApps{
 	          if ($e->hasResponse()) {
 	            $error .= $e->getResponse() . "\n";
 	          }
-	          return ["Success"=>false, "request" => $options, "response" => $error];
+	          return ["Success"=>false, "request" => $arr, "response" => $error];
 	        }
 	        $res = json_decode($res->getBody()->getContents(), true);
 	        return ["Success"=>true, "request" => $arr, "response" => $res];

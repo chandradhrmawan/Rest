@@ -388,8 +388,8 @@ class ConnectedExternalApps{
         $vparam = '';
         $hscode = '0000';
         if ($req_type == 'REC' or $req_type == 'BM') {
-          $hscode = DB::connection('mdm')->table('M_CG_HSCODE')->where('COMMODITY_ID', $list->dtl_cmdty_id)->first();
-          $hscode = $hscode->hs_code;
+          $hscode = DB::connection('mdm')->table('TM_COMMODITY')->where('COMMODITY_ID', $list->dtl_cmdty_id)->first();
+          $hscode = $hscode->hscode;
         }
         // first
           if ($req_type == 'BM' and $list->dtl_bm_type == 'Muat' and $listA[$config['head_tab_detil_tl']] == 'Y') {
