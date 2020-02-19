@@ -682,7 +682,7 @@ class PlgRequestBooking{
             	$arr = [
             		'nota' => (array)$getNota,
             	];
-            	$sendInvProforma = PlgEInvo::sendInvProforma($arr);
+            	return $sendInvProforma = PlgEInvo::sendInvProforma($arr);
             	if ($sendInvProforma['Success'] == true) {
 	            	$getNota->nota_status = 2;
 	            	$getNota->save();

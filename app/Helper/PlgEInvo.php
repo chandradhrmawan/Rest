@@ -9,7 +9,7 @@ use App\Helper\PlgConnectedExternalApps;
 class PlgEInvo{
 
 	private static function getJsonInvAR($arr){
-		$hdr = static::getDtlInvAR($arr);
+		$hdr = static::getHdrInvAR($arr);
 		$lines = static::getDtlInvAR($arr);
 		$json = '
 		{
@@ -41,7 +41,7 @@ class PlgEInvo{
 	}
 
 	private static function getHdrInvAR($arr){
-		$hdr = '"header": {
+		return $hdr = '"header": {
 		        	"billerRequestId":"'.$arr['nota']['nota_req_no'].'",
 		        	"orgId":"'.$arr['branch']['branch_org_id'].'",
 		        	"trxNumber":"'.$arr['nota']['nota_no'].'",
@@ -141,7 +141,6 @@ class PlgEInvo{
 		            "tanggalKoreksi": null,
 		            "keteranganKoreksi": ""
 		        }';
-		return json_encode(json_decode($hdr,true));
 	}
 
 	private static function getDtlInvAR($arr){
@@ -188,8 +187,7 @@ class PlgEInvo{
 				"lineDoc": ""
 			},';
 		}
-        $lines = substr($lines, 0,-1);
-        return json_encode(json_decode($lines,true));
+        return $lines = substr($lines, 0,-1);
 	}
 
 	public static function sendInvProforma($arr){
@@ -205,7 +203,6 @@ class PlgEInvo{
 		$sendArr['nDateNotHour'] = $nota_date_noHour;
 		$sendArr['branch'] = $branch;
 		$json = static::getJsonInvAR($sendArr);
-		$json = json_encode(json_decode($json, true));
 		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
         	"user" => config('endpoint.esbInvoicePutAR.user'),
         	"pass" => config('endpoint.esbInvoicePutAR.pass'),
