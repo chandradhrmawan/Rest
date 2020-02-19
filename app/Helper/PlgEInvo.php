@@ -9,7 +9,7 @@ use App\Helper\PlgConnectedExternalApps;
 class PlgEInvo{
 
 	private static function getJsonInvAR($arr){
-		$hdr = static::getDtlInvAR($arr);
+		$hdr = static::getHdrInvAR($arr);
 		$lines = static::getDtlInvAR($arr);
 		$json = '
 		{
@@ -41,7 +41,7 @@ class PlgEInvo{
 	}
 
 	private static function getHdrInvAR($arr){
-		$hdr = '"header": {
+		return $hdr = '"header": {
 		        	"billerRequestId":"'.$arr['nota']['nota_req_no'].'",
 		        	"orgId":"'.$arr['branch']['branch_org_id'].'",
 		        	"trxNumber":"'.$arr['nota']['nota_no'].'",
@@ -141,7 +141,6 @@ class PlgEInvo{
 		            "tanggalKoreksi": null,
 		            "keteranganKoreksi": ""
 		        }';
-		return json_encode(json_decode($hdr,true));
 	}
 
 	private static function getDtlInvAR($arr){
@@ -188,8 +187,7 @@ class PlgEInvo{
 				"lineDoc": ""
 			},';
 		}
-        $lines = substr($lines, 0,-1);
-        return json_encode(json_decode($lines,true));
+        return $lines = substr($lines, 0,-1);
 	}
 
 	public static function sendInvProforma($arr){
@@ -205,7 +203,6 @@ class PlgEInvo{
 		$sendArr['nDateNotHour'] = $nota_date_noHour;
 		$sendArr['branch'] = $branch;
 		$json = static::getJsonInvAR($sendArr);
-		$json = json_encode(json_decode($json, true));
 		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
         	"user" => config('endpoint.esbInvoicePutAR.user'),
         	"pass" => config('endpoint.esbInvoicePutAR.pass'),
@@ -216,6 +213,7 @@ class PlgEInvo{
         if ($res['response']['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
         	$hsl = false;
         }
+		$res['request']['json'] = json_decode($res['request']['json'],true);
 		return ['Success' => $hsl, 'sendInvProformaAR' => $res];
 	}
 
@@ -330,27 +328,27 @@ class PlgEInvo{
 								"paymentCode":"'.$arr['nota']['nota_no'].'",
 								"trxNumber":"'.$arr['nota']['nota_no'].'",
 								"orgId":"'.$arr['branch']['branch_org_id'].'",
-								"amountApplied":"1542550",
+								"amountApplied":"'.$arr['payment']['pay_amount'].'",
 								"cashReceiptId":null,
-								"customerTrxId":null,
+								"customerTrxId":"'.$arr['payment']['pay_cust_id'].'",
 								"paymentScheduleId":null,
-								"bankId":"124009",
-								"receiptSource":"CMS",
-								"legacySystem":"INVOICE",
+								"bankId":"'.$arr['bank']['bank_id'].'",
+								"receiptSource":"ESB",
+								"legacySystem":"NPKSBILLING",
 								"statusTransfer":"N",
 								"errorMessage":null,
 								"requestIdApply":null,
-								"createdBy":"309",
-								"creationDate":"2019-10-15",
-								"lastUpdateBy":"309",
-								"lastUpdateDate":"2019-10-15",
-								"amountPaid":"1542550",
+								"createdBy":"-1",
+								"creationDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
+								"lastUpdateBy":"-1",
+								"lastUpdateDate":"'.date('Y-m-d', strtotime($arr['payment']['pay_create_date'])).'",
+								"amountPaid":"'.$arr['payment']['pay_amount'].'",
 								"epay":"N"
 							}
 						}
 						],
 						"esbSecurity":{
-							"orgId":"1827",
+							"orgId":"'.$arr['branch']['branch_org_id'].'",
 							"batchSourceId":"",
 							"lastUpdateLogin":"",
 							"userId":"",
@@ -374,9 +372,6 @@ class PlgEInvo{
 	}
 
 	public static function sendInvPay($arr){
-		// di by passs dulu
-		return ['Success' => true, 'response' => 'by passs'];
-		// di by passs dulu
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->first();
 		if (empty($branch)) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
@@ -393,8 +388,10 @@ class PlgEInvo{
 		$bank = (array)$bank;
 		$arr['bank'] = $bank;
 		$sendInvPutReceipt = static::sendInvReceipt($arr);
+		$sendInvPutReceipt['request']['json'] = json_decode($sendInvPutReceipt['request']['json'],true);
 		$sendInvPutApply = static::sendInvApply($arr);
+		$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
 
-		return [ "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
+		return [ "Success" => true, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }
