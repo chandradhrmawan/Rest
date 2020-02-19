@@ -93,8 +93,8 @@ class PlgFunctTOS{
 	        	"json" => json_encode(json_decode($json,true))
 	        ]);
 	        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPost');
-					// Simpan ke TX_SERVICES error lit ini
-					// PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+			// Simpan ke TX_SERVICES
+			PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoPostResponse"]["esbBody"]["request"],$res["result"]["result"]);
 
     	}
         return ['sendRequestBookingPLG' => $res];
@@ -369,7 +369,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
+	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA']].'",
+	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
 	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
@@ -422,7 +423,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
+	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA']].'",
+	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
 	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
