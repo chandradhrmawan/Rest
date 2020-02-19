@@ -93,6 +93,9 @@ class PlgFunctTOS{
 	        	"json" => json_encode(json_decode($json,true))
 	        ]);
 	        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPost');
+					// Simpan ke TX_SERVICES
+					PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+
     	}
         return ['sendRequestBookingPLG' => $res];
 	}

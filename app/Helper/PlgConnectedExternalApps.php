@@ -103,18 +103,727 @@ class PlgConnectedExternalApps{
 			return ["result"=>$result, "count"=>count($result)];
 		}
 
-		public static function getRealGati() {
-			$getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
-			foreach ($getIdReal as $value) {
-				$input = ["nota_id"=>1,"id"=>$getIdReal[0]->rec_hdr_id];
-				PlgFunctTOS::getRealPLG($input);
-			}
-			// $getIdReal = DB::connection('omuster')->table('TX_DTL_DEL')->where('DEL_FL_REAL', '1')->select(DB::raw("DISTINCT DEL_HDR_ID"))->get();
-			// foreach ($getIdReal as $value) {
-			// 	$input = ["nota_id"=>2,"id"=>$value->rec_id];
-			// 	PlgFunctTOS::getRealPLG($input);
-			// }
-		}
+		// public static function getRealGati() {
+		// 	$getIdReal = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', '1')->select(DB::raw("DISTINCT REC_HDR_ID"))->get();
+		// 	foreach ($getIdReal as $value) {
+		// 		$input = ["nota_id"=>1,"id"=>$getIdReal[0]->rec_hdr_id];
+		// 		PlgFunctTOS::getRealPLG($input);
+		// 	}
+		// }
+
+
+		// public static function getRealStuffing() {
+		// 	$all 						 = [];
+		//  $det 						 = DB::connection('omuster')->table('TX_DTL_STUFF')->where('STUFF_FL_REAL', "1")->get();
+		//  foreach ($det as $lista) {
+		// 	 $newDt 				 = [];
+		// 	 foreach ($lista as $key => $value) {
+		// 		 $newDt[$key] = $value;
+		// 	 }
+		//
+		// 	 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STUFF')->where('STUFF_ID', $lista->stuff_hdr_id)->get();
+		// 	 foreach ($hdr as $listS) {
+		// 		 foreach ($listS as $key => $value) {
+		// 			 $newDt[$key] = $value;
+		// 		 }
+		// 	 }
+		//
+		// 		 $all[] 				= $newDt;
+		// 	 }
+		//
+		//  $dtl 							= '';
+		//  $arrdtl 						= [];
+		//
+		//  foreach ($all as $list) {
+		// 	 $dtl .= '
+		// 	 {
+		// 		 "NO_CONTAINER"		: "'.$list["stuff_dtl_cont"].'",
+		// 		 "NO_REQUEST"			: "'.$list["stuff_no"].'",
+		// 		 "BRANCH_ID"			: "'.$list["stuff_branch_id"].'"
+		// 	 },';
+		//  }
+		//
+		//  $dtl 	= substr($dtl, 0,-1);
+		//  $json = '
+		//  {
+		// 	 "action" : "generateRealStuffing",
+		// 	 "data": ['.$dtl.']
+		//  }';
+		//
+		//  $json = base64_encode(json_encode(json_decode($json,true)));
+		//  $json = '
+		// 	 {
+		// 			 "repoGetRequest": {
+		// 					 "esbHeader": {
+		// 							 "internalId": "",
+		// 							 "externalId": "",
+		// 							 "timestamp": "",
+		// 							 "responseTimestamp": "",
+		// 							 "responseCode": "",
+		// 							 "responseMessage": ""
+		// 					 },
+		// 					 "esbBody": {
+		// 							 "request": "'.$json.'"
+		// 					 },
+		// 					 "esbSecurity": {
+		// 							 "orgId": "",
+		// 							 "batchSourceId": "",
+		// 							 "lastUpdateLogin": "",
+		// 							 "userId": "",
+		// 							 "respId": "",
+		// 							 "ledgerId": "",
+		// 							 "respAppId": "",
+		// 							 "batchSourceName": ""
+		// 					 }
+		// 			 }
+		// 	 }
+		// 		 ';
+		//  $json = json_encode(json_decode($json,true));
+		//  $arr = [
+		// 				 "user"		 		=> config('endpoint.tosGetPLG.user'),
+		// 				 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		// 				 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		// 				 "json" 		 	=> $json
+		// 			 ];
+		//  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		//  $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		//
+		//  if (empty($res["result"]["result"])) {
+		// 	 return "STUFF is uptodate";
+		//  }
+		//
+		//  static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		//
+		//  foreach ($res["result"]["result"] as $value) {
+		// 	$stufBranch 				= $value["REAL_STUFF_BRANCH_ID"];
+		//  	$stuffReq 					= $value["REAL_STUFF_NOREQ"];
+		// 	$stuffCont 					= $value["REAL_STUFF_CONT"];
+		// 	$stuffDate 					= date('Y-m-d', strtotime($value["REAL_STUFF_DATE"]));
+		//
+		// 	$findHdrStuff 			= [
+		// 		"STUFF_BRANCH_ID" => $stufBranch,
+		// 		"STUFF_NO"				=> $stuffReq
+		// 	];
+		//
+		// 	$stuffHDR 					= DB::connection('omuster')->table('TX_HDR_STUFF')->where($findHdrStuff)->first();
+		//
+		// 	$findDtlStuff 			= [
+		// 		"STUFF_HDR_ID"		=> $stuffHDR->stuff_id,
+		// 		"STUFF_DTL_CONT"	=> $stuffCont
+		// 	];
+		//
+		// 	$findHistory 				= [
+		// 		"NO_REQUEST" 			=> $stuffReq,
+		// 		"NO_CONTAINER" 		=> $stuffCont,
+		// 		"KEGIATAN"				=> "13"
+		// 	];
+		//
+		// 	$storeHistory 			= [
+		// 		"NO_CONTAINER" 		=> $stuffCont,
+		// 		"NO_REQUEST"			=> $stuffReq,
+		// 		"KEGIATAN"				=> "13",
+		// 		"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($stuffDate)),
+		// 		"ID_USER"					=> $value["REAL_STUFF_OPERATOR"],
+		// 		"ID_YARD"					=> "",
+		// 		"STATUS_CONT"			=> "",
+		// 		"VVD_ID"					=> "",
+		// 		"COUNTER"					=> $value["REAL_STUFF_COUNTER"],
+		// 		"SUB_COUNTER"			=> "",
+		// 		"WHY"							=> ""
+		// 	];
+		//
+		//
+		// 	$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+		//
+		// 	if (empty($cekHistory)) {
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+		// 	} else {
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+		// 	}
+		//
+		// 	$setReal 						= DB::connection('omuster')->table('TX_DTL_STUFF')->where($findDtlStuff)->update(["STUFF_DTL_REAL_DATE"=>$stuffDate,"STUFF_FL_REAL"=>4]);
+		// 	echo "Realization Stuffing Done";
+		// 	}
+		// }
+		//
+		// public static function getRealStripping() {
+		//  $all 						 = [];
+		//  $det 						 = DB::connection('omuster')->table('TX_DTL_STRIPP')->where('STRIPP_FL_REAL', "1")->get();
+		//  foreach ($det as $lista) {
+		// 	 $newDt 				 = [];
+		// 	 foreach ($lista as $key => $value) {
+		// 		 $newDt[$key] = $value;
+		// 	 }
+		//
+		// 	 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STRIPP')->where('STRIPP_ID', $lista->stripp_hdr_id)->get();
+		// 	 foreach ($hdr as $listS) {
+		// 		 foreach ($listS as $key => $value) {
+		// 			 $newDt[$key] = $value;
+		// 		 }
+		// 	 }
+		//
+		// 		 $all[] 				= $newDt;
+		// 	 }
+		//
+		//  $dtl 							= '';
+		//  $arrdtl 						= [];
+		//
+		//  // return $all;
+		//
+		//  foreach ($all as $list) {
+		// 	 $dtl .= '
+		// 	 {
+		// 		 "NO_CONTAINER"		: "'.$list["stripp_dtl_cont"].'",
+		// 		 "NO_REQUEST"			: "'.$list["stripp_no"].'",
+		// 		 "BRANCH_ID"			: "'.$list["stripp_branch_id"].'"
+		// 	 },';
+		//
+		//  $dtl 	= substr($dtl, 0,-1);
+		//  $json = '
+		//  {
+		// 	 "action" : "generateRealStripping",
+		// 	 "data": ['.$dtl.']
+		//  }';
+		//
+		//  $json = base64_encode(json_encode(json_decode($json,true)));
+		//  $json = '
+		// 	 {
+		// 			 "repoGetRequest": {
+		// 					 "esbHeader": {
+		// 							 "internalId": "",
+		// 							 "externalId": "",
+		// 							 "timestamp": "",
+		// 							 "responseTimestamp": "",
+		// 							 "responseCode": "",
+		// 							 "responseMessage": ""
+		// 					 },
+		// 					 "esbBody": {
+		// 							 "request": "'.$json.'"
+		// 					 },
+		// 					 "esbSecurity": {
+		// 							 "orgId": "",
+		// 							 "batchSourceId": "",
+		// 							 "lastUpdateLogin": "",
+		// 							 "userId": "",
+		// 							 "respId": "",
+		// 							 "ledgerId": "",
+		// 							 "respAppId": "",
+		// 							 "batchSourceName": ""
+		// 					 }
+		// 			 }
+		// 	 }
+		// 		 ';
+		//  $json = json_encode(json_decode($json,true));
+		//  $arr = [
+		// 				 "user"		 		=> config('endpoint.tosGetPLG.user'),
+		// 				 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		// 				 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		// 				 "json" 		 	=> $json
+		// 			 ];
+		//  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		//  $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		//
+		//  if (empty($res["result"]["result"])) {
+		// 	 return "STRIPP is uptodate";
+		//  }
+		//
+		//  static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		//
+		//  // return $res["result"]["result"];
+		//  foreach ($res["result"]["result"] as $value) {
+		// 	$stripBranch 				= $value["REAL_STRIP_BRANCH_ID"];
+		// 	$stripReq 					= $value["REAL_STRIP_NOREQ"];
+		// 	$stripCont 					= $value["REAL_STRIP_CONT"];
+		// 	$stripDate 					= date('Y-m-d', strtotime($value["REAL_STRIP_DATE"]));
+		//
+		// 	$findHdrStrip 			= [
+		// 		"STRIPP_BRANCH_ID"=> $stripBranch,
+		// 		"STRIPP_NO"				=> $stripReq
+		// 	];
+		//
+		// 	$stripHDR 					= DB::connection('omuster')->table('TX_HDR_STRIPP')->where($findHdrStrip)->first();
+		//
+		// 	$findDtlStuff 			= [
+		// 		"STRIPP_HDR_ID"		=> $stripHDR->stripp_id,
+		// 		"STRIPP_DTL_CONT"	=> $stripCont
+		// 	];
+		//
+		// 	$findHistory 				= [
+		// 		"NO_REQUEST" 			=> $stripReq,
+		// 		"NO_CONTAINER" 		=> $stripCont,
+		// 		"KEGIATAN"				=> "14"
+		// 	];
+		//
+		// 	$storeHistory 			= [
+		// 		"NO_CONTAINER" 		=> $stripCont,
+		// 		"NO_REQUEST"			=> $stripReq,
+		// 		"KEGIATAN"				=> "14",
+		// 		"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($stripDate)),
+		// 		"ID_USER"					=> $value["REAL_STRIP_OPERATOR"],
+		// 		"ID_YARD"					=> "",
+		// 		"STATUS_CONT"			=> "",
+		// 		"VVD_ID"					=> "",
+		// 		"COUNTER"					=> $value["REAL_STRIP_COUNTER"],
+		// 		"SUB_COUNTER"			=> "",
+		// 		"WHY"							=> ""
+		// 	];
+		//
+		// 	$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+		//
+		// 	if (empty($cekHistory)) {
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+		// 	} else {
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+		// 	}
+		//
+		// 		$setReal 						= DB::connection('omuster')->table('TX_DTL_STRIPP')->where($findDtlStuff)->update(["STRIPP_DTL_REAL_DATE"=>$stripDate,"STRIPP_FL_REAL"=>5]);
+		// 		echo "Realization Stripping Done";
+		// 	 	}
+		// 	}
+		// }
+		//
+		// public static function getRealFumigasi() {
+ 		//  $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->leftJoin('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('B.FUMI_FL_REAL', "1")->get();
+ 		//  $dtl 							= '';
+ 		//  $arrdtl 						= [];
+		//  $all 							= json_decode(json_encode($all),TRUE);
+		//
+		//  foreach ($all as $list) {
+		// 	 $dtl .= '
+		// 	 {
+		// 		 "NO_CONTAINER"		: "'.$list["fumi_dtl_cont"].'",
+		// 		 "NO_REQUEST"			: "'.$list["fumi_no"].'",
+		// 		 "BRANCH_ID"			: "'.$list["fumi_branch_id"].'"
+		// 	 },';
+		//
+		//  $dtl 	= substr($dtl, 0,-1);
+		//  $json = '
+		//  {
+		// 	 "action" : "generateFumi",
+		// 	 "data": ['.$dtl.']
+		//  }';
+		//
+		//  $json = base64_encode(json_encode(json_decode($json,true)));
+		//  $json = '
+		// 	 {
+		// 			 "repoGetRequest": {
+		// 					 "esbHeader": {
+		// 							 "internalId": "",
+		// 							 "externalId": "",
+		// 							 "timestamp": "",
+		// 							 "responseTimestamp": "",
+		// 							 "responseCode": "",
+		// 							 "responseMessage": ""
+		// 					 },
+		// 					 "esbBody": {
+		// 							 "request": "'.$json.'"
+		// 					 },
+		// 					 "esbSecurity": {
+		// 							 "orgId": "",
+		// 							 "batchSourceId": "",
+		// 							 "lastUpdateLogin": "",
+		// 							 "userId": "",
+		// 							 "respId": "",
+		// 							 "ledgerId": "",
+		// 							 "respAppId": "",
+		// 							 "batchSourceName": ""
+		// 					 }
+		// 			 }
+		// 	 }
+		// 		 ';
+		//  $json = json_encode(json_decode($json,true));
+		//  $arr = [
+		// 				 "user"		 		=> config('endpoint.tosGetPLG.user'),
+		// 				 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		// 				 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		// 				 "json" 		 	=> $json
+		// 			 ];
+		//  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		//  $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		//
+		//  if (empty($res["result"]["result"])) {
+		// 	 return "Fumi is uptodate";
+		//  }
+		//
+		//  static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		//
+		//  // return $res["result"]["result"];
+		//  foreach ($res["result"]["result"] as $value) {
+		// 	$fumiBranch 				= $value["REAL_FUMI_BRANCH_ID"];
+		//  	$fumiReq 						= $value["REAL_FUMI_NOREQ"];
+		// 	$fumiCont 					= $value["REAL_FUMI_CONT"];
+		// 	$fumiDate 					= date('Y-m-d', strtotime($value["REAL_FUMI_DATE"]));
+		//
+		// 	$findHdrFumi 			= [
+		// 		"FUMI_BRANCH_ID" => $fumiBranch,
+		// 		"FUMI_NO"				=> $fumiReq
+		// 	];
+		//
+		// 	$fumiHDR 					= DB::connection('omuster')->table('TX_HDR_FUMI')->where($findHdrFumi)->first();
+		//
+		// 	$findDtlFumi 			= [
+		// 		"FUMI_HDR_ID"		=> $fumiHDR->fumi_id,
+		// 		"FUMI_DTL_CONT"	=> $fumiCont
+		// 	];
+		//
+		// 	$findHistory 				= [
+		// 		"NO_REQUEST" 			=> $fumiReq,
+		// 		"NO_CONTAINER" 		=> $fumiCont,
+		// 		"KEGIATAN"				=> "15"
+		// 	];
+		//
+		// 	$storeHistory 			= [
+		// 		"NO_CONTAINER" 		=> $fumiCont,
+		// 		"NO_REQUEST"			=> $fumiReq,
+		// 		"KEGIATAN"				=> "15",
+		// 		"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($fumiDate)),
+		// 		"ID_USER"					=> $value["REAL_FUMI_OPERATOR"],
+		// 		"ID_YARD"					=> "",
+		// 		"STATUS_CONT"			=> "",
+		// 		"VVD_ID"					=> "",
+		// 		"COUNTER"					=> $value["REAL_FUMI_COUNTER"],
+		// 		"SUB_COUNTER"			=> "",
+		// 		"WHY"							=> ""
+		// 	];
+		//
+		//
+		// 	$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+		//
+		// 	// return $findDtlFumi;
+		// 	if (empty($cekHistory)) {
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+		// 	} else {
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+		// 	}
+		//
+		// 	$setReal 						= DB::connection('omuster')->table('TX_DTL_FUMI')->where($findDtlFumi)->update(["FUMI_DTL_REAL_DATE"=>$fumiDate,"FUMI_FL_REAL"=>5]);
+		// 	echo "Realization Fumigasi Done";
+		// 	 	}
+		// 	}
+		// }
+		//
+		// public static function getRealPlug() {
+ 		//  $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->whereIn('B.PLUG_FL_REAL', ["1","7"])->get();
+ 		//  $dtl 							= '';
+ 		//  $arrdtl 						= [];
+		//  $all 							= json_decode(json_encode($all),TRUE);
+		//
+		//  foreach ($all as $list) {
+		// 	 $dtl .= '
+		// 	 {
+		// 		 "NO_CONTAINER"		: "'.$list["plug_dtl_cont"].'",
+		// 		 "NO_REQUEST"			: "'.$list["plug_no"].'",
+		// 		 "BRANCH_ID"			: "'.$list["plug_branch_id"].'"
+		// 	 },';
+		//  }
+		//
+		//  $dtl 	= substr($dtl, 0,-1);
+		//  $json = '
+		//  {
+		// 	 "action" : "generatePlugStart",
+		// 	 "data": ['.$dtl.']
+		//  }';
+		//
+		//  $json = base64_encode(json_encode(json_decode($json,true)));
+		//  $json = '
+		// 	 {
+		// 			 "repoGetRequest": {
+		// 					 "esbHeader": {
+		// 							 "internalId": "",
+		// 							 "externalId": "",
+		// 							 "timestamp": "",
+		// 							 "responseTimestamp": "",
+		// 							 "responseCode": "",
+		// 							 "responseMessage": ""
+		// 					 },
+		// 					 "esbBody": {
+		// 							 "request": "'.$json.'"
+		// 					 },
+		// 					 "esbSecurity": {
+		// 							 "orgId": "",
+		// 							 "batchSourceId": "",
+		// 							 "lastUpdateLogin": "",
+		// 							 "userId": "",
+		// 							 "respId": "",
+		// 							 "ledgerId": "",
+		// 							 "respAppId": "",
+		// 							 "batchSourceName": ""
+		// 					 }
+		// 			 }
+		// 	 }
+		// 		 ';
+		//
+		//  $json = json_encode(json_decode($json,true));
+		//  $arr = [
+		// 				 "user"		 		=> config('endpoint.tosGetPLG.user'),
+		// 				 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		// 				 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		// 				 "json" 		 	=> $json
+		// 			 ];
+		//  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		//  $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		//
+		//  if (empty($res["result"]["result"])) {
+		// 	 return "PLUG Start is uptodate";
+		//  }
+		//
+		//  static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		//
+		//  // return $res["result"]["result"];
+		//  foreach ($res["result"]["result"] as $value) {
+		// 	$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
+		//  	$plugReq 						= $value["REAL_PLUG_NOREQ"];
+		// 	$plugCont 					= $value["REAL_PLUG_CONT"];
+		// 	$plugStatus 				= $value["REAL_PLUG_STATUS"];
+		// 	$plugDate 					= date('Y-m-d', strtotime($value["REAL_PLUG_DATE"]));
+		//
+		// 	$findHdrPlug 			= [
+		// 		"PLUG_BRANCH_ID" => $plugBranch,
+		// 		"PLUG_NO"				=> $plugReq
+		// 	];
+		//
+		//
+		// 	$plugHDR 					= DB::connection('omuster')->table('TX_HDR_PLUG')->where($findHdrPlug)->first();
+		//
+		// 	$findDtlPlug 			= [
+		// 		"PLUG_HDR_ID"		=> $plugHDR->plug_id,
+		// 		"PLUG_DTL_CONT"	=> $plugCont
+		// 	];
+		//
+		// 	$storeHistory 			= [
+		// 		"NO_CONTAINER" 		=> $plugCont,
+		// 		"NO_REQUEST"			=> $plugReq,
+		// 		"KEGIATAN"				=> "16",
+		// 		"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($plugDate)),
+		// 		"ID_USER"					=> $value["REAL_PLUG_OPERATOR"],
+		// 		"ID_YARD"					=> "",
+		// 		"STATUS_CONT"			=> "",
+		// 		"VVD_ID"					=> "",
+		// 		"COUNTER"					=> $value["REAL_PLUG_COUNTER"],
+		// 		"SUB_COUNTER"			=> "",
+		// 		"WHY"							=> ""
+		// 	];
+		//
+		// 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+		// 		if ($plugStatus == "1") {
+		// 			$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_START_DATE"=>$plugDate,"PLUG_FL_REAL"=>7]);
+		// 		} else {
+		// 			$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_END_DATE"=>$plugDate,"PLUG_FL_REAL"=>8]);
+		// 		}
+		//
+		// 	}
+		// }
+		//
+		// public static function getRealRecBRG() {
+ 		//  $all 						  = DB::connection('omuster')
+		//  											->table('TX_HDR_REC_CARGO A')
+		// 											->join('TX_DTL_REC_CARGO B', 'B.REC_CARGO_HDR_ID', '=', 'A.REC_CARGO_ID')
+		// 											->where('B.REC_CARGO_FL_REAL', "1")
+		// 											->get();
+		//
+ 		//  $dtl 							= '';
+ 		//  $arrdtl 						= [];
+		//  $all 							= json_decode(json_encode($all),TRUE);
+		//
+		//  foreach ($all as $list) {
+		// 	 $dtl .= '
+		// 	 {
+		// 		 "NO_CONTAINER"		: "'.$list["rec_cargo_dtl_si_no"].'",
+		// 		 "NO_REQUEST"			: "'.$list["rec_cargo_no"].'",
+		// 		 "BRANCH_ID"			: "'.$list["rec_cargo_branch_id"].'"
+		// 	 },';
+		//  }
+		//
+		//  $dtl 	= substr($dtl, 0,-1);
+		//  $json = '
+		//  {
+		// 	 "action" : "generateRecRealStorage",
+		// 	 "data": ['.$dtl.']
+		//  }';
+		//
+		//  $json = base64_encode(json_encode(json_decode($json,true)));
+		//  $json = '
+		// 	 {
+		// 			 "repoGetRequest": {
+		// 					 "esbHeader": {
+		// 							 "internalId": "",
+		// 							 "externalId": "",
+		// 							 "timestamp": "",
+		// 							 "responseTimestamp": "",
+		// 							 "responseCode": "",
+		// 							 "responseMessage": ""
+		// 					 },
+		// 					 "esbBody": {
+		// 							 "request": "'.$json.'"
+		// 					 },
+		// 					 "esbSecurity": {
+		// 							 "orgId": "",
+		// 							 "batchSourceId": "",
+		// 							 "lastUpdateLogin": "",
+		// 							 "userId": "",
+		// 							 "respId": "",
+		// 							 "ledgerId": "",
+		// 							 "respAppId": "",
+		// 							 "batchSourceName": ""
+		// 					 }
+		// 			 }
+		// 	 }
+		// 		 ';
+		//
+		//  $json = json_encode(json_decode($json,true));
+		//  $arr = [
+		// 				 "user"		 		=> config('endpoint.tosGetPLG.user'),
+		// 				 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		// 				 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		// 				 "json" 		 	=> $json
+		// 			 ];
+		//  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		//  $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		//
+		//  if (empty($res["result"]["result"])) {
+		// 	 return " Real Receiving Cargo is uptodate ";
+		//  }
+		//
+		//  static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		//
+		//  // return $res["result"]["result"];
+		//  foreach ($res["result"]["result"] as $value) {
+		// 	$recBrgBranch 				= $value["BRANCH_ID"];
+		//  	$recBrgReq 						= $value["NO_REQUEST"];
+		// 	$recBrgCont 					= $value["NO_CONTAINER"];
+		// 	$recBrgJml 						= $value["JUMLAH"];
+		//
+		// 	$findHdrRecBrg 				= [
+		// 		"REC_CARGO_BRANCH_ID" => $recBrgBranch,
+		// 		"REC_CARGO_NO"				=> $recBrgReq
+		// 	];
+		//
+		//
+		// 	$recBrgHDR 					= DB::connection('omuster')->table('TX_HDR_REC_CARGO')->where($findHdrRecBrg)->first();
+		//
+		// 	$findDtlRecBrg 			= [
+		// 		"REC_CARGO_HDR_ID"		=> $recBrgHDR->rec_cargo_id,
+		// 		"REC_CARGO_DTL_SI_NO"	=> $recBrgCont
+		// 		];
+		//  	}
+		//
+		// 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_DTL_REAL_QTY"=>$recBrgJml, "REC_CARGO_REMAINING_QTY"=>$recBrgJml]);
+		//
+		//  	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
+		// 	$qty 								= $dataDetail->rec_cargo_dtl_qty;
+		// 	$qtyReal 						= $dataDetail->rec_cargo_dtl_real_qty;
+		//
+		//
+		// 	if ($qty <= $qtyReal) {
+		// 		$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>10]);
+		// 	}
+		// }
+		//
+		// public static function getRealDelBRG() {
+ 		//  $all 						  = DB::connection('omuster')
+		//  											->table('TX_HDR_DEL_CARGO A')
+		// 											->join('TX_DTL_DEL_CARGO B', 'B.DEL_CARGO_HDR_ID', '=', 'A.DEL_CARGO_ID')
+		// 											->where('B.DEL_CARGO_FL_REAL', "1")
+		// 											->get();
+		//
+		//
+ 		//  $dtl 							= '';
+ 		//  $arrdtl 						= [];
+		//  $all 							= json_decode(json_encode($all),TRUE);
+		//
+		//  foreach ($all as $list) {
+		// 	 $dtl .= '
+		// 	 {
+		// 		 "NO_CONTAINER"		: "'.$list["del_cargo_dtl_si_no"].'",
+		// 		 "NO_REQUEST"			: "'.$list["del_cargo_no"].'",
+		// 		 "BRANCH_ID"			: "'.$list["del_cargo_branch_id"].'"
+		// 	 },';
+		//  }
+		//
+		//  $dtl 	= substr($dtl, 0,-1);
+		//  $json = '
+		//  {
+		// 	 "action" : "generateDelRealStorage",
+		// 	 "data": ['.$dtl.']
+		//  }';
+		//
+		//  $json = base64_encode(json_encode(json_decode($json,true)));
+		//  $json = '
+		// 	 {
+		// 			 "repoGetRequest": {
+		// 					 "esbHeader": {
+		// 							 "internalId": "",
+		// 							 "externalId": "",
+		// 							 "timestamp": "",
+		// 							 "responseTimestamp": "",
+		// 							 "responseCode": "",
+		// 							 "responseMessage": ""
+		// 					 },
+		// 					 "esbBody": {
+		// 							 "request": "'.$json.'"
+		// 					 },
+		// 					 "esbSecurity": {
+		// 							 "orgId": "",
+		// 							 "batchSourceId": "",
+		// 							 "lastUpdateLogin": "",
+		// 							 "userId": "",
+		// 							 "respId": "",
+		// 							 "ledgerId": "",
+		// 							 "respAppId": "",
+		// 							 "batchSourceName": ""
+		// 					 }
+		// 			 }
+		// 	 }
+		// 		 ';
+		//
+		//  $json = json_encode(json_decode($json,true));
+		//  $arr = [
+		// 				 "user"		 		=> config('endpoint.tosGetPLG.user'),
+		// 				 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		// 				 "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		// 				 "json" 		 	=> $json
+		// 			 ];
+		//  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		//  $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		//
+		//  if (empty($res["result"]["result"])) {
+		// 	 return " Real Receiving Cargo is uptodate ";
+		//  }
+		//
+		//  // static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+		//
+		//  // return $res["result"]["result"];
+		//  foreach ($res["result"]["result"] as $value) {
+		// 	$delBrgBranch 				= $value["BRANCH_ID"];
+		//  	$delBrgReq 						= $value["NO_REQUEST"];
+		// 	$delBrgCont 					= $value["NO_CONTAINER"];
+		// 	$delBrgJml 						= $value["JUMLAH"];
+		//
+		// 	$findHdrDelBrg 				= [
+		// 		"DEL_CARGO_BRANCH_ID" => $delBrgBranch,
+		// 		"DEL_CARGO_NO"				=> $delBrgReq
+		// 	];
+		//
+		// 	$delBrgHDR 					= DB::connection('omuster')->table('TX_HDR_DEL_CARGO')->where($findHdrDelBrg)->first();
+		//
+		// 	$findDtlDelBrg 			= [
+		// 		"DEL_CARGO_HDR_ID"		=> $delBrgHDR->del_cargo_id,
+		// 		"DEL_CARGO_DTL_SI_NO"	=> $delBrgCont
+		// 		];
+		//  	}
+		//
+		// 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_DTL_REAL_QTY"=>$delBrgJml]);
+		//
+		// 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->first();
+		// 	$qty 								= $dataDetail->del_cargo_dtl_qty;
+		// 	$qtyReal 						= $dataDetail->del_cargo_dtl_real_qty;
+		//
+		//
+		// 	if ($qty <= $qtyReal) {
+		// 		$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>11]);
+		// 	}
+		// }
+		//
 
 		public static function getUpdatePlacement(){
 		  $all 						 = [];
@@ -201,7 +910,7 @@ class PlgConnectedExternalApps{
 		          "json" 		 	=> $json
 		        ];
 		  $res 							 	= static::sendRequestToExtJsonMet($arr);
-		  $res				 			 	= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		  $res				 			 	= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
 			if (empty($res["result"]["result"])) {
 				return "Placement is uptodate";
@@ -283,718 +992,6 @@ class PlgConnectedExternalApps{
 		  }
 		}
 
-		public static function getRealStuffing() {
-			$all 						 = [];
-		 $det 						 = DB::connection('omuster')->table('TX_DTL_STUFF')->where('STUFF_FL_REAL', "1")->get();
-		 foreach ($det as $lista) {
-			 $newDt 				 = [];
-			 foreach ($lista as $key => $value) {
-				 $newDt[$key] = $value;
-			 }
-
-			 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STUFF')->where('STUFF_ID', $lista->stuff_hdr_id)->get();
-			 foreach ($hdr as $listS) {
-				 foreach ($listS as $key => $value) {
-					 $newDt[$key] = $value;
-				 }
-			 }
-
-				 $all[] 				= $newDt;
-			 }
-
-		 $dtl 							= '';
-		 $arrdtl 						= [];
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["stuff_dtl_cont"].'",
-				 "NO_REQUEST"			: "'.$list["stuff_no"].'",
-				 "BRANCH_ID"			: "'.$list["stuff_branch_id"].'"
-			 },';
-		 }
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generateRealStuffing",
-			 "data": ['.$dtl.']
-		 }';
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return "STUFF is uptodate";
-		 }
-
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
-		 foreach ($res["result"]["result"] as $value) {
-			$stufBranch 				= $value["REAL_STUFF_BRANCH_ID"];
-		 	$stuffReq 					= $value["REAL_STUFF_NOREQ"];
-			$stuffCont 					= $value["REAL_STUFF_CONT"];
-			$stuffDate 					= date('Y-m-d', strtotime($value["REAL_STUFF_DATE"]));
-
-			$findHdrStuff 			= [
-				"STUFF_BRANCH_ID" => $stufBranch,
-				"STUFF_NO"				=> $stuffReq
-			];
-
-			$stuffHDR 					= DB::connection('omuster')->table('TX_HDR_STUFF')->where($findHdrStuff)->first();
-
-			$findDtlStuff 			= [
-				"STUFF_HDR_ID"		=> $stuffHDR->stuff_id,
-				"STUFF_DTL_CONT"	=> $stuffCont
-			];
-
-			$findHistory 				= [
-				"NO_REQUEST" 			=> $stuffReq,
-				"NO_CONTAINER" 		=> $stuffCont,
-				"KEGIATAN"				=> "13"
-			];
-
-			$storeHistory 			= [
-				"NO_CONTAINER" 		=> $stuffCont,
-				"NO_REQUEST"			=> $stuffReq,
-				"KEGIATAN"				=> "13",
-				"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($stuffDate)),
-				"ID_USER"					=> $value["REAL_STUFF_OPERATOR"],
-				"ID_YARD"					=> "",
-				"STATUS_CONT"			=> "",
-				"VVD_ID"					=> "",
-				"COUNTER"					=> $value["REAL_STUFF_COUNTER"],
-				"SUB_COUNTER"			=> "",
-				"WHY"							=> ""
-			];
-
-
-			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
-
-			if (empty($cekHistory)) {
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
-			} else {
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
-			}
-
-			$setReal 						= DB::connection('omuster')->table('TX_DTL_STUFF')->where($findDtlStuff)->update(["STUFF_DTL_REAL_DATE"=>$stuffDate,"STUFF_FL_REAL"=>4]);
-			echo "Realization Stuffing Done";
-			}
-		}
-
-		public static function getRealStripping() {
-		 $all 						 = [];
-		 $det 						 = DB::connection('omuster')->table('TX_DTL_STRIPP')->where('STRIPP_FL_REAL', "1")->get();
-		 foreach ($det as $lista) {
-			 $newDt 				 = [];
-			 foreach ($lista as $key => $value) {
-				 $newDt[$key] = $value;
-			 }
-
-			 $hdr 		 			 = DB::connection('omuster')->table('TX_HDR_STRIPP')->where('STRIPP_ID', $lista->stripp_hdr_id)->get();
-			 foreach ($hdr as $listS) {
-				 foreach ($listS as $key => $value) {
-					 $newDt[$key] = $value;
-				 }
-			 }
-
-				 $all[] 				= $newDt;
-			 }
-
-		 $dtl 							= '';
-		 $arrdtl 						= [];
-
-		 // return $all;
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["stripp_dtl_cont"].'",
-				 "NO_REQUEST"			: "'.$list["stripp_no"].'",
-				 "BRANCH_ID"			: "'.$list["stripp_branch_id"].'"
-			 },';
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generateRealStripping",
-			 "data": ['.$dtl.']
-		 }';
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return "STRIPP is uptodate";
-		 }
-
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
-		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
-			$stripBranch 				= $value["REAL_STRIP_BRANCH_ID"];
-			$stripReq 					= $value["REAL_STRIP_NOREQ"];
-			$stripCont 					= $value["REAL_STRIP_CONT"];
-			$stripDate 					= date('Y-m-d', strtotime($value["REAL_STRIP_DATE"]));
-
-			$findHdrStrip 			= [
-				"STRIPP_BRANCH_ID"=> $stripBranch,
-				"STRIPP_NO"				=> $stripReq
-			];
-
-			$stripHDR 					= DB::connection('omuster')->table('TX_HDR_STRIPP')->where($findHdrStrip)->first();
-
-			$findDtlStuff 			= [
-				"STRIPP_HDR_ID"		=> $stripHDR->stripp_id,
-				"STRIPP_DTL_CONT"	=> $stripCont
-			];
-
-			$findHistory 				= [
-				"NO_REQUEST" 			=> $stripReq,
-				"NO_CONTAINER" 		=> $stripCont,
-				"KEGIATAN"				=> "14"
-			];
-
-			$storeHistory 			= [
-				"NO_CONTAINER" 		=> $stripCont,
-				"NO_REQUEST"			=> $stripReq,
-				"KEGIATAN"				=> "14",
-				"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($stripDate)),
-				"ID_USER"					=> $value["REAL_STRIP_OPERATOR"],
-				"ID_YARD"					=> "",
-				"STATUS_CONT"			=> "",
-				"VVD_ID"					=> "",
-				"COUNTER"					=> $value["REAL_STRIP_COUNTER"],
-				"SUB_COUNTER"			=> "",
-				"WHY"							=> ""
-			];
-
-			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
-
-			if (empty($cekHistory)) {
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
-			} else {
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
-			}
-
-				$setReal 						= DB::connection('omuster')->table('TX_DTL_STRIPP')->where($findDtlStuff)->update(["STRIPP_DTL_REAL_DATE"=>$stripDate,"STRIPP_FL_REAL"=>5]);
-				echo "Realization Stripping Done";
-			 	}
-			}
-		}
-
-		public static function getRealFumigasi() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_FUMI A')->leftJoin('TX_DTL_FUMI B', 'B.FUMI_HDR_ID', '=', 'A.FUMI_ID')->where('B.FUMI_FL_REAL', "1")->get();
- 		 $dtl 							= '';
- 		 $arrdtl 						= [];
-		 $all 							= json_decode(json_encode($all),TRUE);
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["fumi_dtl_cont"].'",
-				 "NO_REQUEST"			: "'.$list["fumi_no"].'",
-				 "BRANCH_ID"			: "'.$list["fumi_branch_id"].'"
-			 },';
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generateFumi",
-			 "data": ['.$dtl.']
-		 }';
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return "Fumi is uptodate";
-		 }
-
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
-		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
-			$fumiBranch 				= $value["REAL_FUMI_BRANCH_ID"];
-		 	$fumiReq 						= $value["REAL_FUMI_NOREQ"];
-			$fumiCont 					= $value["REAL_FUMI_CONT"];
-			$fumiDate 					= date('Y-m-d', strtotime($value["REAL_FUMI_DATE"]));
-
-			$findHdrFumi 			= [
-				"FUMI_BRANCH_ID" => $fumiBranch,
-				"FUMI_NO"				=> $fumiReq
-			];
-
-			$fumiHDR 					= DB::connection('omuster')->table('TX_HDR_FUMI')->where($findHdrFumi)->first();
-
-			$findDtlFumi 			= [
-				"FUMI_HDR_ID"		=> $fumiHDR->fumi_id,
-				"FUMI_DTL_CONT"	=> $fumiCont
-			];
-
-			$findHistory 				= [
-				"NO_REQUEST" 			=> $fumiReq,
-				"NO_CONTAINER" 		=> $fumiCont,
-				"KEGIATAN"				=> "15"
-			];
-
-			$storeHistory 			= [
-				"NO_CONTAINER" 		=> $fumiCont,
-				"NO_REQUEST"			=> $fumiReq,
-				"KEGIATAN"				=> "15",
-				"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($fumiDate)),
-				"ID_USER"					=> $value["REAL_FUMI_OPERATOR"],
-				"ID_YARD"					=> "",
-				"STATUS_CONT"			=> "",
-				"VVD_ID"					=> "",
-				"COUNTER"					=> $value["REAL_FUMI_COUNTER"],
-				"SUB_COUNTER"			=> "",
-				"WHY"							=> ""
-			];
-
-
-			$cekHistory 				= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
-
-			// return $findDtlFumi;
-			if (empty($cekHistory)) {
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
-			} else {
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
-			}
-
-			$setReal 						= DB::connection('omuster')->table('TX_DTL_FUMI')->where($findDtlFumi)->update(["FUMI_DTL_REAL_DATE"=>$fumiDate,"FUMI_FL_REAL"=>5]);
-			echo "Realization Fumigasi Done";
-			 	}
-			}
-		}
-
-		public static function getRealPlug() {
- 		 $all 						  = DB::connection('omuster')->table('TX_HDR_PLUG A')->leftJoin('TX_DTL_PLUG B', 'B.PLUG_HDR_ID', '=', 'A.PLUG_ID')->whereIn('B.PLUG_FL_REAL', ["1","7"])->get();
- 		 $dtl 							= '';
- 		 $arrdtl 						= [];
-		 $all 							= json_decode(json_encode($all),TRUE);
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["plug_dtl_cont"].'",
-				 "NO_REQUEST"			: "'.$list["plug_no"].'",
-				 "BRANCH_ID"			: "'.$list["plug_branch_id"].'"
-			 },';
-		 }
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generatePlugStart",
-			 "data": ['.$dtl.']
-		 }';
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return "PLUG Start is uptodate";
-		 }
-
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
-		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
-			$plugBranch 				= $value["REAL_PLUG_BRANCH_ID"];
-		 	$plugReq 						= $value["REAL_PLUG_NOREQ"];
-			$plugCont 					= $value["REAL_PLUG_CONT"];
-			$plugStatus 				= $value["REAL_PLUG_STATUS"];
-			$plugDate 					= date('Y-m-d', strtotime($value["REAL_PLUG_DATE"]));
-
-			$findHdrPlug 			= [
-				"PLUG_BRANCH_ID" => $plugBranch,
-				"PLUG_NO"				=> $plugReq
-			];
-
-
-			$plugHDR 					= DB::connection('omuster')->table('TX_HDR_PLUG')->where($findHdrPlug)->first();
-
-			$findDtlPlug 			= [
-				"PLUG_HDR_ID"		=> $plugHDR->plug_id,
-				"PLUG_DTL_CONT"	=> $plugCont
-			];
-
-			$storeHistory 			= [
-				"NO_CONTAINER" 		=> $plugCont,
-				"NO_REQUEST"			=> $plugReq,
-				"KEGIATAN"				=> "16",
-				"HISTORY_DATE"			=> date('Y-m-d h:i:s', strtotime($plugDate)),
-				"ID_USER"					=> $value["REAL_PLUG_OPERATOR"],
-				"ID_YARD"					=> "",
-				"STATUS_CONT"			=> "",
-				"VVD_ID"					=> "",
-				"COUNTER"					=> $value["REAL_PLUG_COUNTER"],
-				"SUB_COUNTER"			=> "",
-				"WHY"							=> ""
-			];
-
-				DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
-				if ($plugStatus == "1") {
-					$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_START_DATE"=>$plugDate,"PLUG_FL_REAL"=>7]);
-				} else {
-					$setReal 						= DB::connection('omuster')->table('TX_DTL_PLUG')->where($findDtlPlug)->update(["PLUG_DTL_REAL_END_DATE"=>$plugDate,"PLUG_FL_REAL"=>8]);
-				}
-
-			}
-		}
-
-		public static function getRealRecBRG() {
- 		 $all 						  = DB::connection('omuster')
-		 											->table('TX_HDR_REC_CARGO A')
-													->join('TX_DTL_REC_CARGO B', 'B.REC_CARGO_HDR_ID', '=', 'A.REC_CARGO_ID')
-													->where('B.REC_CARGO_FL_REAL', "1")
-													->get();
-
- 		 $dtl 							= '';
- 		 $arrdtl 						= [];
-		 $all 							= json_decode(json_encode($all),TRUE);
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["rec_cargo_dtl_si_no"].'",
-				 "NO_REQUEST"			: "'.$list["rec_cargo_no"].'",
-				 "BRANCH_ID"			: "'.$list["rec_cargo_branch_id"].'"
-			 },';
-		 }
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generateRecRealStorage",
-			 "data": ['.$dtl.']
-		 }';
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return " Real Receiving Cargo is uptodate ";
-		 }
-
-		 static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
-		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
-			$recBrgBranch 				= $value["BRANCH_ID"];
-		 	$recBrgReq 						= $value["NO_REQUEST"];
-			$recBrgCont 					= $value["NO_CONTAINER"];
-			$recBrgJml 						= $value["JUMLAH"];
-
-			$findHdrRecBrg 				= [
-				"REC_CARGO_BRANCH_ID" => $recBrgBranch,
-				"REC_CARGO_NO"				=> $recBrgReq
-			];
-
-
-			$recBrgHDR 					= DB::connection('omuster')->table('TX_HDR_REC_CARGO')->where($findHdrRecBrg)->first();
-
-			$findDtlRecBrg 			= [
-				"REC_CARGO_HDR_ID"		=> $recBrgHDR->rec_cargo_id,
-				"REC_CARGO_DTL_SI_NO"	=> $recBrgCont
-				];
-		 	}
-
-			$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_DTL_REAL_QTY"=>$recBrgJml, "REC_CARGO_REMAINING_QTY"=>$recBrgJml]);
-
-		 	$dataDetail 				= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
-			$qty 								= $dataDetail->rec_cargo_dtl_qty;
-			$qtyReal 						= $dataDetail->rec_cargo_dtl_real_qty;
-
-
-			if ($qty <= $qtyReal) {
-				$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>10]);
-			}
-		}
-
-		public static function getRealDelBRG() {
- 		 $all 						  = DB::connection('omuster')
-		 											->table('TX_HDR_DEL_CARGO A')
-													->join('TX_DTL_DEL_CARGO B', 'B.DEL_CARGO_HDR_ID', '=', 'A.DEL_CARGO_ID')
-													->where('B.DEL_CARGO_FL_REAL', "1")
-													->get();
-
-
- 		 $dtl 							= '';
- 		 $arrdtl 						= [];
-		 $all 							= json_decode(json_encode($all),TRUE);
-
-		 foreach ($all as $list) {
-			 $dtl .= '
-			 {
-				 "NO_CONTAINER"		: "'.$list["del_cargo_dtl_si_no"].'",
-				 "NO_REQUEST"			: "'.$list["del_cargo_no"].'",
-				 "BRANCH_ID"			: "'.$list["del_cargo_branch_id"].'"
-			 },';
-		 }
-
-		 $dtl 	= substr($dtl, 0,-1);
-		 $json = '
-		 {
-			 "action" : "generateDelRealStorage",
-			 "data": ['.$dtl.']
-		 }';
-
-		 $json = base64_encode(json_encode(json_decode($json,true)));
-		 $json = '
-			 {
-					 "repoGetRequest": {
-							 "esbHeader": {
-									 "internalId": "",
-									 "externalId": "",
-									 "timestamp": "",
-									 "responseTimestamp": "",
-									 "responseCode": "",
-									 "responseMessage": ""
-							 },
-							 "esbBody": {
-									 "request": "'.$json.'"
-							 },
-							 "esbSecurity": {
-									 "orgId": "",
-									 "batchSourceId": "",
-									 "lastUpdateLogin": "",
-									 "userId": "",
-									 "respId": "",
-									 "ledgerId": "",
-									 "respAppId": "",
-									 "batchSourceName": ""
-							 }
-					 }
-			 }
-				 ';
-
-		 $json = json_encode(json_decode($json,true));
-		 $arr = [
-						 "user"		 		=> config('endpoint.tosGetPLG.user'),
-						 "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
-						 "target" 	 	=> config('endpoint.tosGetPLG.target'),
-						 "json" 		 	=> $json
-					 ];
-		 $res 							 	= static::sendRequestToExtJsonMet($arr);
-		 $res				 			 		= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-
-		 if (empty($res["result"]["result"])) {
-			 return " Real Receiving Cargo is uptodate ";
-		 }
-
-		 // static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
-
-		 // return $res["result"]["result"];
-		 foreach ($res["result"]["result"] as $value) {
-			$delBrgBranch 				= $value["BRANCH_ID"];
-		 	$delBrgReq 						= $value["NO_REQUEST"];
-			$delBrgCont 					= $value["NO_CONTAINER"];
-			$delBrgJml 						= $value["JUMLAH"];
-
-			$findHdrDelBrg 				= [
-				"DEL_CARGO_BRANCH_ID" => $delBrgBranch,
-				"DEL_CARGO_NO"				=> $delBrgReq
-			];
-
-			$delBrgHDR 					= DB::connection('omuster')->table('TX_HDR_DEL_CARGO')->where($findHdrDelBrg)->first();
-
-			$findDtlDelBrg 			= [
-				"DEL_CARGO_HDR_ID"		=> $delBrgHDR->del_cargo_id,
-				"DEL_CARGO_DTL_SI_NO"	=> $delBrgCont
-				];
-		 	}
-
-			$dataDetail 				= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_DTL_REAL_QTY"=>$delBrgJml]);
-
-			$dataDetail 				= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->first();
-			$qty 								= $dataDetail->del_cargo_dtl_qty;
-			$qtyReal 						= $dataDetail->del_cargo_dtl_real_qty;
-
-
-			if ($qty <= $qtyReal) {
-				$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>11]);
-			}
-		}
-
 		public static function storeTxServices($json, $jsonRequest, $jsonResponse) {
 			$request 									= json_decode($json,true);
 			$service["request"] 			= base64_decode($jsonRequest);
@@ -1012,18 +1009,18 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function flagRealisationRequest(){
-			$nota = DB::connection('mdm')->table('TS_NOTA')->where('flag_status','Y')->get();
+			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->where('API_SET', '!=', null)->whereNotIn('NOTA_ID',[20,21,22])->get();
 			foreach ($nota as $notaData) {
 				$config = json_decode($notaData->api_set, true);
 				$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_status'], 3)->get();
 				foreach ($hdr as $list) {
 					$list = (array)$list;
 					$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
-					if ( 
+					if (
 						( // jika cash maka cek nota harus ada dan dibayarkan
-							!empty($cekNota) 
-							and $cekNota->nota_status == 3 
-							and $cekNota->nota_paid == 'Y' 
+							!empty($cekNota)
+							and $cekNota->nota_status == 3
+							and $cekNota->nota_paid == 'Y'
 							and  $list[$config['head_paymethod']] == 1
 						) or ( // jika pihutang maka tidak wajib ada NOTA
 							empty($cekNota)
