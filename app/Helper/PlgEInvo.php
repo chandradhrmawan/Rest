@@ -372,9 +372,6 @@ class PlgEInvo{
 	}
 
 	public static function sendInvPay($arr){
-		// di by passs dulu
-		return ['Success' => true, 'response' => 'by passs'];
-		// di by passs dulu
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->first();
 		if (empty($branch)) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
