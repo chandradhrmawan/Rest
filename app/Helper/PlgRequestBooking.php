@@ -407,6 +407,12 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result' => 'canceled request not found'];
 			}
 			$reqsHdr = (array)$reqsHdr;
+			DB::connection('omuster')->table($config['head_tab_detil'])->where([
+				$config['head_forigen'] => $reqsHdr[$config['head_primery']]
+			])->update([
+				$config['DTL_IS_ACTIVE'] => 'Y',
+				$config['DTL_IS_CANCEL'] => 'N'
+			]);
 			$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get();
 			foreach ($cnclDtl as $list) {
 				$noDtl = $list->cancl_cont.$list->cancl_si;
@@ -617,7 +623,12 @@ class PlgRequestBooking{
 	    public static function approvalRequestPLG($input){
 			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 			$config = json_decode($config->api_set, true);
-			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
+	    	if (!empty($input['canceled'])) {
+				$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
+			}else if($input['canceled'] == 'true'){
+	    		$find = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
+
+			}
 			if (empty($find)) {
 				return ['result' => "Fail, requst not found!", "Success" => false];
 			}
