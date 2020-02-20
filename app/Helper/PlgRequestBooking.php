@@ -727,7 +727,7 @@ class PlgRequestBooking{
 			return [
 				'result' => "Success, approved request! ".$pesan['result'],
 				"note" => $pesan['result'],
-				'no_req' => ,
+				'no_req' => $retHeadNo,
 				'sendRequestBooking' => $sendRequestBooking
 			];
 	    }
@@ -767,7 +767,7 @@ class PlgRequestBooking{
 					}
 				// calculate tariff
 				// migrate nota
-					$pesan = static::migrateNotaData($find, $config);
+					$pesan = static::migrateNotaData($find, $config, null);
 					if ($pesan['Success'] == false) {
 						return $pesan;
 					}
