@@ -321,7 +321,7 @@ class PlgConnectedExternalApps{
 							"json_response" => json_encode($response),
 							"create_name" => 'sceduler'
 						];
-						static::storeHistory($storeHistory);
+						// static::storeHistory($storeHistory);
 					}
 					if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
 						$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
@@ -343,7 +343,7 @@ class PlgConnectedExternalApps{
 								"json_response" => json_encode($trackInpt),
 								"create_name" => 'sceduler'
 							];
-							static::storeHistory($storeHistory);
+							// static::storeHistory($storeHistory);
 						}
 					}
 				}
