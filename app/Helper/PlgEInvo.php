@@ -391,9 +391,14 @@ class PlgEInvo{
 		$arr['bank'] = $bank;
 		$sendInvPutReceipt = static::sendInvReceipt($arr);
 		$sendInvPutReceipt['request']['json'] = json_decode($sendInvPutReceipt['request']['json'],true);
+		if ($sendInvPutReceipt['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
+			return ['Success' =>false, 'response' => 'fail send sendInvPutReceipt!', "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => null];
+		}
 		$sendInvPutApply = static::sendInvApply($arr);
 		$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
-
+		if ($sendInvPutApply['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
+			return ['Success' =>false, 'response' => 'fail send sendInvPutApply!', "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply];
+		}
 		return [ "Success" => true, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }
