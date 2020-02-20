@@ -121,19 +121,7 @@ class PlgFunctTOS{
 			}
 		}
 		$res['his_cont'] = $his_cont;
-		$dtl = DB::connection('omuster')->table($config['head_tab_detil']);
-		if ($input['nota_id'] == 1) {
-			$dtl->leftJoin('TX_GATEIN', function($join) use ($find, $config){
-				$join->on('TX_GATEIN.gatein_cont', '=', 'TX_DTL_REC.rec_dtl_cont');
-				$join->on('TX_GATEIN.gatein_req_no', '=', DB::raw("'".$find[$config['head_no']]."'"));
-			});
-		}else if ($input['nota_id'] == 2) {
-			$dtl->leftJoin('TX_GATEOUT', function($join) use ($find, $config){
-				$join->on('TX_GATEOUT.gateout_cont', '=', 'TX_DTL_DEL.del_dtl_cont');
-				$join->on('TX_GATEOUT.gateout_req_no', '=', DB::raw("'".$find[$config['head_no']]."'"));
-			});
-		}
-		$dtl = $dtl->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->get();
+		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->get();
         return [
         	'response' => $Success,
         	'result' => $msg,
