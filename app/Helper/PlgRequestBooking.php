@@ -497,21 +497,31 @@ class PlgRequestBooking{
 				}
 			}
 			$tariffResp['his_cont'] = $his_cont;
+			if (!empty($canceledReqPrepare)) {
+				DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->update(['cancelled_status'=>2]);
+			}
 			return $tariffResp;
 	    }
 
 	    public static function viewTempTariffPLG($input){
-	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
-			$config = json_decode($config->api_set, true);
-	    	$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
-	    	if (count($find) == 0) {
-	    		return ['Success' => false, 'result' => 'fail, not found data!'];
+	    	if (!empty($input['canceled'])) {
+		    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+				$config = json_decode($config->api_set, true);
+		    	$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
+		    	if (count($find) == 0) {
+		    		return ['Success' => false, 'result' => 'fail, not found data!'];
+		    	}
+		    	$find = (array)$find[0];
+		    	$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
+	    	}else if($input['canceled'] == 'true'){
+	    		$find = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
+	    		if (empty($find)) {
+		    		return ['Success' => false, 'result' => 'fail, not found data!'];
+		    	}
+		    	$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->cancelled_no]."'";
 	    	}
-	    	$find = (array)$find[0];
 
 	    	$result = [];
-
-	    	$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find[$config['head_no']]."'";
 	    	$getHS = DB::connection('eng')->select(DB::raw($query));
 	    	foreach ($getHS as $getH){
 	    		$comp_notas = DB::connection('mdm')->table('TM_REFF')->where([
