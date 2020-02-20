@@ -518,7 +518,7 @@ class PlgRequestBooking{
 	    		if (empty($find)) {
 		    		return ['Success' => false, 'result' => 'fail, not found data!'];
 		    	}
-		    	$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->cancelled_no]."'";
+		    	$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$find->cancelled_no."'";
 	    	}
 
 	    	$result = [];
