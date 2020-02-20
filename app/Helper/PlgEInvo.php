@@ -68,7 +68,7 @@ class PlgEInvo{
 		            "headerSubContext": "'.$arr['nota']['nota_sub_context'].'",
 		            "startDate": null,
 		            "endDate": null,
-		            "terminal": "-",
+		            "terminal": "00",
 		            "vesselName": "'.$arr['nota']['nota_vessel_name'].'",
 		            "branchCode": "'.$arr['nota']['nota_branch_code'].'",
 		            "errorMessage": "",
@@ -192,6 +192,10 @@ class PlgEInvo{
 
 	public static function sendInvProforma($arr){
 		// return ['Success' =>true, 'response' => 'by pass dulu!']; // by pass
+		$sendArr = $arr;
+		if (!empty($arr['reqCanc'])) {
+			$sendArr['cancFrom'] = '';
+		}
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {
 			return ['Success' =>false, 'response' => 'branch not found!'];
@@ -199,7 +203,6 @@ class PlgEInvo{
 		$branch = (array)$branch[0];
 		$nota_date = $arr['nota']['nota_date'];
 		$nota_date_noHour = date('Y-m-d', strtotime($arr['nota']['nota_date']));
-		$sendArr = $arr;
 		$sendArr['nDateWitHour'] = $nota_date;
 		$sendArr['nDateNotHour'] = $nota_date_noHour;
 		$sendArr['branch'] = $branch;

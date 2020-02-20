@@ -795,10 +795,12 @@ class PlgRequestBooking{
             if ($cekNota = 0) {
             	return ['result' => "Fail, proforma not waiting approval!", 'nota_no' => $getNota->nota_no, "Success" => false];
             }
+            $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
             $sendInvProforma = null;
             if ($input['approved'] == 'true') {
             	$arr = [
             		'nota' => (array)$getNota['attributes'],
+            		'reqCanc' => (array)$cekIsCanc
             	];
             	$sendInvProforma = PlgEInvo::sendInvProforma($arr);
             	if ($sendInvProforma['Success'] == true) {
@@ -811,15 +813,19 @@ class PlgRequestBooking{
             }else if ($input['approved'] == 'false') {
             	$getNota->nota_status = 4;
             	$getNota->save();
-            	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-				$config = json_decode($config->api_set, true);
-				$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
-				$getReq = (array)$getReq;
-				if ($getReq[$config['head_paymethod']] == 1) {
-					DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 4 ]);
-				}else if($getReq[$config['head_paymethod']] == 2) {
-					DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 3 ]);
-				}
+            	if (empty($cekIsCanc)) {
+	            	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+					$config = json_decode($config->api_set, true);
+					$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
+					$getReq = (array)$getReq;
+					if ($getReq[$config['head_paymethod']] == 1) {
+						DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 4 ]);
+					}else if($getReq[$config['head_paymethod']] == 2) {
+						DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->update([$config['head_status'] => 3 ]);
+					}
+            	}else{
+            		DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->update(['cancelled_status'=>4]);
+            	}
 
             	$msg='Success, rejected!';
             }
