@@ -411,7 +411,7 @@ class PlgRequestBooking{
 			foreach ($cnclDtl as $list) {
 				$noDtl = $list->cancl_cont.$list->cancl_si;
 				DB::connection('omuster')->table($config['head_tab_detil'])->where([
-					$config['head_forigen'] => $reqsHdr[$config['head_primery']]
+					$config['head_forigen'] => $reqsHdr[$config['head_primery']],
 					$config['DTL_BL'] => $noDtl
 				])->update([
 					$config['DTL_IS_ACTIVE'] => 'N',
