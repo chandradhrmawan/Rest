@@ -193,8 +193,13 @@ class PlgEInvo{
 	public static function sendInvProforma($arr){
 		// return ['Success' =>true, 'response' => 'by pass dulu!']; // by pass
 		$sendArr = $arr;
+		$sendArr['cancReqFrom'] = null;
+		$sendArr['cancNotaFrom'] = null;
 		if (!empty($arr['reqCanc'])) {
-			$sendArr['cancFrom'] = '';
+			$sendArr['cancReqFrom'] = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$arr['reqCanc']['cancelled_req_no'])->first();
+			$sendArr['cancReqFrom'] = (array)$sendArr['cancReqFrom'];
+			$sendArr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$sendArr['cancReqFrom'][$config['head_no']])->first();
+			$sendArr['cancNotaFrom'] = (array)$sendArr['cancNotaFrom'];
 		}
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {

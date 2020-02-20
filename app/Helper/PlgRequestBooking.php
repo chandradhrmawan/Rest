@@ -795,11 +795,14 @@ class PlgRequestBooking{
             if ($cekNota = 0) {
             	return ['result' => "Fail, proforma not waiting approval!", 'nota_no' => $getNota->nota_no, "Success" => false];
             }
+            $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+            $config = json_decode($config->api_set, true);
             $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
             $sendInvProforma = null;
             if ($input['approved'] == 'true') {
             	$arr = [
             		'nota' => (array)$getNota['attributes'],
+            		'config' => $config,
             		'reqCanc' => (array)$cekIsCanc
             	];
             	$sendInvProforma = PlgEInvo::sendInvProforma($arr);
@@ -814,8 +817,6 @@ class PlgRequestBooking{
             	$getNota->nota_status = 4;
             	$getNota->save();
             	if (empty($cekIsCanc)) {
-	            	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-					$config = json_decode($config->api_set, true);
 					$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
 					$getReq = (array)$getReq;
 					if ($getReq[$config['head_paymethod']] == 1) {

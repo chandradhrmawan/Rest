@@ -287,66 +287,70 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function flagRealisationRequest(){
-			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->where('API_SET', '!=', null)->whereNotIn('NOTA_ID',[20])->get();
+			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->whereNotNull('API_SET')->whereNotIn('NOTA_ID',[20])->orderBy('nota_id', 'asc')->get();
+			$nota_id_old = 0;
 			foreach ($nota as $notaData) {
-				$config = json_decode($notaData->api_set, true);
-				$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_status'], 3)->get();
-				foreach ($hdr as $list) {
-					$list = (array)$list;
-					$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
-					if (
-						( // jika cash maka cek nota harus ada dan dibayarkan
-							!empty($cekNota)
-							and $cekNota->nota_status == 3
-							and $cekNota->nota_paid == 'Y'
-							and  $list[$config['head_paymethod']] == 1
-						) or ( // jika pihutang maka tidak wajib ada NOTA
-							empty($cekNota)
-							and  $list[$config['head_paymethod']] == 2
-						)
-					) {
-						$input = [
-							"sceduler"=>true,
-							"nota_id"=>$notaData->nota_id,
-							"id"=>$list[$config['head_primery']]
-						];
-						$response = PlgFunctTOS::getRealPLG($input);
-
-						$storeHistory = [
-							"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
-							"action" => 'flagRealisationDtlRequest',
-							"branch_id" => 4,
-							"branch_code" => 'PLG',
-							"json_request" => json_encode($input),
-							"json_response" => json_encode($response),
-							"create_name" => 'sceduler'
-						];
-						// static::storeHistory($storeHistory);
-					}
-					if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
-						$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
-							$config['head_forigen'] => $list[$config['head_primery']],
-						])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
-						if (count($dtl) == 0) {
-							DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>5]);
-							$trackInpt = [
-								"tab"=>$config['head_table'],
-								"id"=>$list[$config['head_primery']],
-								"update"=>[$config['head_status']=>5]
+				if ($nota_id_old != $notaData->nota_id) {
+					$config = json_decode($notaData->api_set, true);
+					$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_status'], 3)->get();
+					foreach ($hdr as $list) {
+						$list = (array)$list;
+						$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
+						if (
+							( // jika cash maka cek nota harus ada dan dibayarkan
+								!empty($cekNota)
+								and $cekNota->nota_status == 3
+								and $cekNota->nota_paid == 'Y'
+								and  $list[$config['head_paymethod']] == 1
+							) or ( // jika pihutang maka tidak wajib ada NOTA
+								empty($cekNota)
+								and  $list[$config['head_paymethod']] == 2
+							)
+						) {
+							$input = [
+								"sceduler"=>true,
+								"nota_id"=>$notaData->nota_id,
+								"id"=>$list[$config['head_primery']]
 							];
+							$response = PlgFunctTOS::getRealPLG($input);
+
 							$storeHistory = [
 								"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
-								"action" => 'flagRealisationHdrRequest',
+								"action" => 'flagRealisationDtlRequest',
 								"branch_id" => 4,
 								"branch_code" => 'PLG',
-								"json_request" => json_encode($trackInpt),
-								"json_response" => json_encode($trackInpt),
+								"json_request" => json_encode($input),
+								"json_response" => json_encode($response),
 								"create_name" => 'sceduler'
 							];
 							// static::storeHistory($storeHistory);
 						}
+						if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
+							$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+								$config['head_forigen'] => $list[$config['head_primery']],
+							])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
+							if (count($dtl) == 0) {
+								DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>5]);
+								$trackInpt = [
+									"tab"=>$config['head_table'],
+									"id"=>$list[$config['head_primery']],
+									"update"=>[$config['head_status']=>5]
+								];
+								$storeHistory = [
+									"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
+									"action" => 'flagRealisationHdrRequest',
+									"branch_id" => 4,
+									"branch_code" => 'PLG',
+									"json_request" => json_encode($trackInpt),
+									"json_response" => json_encode($trackInpt),
+									"create_name" => 'sceduler'
+								];
+								// static::storeHistory($storeHistory);
+							}
+						}
 					}
 				}
+				$nota_id_old = $notaData->nota_id;
 			}
 		}
 
