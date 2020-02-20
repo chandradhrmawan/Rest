@@ -761,7 +761,7 @@ class PlgRequestBooking{
 			$pesan['result'] = null;
 			if ($find[$config['head_paymethod']] == 2) {
 				// calculate tariff
-					$tariffResp = static::calculateTariffBuild($find, $input, $config);
+					$tariffResp = static::calculateTariffBuild($find, $input, $config, null);
 					if ($tariffResp['result_flag'] != 'S') {
 						return $tariffResp;
 					}
