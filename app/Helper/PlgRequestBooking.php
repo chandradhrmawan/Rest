@@ -20,7 +20,7 @@ class PlgRequestBooking{
 			return ceil($difference);
 		}
 
-		public static function calculateTariffBuild($find, $input, $config){
+		public static function calculateTariffBuild($find, $input, $config, $canceledReqPrepare){
 			if (in_array($config['kegiatan'], [7,8]) and $find[$config['head_status']] == 1) {
 				return [
 					"result_flag"=>"S",
@@ -29,7 +29,7 @@ class PlgRequestBooking{
 					"Success"=>true
 				];
 			}
-			$setH = static::calculateTariffBuildHead($find, $input, $config);// build head
+			$setH = static::calculateTariffBuildHead($find, $input, $config, $canceledReqPrepare);// build head
 			// build detil
 				$setD = [];
 				$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
@@ -86,7 +86,7 @@ class PlgRequestBooking{
 			return $tariffResp;
 		}
 
-		private static function calculateTariffBuildHead($data, $input, $config){
+		private static function calculateTariffBuildHead($data, $input, $config, $canceledReqPrepare){
 			$result = [];
 			$result['P_SOURCE_ID'] = "NPKS_BILLING";
 			$result['P_NOTA_ID'] = $input['nota_id'];
@@ -94,7 +94,11 @@ class PlgRequestBooking{
 			$result['P_BRANCH_CODE'] = $data[$config['head_branch_code']];
 			$result['P_CUSTOMER_ID'] = $data[$config['head_cust']];
 			$result['P_PBM_INTERNAL'] = 'N';
-			$result['P_BOOKING_NUMBER'] = $data[$config['head_no']];
+			if (empty($canceledReqPrepare)) {
+				$result['P_BOOKING_NUMBER'] = $data[$config['head_no']];
+			}else{
+				$result['P_BOOKING_NUMBER'] = $canceledReqPrepare['canc']['cancelled_no'];
+			}
 			$result['P_REALIZATION'] = 'N';
 			$result['P_RESTITUTION'] = 'N';
 			if (empty($config['p_tarde'])) {
@@ -393,6 +397,31 @@ class PlgRequestBooking{
 			return ['result' => "Created Nota No : ".$no_nota, "Success" => true];
 		}
 
+		private static function canceledReqPrepare($input, $config){
+			$cnclHdr = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
+			if (empty($cnclHdr)) {
+				return ['Success' => false, 'result' => 'canceled request not found'];
+			}
+			$reqsHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$cnclHdr->cancelled_req_no)->first();
+			if (empty($reqsHdr)) {
+				return ['Success' => false, 'result' => 'canceled request not found'];
+			}
+			$reqsHdr = (array)$reqsHdr;
+			$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get();
+			foreach ($cnclDtl as $list) {
+				$noDtl = $list->cancl_cont.$list->cancl_si;
+				DB::connection('omuster')->table($config['head_tab_detil'])->where([
+					$config['head_forigen'] => $reqsHdr[$config['head_primery']]
+					$config['DTL_BL'] => $noDtl
+				])->update([
+					$config['DTL_IS_ACTIVE'] => 'N',
+					$config['DTL_IS_CANCEL'] => 'Y'
+				]);
+			}
+
+			return ['Success' => true, 'find' => $reqsHdr, 'canc' => (array)$cnclHdr];
+		}
+
 	    public static function sendRequestPLG($input){
 			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 			if (empty($config) or empty($config->api_set)) {
@@ -402,20 +431,35 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result' => "Fail, nota not active!"];
 			}
 			$config = json_decode($config->api_set, true);
-			$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
+
+			// request batal
+			$canceledReqPrepare = null;
+			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
+				$canceledReqPrepare = static::canceledReqPrepare($input, $config);
+				if ($canceledReqPrepare['Success'] == false) {
+					return $canceledReqPrepare;
+				}
+			}
+			// request batal
+
+			if (empty($canceledReqPrepare)) {
+				$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
+			}else{
+				$find = $canceledReqPrepare['find'];
+			}
 			if (empty($find)) {
 				return ['Success' => false, 'result' => "Fail, requst not found!"];
 			}
 			$find = (array)$find;
-			if ($find[$config['head_status']] == 3) {
+			if ($find[$config['head_status']] == 3 and empty($canceledReqPrepare)) {
 				return ['Success' => false, 'result' => "Fail, requst already send!"];
 			}
 
 			$his_cont = [];
-			$tariffResp = static::calculateTariffBuild($find, $input, $config);
+			$tariffResp = static::calculateTariffBuild($find, $input, $config, $canceledReqPrepare);
 			if (empty($tariffResp['result_flag']) or $tariffResp['result_flag'] != 'S') {
 				return $tariffResp;
-			} else if ($tariffResp['result_flag'] == 'S') {
+			} else if ($tariffResp['result_flag'] == 'S' and empty($canceledReqPrepare)) {
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
