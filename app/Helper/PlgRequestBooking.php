@@ -835,6 +835,8 @@ class PlgRequestBooking{
 
 	    public static function storePaymentPLG($input){
 	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
+	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
+        	$config = json_decode($config->api_set, true);
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no'],
             	'nota_paid'=>'Y'
@@ -893,9 +895,13 @@ class PlgRequestBooking{
 	    			]);
 	    		}
 	    	}
+            $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
+            $cekIsCanc = (array)$cekIsCanc;
 	    	$arr = [
+	    		'config' => $config,
 	    		"nota" => (array)$getNota['attributes'],
-	    		"payment" => (array)$pay['attributes']
+	    		"payment" => (array)$pay['attributes'],
+	    		'reqCanc' => $cekIsCanc
 	    	];
         	$sendInvPay = PlgEInvo::sendInvPay($arr);
         	if ($sendInvPay['Success'] == false) {
@@ -911,22 +917,30 @@ class PlgRequestBooking{
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
         	$getNota->nota_paid = 'Y';
         	$getNota->save();
-        	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
-					$config = json_decode($config->api_set, true);
-					$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
-					$getReq = (array)$getReq;
-					$sendRequestBooking = null;
-					if ($getReq[$config['head_paymethod']] == 1) {
-						$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $getReq[$config['head_primery']] ,'config' => $config]);
-					}
-		            return [
-						'result' => "Success, pay proforma!",
-						'no_pay' => $pay->pay_no,
-						'no_nota' => $input['pay_nota_no'],
-						'no_req' => $pay->pay_req_no,
-						'sendInvPay' => $sendInvPay,
-						'sendRequestBooking' => $sendRequestBooking
-					];
+        	if (empty($cekIsCanc)) {
+	        	$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
+	        	$getReq = (array)$getReq;
+	        	$id = $getReq[$config['head_primery']];
+	        	$table = $config['head_table'];
+        	}else{
+        		$id = $cekIsCanc['cancelled_id'];
+	        	$table = 'TX_HDR_CANCELLED';
+        	}
+        	$sendRequestBooking = null;
+        	if (
+        		(!empty($getReq) and $getReq[$config['head_paymethod']] == 1) or
+        		!empty($cekIsCanc)
+        	) {
+        		$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' => $table, 'config' => $config]);
+        	}
+        	return [
+        		'result' => "Success, pay proforma!",
+        		'no_pay' => $pay->pay_no,
+        		'no_nota' => $input['pay_nota_no'],
+        		'no_req' => $pay->pay_req_no,
+        		'sendInvPay' => $sendInvPay,
+        		'sendRequestBooking' => $sendRequestBooking
+        	];
 	    }
 
 	    public static function storeTsContAndTxHisCont($arr){

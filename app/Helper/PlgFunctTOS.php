@@ -56,7 +56,7 @@ class PlgFunctTOS{
     			'note' => 'function bulid json send request, not available!'
     		];
     	}else{
-	        $toFunct = 'buildJson'.$arr['config']['head_table'];
+	        $toFunct = 'buildJson'.$arr['table'];
 	        $json = static::$toFunct($arr);
 	        $json = base64_encode(json_encode(json_decode($json,true)));
 	        $json = '
@@ -93,8 +93,8 @@ class PlgFunctTOS{
 	        	"json" => json_encode(json_decode($json,true))
 	        ]);
 	        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPost');
-					// Simpan ke TX_SERVICES error lit ini
-					// PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+			// Simpan ke TX_SERVICES error lit ini
+			PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoPostRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
     	}
         return ['sendRequestBookingPLG' => $res];
