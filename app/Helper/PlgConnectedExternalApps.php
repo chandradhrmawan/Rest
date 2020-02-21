@@ -345,7 +345,7 @@ class PlgConnectedExternalApps{
 									"json_response" => json_encode($trackInpt),
 									"create_name" => 'sceduler'
 								];
-								// static::storeHistory($storeHistory);
+								static::storeHistory($storeHistory);
 							}
 						}
 					}

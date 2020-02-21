@@ -360,6 +360,14 @@ class PlgFunctTOS{
 	}
 
 	// store request data to tos
+
+		private static function getHeadFromTmReff10($head,$arr){
+			return DB::connection('omuster')->table('TM_REFF')->where([
+	          'reff_tr_id' => 5,
+	          'reff_id' => $head[$arr['config']['head_from']]
+	        ])->first();
+		}
+
 		private static function buildJsonTX_HDR_CANCELLED($arr) {
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id', $arr['id'])->get();
@@ -430,10 +438,7 @@ class PlgFunctTOS{
 	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
 	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
 	        }
-	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
-	          'reff_tr_id' => 5,
-	          'reff_id' => $head[$arr['config']['head_from']]
-	        ])->first();
+	        $dr = static::getHeadFromTmReff10($head,$arr);
 	        return $json_body = '{
 	          "action" : "getReceiving",
 	          "header": {
@@ -445,7 +450,7 @@ class PlgFunctTOS{
 	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
 	            "REQ_MARK": "",
 	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-	            "RECEIVING_DARI": "'.$rec_dr->reff_name.'",
+	            "RECEIVING_DARI": "'.$dr->reff_name.'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "DI": "",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
@@ -512,11 +517,16 @@ class PlgFunctTOS{
 		}
 
 		private static function buildJsonTX_HDR_STUFF($arr){
+			$appendHeader = null;
+			$appendArrdetail = null;
+			if (!is_array($arr['config']['kegiatan']) and $arr['config']['kegiatan'] == 5) {
+	        	$actionJ = 'getStuffing';
+	        }
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
-	          $arrdetil .= '{
+	          $arrdetil .= '{'.$appendArrdetail.'
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
@@ -542,13 +552,10 @@ class PlgFunctTOS{
 	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
 	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
 	        }
-	        $rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
-	          'reff_tr_id' => 5,
-	          'reff_id' => $head[$arr['config']['head_from']]
-	        ])->first();
+	        $dr = static::getHeadFromTmReff10($head,$arr);
 	        return $json_body = '{
-	          "action" : "getStuffing",
-	          "header": {
+	          "action" : "'.$actionJ.'",
+	          "header": {'.$appendHeader.'
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",
@@ -561,7 +568,7 @@ class PlgFunctTOS{
 	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
-	            "STUFFING_DARI": "'.$rec_dr->reff_name.'",
+	            "STUFFING_DARI": "'.$dr->reff_name.'",
 	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
@@ -931,5 +938,6 @@ class PlgFunctTOS{
 					},
 						"arrdetail": ['.$arrdetil.']
 					}';
+				}
 	// store request data to tos
 }
