@@ -50,7 +50,7 @@ class PlgFunctTOS{
 
 	public static function sendRequestBookingPLG($arr){
     	$in_array = ['TX_HDR_REC','TX_HDR_DEL','TX_HDR_STUFF','TX_HDR_STRIPP', 'TX_HDR_FUMI', 'TX_HDR_PLUG', 'TX_HDR_REC_CARGO', 'TX_HDR_DEL_CARGO'];
-    	if (!in_array($arr['wetable'], $in_array)) {
+    	if (!in_array($arr['table'], $in_array)) {
     		$res = [
     			'Success' => false,
     			'note' => 'function bulid json send request, not available!'
