@@ -820,7 +820,7 @@ class PlgRequestBooking{
 
 			$sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $input['id'] ,'config' => $config]);
+				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $input['id'], 'table' =>$config['head_table'],'config' => $config]);
 			}
 
 			return [
