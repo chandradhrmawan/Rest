@@ -53,6 +53,26 @@ class PrintAndExport{
     $dompdf->stream($filename, array("Attachment" => false));
   }
 
+  public static function printRDCardNPKS($branchCode, $notaId, $id) {
+    $findConfig       =  [
+      "NOTA_ID"       => $notaId,
+      "BRANCH_CODE"   => $branchCode
+    ];
+
+    $notaData         = DB::connection('mdm')->table('TS_NOTA')->where($findConfig)->first();
+    $config           = json_decode($notaData->api_set, true);
+
+    $findRequest      = [
+        $config["head_primery"] => $id,
+        $config["head_status"]  => 3
+    ];
+
+    $requestData      = DB::connection('omuster')->table($config["head_table"])->join($config["head_tab_detil"],$config['head_tab_detil'].".".strtoupper($config['head_forigen']), "=", $config['head_table'].".".strtoupper($config['head_primery']))->where($findRequest)->get();
+
+    
+
+  }
+
   public static function printUperPaidNPK($id) {
     $connect    = DB::connection("omcargo");
     $header     = $connect->table("TX_HDR_UPER")->where('UPER_NO', $id)->get();

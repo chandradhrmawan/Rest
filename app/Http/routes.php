@@ -43,6 +43,8 @@ $app->get('/print/realisasi2/{id}','ViewController@printRealisasi');
 // Print NPKS
 $app->get('/print/proformaNPKS/{id}','ViewController@proformaNpks');
 $app->get('/print/notaNpks/{id}','ViewController@notaNpks');
+$app->get('/print/printRDCardNPKS/{branchCode}/{notaId}/{id}','ViewController@printRDCardNPKS');
+
 
 // Export
 $app->get('/export/debitur/{branchId}/{notaNo}/{custName}/{layanan}/{startDate}/{endDate}/{branchCode}'      ,'ViewController@ExportDebitur');

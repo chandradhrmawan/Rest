@@ -645,7 +645,7 @@ class PlgRequestBooking{
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
 				$findCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
 			}
-			
+
 			if (empty($findCanc)) {
 				$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->get();
 				if (empty($find)) {
@@ -654,7 +654,7 @@ class PlgRequestBooking{
 				$find = (array)$find[0];
 				$retHeadNo = $find[$config['head_no']];
 
-				$upHead =DB:connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id']);
+				$upHead =DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id']);
 			}else{
 				$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$findCanc->cancelled_req_no)->get();
 				if (empty($find)) {
@@ -676,20 +676,20 @@ class PlgRequestBooking{
 			if (count($nota) > 0) {
 				return ['result' => "Fail, request already exist on proforma!", 'no_req' => $retHeadNo, "Success" => false];
 			}
-			
+
 			if ($input['approved'] == 'false') {
 				if (empty($findCanc)){
-					 DB:connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
+					 DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 						$config['head_status'] => 4,
 						$config['head_mark'] => $input['msg']
 					]);
 				}else{
-					DB:connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
+					DB::connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
 						'cancelled_status' => 4,
 						'cancelled_mark' => $input['msg']
 					]);
 				}
-			
+
 				return ['result' => "Success, rejected requst", 'no_req' => $retHeadNo];
 			}
 
@@ -707,17 +707,17 @@ class PlgRequestBooking{
 			}
 
 			if (empty($findCanc)){
-				DB:connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
+				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 3,
 					$config['head_mark'] => $input['msg']
 				]);
 			}else{
-				DB:connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
+				DB::connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
 					'cancelled_status' => 3,
 					'cancelled_mark' => $input['msg']
 				]);
 			}
-			
+
 
 			$sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {

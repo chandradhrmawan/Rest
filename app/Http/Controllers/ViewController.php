@@ -100,10 +100,13 @@ class ViewController extends Controller
     // UserAndRoleManagemnt
 
 
-  // Belum Ke PIndah Ke Helper
   function printGetPass($id) {
     return PrintAndExport::printGetPass($id);
-    }
+  }
+
+  function printRDCardNPKS($branchCode, $notaId, $id) {
+    return PrintAndExport::printRDCardNPKS($branchCode, $notaId, $id);
+  }
 
   function printProforma2($id) {
     return PrintAndExport::printProformaNPK($id);
