@@ -667,7 +667,7 @@ class PlgRequestBooking{
 			}
 
 			if (
-				($find[$config['head_status']] == 3 and $input['approved'] == 'true') or
+				(empty($findCanc) and $find[$config['head_status']] == 3 and $input['approved'] == 'true') or
 				(!empty($findCanc) and $findCanc->cancelled_status == 3 and $input['approved'] == 'true')
 			) {
 				return ['result' => "Fail, requst already approved!", 'no_req' => $retHeadNo, "Success" => false];
