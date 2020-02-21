@@ -860,7 +860,8 @@ class PlgFunctTOS{
 					        "TL_PRINT_CARD":"'.$head[$arr['config']['head_print_card']].'",
 					        "TL_FROM":"'.$head[$arr['config']['head_from']].'",
 					        "TL_TO":"'.$head[$arr['config']['head_to']].'",
-					        "TL_VESSEL_AGENT_NAME":"'.$head[$arr['config']['']].'",
+					        "TL_VESSEL_AGENT" : "'.$head[$arr['config']['head_vessel_agent']].'"
+					        "TL_VESSEL_AGENT_NAME":"'.$head[$arr['config']['head_vessel_agent_name']].'",
 					        "TL_CREATE_DATE":"'.$head[$arr['config']['head_date']].'",
 					        "TL_CREATE_BY":"'.$head[$arr['config']['head_by']].'",
 					        "TL_STATUS":"'.$head[$arr['config']['head_status']].'",
