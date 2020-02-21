@@ -49,7 +49,18 @@ class PlgFunctTOS{
 	}
 
 	public static function sendRequestBookingPLG($arr){
-    	$in_array = ['TX_HDR_REC','TX_HDR_DEL','TX_HDR_STUFF','TX_HDR_STRIPP', 'TX_HDR_FUMI', 'TX_HDR_PLUG', 'TX_HDR_REC_CARGO', 'TX_HDR_DEL_CARGO', 'TX_HDR_TL'];
+    	$in_array = [
+    		'TX_HDR_CANCELLED', 
+    		'TX_HDR_REC',
+    		'TX_HDR_DEL',
+    		'TX_HDR_STUFF',
+    		'TX_HDR_STRIPP', 
+    		'TX_HDR_FUMI', 
+    		'TX_HDR_PLUG', 
+    		'TX_HDR_REC_CARGO', 
+    		'TX_HDR_DEL_CARGO', 
+    		'TX_HDR_TL'
+    	];
     	if (!in_array($arr['table'], $in_array)) {
     		$res = [
     			'Success' => false,
@@ -349,7 +360,48 @@ class PlgFunctTOS{
 	}
 
 	// store request data to tos
-	  private static function buildJsonTX_HDR_REC($arr) {
+		private static function buildJsonTX_HDR_CANCELLED($arr) {
+	        $arrdetil = '';
+	        $dtls = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id', $arr['id'])->get();
+	        foreach ($dtls as $dtl) {
+	          $dtl = (array)$dtl;
+	          $arrdetil .= '{
+	            "REQ_DTL_CONT": "'.$dtl['cancl_cont'].'",
+	            "REQ_DTL_SI": "'.$dtl['cancl_si'].'",
+	            "REQ_DTL_COMMODITY": "'.$dtl['cancl_cmdty_id'].'",
+	            "REQ_DTL_PKG": "'.$dtl['cancl_pkg_id'].'",
+	            "REQ_DTL_PKG_PARENT": "'.$dtl['cancl_pkg_parent_id'].'",
+	            "REQ_DTL_UNIT": "'.$dtl['cancl_unit_id'].'",
+	            "REQ_DTL_QTY": "'.$dtl['cancl_qty'].'"
+	          },';
+	        }
+	        $arrdetil = substr($arrdetil, 0,-1);
+	        $head = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id', $arr['id'])->first();
+	        $head = (array)$head;
+	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head['cancelled_no'])->first();
+	        $nota_no = null;
+	        $nota_date = null;
+	        $nota_paid_date = null;
+	        if (!empty($nota)) {
+	        	$nota_no = $nota->nota_no;
+	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+	        }
+	        return $json_body = '{
+	          "action" : "getCancelledReq",
+	          "header": {
+	            "REQ_NO": "'.$head['cancelled_no'].'",
+	            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head['cancelled_create_date'])).'",
+	            "NO_NOTA": "'.$nota_no.'",
+	            "TGL_NOTA": "'.$nota_date.'",
+	            "REQ_MARK": "",
+	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'"
+	          },
+	          "arrdetail": ['.$arrdetil.']
+	        }';
+		}
+
+		private static function buildJsonTX_HDR_REC($arr) {
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
@@ -400,7 +452,7 @@ class PlgFunctTOS{
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
-				}
+		}
 
 		private static function buildJsonTX_HDR_DEL($arr){
 	        $arrdetil = '';
