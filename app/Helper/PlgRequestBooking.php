@@ -932,6 +932,11 @@ class PlgRequestBooking{
         		!empty($cekIsCanc)
         	) {
         		$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' => $table, 'config' => $config]);
+        		if (!empty($cekIsCanc)) {
+        			DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id', $cekIsCanc['cancelled_id'])->update([
+        				'cancelled_status' => 4
+        			]);
+        		}
         	}
         	return [
         		'result' => "Success, pay proforma!",
