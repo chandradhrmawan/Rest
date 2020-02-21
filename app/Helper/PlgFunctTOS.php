@@ -879,5 +879,6 @@ class PlgFunctTOS{
 					},
 						"arrdetail": ['.$arrdetil.']
 					}';
+				}
 	// store request data to tos
 }
