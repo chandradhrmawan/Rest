@@ -67,10 +67,19 @@ class PrintAndExport{
         $config["head_status"]  => 3
     ];
 
-    $requestData      = DB::connection('omuster')->table($config["head_table"])->join($config["head_tab_detil"],$config['head_tab_detil'].".".strtoupper($config['head_forigen']), "=", $config['head_table'].".".strtoupper($config['head_primery']))->where($findRequest)->get();
+    $hdrRequest      = DB::connection('omuster')->table($config["head_table"])->where($findRequest)->first();
+    $hdrRequest      = json_decode(json_encode($hdrRequest), TRUE);
+    $dtlRequest      = DB::connection('omuster')->table($config["head_tab_detil"])->where($config["head_forigen"], $id)->get();
+    $dtlRequest      = json_decode(json_encode($dtlRequest), TRUE);
 
-    
 
+    $html = view('print.rdCardNPKS', ["header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
+    $filename = $hdrRequest[$config["head_primery"]];
+    $dompdf = new Dompdf();
+    $dompdf->set_option('isRemoteEnabled', true);
+    $dompdf->loadHtml($html);
+    $dompdf->render();
+    $dompdf->stream($filename, array("Attachment" => false));
   }
 
   public static function printUperPaidNPK($id) {

@@ -46,7 +46,7 @@ class PlgEInvo{
 		        	"orgId":"'.$arr['branch']['branch_org_id'].'",
 		        	"trxNumber":"'.$arr['nota']['nota_no'].'",
 		        	"trxNumberOrig":"",
-		        	"trxNumberPrev":"",
+		        	"trxNumberPrev":"'.$arr['cancNotaFrom'].'",
 		        	"trxTaxNumber":"",
 		        	"trxDate":"'.$arr['nDateWitHour'].'",
 		        	"trxClass":"INV",
@@ -193,13 +193,11 @@ class PlgEInvo{
 	public static function sendInvProforma($arr){
 		// return ['Success' =>true, 'response' => 'by pass dulu!']; // by pass
 		$sendArr = $arr;
-		$sendArr['cancReqFrom'] = null;
 		$sendArr['cancNotaFrom'] = null;
 		if (!empty($arr['reqCanc'])) {
-			$sendArr['cancReqFrom'] = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_no'],$arr['reqCanc']['cancelled_req_no'])->first();
-			$sendArr['cancReqFrom'] = (array)$sendArr['cancReqFrom'];
-			$sendArr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$sendArr['cancReqFrom'][$arr['config']['head_no']])->first();
+			$sendArr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$arr['reqCanc']['cancelled_req_no'])->first();
 			$sendArr['cancNotaFrom'] = (array)$sendArr['cancNotaFrom'];
+			$sendArr['cancNotaFrom'] = $sendArr['cancNotaFrom']['nota_no'];
 		}
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
 		if (count($branch) == 0) {
@@ -255,7 +253,7 @@ class PlgEInvo{
 								"errorMessage":"",
 								"apiMessage":"",
 								"attributeCategory":"BANK",
-								"referenceNum":"",
+								"referenceNum":"'.$arr['cancNotaFrom'].'",
 								"receiptType":"",
 								"receiptSubType":"",
 								"createdBy":"-1",
@@ -381,13 +379,11 @@ class PlgEInvo{
 	}
 
 	public static function sendInvPay($arr){
-		$arr['cancReqFrom'] = null;
 		$arr['cancNotaFrom'] = null;
 		if (!empty($arr['reqCanc'])) {
-			$arr['cancReqFrom'] = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_no'],$arr['reqCanc']['cancelled_req_no'])->first();
-			$arr['cancReqFrom'] = (array)$arr['cancReqFrom'];
-			$arr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$arr['cancReqFrom'][$arr['config']['head_no']])->first();
+			$arr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$arr['reqCanc']['cancelled_req_no'])->first();
 			$arr['cancNotaFrom'] = (array)$arr['cancNotaFrom'];
+			$arr['cancNotaFrom'] = $arr['cancNotaFrom']['nota_no'];
 		}
 
 		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->first();
