@@ -654,7 +654,7 @@ class PlgRequestBooking{
 				$find = (array)$find[0];
 				$retHeadNo = $find[$config['head_no']];
 
-				$upHead = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id']);
+				$upHead =DB:connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id']);
 			}else{
 				$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$findCanc->cancelled_req_no)->get();
 				if (empty($find)) {
@@ -679,17 +679,17 @@ class PlgRequestBooking{
 			
 			if ($input['approved'] == 'false') {
 				if (empty($findCanc)){
-					$upValue = [
+					 DB:connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 						$config['head_status'] => 4,
 						$config['head_mark'] => $input['msg']
-					];
+					]);
 				}else{
-					$upValue = [
+					DB:connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
 						'cancelled_status' => 4,
 						'cancelled_mark' => $input['msg']
-					];
+					]);
 				}
-				$upHead = $upHead->update($upValue);
+			
 				return ['result' => "Success, rejected requst", 'no_req' => $retHeadNo];
 			}
 
@@ -707,17 +707,17 @@ class PlgRequestBooking{
 			}
 
 			if (empty($findCanc)){
-				$upHead = [
+				DB:connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 3,
 					$config['head_mark'] => $input['msg']
-				];
+				]);
 			}else{
-				$upHead =[
+				DB:connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
 					'cancelled_status' => 3,
 					'cancelled_mark' => $input['msg']
-				];
+				]);
 			}
-			$upHead = $upHead->update($upValue);
+			
 
 			$sendRequestBooking = null;
 			if ($find[$config['head_paymethod']] == 2) {
