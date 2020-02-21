@@ -81,7 +81,7 @@ class PlgRequestBooking{
 			return $DTL_FUMI_TYPE;
 		}
 
-		private static function getDTL_PKG_ID($config,$list,$hdr,$input);{
+		private static function getDTL_PKG_ID($config,$list,$hdr,$input){
 			if (empty($config['DTL_PKG_ID'])) {
 				$DTL_PKG_ID = 8;
 			}else{
@@ -381,9 +381,9 @@ class PlgRequestBooking{
 			$newD['DTL_BM_TYPE'] = 'NULL';
 			$newD['DTL_STACK_AREA'] = static::getDTL_STACK_AREA($config,$list,$hdr,$input);
 			$newD['DTL_TL'] = static::getDTL_TL($config,$list,$hdr,$input);
-			$newD['DTL_DATE_IN'] = static::getDTL_DATE_IN($config,$list,$hdr);
-			$newD['DTL_DATE_OUT'] = static::getDTL_DATE_OUT($config,$list,$hdr);
-			$newD['DTL_DATE_OUT_OLD'] = static::getDTL_DATE_OUT_OLD($config,$list,$hdr);
+			$newD['DTL_DATE_IN'] = static::getDTL_DATE_IN($config,$list,$hdr,$input);
+			$newD['DTL_DATE_OUT'] = static::getDTL_DATE_OUT($config,$list,$hdr,$input);
+			$newD['DTL_DATE_OUT_OLD'] = static::getDTL_DATE_OUT_OLD($config,$list,$hdr,$input);
 			return $newD;
 		}
 
