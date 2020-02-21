@@ -97,12 +97,13 @@ class PlgFunctTOS{
 				    }
 				}
 	        ';
-	        $res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
+	        $opt = [
 	        	"user" => config('endpoint.tosPostPLG.user'),
 	        	"pass" => config('endpoint.tosPostPLG.pass'),
 	        	"target" => config('endpoint.tosPostPLG.target'),
 	        	"json" => json_encode(json_decode($json,true))
-	        ]);
+	        ];
+	        $res = PlgConnectedExternalApps::sendRequestToExtJsonMet($opt);
 	        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPost');
 			// Simpan ke TX_SERVICES error lit ini
 			PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoPostRequest"]["esbBody"]["request"],$res["result"]["result"]);

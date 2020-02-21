@@ -752,8 +752,6 @@ class PlgRequestBooking{
 				}
 				$find = (array)$find[0];
 				$retHeadNo = $find[$config['head_no']];
-
-				$upHead =DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id']);
 			}else{
 				$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$findCanc->cancelled_req_no)->get();
 				if (empty($find)) {
@@ -761,8 +759,6 @@ class PlgRequestBooking{
 				}
 				$find = (array)$find[0];
 				$retHeadNo = $findCanc->cancelled_no;
-
-				$upHead = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id']);
 			}
 
 			if (
@@ -805,6 +801,14 @@ class PlgRequestBooking{
 				}
 			}
 
+			$sendRequestBooking = null;
+			if ($find[$config['head_paymethod']] == 2) {
+				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $input['id'], 'table' =>$config['head_table'],'config' => $config]);
+				if (empty($sendRequestBooking['sendRequestBookingPLG'])) {
+					return ['result' => "Fail, error went send request to TOS!", 'no_req' => $retHeadNo, "Success" => false];
+				}
+			}
+
 			if (empty($findCanc)){
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 3,
@@ -815,12 +819,6 @@ class PlgRequestBooking{
 					'cancelled_status' => 3,
 					'cancelled_mark' => $input['msg']
 				]);
-			}
-
-
-			$sendRequestBooking = null;
-			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $input['id'], 'table' =>$config['head_table'],'config' => $config]);
 			}
 
 			return [
