@@ -253,7 +253,7 @@ class PlgEInvo{
 								"errorMessage":"",
 								"apiMessage":"",
 								"attributeCategory":"BANK",
-								"referenceNum":"'.$arr['cancNotaFrom'].'",
+								"referenceNum":"",
 								"receiptType":"",
 								"receiptSubType":"",
 								"createdBy":"-1",

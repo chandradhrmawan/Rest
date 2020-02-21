@@ -67,15 +67,21 @@ class PrintAndExport{
         $config["head_status"]  => 3
     ];
 
-    $hdrRequest      = DB::connection('omuster')->table($config["head_table"])->where($findRequest)->first();
-    $hdrRequest      = json_decode(json_encode($hdrRequest), TRUE);
-    $dtlRequest      = DB::connection('omuster')->table($config["head_tab_detil"])->where($config["head_forigen"], $id)->get();
-    $dtlRequest      = json_decode(json_encode($dtlRequest), TRUE);
+    $findDetail       = [
+        $config["head_forigen"] => $id,
+        $config["DTL_IS_ACTIVE"] => 'Y'
+    ];
+
+    $hdrRequest       = DB::connection('omuster')->table($config["head_table"])->where($findRequest)->first();
+    $hdrRequest       = json_decode(json_encode($hdrRequest), TRUE);
+    $dtlRequest       = DB::connection('omuster')->table($config["head_tab_detil"])->where($findDetail)->get();
+    $dtlRequest       = json_decode(json_encode($dtlRequest), TRUE);
 
 
-    $html = view('print.rdCardNPKS', ["header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
-    $filename = $hdrRequest[$config["head_primery"]];
-    $dompdf = new Dompdf();
+    $page             = count($dtlRequest);
+    $html             = view('print.rdCardNPKS', ["page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
+    $filename         = $hdrRequest[$config["head_primery"]];
+    $dompdf           = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
     $dompdf->loadHtml($html);
     $dompdf->render();
