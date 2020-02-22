@@ -5,7 +5,6 @@ namespace App\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Helper\GlobalHelper;
 use App\Helper\PlgRequestBooking;
 use App\Helper\PlgConnectedExternalApps;
 
@@ -51,15 +50,15 @@ class PlgFunctTOS{
 
 	public static function sendRequestBookingPLG($arr){
     	$in_array = [
-    		'TX_HDR_CANCELLED', 
+    		'TX_HDR_CANCELLED',
     		'TX_HDR_REC',
     		'TX_HDR_DEL',
     		'TX_HDR_STUFF',
-    		'TX_HDR_STRIPP', 
-    		'TX_HDR_FUMI', 
-    		'TX_HDR_PLUG', 
-    		'TX_HDR_REC_CARGO', 
-    		'TX_HDR_DEL_CARGO', 
+    		'TX_HDR_STRIPP',
+    		'TX_HDR_FUMI',
+    		'TX_HDR_PLUG',
+    		'TX_HDR_REC_CARGO',
+    		'TX_HDR_DEL_CARGO',
     		'TX_HDR_TL'
     	];
     	if (!in_array($arr['table'], $in_array)) {
@@ -107,7 +106,7 @@ class PlgFunctTOS{
 	        $res = PlgConnectedExternalApps::sendRequestToExtJsonMet($opt);
 	        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPost');
 			// Simpan ke TX_SERVICES error lit ini
-			PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoPostRequest"]["esbBody"]["request"],$res["result"]["result"]);
+			// PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoPostRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
     	}
         return ['sendRequestBookingPLG' => $res];
@@ -231,7 +230,7 @@ class PlgFunctTOS{
 			"gatein_req_no" => $listR['NO_REQUEST'],
 			"gatein_pol_no" => $listR['NOPOL'],
 			"gatein_cont_status" => $listR['STATUS'],
-			"gatein_date" => date('Y-m-d', strtotime($listR['TGL_IN'])),
+			"gatein_date" => date('Y-m-d h:i:s', strtotime($listR['TGL_IN'])),
 			"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
 			"gatein_create_by" => "1",
 			"gatein_branch_id" => $hdr[$config['head_branch']],
@@ -264,7 +263,7 @@ class PlgFunctTOS{
 			"gateout_req_no" 		 	=> $listR['NO_REQUEST'],
 			"gateout_pol_no" 		 	=> $listR['NOPOL'],
 			"gateout_cont_status" => $listR['STATUS'],
-			"gateout_date" 				=> date('Y-m-d', strtotime($listR['TGL_OUT'])),
+			"gateout_date" 				=> date('Y-m-d h:i:s', strtotime($listR['TGL_OUT'])),
 			"gateout_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
 			"gateout_create_by" 	=> 1,
 			"gateout_branch_id" 	=> $hdr[$config['head_branch']],
@@ -282,7 +281,7 @@ class PlgFunctTOS{
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update([
-			$config['DTL_REAL_DATE'] =>date('Y-m-d', strtotime($listR['TGL_OUT']))
+			$config['DTL_REAL_DATE'] =>date('Y-m-d h:i:s', strtotime($listR['TGL_OUT']))
 		]);
 
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR['TGL_OUT']];
@@ -293,7 +292,7 @@ class PlgFunctTOS{
 			$config['head_forigen'] => $hdr[$config['head_primery']],
 			$config['DTL_BL'] => $listR['NO_CONTAINER']
 		])->update([
-			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d', strtotime($listR[$config['DTL_REAL_DATE']['tos']]))
+			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d h:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tos']]))
 		]);
 
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR[$config['DTL_REAL_DATE']['tos']]];
@@ -303,11 +302,11 @@ class PlgFunctTOS{
 		if ($listR[$config['DTL_REAL_DATE']['status']] == 1) {
 			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['uster']['usterStart'] => date('Y-m-d', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['uster']['usterStart'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
 		}else{
 			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['uster']['usterEnd'] => date('Y-m-d', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['uster']['usterEnd'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where([
@@ -362,88 +361,6 @@ class PlgFunctTOS{
 	}
 
 	// store request data to tos
-
-		private static function duplicateAndStoreToRec($head,$dtls,$arr){
-			$storeRecDtl = '';
-			foreach ($dtls as $dtl) {
-				$storeRecDtl .= '
-				{
-					"rec_dtl_id": null,
-					"rec_hdr_id": null,
-					"rec_dtl_owner": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-					"rec_dtl_owner_name": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-					"rec_dtl_cont": "'.$dtl[$arr['config']['DTL_BL']].'",
-					"rec_dtl_cont_size": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-					"rec_dtl_cont_type": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
-					"rec_dtl_cont_status": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-					"rec_dtl_cont_danger": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-					"rec_dtl_via": "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
-					"rec_dtl_via_name": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-					"rec_dtl_cmdty_id": null,
-					"rec_dtl_cmdty_name": "",
-					"rec_dtl_date_plan": "'.$dtl[$arr['config']['DTL_DATE_REC']].'",
-				},
-				';
-			}
-	        $storeRecDtl = substr($storeRecDtl, 0,-1);
-			$storeRecHead = '
-				{
-					"REC_ID": "",
-					"REC_NO": "'.$head[$arr['config']['head_no']].'",
-					"REC_DATE": "'.$head[$arr['config']['head_date']].'",
-					"REC_PAYMETHOD": "'.$head[$arr['config']['head_paymethod']].'",
-					"REC_CUST_ID": "'.$head[$arr['config']['head_cust']].'",
-					"REC_CUST_NAME": "'.$head[$arr['config']['head_cust_name']].'",
-					"REC_CUST_NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-					"REC_CUST_ACCOUNT": null,
-					"REC_STACKBY_ID": "'.$head[$arr['config']['head_shipping_agent_id']].'",
-					"REC_STACKBY_NAME": "'.$head[$arr['config']['head_shipping_agent_name']].'",
-					"REC_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
-					"REC_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
-					"REC_VOYIN": "'.$head[$arr['config']['head_vin']].'",
-					"REC_VOYOUT": "'.$head[$arr['config']['head_vout']].'",
-					"REC_VVD_ID": "'.$head[$arr['config']['head_vvd']].'",
-					"REC_VESSEL_ETA": "'.$head[$arr['config']['head_vessel_eta']].'",
-					"REC_VESSEL_ETD": "'.$head[$arr['config']['head_vessel_etd']].'",
-					"REC_BRANCH_ID": "'.$head[$arr['config']['head_branch']].'",
-					"REC_NOTA": "'.$head[$arr['config']['head_nota']].'",
-					"REC_FROM": "'.$head[$arr['config']['head_from']].'",
-					"REC_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-					"REC_STATUS": 10,
-					"REC_VESSEL_AGENT": "",
-					"REC_VESSEL_AGENT_NAME": "",
-					"REC_CUST_ADDRESS": "'.$head[$arr['config']['head_cust_addr']].'",
-					"REC_BRANCH_CODE": "'.$head[$arr['config']['head_branch_code']].'",
-					"REC_PBM_ID": "'.$head[$arr['config']['head_pbm_id']].'",
-					"REC_PBM_NAME": "'.$head[$arr['config']['head_pbm_name']].'",
-					"REC_VESSEL_PKK": "'.$head[$arr['config']['head_pbm_id']].'"
-				}
-	        	';
-	        $json = '{
-	        	        		"action": "saveheaderdetail",
-	        	        		"data": [
-	        	        			"HEADER",
-	        	        			"DETAIL"
-	        	        		],
-	        	        		"HEADER": {
-	        	        			"DB": "omuster",
-	        	        			"TABLE": "TX_HDR_REC",
-	        	        			"PK": "REC_ID",
-	        	        			"VALUE": ['.$storeRecHead.']
-	        	        		},
-	        	        		"DETAIL": {
-	        	        			"DB": "omuster",
-	        	        			"TABLE": "TX_DTL_REC",
-	        	        			"FK": [
-	        	        				"rec_hdr_id",
-	        	        				"rec_id"
-	        	        			],
-	        	        			"VALUE": ['.$storeRecDtl.']
-	        	        		}
-	        	        	}';
-	        $arr = json_decode($json,true);
-	        return GlobalHelper::saveheaderdetail($arr);
-		}
 
 		private static function getHeadFromTmReff10($head,$arr){
 			return DB::connection('omuster')->table('TM_REFF')->where([
@@ -601,21 +518,25 @@ class PlgFunctTOS{
 		}
 
 		private static function buildJsonTX_HDR_STUFF($arr){
-			$storeRecDtl = null;
+			$appendHeader 	 = null;
+			$appendArrdetail = null;
+			$head 				 	 = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+			$head 					 = (array)$head;
+
+			$contFromName = DB::connection('omuster')
+											->table($arr['config']['head_table']." A")
+											->join("TM_REFF B", "A.".$arr['config']['head_from'], '=', 'B.REFF_ID')
+											->where("B.REFF_TR_ID", "5")
+											->first();
+
 			if (!is_array($arr['config']['kegiatan']) and $arr['config']['kegiatan'] == 5) {
 	        	$actionJ = 'getStuffing';
-	        }else{
-	        	if ($arr['config']['kegiatan'] == [3,5]) {
-	        		$actionJ = 'getRecStuffing';
-	        	}else{
-	        		$actionJ = 'getRecStuffingDel';
-	        	}
 	        }
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
-	          $arrdetil .= '{
+	          $arrdetil .= '{'.$appendArrdetail.'
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
@@ -623,16 +544,13 @@ class PlgFunctTOS{
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_REMARK_SP2": "",
-	            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
-	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-	            "REQ_DTL_DEL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
+	            "REQ_DTL_ORIGIN": "'.$contFromName->reff_name.'",
+							"REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
 	            "TGL_MULAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
 	            "TGL_SELESAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
-	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
-	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
 	        $nota_no = null;
 	        $nota_date = null;
@@ -643,12 +561,9 @@ class PlgFunctTOS{
 	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
 	        }
 	        $dr = static::getHeadFromTmReff10($head,$arr);
-	        if (in_array($actionJ, ['getRecStuffing','getRecStuffingDel'])) {
-	        	static::duplicateAndStoreToRec($head,$dtls,$arr);
-	        }
 	        return $json_body = '{
 	          "action" : "'.$actionJ.'",
-	          "header": {
+	          "header": {'.$appendHeader.'
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",
@@ -822,7 +737,7 @@ class PlgFunctTOS{
 							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']].'",
-							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_ID']].'"
+							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
 					$arrdetil = substr($arrdetil, 0,-1);
@@ -885,7 +800,7 @@ class PlgFunctTOS{
 							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']].'",
-							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_ID']].'"
+							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
 					$arrdetil = substr($arrdetil, 0,-1);
