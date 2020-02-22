@@ -667,6 +667,13 @@ class PlgFunctTOS{
 		}
 
 		private static function buildJsonTX_HDR_STRIPP($arr){
+	        if (!is_array($arr['config']['kegiatan']) and $arr['config']['kegiatan'] == 6) {
+	        	$actionJ = 'getStripping';
+	        }else{
+	        	if ($arr['config']['kegiatan'] == [3,6]) {
+	        		$actionJ = 'getRecStripping';
+	        	}
+	        }
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
@@ -677,6 +684,7 @@ class PlgFunctTOS{
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
 	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
 	            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
@@ -699,8 +707,11 @@ class PlgFunctTOS{
 	          'reff_tr_id' => 5,
 	          'reff_id' => $head[$arr['config']['head_from']]
 	        ])->first();
+	        if (in_array($actionJ, ['getRecStripping'])) {
+	        	static::duplicateAndStoreToRec($head,$dtls,$arr);
+	        }
 	        return $json_body = '{
-	          "action" : "getStripping",
+	          "action" : "'.$actionJ.'",
 	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_STRIP_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
