@@ -5,7 +5,7 @@ namespace App\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Helper\PlgRequestBooking;
+use App\Helper\PlgContHist;
 use App\Helper\PlgConnectedExternalApps;
 
 class PlgFunctTOS{
@@ -182,7 +182,7 @@ class PlgFunctTOS{
 			if (!empty($input["user"])) {
 				$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
 			}
-			$his_cont[] = PlgRequestBooking::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+			$his_cont[] = PlgContHist::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 		}
 		return $his_cont;
 	}
