@@ -193,13 +193,13 @@ class PlgConnectedExternalApps{
 			if (empty($res["result"]["result"])) {
 				return "Placement is uptodate";
 			}
-
 			static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+			// return $res["result"]["result"];
 
 			$updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "2")->get();
-		  foreach ($updateDetail as $updateVal) {
-		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"3"]);
-		  }
+			foreach ($updateDetail as $updateVal) {
+				$updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"3"]);
+			}
 
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
@@ -209,7 +209,7 @@ class PlgConnectedExternalApps{
 		    ];
 
 
-		    $findPlacement 		= [
+		   $findPlacement 		= [
 		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
 		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"]
 		    ];
@@ -220,7 +220,7 @@ class PlgConnectedExternalApps{
 					"KEGIATAN"			=> "12"
 		    ];
 
-		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->first();
+		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->get();
 		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
@@ -237,7 +237,7 @@ class PlgConnectedExternalApps{
 		      "CONT_STATUS"		=> $listR["CONT_STATUS"],
 		      "TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
 		      "BRANCH_ID"			=> $listR["BRANCH_ID"],
-		      "CONT_COUNTER"	=> $tsContainer->cont_counter
+		      "CONT_COUNTER"	=> $tsContainer[0]->cont_counter
 		    ];
 
 		    $storeHistory 		= [
@@ -249,7 +249,7 @@ class PlgConnectedExternalApps{
 		      "ID_YARD"				=> $listR["ID_YARD"],
 		      "STATUS_CONT"		=> $listR["CONT_STATUS"],
 		      "VVD_ID"				=> "",
-		      "COUNTER"				=> $tsContainer->cont_counter,
+		      "COUNTER"				=> $tsContainer[0]->cont_counter,
 		      "SUB_COUNTER"		=> "",
 		      "WHY"						=> ""
 		    ];
@@ -330,7 +330,7 @@ class PlgConnectedExternalApps{
 							])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
 							if (count($dtl) == 0) {
 								if ($list[$config['head_status']] == 3) {
-									$upStHead = 3;
+									$upStHead = 5;
 								}else if ($list[$config['head_status']] == 10){
 									$upStHead = 11;
 								}
