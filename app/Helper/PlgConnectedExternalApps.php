@@ -295,7 +295,7 @@ class PlgConnectedExternalApps{
 			foreach ($nota as $notaData) {
 				if ($nota_id_old != $notaData->nota_id) {
 					$config = json_decode($notaData->api_set, true);
-					$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_status'], 3)->get();
+					$hdr = DB::connection('omuster')->table($config['head_table'])->whereIn($config['head_status'], [3,10])->get();
 					foreach ($hdr as $list) {
 						$list = (array)$list;
 						$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
@@ -355,11 +355,16 @@ class PlgConnectedExternalApps{
 								$config['head_forigen'] => $list[$config['head_primery']],
 							])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
 							if (count($dtl) == 0) {
-								DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>5]);
+								if ($list[$config['head_status']] == 3) {
+									$upStHead = 3;
+								}else if ($list[$config['head_status']] == 10){
+									$upStHead = 11;
+								}
+								DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>$upStHead]);
 								$trackInpt = [
 									"tab"=>$config['head_table'],
 									"id"=>$list[$config['head_primery']],
-									"update"=>[$config['head_status']=>5]
+									"update"=>[$config['head_status']=>$upStHead]
 								];
 								$res[] = $storeHistory;
 								$storeHistory = [
