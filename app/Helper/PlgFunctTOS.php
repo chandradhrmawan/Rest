@@ -539,6 +539,7 @@ class PlgFunctTOS{
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
+	            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	        }';
 		}
 
@@ -614,6 +615,8 @@ class PlgFunctTOS{
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
+	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
+	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
@@ -658,9 +661,11 @@ class PlgFunctTOS{
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
 	            "STUFFING_DARI": "'.$dr->reff_name.'",
+	            "RECEIVING_DARI": "'.$dr->reff_name.'",
 	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'",
+	            "DI": ""
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -679,6 +684,8 @@ class PlgFunctTOS{
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
+	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
+	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
@@ -726,9 +733,11 @@ class PlgFunctTOS{
 	            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "STRIP_DARI": "'.$rec_dr->reff_name.'",
+	            "RECEIVING_DARI": "'.$rec_dr->reff_name.'",
 	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'",
+	            "DI": ""
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
