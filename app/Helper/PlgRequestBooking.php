@@ -590,7 +590,7 @@ class PlgRequestBooking{
 				if (is_array($confKgt)) {
 					$confKgt = $confKgt[0];
 				}
-				if (!in_array($confKgt, [21,22])) {
+				if (!in_array($confKgt, [10,11])) {
 					foreach ($tariffResp['detil_data'] as $list) {
 						$list = (array)$list;
 						$his_cont = static::saveHisCont($find,$list,$config,$input,$confKgt);
