@@ -852,6 +852,16 @@ class PlgRequestBooking{
 			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 5
 			]);
+			// update utk gabungan
+				if (in_array($input['nota_id'], [7,8,9,10])) {
+					DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$find[$config['head_no']])->update([
+						'rec_status' => 11
+					]);
+					DB::connection('omuster')->table('TX_HDR_DEL')->where('del_no',$find[$config['head_no']])->update([
+						'del_status' => 11
+					]);
+				}
+			// update utk gabungan
 			return [
 				'result' => "Success, confirm realisasion! ".$pesan['result'],
 				"note" => $pesan['result'],
