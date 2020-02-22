@@ -347,6 +347,7 @@ class PlgConnectedExternalApps{
 						if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
 							$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
 								$config['head_forigen'] => $list[$config['head_primery']],
+								$config['DTL_IS_ACTIVE'] => 'Y'
 							])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
 							if (count($dtl) == 0) {
 								if ($list[$config['head_status']] == 3) {
