@@ -32,7 +32,7 @@ class PlgRequestBooking{
 		}
 
 		private static function getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config){
-			$in = [3,13,14];
+			$in = [12,13,14];
 			$tglIn 	= DB::connection('omuster')
 			->table('TX_HISTORY_CONTAINER')
 			->where('NO_CONTAINER', $list[$config['DTL_BL']])
@@ -590,36 +590,10 @@ class PlgRequestBooking{
 				if (is_array($confKgt)) {
 					$confKgt = $confKgt[0];
 				}
-				if (in_array($confKgt, [1])) {
+				if (!in_array($confKgt, [21,22])) {
 					foreach ($tariffResp['detil_data'] as $list) {
 						$list = (array)$list;
-						$findTsCont = [
-							'cont_no' => $list[$config['DTL_BL']],
-							'branch_id' => $find[$config['head_branch']],
-							'branch_code' => $find[$config['head_branch_code']]
-						];
-						$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-						if (empty($cekTsCont)) {
-							$cont_counter = 0;
-						}else{
-							$cont_counter = $cekTsCont->cont_counter;
-						}
-						$arrStoreTsContAndTxHisCont = [
-							'history_date' => Carbon::now()->format('Y-m-d h:i:s'),
-							'cont_no' => $list[$config['DTL_BL']],
-							'branch_id' => $find[$config['head_branch']],
-							'branch_code' => $find[$config['head_branch_code']],
-							'cont_location' => 'GATO',
-							'cont_size' => $list[$config['DTL_CONT_SIZE']],
-							'cont_type' => $list[$config['DTL_CONT_TYPE']],
-							'cont_counter' => $cont_counter,
-							'no_request' => $find[$config['head_no']],
-							'kegiatan' => $confKgt,
-							'id_user' => $input["user"]->user_id,
-							'status_cont' => $list[$config['DTL_CONT_STATUS']],
-							'vvd_id' => $find[$config['head_vvd']]
-						];
-						$his_cont[] = static::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+						$his_cont = static::saveHisCont($find,$list,$config,$input,$confKgt);
 					}
 				}
 			}
@@ -1048,6 +1022,38 @@ class PlgRequestBooking{
         		'sendInvPay' => $sendInvPay,
         		'sendRequestBooking' => $sendRequestBooking
         	];
+	    }
+
+	    private static function saveHisCont($find,$list,$config,$input,$confKgt){
+	    	$findTsCont = [
+	    		'cont_no' => $list[$config['DTL_BL']],
+	    		'branch_id' => $find[$config['head_branch']],
+	    		'branch_code' => $find[$config['head_branch_code']]
+	    	];
+	    	$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
+	    	if (empty($cekTsCont)) {
+	    		$cont_counter = 0;
+	    		$cont_location = 'GATO';
+	    	}else{
+	    		$cont_counter = $cekTsCont->cont_counter;
+	    		$cont_location = $cekTsCont->cont_location;
+	    	}
+	    	$arrStoreTsContAndTxHisCont = [
+	    		'history_date' => Carbon::now()->format('Y-m-d h:i:s'),
+	    		'cont_no' => $list[$config['DTL_BL']],
+	    		'branch_id' => $find[$config['head_branch']],
+	    		'branch_code' => $find[$config['head_branch_code']],
+	    		'cont_location' => $cont_location,
+	    		'cont_size' => $list[$config['DTL_CONT_SIZE']],
+	    		'cont_type' => $list[$config['DTL_CONT_TYPE']],
+	    		'cont_counter' => $cont_counter,
+	    		'no_request' => $find[$config['head_no']],
+	    		'kegiatan' => $confKgt,
+	    		'id_user' => $input["user"]->user_id,
+	    		'status_cont' => $list[$config['DTL_CONT_STATUS']],
+	    		'vvd_id' => $find[$config['head_vvd']]
+	    	];
+	    	$his_cont[] = static::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 	    }
 
 	    public static function storeTsContAndTxHisCont($arr){

@@ -254,6 +254,8 @@ class PlgConnectedExternalApps{
 		      "WHY"						=> ""
 		    ];
 
+		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT']))]);
+
 		    $cekPlacement 		= DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->first();
 		    if (empty($cekPlacement)) {
 		      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
@@ -287,6 +289,7 @@ class PlgConnectedExternalApps{
 		}
 
 		public static function flagRealisationRequest(){
+			$res = [];
 			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->whereNotNull('API_SET')->whereNotIn('NOTA_ID',[20])->orderBy('nota_id', 'asc')->get();
 			$nota_id_old = 0;
 			foreach ($nota as $notaData) {
@@ -323,6 +326,7 @@ class PlgConnectedExternalApps{
 								"json_response" => json_encode($response),
 								"create_name" => 'sceduler'
 							];
+							$res[] = $storeHistory;
 							// static::storeHistory($storeHistory);
 						}
 						if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
@@ -336,6 +340,7 @@ class PlgConnectedExternalApps{
 									"id"=>$list[$config['head_primery']],
 									"update"=>[$config['head_status']=>5]
 								];
+								$res[] = $storeHistory;
 								$storeHistory = [
 									"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
 									"action" => 'flagRealisationHdrRequest',
@@ -352,6 +357,7 @@ class PlgConnectedExternalApps{
 				}
 				$nota_id_old = $notaData->nota_id;
 			}
+			return $res;
 		}
 
 		public static function storeHistory($inp){
