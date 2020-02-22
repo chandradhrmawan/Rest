@@ -362,6 +362,88 @@ class PlgFunctTOS{
 
 	// store request data to tos
 
+		private static function duplicateAndStoreToRec($head,$dtls,$arr){
+			$storeRecDtl = '';
+			foreach ($dtls as $dtl) {
+				$storeRecDtl .= '
+				{
+					"rec_dtl_id": null,
+					"rec_hdr_id": null,
+					"rec_dtl_owner": "'.$dtl[$arr['config']['DTL_OWNER']].'",
+					"rec_dtl_owner_name": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+					"rec_dtl_cont": "'.$dtl[$arr['config']['DTL_BL']].'",
+					"rec_dtl_cont_size": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+					"rec_dtl_cont_type": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+					"rec_dtl_cont_status": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+					"rec_dtl_cont_danger": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+					"rec_dtl_via": "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
+					"rec_dtl_via_name": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+					"rec_dtl_cmdty_id": null,
+					"rec_dtl_cmdty_name": "",
+					"rec_dtl_date_plan": "'.$dtl[$arr['config']['DTL_DATE_REC']].'",
+				},
+				';
+			}
+	        $storeRecDtl = substr($storeRecDtl, 0,-1);
+			$storeRecHead = '
+				{
+					"REC_ID": "",
+					"REC_NO": "'.$head[$arr['config']['head_no']].'",
+					"REC_DATE": "'.$head[$arr['config']['head_date']].'",
+					"REC_PAYMETHOD": "'.$head[$arr['config']['head_paymethod']].'",
+					"REC_CUST_ID": "'.$head[$arr['config']['head_cust']].'",
+					"REC_CUST_NAME": "'.$head[$arr['config']['head_cust_name']].'",
+					"REC_CUST_NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
+					"REC_CUST_ACCOUNT": null,
+					"REC_STACKBY_ID": "'.$head[$arr['config']['head_shipping_agent_id']].'",
+					"REC_STACKBY_NAME": "'.$head[$arr['config']['head_shipping_agent_name']].'",
+					"REC_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
+					"REC_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
+					"REC_VOYIN": "'.$head[$arr['config']['head_vin']].'",
+					"REC_VOYOUT": "'.$head[$arr['config']['head_vout']].'",
+					"REC_VVD_ID": "'.$head[$arr['config']['head_vvd']].'",
+					"REC_VESSEL_ETA": "'.$head[$arr['config']['head_vessel_eta']].'",
+					"REC_VESSEL_ETD": "'.$head[$arr['config']['head_vessel_etd']].'",
+					"REC_BRANCH_ID": "'.$head[$arr['config']['head_branch']].'",
+					"REC_NOTA": "'.$head[$arr['config']['head_nota']].'",
+					"REC_FROM": "'.$head[$arr['config']['head_from']].'",
+					"REC_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
+					"REC_STATUS": 10,
+					"REC_VESSEL_AGENT": "",
+					"REC_VESSEL_AGENT_NAME": "",
+					"REC_CUST_ADDRESS": "'.$head[$arr['config']['head_cust_addr']].'",
+					"REC_BRANCH_CODE": "'.$head[$arr['config']['head_branch_code']].'",
+					"REC_PBM_ID": "'.$head[$arr['config']['head_pbm_id']].'",
+					"REC_PBM_NAME": "'.$head[$arr['config']['head_pbm_name']].'",
+					"REC_VESSEL_PKK": "'.$head[$arr['config']['head_pbm_id']].'"
+				}
+	        	';
+	        $json = '{
+	        	        		"action": "saveheaderdetail",
+	        	        		"data": [
+	        	        			"HEADER",
+	        	        			"DETAIL"
+	        	        		],
+	        	        		"HEADER": {
+	        	        			"DB": "omuster",
+	        	        			"TABLE": "TX_HDR_REC",
+	        	        			"PK": "REC_ID",
+	        	        			"VALUE": ['.$storeRecHead.']
+	        	        		},
+	        	        		"DETAIL": {
+	        	        			"DB": "omuster",
+	        	        			"TABLE": "TX_DTL_REC",
+	        	        			"FK": [
+	        	        				"rec_hdr_id",
+	        	        				"rec_id"
+	        	        			],
+	        	        			"VALUE": ['.$storeRecDtl.']
+	        	        		}
+	        	        	}';
+	        $arr = json_decode($json,true);
+	        return GlobalHelper::saveheaderdetail($arr);
+		}
+
 		private static function getHeadFromTmReff10($head,$arr){
 			return DB::connection('omuster')->table('TM_REFF')->where([
 	          'reff_tr_id' => 5,
@@ -518,25 +600,20 @@ class PlgFunctTOS{
 		}
 
 		private static function buildJsonTX_HDR_STUFF($arr){
-			$appendHeader 	 = null;
-			$appendArrdetail = null;
-			$head 				 	 = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
-			$head 					 = (array)$head;
-
-			$contFromName = DB::connection('omuster')
-											->table($arr['config']['head_table']." A")
-											->join("TM_REFF B", "A.".$arr['config']['head_from'], '=', 'B.REFF_ID')
-											->where("B.REFF_TR_ID", "5")
-											->first();
-
 			if (!is_array($arr['config']['kegiatan']) and $arr['config']['kegiatan'] == 5) {
 	        	$actionJ = 'getStuffing';
+	        }else{
+	        	if ($arr['config']['kegiatan'] == [3,5]) {
+	        		$actionJ = 'getRecStuffing';
+	        	}else{
+	        		$actionJ = 'getRecStuffingDel';
+	        	}
 	        }
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
-	          $arrdetil .= '{'.$appendArrdetail.'
+	          $arrdetil .= '{
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
@@ -545,7 +622,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_REMARK_SP2": "",
 	            "REQ_DTL_ORIGIN": "'.$contFromName->reff_name.'",
-							"REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+	            "REQ_DTL_DEL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
 	            "TGL_MULAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
 	            "TGL_SELESAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 	          },';
@@ -561,9 +639,12 @@ class PlgFunctTOS{
 	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
 	        }
 	        $dr = static::getHeadFromTmReff10($head,$arr);
+	        if (in_array($actionJ, ['getRecStuffing','getRecStuffingDel'])) {
+	        	static::duplicateAndStoreToRec($head,$dtls,$arr);
+	        }
 	        return $json_body = '{
 	          "action" : "'.$actionJ.'",
-	          "header": {'.$appendHeader.'
+	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",

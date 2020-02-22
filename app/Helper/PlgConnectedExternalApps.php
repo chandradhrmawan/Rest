@@ -290,7 +290,7 @@ class PlgConnectedExternalApps{
 
 		public static function flagRealisationRequest(){
 			$res = [];
-			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->whereNotNull('API_SET')->where('NOTA_ID',3)->orderBy('nota_id', 'asc')->get();
+			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->whereNotNull('API_SET')->orderBy('nota_id', 'asc')->get();
 			$nota_id_old = 0;
 			foreach ($nota as $notaData) {
 				if ($nota_id_old != $notaData->nota_id) {
