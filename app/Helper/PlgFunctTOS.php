@@ -657,7 +657,7 @@ class PlgFunctTOS{
 	            "FUMI_DTL_ACTIVE": "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
 	            "FUMI_DTL_START_FUMI_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
 	            "FUMI_DTL_END_FUMI_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
-	            "FUMI_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_ID']].'",
+	            "FUMI_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
 	            "FUMI_DTL_COUNTER": "'.$getCountCounter->cont_counter.'"
 	          },';
 	        }
