@@ -263,7 +263,7 @@ class PlgFunctTOS{
 			"gateout_req_no" 		 	=> $listR['NO_REQUEST'],
 			"gateout_pol_no" 		 	=> $listR['NOPOL'],
 			"gateout_cont_status" => $listR['STATUS'],
-			"gateout_date" 				=> date('Y-m-d', strtotime($listR['TGL_OUT'])),
+			"gateout_date" 				=> date('Y-m-d h:i:s', strtotime($listR['TGL_OUT'])),
 			"gateout_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
 			"gateout_create_by" 	=> 1,
 			"gateout_branch_id" 	=> $hdr[$config['head_branch']],
