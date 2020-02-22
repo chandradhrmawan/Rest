@@ -281,7 +281,7 @@ class PlgFunctTOS{
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update([
-			$config['DTL_REAL_DATE'] =>date('Y-m-d', strtotime($listR['TGL_OUT']))
+			$config['DTL_REAL_DATE'] =>date('Y-m-d h:i:s', strtotime($listR['TGL_OUT']))
 		]);
 
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR['TGL_OUT']];
@@ -302,11 +302,11 @@ class PlgFunctTOS{
 		if ($listR[$config['DTL_REAL_DATE']['status']] == 1) {
 			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['uster']['usterStart'] => date('Y-m-d', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['uster']['usterStart'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
 		}else{
 			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['uster']['usterEnd'] => date('Y-m-d', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['uster']['usterEnd'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where([
