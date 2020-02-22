@@ -255,13 +255,7 @@ class PlgConnectedExternalApps{
 		    ];
 
 		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT']))]);
-
-		    $cekPlacement 		= DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->first();
-		    if (empty($cekPlacement)) {
-		      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
-		    } else {
-		      DB::connection('omuster')->table('TX_PLACEMENT')->where($findPlacement)->update($storePlacement);
-		    }
+	      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
 
 		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
 		    if (empty($cekHistory)) {
