@@ -293,27 +293,6 @@ class PlgConnectedExternalApps{
 					foreach ($hdr as $list) {
 						$list = (array)$list;
 						$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
-						// Advance Payment Auto Realisation
-						if ($list[$config["head_paymethod"]] == "1") {
-							$findFinishflReal = [
-									$config["head_forigen"] => $list[$config["head_primery"]],
-									$config["DTL_FL_REAL"] 	=> $config["DTL_FL_REAL_F"][0]
-							];
-							$findFinishfl = [
-									$config["head_forigen"] => $list[$config["head_primery"]]
-							];
-							$cekDetail 		= DB::connection('omuster')->table($config["head_tab_detil"])->where($findFinishfl)->get();
-							$cekDetailReal= DB::connection('omuster')->table($config["head_tab_detil"])->where($findFinishflReal)->get();
-							$jumlahDet 	  = count($cekDetail);
-							$jumlahReal 	= count($cekDetailReal);
-							// return ["Jumlah Detail"=>$jumlahDet, "Jumlah Real"=>$jumlahReal];
-
-							if ($jumlahDet == $jumlahReal) {
-								$headerUpdate = DB::connection('omuster')->table($config['head_table'])->update([$config["head_status"]=>5]);
-							}
-						}
-						// end
-
 						if (
 							( // jika cash maka cek nota harus ada dan dibayarkan
 								!empty($cekNota)
