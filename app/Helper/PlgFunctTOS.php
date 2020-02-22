@@ -555,7 +555,7 @@ class PlgFunctTOS{
 	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-	            "REQ_DTL_DEL_DATE": "'.$dtl[$arr['config']['DEL_DTL_DATE_PLAN']].'",
+	            "REQ_DTL_DEL_DATE": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_HIS_CONT']])).'",
 	            "REQ_DTL_NO_SEAL": ""
 	          },';
 	        }
