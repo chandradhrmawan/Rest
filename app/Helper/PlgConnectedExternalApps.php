@@ -196,11 +196,6 @@ class PlgConnectedExternalApps{
 			static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
 			// return $res["result"]["result"];
 
-			$updateDetail				= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_FL_REAL', "2")->get();
-			foreach ($updateDetail as $updateVal) {
-				$updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_fl_real"=>"3"]);
-			}
-
 		  foreach ($res["result"]["result"] as $listR) {
 		    $findCont 				= [
 		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
@@ -235,7 +230,7 @@ class PlgConnectedExternalApps{
 		      "ID_YARD"				=> $listR["ID_YARD"],
 		      "ID_USER"				=> $listR["ID_USER"],
 		      "CONT_STATUS"		=> $listR["CONT_STATUS"],
-		      "TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
+		      "TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
 		      "BRANCH_ID"			=> $listR["BRANCH_ID"],
 		      "CONT_COUNTER"	=> $tsContainer[0]->cont_counter
 		    ];
@@ -244,7 +239,7 @@ class PlgConnectedExternalApps{
 		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
 		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
 		      "KEGIATAN"			=> "12",
-		      "HISTORY_DATE"		=> date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT'])),
+		      "HISTORY_DATE"		=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
 		      "ID_USER"				=> $listR["ID_USER"],
 		      "ID_YARD"				=> $listR["ID_YARD"],
 		      "STATUS_CONT"		=> $listR["CONT_STATUS"],
@@ -254,7 +249,14 @@ class PlgConnectedExternalApps{
 		      "WHY"						=> ""
 		    ];
 
-		    $updateFlReal 		= DB::connection('omuster')->table("TX_DTL_REC")->where('REC_DTL_ID', $updateVal->rec_dtl_id)->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['TGL_PLACEMENT']))]);
+				$headerID 				= DB::connection('omuster')->table('TX_HDR_REC')->where('REC_NO', $listR["NO_REQUEST"])->first();
+
+		    $updateFlReal 		= DB::connection('omuster')
+														->table("TX_DTL_REC")
+														->where('REC_DTL_CONT', $listR["NO_CONTAINER"])
+														->where('REC_HDR_ID', $headerID->rec_id)
+														->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])), "rec_fl_real"=>"3"]);
+
 	      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
 
 		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
