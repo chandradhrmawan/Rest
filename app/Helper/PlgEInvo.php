@@ -379,6 +379,7 @@ class PlgEInvo{
 	}
 
 	public static function sendInvPay($arr){
+		return [ "Success" => true, "sendInvPutReceipt" => 'by pass', "sendInvPutApply" => 'by pass' ];
 		$arr['cancNotaFrom'] = null;
 		if (!empty($arr['reqCanc'])) {
 			$arr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$arr['reqCanc']['cancelled_req_no'])->first();
