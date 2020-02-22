@@ -339,7 +339,7 @@ class PlgRequestBooking{
 				];
 			// set data
 			$tariffResp = BillingEngine::calculateTariff($set_data);
-			if (in_array($config['kegiatan'], [1])){
+			if (!in_array($config['kegiatan'], [21,22])){
 				$tariffResp['detil_data'] = $detil;
 			}
 			return $tariffResp;
