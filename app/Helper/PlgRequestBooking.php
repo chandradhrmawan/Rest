@@ -15,7 +15,7 @@ use App\Models\OmUster\TxPayment;
 class PlgRequestBooking{
 	// PLG
 		private static function migrateNotaData($find, $config, $findCanc){
-			if (in_array($config['kegiatan'], [7,8]) and $find[$config['head_status']] == 2) {
+			if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 2) {
 				return ['result' => null, "Success" => true];
 			}
 			$datenow = Carbon::now()->format('Y-m-d');
