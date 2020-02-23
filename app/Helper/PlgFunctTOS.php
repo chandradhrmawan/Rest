@@ -611,7 +611,8 @@ class PlgFunctTOS{
 	        	}
 	        }
 	        $arrdetil = '';
-
+					$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = (array)$head;
 					$contFromName = DB::connection('omuster')
 											->table($arr['config']['head_table']." A")
 											->join("TM_REFF B", "A.".$arr['config']['head_from'], '=', 'B.REFF_ID')
