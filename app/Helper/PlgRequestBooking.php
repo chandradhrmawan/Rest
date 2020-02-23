@@ -62,7 +62,7 @@ class PlgRequestBooking{
 				$headU->nota_trade_type = $tarif['trade_type'];
 				$headU->nota_req_no = $tarif['booking_number'];
 				// $headU->nota_real_no = '';
-				$headU->nota_ppn = $tarif['ppn_uper'];
+				$headU->nota_ppn = $tarif['ppn'];
 				// $headN->nota_paid = $getH->; // pasti null
 		        // $headN->nota_paid_date = $getH->; // pasti null
 		        // $headN->rest_payment = $getH->; // pasti null
@@ -83,6 +83,9 @@ class PlgRequestBooking{
 				$headU->save();
 
 				$headU = TxHdrNota::find($headU->nota_id);
+				if (empty($headU)) {
+					return ['result' => 'fail, error went store to nota hdr!', "Success" => false];
+				}
 				$no_nota .= $headU->nota_no.', ';
 				$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '".$tarif['temp_hdr_id']."' AND CUSTOMER_ID = '".$tarif['customer_id']."'";
 				$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
