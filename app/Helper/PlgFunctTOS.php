@@ -693,8 +693,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
-	            "TGL_MULAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
-	            "TGL_SELESAI": "'.date('d/m/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
+	            "TGL_MULAI": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+	            "TGL_SELESAI": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
