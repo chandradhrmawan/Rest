@@ -252,8 +252,8 @@ class PlgFunctTOS{
 		$findGATO = [
 			'GATEOUT_CONT' 					=> $listR['NO_CONTAINER'],
 			'GATEOUT_REQ_NO' 				=> $listR['NO_REQUEST'],
-			'GATEOUT_BRANCH_ID' 		=> $find[$config['head_branch']],
-			'GATEOUT_BRANCH_CODE' 	=> $find[$config['head_branch_code']]
+			'GATEOUT_BRANCH_ID' 		=> $hdr[$config['head_branch']],
+			'GATEOUT_BRANCH_CODE' 	=> $hdr[$config['head_branch_code']]
 		];
 
 		$cek 		= DB::connection('omuster')->table('TX_GATEOUT')->where($findGATO)->first();
