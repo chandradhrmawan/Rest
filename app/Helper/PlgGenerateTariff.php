@@ -270,7 +270,7 @@ class PlgGenerateTariff{
 	}
 
 	public static function calculateTariffBuild($find, $input, $config, $canceledReqPrepare){
-		if (in_array($config['kegiatan'], [7,8]) and $find[$config['head_status']] == 1) {
+		if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) {
 			return [
 				"result_flag"=>"S",
 				"result_msg"=>"Success",
