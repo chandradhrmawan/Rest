@@ -262,7 +262,7 @@ class PlgGenerateTariff{
 				$config['DTL_BL'] => $list[$config['DTL_BL']]
 			])->first();
 			$getOldDtDtl = (array)$getOldDtDtl;
-			$DTL_DATE_OUT_OLD = 'to_date(\''.\Carbon\Carbon::parse($getOldDtDtl[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+			$DTL_DATE_OUT_OLD = 'to_date(\''.\Carbon\Carbon::parse($getOldDtDtl[$config['DTL_DATE_OUT']['paymethod1']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 		}else{
 			$DTL_DATE_OUT_OLD = 'NULL';
 		}
