@@ -21,7 +21,8 @@ class PlgContHist{
 			$cont_location = $cekTsCont->cont_location;
 		}
 		$arrStoreTsContAndTxHisCont = [
-			'history_date' => $list[$config['DTL_DATE_HIS_CONT']],
+			// 'history_date' => $list[$config['DTL_DATE_HIS_CONT']],
+			'history_date' => date('Y-m-d h:i:s'), // nanti ganti ya mas adam
 			'cont_no' => $list[$config['DTL_BL']],
 			'branch_id' => $find[$config['head_branch']],
 			'branch_code' => $find[$config['head_branch_code']],
