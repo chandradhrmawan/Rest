@@ -26,9 +26,9 @@ class PlgGenerateTariff{
 	}
 
 	private static function getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input){
-		if (in_array($input['nota_id'], [5])) {
+		if (in_array($input['nota_id'], [3])) {
 			$in = [12,14];
-		} else if (in_array($input['nota_id'], [6])){
+		} else if (in_array($input['nota_id'], [4])){
 			$in = [12,13];
 		}
 
