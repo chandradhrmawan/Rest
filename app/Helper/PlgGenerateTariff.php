@@ -26,44 +26,19 @@ class PlgGenerateTariff{
 	}
 
 	private static function getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input){
-		if (in_array($input['nota_id'], [2,16])) {
-			$tglIn 	= DB::connection('omuster')
-			->table('TX_HISTORY_CONTAINER')
-			->where('NO_CONTAINER', $list[$config['DTL_BL']])
-			->orderBy("HISTORY_DATE", "DESC")
-			->first();
+		if (in_array($input['nota_id'], [5])) {
+			$in = [12,14];
+		} else if (in_array($input['nota_id'], [6])){
+			$in = [12,13];
 		}
-		else{
-			$in = [12,13,14];
-			if ($hdr[$config['head_paymethod']] == 1) {
-				$tglIn 	= DB::connection('omuster')
-				->table('TX_HISTORY_CONTAINER')
-				->where('NO_CONTAINER', $list[$config['DTL_BL']])
-				->whereIn('KEGIATAN', $in)
-				->orderBy("HISTORY_DATE", "DESC")
-				->first();
-			}else{
-				$tglIn 	= DB::connection('omuster')
-				->table('TX_HISTORY_CONTAINER')
-				->where('NO_CONTAINER', $list[$config['DTL_BL']])
-				->whereIn('KEGIATAN', $in)
-				->orderBy("HISTORY_DATE", "DESC")
-				->get();
 
-				if (count($tglIn) == 0) {
-					return [
-						"result_flag"=>"F",
-						"result_msg"=>"Not found countainer!",
-						"no_req"=>$hdr[$config['head_no']],
-						"Success"=>false
-					];
-				}else if (count($tglIn) == 1) {
-					$tglIn = $tglIn[0];
-				}else{
-					$tglIn = $tglIn[1];
-				}
-			}
+		$tglIn 	= DB::connection('omuster')
+			->table('TX_HISTORY_CONTAINER')
+			->where('NO_CONTAINER', $list[$config['DTL_BL']]);
+		if (!in_array($input['nota_id'], [2,16])) {
+			$tglIn->whereIn('KEGIATAN', $in);
 		}
+		$tglIn = $tglIn->orderBy("HISTORY_DATE", "DESC")->first();
 		if (empty($tglIn)) {
 			return [
 				"result_flag"=>"F",
