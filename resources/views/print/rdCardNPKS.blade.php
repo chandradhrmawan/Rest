@@ -28,7 +28,7 @@
   <table width="100%" style="font-size:10px">
     <tr>
       <td style="width:10%"><img src="{{ url('/other/logo_ptp.png') }}" style="height:50px"></td>
-      <td style="vertical-align:top"><b>PTP MULTIPURPOSE TERMINAL</b><hr><b>{{$config['nota_name']}} CARD</b></td>
+      <td style="vertical-align:top"><b>PTP MULTIPURPOSE TERMINAL</b><hr><b>{{$title}} CARD</b></td>
     </tr>
   </table>
 
@@ -101,7 +101,7 @@
 <table width="100%" style="font-size:10px;margin-top:20px">
   <tr>
     <td style="width:10%"><img src="{{ url('/other/logo_ptp.png') }}" style="height:50px"></td>
-    <td style="vertical-align:top"><b>PTP MULTIPURPOSE TERMINAL</b><hr><b>{{$config['nota_name']}} CARD</b></td>
+    <td style="vertical-align:top"><b>PTP MULTIPURPOSE TERMINAL</b><hr><b>{{$title}} CARD</b></td>
   </tr>
 </table>
 

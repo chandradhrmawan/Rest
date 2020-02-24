@@ -59,8 +59,10 @@ class PrintAndExport{
       "BRANCH_CODE"   => $branchCode
     ];
 
+    $tmNota           = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $notaId)->get();
     $notaData         = DB::connection('mdm')->table('TS_NOTA')->where($findConfig)->first();
     $config           = json_decode($notaData->api_set, true);
+    $title            = $tmNota[0]->nota_name;
 
     $findRequest      = [
         $config["head_primery"] => $id,
@@ -79,7 +81,7 @@ class PrintAndExport{
 
 
     $page             = count($dtlRequest);
-    $html             = view('print.rdCardNPKS', ["page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
+    $html             = view('print.rdCardNPKS', ["title"=>$title, "page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
     $filename         = $hdrRequest[$config["head_primery"]];
     $dompdf           = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
