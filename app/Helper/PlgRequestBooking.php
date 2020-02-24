@@ -617,6 +617,7 @@ class PlgRequestBooking{
         	$sendInvPay = PlgEInvo::sendInvPay($arr);
         	if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
         		return [
+        			'Success' => false,
         			'response' => 'Fail, cant send payment invoice',
         			'no_pay' => $pay->pay_no,
         			'nota_no' => $getNota->nota_no,
