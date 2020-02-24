@@ -117,7 +117,11 @@ class PlgFunctTOS{
 		$config = json_decode($config->api_set, true);
 		$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
 		$find = (array)$find;
-		$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
+		$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S']);
+		if (!empty($config['DTL_IS_ACTIVE'])) {
+			$dtlLoop = $dtlLoop->where($config['DTL_IS_ACTIVE'],'Y');
+		}
+		$dtlLoop = $dtlLoop->get();
 		$his_cont = [];
 		$Success = true;
 		$msg = 'Success get realisasion';
