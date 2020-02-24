@@ -137,7 +137,11 @@ class PlgFunctTOS{
 			}
 		}
 		$res['his_cont'] = $his_cont;
-		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->where($config['DTL_IS_ACTIVE'],'Y')->get();
+		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id']);
+		if (!empty($config['DTL_IS_ACTIVE'])) {
+			$dtl = $dtl->where($config['DTL_IS_ACTIVE'],'Y');
+		}
+		$dtl = $dtl->get();
         return [
         	'response' => $Success,
         	'result' => $msg,

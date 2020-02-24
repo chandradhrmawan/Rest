@@ -219,6 +219,10 @@ class PlgConnectedExternalApps{
 		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
+				if (empty($tsContainer)) {
+					return "TS_CONTAINER up to date";
+				}
+
 		    $storePlacement  	= [
 		      "PLACEMENT_ID"	=> $placementID[0]->nextval,
 		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
@@ -306,7 +310,7 @@ class PlgConnectedExternalApps{
 								and  $list[$config['head_paymethod']] == 2
 							)
 						) {
-							$input = [
+							 $input = [
 								"sceduler"=>true,
 								"nota_id"=>$notaData->nota_id,
 								"id"=>$list[$config['head_primery']]
@@ -326,10 +330,12 @@ class PlgConnectedExternalApps{
 							// static::storeHistory($storeHistory);
 						}
 						if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
-							$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
-								$config['head_forigen'] => $list[$config['head_primery']],
-								$config['DTL_IS_ACTIVE'] => 'Y'
-							])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
+							$condition = [];
+							$condition[$config['head_forigen']] = $list[$config['head_primery']];
+							if (!empty($config['DTL_IS_ACTIVE'])) {
+								$condition[$config['DTL_IS_ACTIVE']] = 'Y';
+							}
+							$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($condition)->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S'])->get();
 							if (count($dtl) == 0) {
 								if ($list[$config['head_status']] == 3) {
 									$upStHead = 5;
