@@ -25,14 +25,45 @@ class PlgGenerateTariff{
 		return $dateIn = $tglIn->gatein_date;
 	}
 
-	private static function getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config){
-		$in = [12,13,14];
-		$tglIn 	= DB::connection('omuster')
-		->table('TX_HISTORY_CONTAINER')
-		->where('NO_CONTAINER', $list[$config['DTL_BL']])
-		->whereIn('KEGIATAN', $in)
-		->orderBy("HISTORY_DATE", "DESC")
-		->first();
+	private static function getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input){
+		if (in_array($input['nota_id'], [2,16])) {
+			$tglIn 	= DB::connection('omuster')
+			->table('TX_HISTORY_CONTAINER')
+			->where('NO_CONTAINER', $list[$config['DTL_BL']])
+			->orderBy("HISTORY_DATE", "DESC")
+			->first();
+		}
+		else{
+			$in = [12,13,14];
+			if ($hdr[$config['head_paymethod']] == 1) {
+				$tglIn 	= DB::connection('omuster')
+				->table('TX_HISTORY_CONTAINER')
+				->where('NO_CONTAINER', $list[$config['DTL_BL']])
+				->whereIn('KEGIATAN', $in)
+				->orderBy("HISTORY_DATE", "DESC")
+				->first();
+			}else{
+				$tglIn 	= DB::connection('omuster')
+				->table('TX_HISTORY_CONTAINER')
+				->where('NO_CONTAINER', $list[$config['DTL_BL']])
+				->whereIn('KEGIATAN', $in)
+				->orderBy("HISTORY_DATE", "DESC")
+				->get();
+
+				if (count($tglIn) == 0) {
+					return [
+						"result_flag"=>"F",
+						"result_msg"=>"Not found countainer!",
+						"no_req"=>$hdr[$config['head_no']],
+						"Success"=>false
+					];
+				}else if (count($tglIn) == 1) {
+					$tglIn = $tglIn[0];
+				}else{
+					$tglIn = $tglIn[1];
+				}
+			}
+		}
 		if (empty($tglIn)) {
 			return [
 				"result_flag"=>"F",
@@ -206,7 +237,7 @@ class PlgGenerateTariff{
 				$dateIn = static::getLastContFromTX_GATEIN($list,$hdr,$config);
 				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			} else if (in_array($config['DTL_DATE_IN'], ["TX_HISTORY_CONTAINER"])){
-				$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config);
+				$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
 				if (!empty($config['DTL_STACK_DATE'])) {
 					DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
 				}
@@ -214,7 +245,7 @@ class PlgGenerateTariff{
 			} else if (is_array($config['DTL_DATE_IN'])){
 				$ddiType = $config['DTL_DATE_IN']['paymethod'.$hdr[$config['head_paymethod']]];
 				if (in_array($ddiType, ["TX_HISTORY_CONTAINER"])) {
-					$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config);
+					$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
 					$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}else{
 					$DTL_DATE_IN = empty($list[$ddiType]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$ddiType])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
