@@ -477,6 +477,11 @@ class PlgRequestBooking{
 					}
 	            }
 			}
+
+				$amount 						= str_replace(",","",$input['pay_amount']);
+				$amount 						= str_replace(".","",$amount);
+				$amount 						= substr($amount, 0,-2);
+
 	    	// pay_id            number,
 	    	// pay_no            varchar2(20 byte),
 	    	$store->pay_nota_no = $input['pay_nota_no'];
@@ -490,7 +495,7 @@ class PlgRequestBooking{
 	    	$store->pay_branch_code = $getNota->nota_branch_code;
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
-	    	$store->pay_amount = substr($input['pay_amount'], 0,-2);
+	    	$store->pay_amount = $amount;
 	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
 	    	$store->pay_note = $input['pay_note'];
 	    	$store->pay_create_by = $input['pay_create_by'];
