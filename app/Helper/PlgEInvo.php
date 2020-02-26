@@ -252,7 +252,7 @@ class PlgEInvo{
 								"processFlag":"",
 								"errorMessage":"",
 								"apiMessage":"",
-								"attributeCategory":"BANK",
+								"attributeCategory":"",
 								"referenceNum":"",
 								"receiptType":"",
 								"receiptSubType":"",
