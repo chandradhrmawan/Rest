@@ -307,14 +307,14 @@ class PlgFunctTOS{
 	}
 
 	public static function storeRealDateSE($listR,$hdr,$config,$input){
-		if ($listR[$config['DTL_REAL_DATE']['status']] == 1) {
+		if ($listR["STATUS"] == 1) {
 			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['uster']['usterStart'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['usterStart'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
 		}else{
 			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['uster']['usterEnd'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['usterEnd'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where([
