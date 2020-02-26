@@ -71,7 +71,7 @@ class IndexController extends Controller
         $data->orderby($in[0], $in[1]);
       }
       if(!empty($input["condition"]["service_code"])) {
-        $data->where("service_code",$input["condition"]["service_code"]);
+        $data->where("TM_NOTA.service_code",$input["condition"]["service_code"]);
       }
       $data->where(['TM_REFF.REFF_TR_ID' => '8']);
       $count    = $data->count();
