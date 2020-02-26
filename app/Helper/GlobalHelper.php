@@ -430,6 +430,8 @@ class GlobalHelper {
             $connect->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
           } else if(!empty($lower)) {
             $connect->where(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+          } else {
+            $connect->where($input["field"], "like", "%".$input["query"]."%");
           }
         }
       } else {
@@ -443,9 +445,12 @@ class GlobalHelper {
           $connect->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%");
         } else if(!empty($lower)) {
           $connect->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+        } else {
+          $connect->where($input["field"], "like", "%".$input["query"]."%");
         }
       }
     }
+
 
     $count    = $connect->count();
     if (!empty($input['start']) || $input["start"] == '0') {
