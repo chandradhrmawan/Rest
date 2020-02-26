@@ -173,7 +173,7 @@ class PlgFunctTOS{
 				$cont_counter++;
 			}
 			$arrStoreTsContAndTxHisCont = [
-				'history_date' => date('Y-m-d h:i:s', strtotime($real_value['real_date'])),
+				'history_date' => date('Y-m-d H:i:s', strtotime($real_value['real_date'])),
 				'cont_no' => $listR['NO_CONTAINER'],
 				'branch_id' => $hdr[$config['head_branch']],
 				'branch_code' => $hdr[$config['head_branch_code']],
@@ -238,7 +238,7 @@ class PlgFunctTOS{
 			"gatein_req_no" => $listR['NO_REQUEST'],
 			"gatein_pol_no" => $listR['NOPOL'],
 			"gatein_cont_status" => $listR['STATUS'],
-			"gatein_date" => date('Y-m-d h:i:s', strtotime($listR['TGL_IN'])),
+			"gatein_date" => date('Y-m-d H:i:s', strtotime($listR['TGL_IN'])),
 			"gatein_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
 			"gatein_create_by" => "1",
 			"gatein_branch_id" => $hdr[$config['head_branch']],
@@ -271,7 +271,7 @@ class PlgFunctTOS{
 			"gateout_req_no" 		 	=> $listR['NO_REQUEST'],
 			"gateout_pol_no" 		 	=> $listR['NOPOL'],
 			"gateout_cont_status" => $listR['STATUS'],
-			"gateout_date" 				=> date('Y-m-d h:i:s', strtotime($listR['TGL_OUT'])),
+			"gateout_date" 				=> date('Y-m-d H:i:s', strtotime($listR['TGL_OUT'])),
 			"gateout_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')"),
 			"gateout_create_by" 	=> 1,
 			"gateout_branch_id" 	=> $hdr[$config['head_branch']],
@@ -289,7 +289,7 @@ class PlgFunctTOS{
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update([
-			$config['DTL_REAL_DATE'] =>date('Y-m-d h:i:s', strtotime($listR['TGL_OUT']))
+			$config['DTL_REAL_DATE'] =>date('Y-m-d H:i:s', strtotime($listR['TGL_OUT']))
 		]);
 
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR['TGL_OUT']];
@@ -300,7 +300,7 @@ class PlgFunctTOS{
 			$config['head_forigen'] => $hdr[$config['head_primery']],
 			$config['DTL_BL'] => $listR['NO_CONTAINER']
 		])->update([
-			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d h:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tos']]))
+			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d H:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tos']]))
 		]);
 
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR[$config['DTL_REAL_DATE']['tos']]];
@@ -310,11 +310,11 @@ class PlgFunctTOS{
 		if ($listR["STATUS"] == 1) {
 			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['usterStart'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['usterStart'] => date('Y-m-d H:i:s', strtotime($ret_date)) ];
 		}else if ($listR["STATUS"] == 2){
 			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['usterEnd'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['usterEnd'] => date('Y-m-d H:i:s', strtotime($ret_date)) ];
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where([
