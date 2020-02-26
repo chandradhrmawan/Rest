@@ -190,26 +190,8 @@ class PlgEInvo{
         return $lines = substr($lines, 0,-1);
 	}
 
-	public static function sendInvProforma($arr){
-		// return ['Success' =>true, 'response' => 'by pass dulu!']; // by pass
-		$sendArr = $arr;
-		$sendArr['cancNotaFrom'] = null;
-		if (!empty($arr['reqCanc'])) {
-			$sendArr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$arr['reqCanc']['cancelled_req_no'])->first();
-			$sendArr['cancNotaFrom'] = (array)$sendArr['cancNotaFrom'];
-			$sendArr['cancNotaFrom'] = $sendArr['cancNotaFrom']['nota_no'];
-		}
-		$branch = DB::connection('mdm')->table('TM_BRANCH')->where('branch_id',$arr['nota']['nota_branch_id'])->where('branch_code',$arr['nota']['nota_branch_code'])->get();
-		if (count($branch) == 0) {
-			return ['Success' =>false, 'response' => 'branch not found!'];
-		}
-		$branch = (array)$branch[0];
-		$nota_date = $arr['nota']['nota_date'];
-		$nota_date_noHour = date('Y-m-d', strtotime($arr['nota']['nota_date']));
-		$sendArr['nDateWitHour'] = $nota_date;
-		$sendArr['nDateNotHour'] = $nota_date_noHour;
-		$sendArr['branch'] = $branch;
-		$json = static::getJsonInvAR($sendArr);
+	public static function sendInvAR($arr){
+		$json = static::getJsonInvAR($arr);
 		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
         	"user" => config('endpoint.esbInvoicePutAR.user'),
         	"pass" => config('endpoint.esbInvoicePutAR.pass'),
@@ -379,7 +361,11 @@ class PlgEInvo{
 	}
 
 	public static function sendInvPay($arr){
-		// return [ "Success" => true, "sendInvPutReceipt" => 'by pass', "sendInvPutApply" => 'by pass' ];
+		// return [ "Success" => true, "sendInvAR" => 'by pass', "sendInvPutReceipt" => 'by pass', "sendInvPutApply" => 'by pass' ];
+		$sendInvAR = null;
+		$sendInvPutReceipt = null;
+		$sendInvPutApply = null;
+
 		$arr['cancNotaFrom'] = null;
 		if (!empty($arr['reqCanc'])) {
 			$arr['cancNotaFrom'] = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$arr['reqCanc']['cancelled_req_no'])->first();
@@ -403,16 +389,41 @@ class PlgEInvo{
 		}
 		$bank = (array)$bank;
 		$arr['bank'] = $bank;
-		$sendInvPutReceipt = static::sendInvReceipt($arr);
-		$sendInvPutReceipt['request']['json'] = json_decode($sendInvPutReceipt['request']['json'],true);
-		if ($sendInvPutReceipt['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
-			return ['Success' =>false, 'response' => 'fail send sendInvPutReceipt!', "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => null];
+
+		$nota_date = $arr['nota']['nota_date'];
+		$nota_date_noHour = date('Y-m-d', strtotime($arr['nota']['nota_date']));
+		$arr['nDateWitHour'] = $nota_date;
+		$arr['nDateNotHour'] = $nota_date_noHour;
+
+		if ($arr['nota']['nota_flag_einv'] == 0) {
+			$sendInvAR = static::sendInvAR($arr);
+			if ($sendInvAR['Success'] == false) {
+				return ['Success' =>false, 'response' => 'fail send sendInvAR!', "sendInvAR" => $sendInvAR, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
+			}else{
+				DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',$arr['nota']['nota_id'])->update(['nota_flag_einv'=>1]);
+				$arr['nota']['nota_flag_einv'] = 1;
+			}
 		}
-		$sendInvPutApply = static::sendInvApply($arr);
-		$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
-		if ($sendInvPutApply['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
-			return ['Success' =>false, 'response' => 'fail send sendInvPutApply!', "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply];
+		if ($arr['nota']['nota_flag_einv'] == 1) {
+			$sendInvPutReceipt = static::sendInvReceipt($arr);
+			$sendInvPutReceipt['request']['json'] = json_decode($sendInvPutReceipt['request']['json'],true);
+			if ($sendInvPutReceipt['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
+				return ['Success' =>false, 'response' => 'fail send sendInvPutReceipt!', "sendInvAR" =>$sendInvAR, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply];
+			}else{
+				DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',$arr['nota']['nota_id'])->update(['nota_flag_einv'=>2]);
+				$arr['nota']['nota_flag_einv'] = 2;
+			}
 		}
-		return [ "Success" => true, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
+		if ($arr['nota']['nota_flag_einv'] == 3) {
+			$sendInvPutApply = static::sendInvApply($arr);
+			$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
+			if ($sendInvPutApply['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
+				return ['Success' =>false, 'response' => 'fail send sendInvPutApply!', "sendInvAR" => $sendInvAR, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply];
+			}else{
+				DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',$arr['nota']['nota_id'])->update(['nota_flag_einv'=>3]);
+				$arr['nota']['nota_flag_einv'] = 3;
+			}
+		}
+		return [ "Success" => true, "sendInvAR" => $sendInvAR, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }

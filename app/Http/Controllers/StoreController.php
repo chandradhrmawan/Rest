@@ -17,6 +17,7 @@ use App\Helper\GlobalHelper;
 use App\Helper\ConnectedExternalApps;
 use App\Helper\RealisasiHelper;
 use App\Models\Mdm\TmTruckCompany;
+use App\Helper\PlgGenerateTariff;
 use App\Helper\PlgRequestBooking;
 use App\Helper\PlgConnectedExternalApps;
 use App\Helper\PlgFunctTOS;
@@ -146,6 +147,10 @@ class StoreController extends Controller
     }
 
     // PLG
+      function simulationTariffPLG($input, $request){
+        return PlgGenerateTariff::simulationTariffPLG($input);
+      }
+
       function sendRequestPLG($input, $request){
         return PlgRequestBooking::sendRequestPLG($input);
       }
