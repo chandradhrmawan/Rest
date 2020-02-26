@@ -11,7 +11,8 @@ class PlgGenerateTariff{
 		$st = strtotime($st);
 		$ed = strtotime($ed);
 		$difference = abs($ed - $st)/3600;
-		return ceil($difference);
+		$difference = ceil($difference);
+		return $difference;
 	}
 
 	private static function getLastContFromTX_GATEIN($list,$hdr,$config){
@@ -159,7 +160,8 @@ class PlgGenerateTariff{
 			$DTL_QTY = 1;
 		}else if (is_array($config['DTL_QTY'])) {
 			if (!empty($config['DTL_QTY']['func'])) {
-				$DTL_QTY = static::$config['DTL_QTY']['func']($config['DTL_QTY']['start'],$config['DTL_QTY']['end']);
+				$funct = $config['DTL_QTY']['func'];
+				$DTL_QTY = static::$funct($list[$config['DTL_QTY']['start']],$list[$config['DTL_QTY']['end']]);
 			}else{
 				$DTL_QTY = 'NULL';
 			}
