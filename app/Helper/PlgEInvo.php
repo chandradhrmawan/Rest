@@ -419,7 +419,7 @@ class PlgEInvo{
 				$arr['nota']['nota_flag_einv'] = 2;
 			}
 		}
-		if ($arr['nota']['nota_flag_einv'] == 3) {
+		if ($arr['nota']['nota_flag_einv'] == 2) {
 			$sendInvPutApply = static::sendInvApply($arr);
 			$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
 			if ($sendInvPutApply['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
