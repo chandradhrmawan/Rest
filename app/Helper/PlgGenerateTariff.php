@@ -276,14 +276,6 @@ class PlgGenerateTariff{
 	}
 
 	public static function calculateTariffBuild($find, $input, $config, $canceledReqPrepare){
-		if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) {
-			return [
-				"result_flag"=>"S",
-				"result_msg"=>"Success",
-				"no_req"=>$find[$config['head_no']],
-				"Success"=>true
-			];
-		}
 		$setH = static::calculateTariffBuildHead($find, $input, $config, $canceledReqPrepare);// build head
 		// build detil
 		$setD = [];
@@ -292,6 +284,15 @@ class PlgGenerateTariff{
 			$detil->where($config['DTL_IS_ACTIVE'], 'Y');
 		}
 		$detil = $detil->get();
+		if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) {
+			return [
+				"detil_data"=>$detil,
+				"result_flag"=>"S",
+				"result_msg"=>"Success",
+				"no_req"=>$find[$config['head_no']],
+				"Success"=>true
+			];
+		}
 		foreach ($detil as $list) {
 			$list = (array)$list;
 			$dtl = static::calculateTariffBuildDetail($find, $list, $input, $config);
