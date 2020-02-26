@@ -207,6 +207,11 @@ class PlgEInvo{
 	}
 
 	private static function sendInvReceipt($arr){
+		$getTsNota = DB::connection('mdm')->table('TS_NOTA')->where([
+			'branch_id' => $arr['nota']['nota_branch_id'],
+			'branch_code' => $arr['nota']['nota_branch_code'],
+			'nota_id' => $arr['nota']['nota_group_id']
+		])->first();
 		$json ='
 			{
 				"arRequestDoc":{
@@ -257,7 +262,7 @@ class PlgEInvo{
 								"attribute14":"'.$arr['nota']['nota_sub_context'].'",
 								"attribute15":"",
 								"statusReceipt":"N",
-								"sourceInvoice":"BRG",
+								"sourceInvoice":"'.$getTsNota->nota_context.'",
 								"statusReceiptMsg":"",
 								"invoiceNum":"",
 								"amountOrig":null,
