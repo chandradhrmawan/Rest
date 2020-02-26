@@ -311,7 +311,7 @@ class PlgFunctTOS{
 			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
 			$up = [ $config['DTL_REAL_DATE']['usterStart'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
-		}else{
+		}else if ($listR["STATUS"] == 2){
 			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
 			$up = [ $config['DTL_REAL_DATE']['usterEnd'] => date('Y-m-d h:i:s', strtotime($ret_date)) ];
