@@ -947,7 +947,7 @@ class PlgFunctTOS{
 							"REQUEST_BL_NO": "",
 							"REQUEST_SPPB_NO": "",
 							"REQUEST_SPPB_DATE": "",
-							"REQUEST_RECEIVING_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
+							"REQUEST_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 							"REQUEST_NOTA_DATE": "'.date('d-M-y', strtotime($nota_date)).'",
 							"REQUEST_PAID_DATE": "'.date('d-M-y', strtotime($nota_paid_date)).'",
 							"REQUEST_FROM": "'.$rec_dr->reff_name.'",
