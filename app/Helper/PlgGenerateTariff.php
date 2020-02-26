@@ -392,7 +392,7 @@ class PlgGenerateTariff{
 		return $newD;
 	}
 
-	public static function showTempTariff($query){
+	public static function showTempTariff($query, $config, $find){
 		$result = [];
 		$getHS = DB::connection('eng')->select(DB::raw($query));
     	foreach ($getHS as $getH){
@@ -432,6 +432,12 @@ class PlgGenerateTariff{
     		}
 
           // build head
+    		$uper_req_date = null;
+    		$uper_vessel_name = null;
+    		if (!empty($config)) {
+    			$uper_req_date = $find[$config['head_date']];
+    			$uper_vessel_name = $find[$config['head_date']];
+    		}
     		$head = [
     			'dpp' => $getH->dpp,
     			'ppn' => $getH->ppn,
@@ -444,15 +450,12 @@ class PlgGenerateTariff{
     			'uper_amount' => $getH->total_uper,
     			'uper_currency_code' => $getH->currency,
     			'uper_status' => 'P',
-                // Tambahan Mas Adi
     			'uper_service_code' => $getH->nota_service_code,
     			'uper_branch_account' => $getH->branch_account,
     			'uper_context' => $getH->nota_context,
     			'uper_sub_context' => $getH->nota_sub_context,
-                // 'uper_terminal_code' => $find[$config['head_terminal_code']],
     			'uper_branch_id' => $getH->branch_id,
     			'uper_branch_code' => $getH->branch_code,
-    			'uper_vessel_name' => $find[$config['head_vessel_name']],
     			'uper_faktur_no' => '-',
     			'uper_trade_type' => $getH->trade_type,
     			'uper_req_no' => $getH->booking_number,
@@ -460,19 +463,22 @@ class PlgGenerateTariff{
     			'uper_percent' => $getH->percent_uper,
     			'uper_dpp' => $getH->dpp_uper,
     			'uper_nota_id' => $getH->nota_id,
-    			'uper_req_date' =>  $find[$config['head_date']]
+    			'uper_req_date' =>  $uper_req_date,
+    			'uper_vessel_name' => $uper_vessel_name
     		];
-    		if ($config['head_pbm_id'] != null) {
-    			$head['uper_pbm_id'] = $find[$config['head_pbm_id']];
-    		}
-    		if ($config['head_pbm_name'] != null) {
-    			$head['uper_pbm_name'] = $find[$config['head_pbm_name']];
-    		}
-    		if ($config['head_shipping_agent_id'] != null) {
-    			$head['uper_shipping_agent_id'] = $find[$config['head_shipping_agent_id']];
-    		}
-    		if ($config['head_shipping_agent_name'] != null) {
-    			$head['uper_shipping_agent_name'] = $find[$config['head_shipping_agent_name']];
+    		if (!empty($config)) {
+	    		if ($config['head_pbm_id'] != null) {
+	    			$head['uper_pbm_id'] = $find[$config['head_pbm_id']];
+	    		}
+	    		if ($config['head_pbm_name'] != null) {
+	    			$head['uper_pbm_name'] = $find[$config['head_pbm_name']];
+	    		}
+	    		if ($config['head_shipping_agent_id'] != null) {
+	    			$head['uper_shipping_agent_id'] = $find[$config['head_shipping_agent_id']];
+	    		}
+	    		if ($config['head_shipping_agent_name'] != null) {
+	    			$head['uper_shipping_agent_name'] = $find[$config['head_shipping_agent_name']];
+	    		}
     		}
               // if ($config['head_terminal_name'] != null) {
               //     $head['uper_terminal_name'] = $find[$config['head_terminal_name']];
@@ -537,7 +543,7 @@ class PlgGenerateTariff{
 			return $tariffResp;
 		}
 		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$input['P_BOOKING_NUMBER']."'";
-		$result = static::showTempTariff($query);
+		$result = static::showTempTariff($query,null,null);
 		return [ "Success" => true, "result" => $result];
 	}
 }

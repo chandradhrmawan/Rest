@@ -249,7 +249,7 @@ class PlgRequestBooking{
 	    		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$findCanc->cancelled_no."'";
 	    	}
 
-	    	$result = PlgGenerateTariff::showTempTariff($query);
+	    	$result = PlgGenerateTariff::showTempTariff($query, $config, $find);
 
 			return [ "Success" => true, "result" => $result];
 		}
