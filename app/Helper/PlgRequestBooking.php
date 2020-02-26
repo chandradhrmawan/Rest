@@ -402,8 +402,9 @@ class PlgRequestBooking{
 			// update utk gabungan
 			return [
 				'result' => "Success, confirm realisasion! ".$pesan['result'],
-				"note" => $pesan['result'],
-				'no_req' => $find[$config['head_no']]
+				'note' => $pesan['result'],
+				'no_req' => $find[$config['head_no']],
+				'tariffResp' => $tariffResp
 			];
 	    }
 
