@@ -422,20 +422,9 @@ class PlgRequestBooking{
             $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
             $config = json_decode($config->api_set, true);
             $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
-            $sendInvProforma = null;
             if ($input['approved'] == 'true') {
-            	$arr = [
-            		'nota' => (array)$getNota['attributes'],
-            		'config' => $config,
-            		'reqCanc' => (array)$cekIsCanc
-            	];
-            	$sendInvProforma = PlgEInvo::sendInvProforma($arr);
-            	if ($sendInvProforma['Success'] == true) {
-	            	$getNota->nota_status = 2;
-	            	$getNota->save();
-            	}else{
-            		return ['Success' => false, 'result' => 'Fail, cant send invoice proforma', 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
-            	}
+            	$getNota->nota_status = 2;
+            	$getNota->save();
             	$msg='Success, approved!';
             }else if ($input['approved'] == 'false') {
             	$getNota->nota_status = 4;
@@ -454,7 +443,7 @@ class PlgRequestBooking{
 
             	$msg='Success, rejected!';
             }
-            return ['result' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvProforma' => $sendInvProforma];
+            return ['result' => $msg, 'nota_no' => $getNota->nota_no];
 	    }
 
 	    public static function storePaymentPLG($input){
