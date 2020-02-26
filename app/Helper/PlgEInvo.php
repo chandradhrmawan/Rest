@@ -322,7 +322,7 @@ class PlgEInvo{
 								"customerTrxId":"'.$arr['payment']['pay_cust_id'].'",
 								"paymentScheduleId":null,
 								"bankId":"'.$arr['bank']['bank_id'].'",
-								"receiptSource":"ESB",
+								"receiptSource":"INVOICE",
 								"legacySystem":"NPKSBILLING",
 								"statusTransfer":"N",
 								"errorMessage":null,
