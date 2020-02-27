@@ -28,8 +28,9 @@ $app->post('/cek', 'IndexController@api');
 
 // Test Route
 $app->post('/get-file', 'StoreController@testview_file');
-$app->post('/tree-menu/{roll_id}' , 'ViewController@menuTree');
-$app->get('/export_testlainlain'  ,'ViewController@exportToExcel');
+$app->post('/tree-menu/{roll_id}'      , 'ViewController@menuTree');
+$app->get('/export_testlainlain'       , 'ViewController@exportToExcel');
+$app->get('/apiSet/{notaId}/{branchId}', 'ViewController@apiSet');
 
 // Print
 $app->get('/print/getPass/{id}'   ,'ViewController@printGetPass');
