@@ -853,10 +853,12 @@ class BillingEngine{
               $setD .= ' detail.DTL_FUMI_TYPE := \''.$list['DTL_FUMI_TYPE'].'\';';
             }
           }
-          if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
-            $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
-          }else{
-            $setD .= ' detail.DTL_VIA := \''.$list['DTL_VIA'].'\';';
+          if (!empty($list['DTL_VIA'])) {
+            if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
+              $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
+            }else{
+              $setD .= ' detail.DTL_VIA := \''.$list['DTL_VIA'].'\';';
+            }
           }
           if ($list['DTL_BL'] == NULL or $list['DTL_BL'] == 'NULL') {
             $setD .= ' detail.DTL_BL := '.$list['DTL_BL'].';';
