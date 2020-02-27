@@ -490,13 +490,14 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "getCancelledReq",
 	          "header": {
-	            "REQ_NO": "'.$head['cancelled_no'].'",
+	            "REQ_NO": "'.$head['cancelled_req_no'].'",
 	            "REQ_RECEIVING_DATE": "'.date('d-M-y', strtotime($head['cancelled_create_date'])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
 	            "REQ_MARK": "",
 	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'",
-							"CANCELLED_STATUS" : "'.$arr["config"]["CANCELLED_STATUS"].'"
+							"CANCELLED_STATUS" : "'.$arr["config"]["CANCELLED_STATUS"].'",
+							"REQ_CANCEL_NO" : "'.$head['cancelled_no'].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
