@@ -343,7 +343,7 @@ class PlgFunctTOS{
 		$qtyReal 										= $dataDetail->rec_cargo_dtl_real_qty;
 
 		if ($qty <= $qtyReal) {
-			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$hdr[$config["DTL_FL_REAL_V"]]]);
 		}
 	}
 
@@ -364,7 +364,7 @@ class PlgFunctTOS{
 		$qtyReal 										= $dataDetail->del_cargo_dtl_real_qty;
 
 		if ($qty <= $qtyReal) {
-			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update(["DEL_CARGO_FL_REAL"=>$hdr[$config["DTL_FL_REAL_V"]]]);
 		}
 	}
 
