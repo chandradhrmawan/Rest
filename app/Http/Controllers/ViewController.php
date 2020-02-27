@@ -172,4 +172,18 @@ class ViewController extends Controller
     return PrintAndExport::printProformaNPKS($id);
   }
 
+  function apiSet($notaId, $branchId) {
+    $connect       = DB::connection('mdm')->table('TS_NOTA')->join('TM_NOTA', 'TM_NOTA.NOTA_ID', '=', 'TS_NOTA.NOTA_ID');
+    if (!empty($notaId) && !empty($branchId)) {
+      $findNota   = [
+        "TS_NOTA.NOTA_ID" => $notaId,
+        "TS_NOTA.BRANCH_ID" => $branchId
+      ];
+
+      $connect->where($findNota);
+    }
+    $data = $connect->get();
+    return view('print.apiSet',["data"=>$data]);
+
+  }
 }

@@ -343,7 +343,7 @@ class PlgFunctTOS{
 		$qtyReal 										= $dataDetail->rec_cargo_dtl_real_qty;
 
 		if ($qty <= $qtyReal) {
-			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$hdr[$config["DTL_FL_REAL_V"]]]);
 		}
 	}
 
@@ -364,7 +364,7 @@ class PlgFunctTOS{
 		$qtyReal 										= $dataDetail->del_cargo_dtl_real_qty;
 
 		if ($qty <= $qtyReal) {
-			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update(["DEL_CARGO_FL_REAL"=>$hdr[$config["DTL_FL_REAL_V"]]]);
 		}
 	}
 
@@ -484,18 +484,19 @@ class PlgFunctTOS{
 	        $nota_paid_date = null;
 	        if (!empty($nota)) {
 	        	$nota_no = $nota->nota_no;
-	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
-	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+	        	$nota_date = date('d-M-y', strtotime($nota->nota_date));
+	        	$nota_paid_date = date('d-M-y', strtotime($nota->nota_paid_date));
 	        }
 	        return $json_body = '{
 	          "action" : "getCancelledReq",
 	          "header": {
 	            "REQ_NO": "'.$head['cancelled_no'].'",
-	            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head['cancelled_create_date'])).'",
+	            "REQ_RECEIVING_DATE": "'.date('d-M-y', strtotime($head['cancelled_create_date'])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
 	            "REQ_MARK": "",
-	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'"
+	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'",
+							"CANCELLED_STATUS" : "'.$arr["config"]["CANCELLED_STATUS"].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
