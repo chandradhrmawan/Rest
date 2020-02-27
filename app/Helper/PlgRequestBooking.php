@@ -155,22 +155,36 @@ class PlgRequestBooking{
 		}
 
 		private static function canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr){
+			if (!empty($config['DTL_IS_CANCEL'])) {
+				$def = [
+					$config['DTL_IS_ACTIVE'] => 'Y',
+					$config['DTL_IS_CANCEL'] => 'N'
+				];
+			}else{
+				$def = [
+					$config['DTL_QTY_CANC'] => 0
+				];
+			}
 			DB::connection('omuster')->table($config['head_tab_detil'])->where([
 				$config['head_forigen'] => $reqsHdr[$config['head_primery']]
-			])->update([
-				$config['DTL_IS_ACTIVE'] => 'Y',
-				$config['DTL_IS_CANCEL'] => 'N'
-			]);
+			])->update($def);
 			$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get();
 			foreach ($cnclDtl as $list) {
 				$noDtl = $list->cancl_cont.$list->cancl_si;
+				if (!empty($config['DTL_IS_CANCEL'])){
+					$upd = [
+						$config['DTL_IS_ACTIVE'] => 'N',
+						$config['DTL_IS_CANCEL'] => 'Y'
+					];
+				}else{
+					$upd = [
+						$config['DTL_QTY_CANC'] => $list->cancl_qty
+					];
+				}
 				DB::connection('omuster')->table($config['head_tab_detil'])->where([
 					$config['head_forigen'] => $reqsHdr[$config['head_primery']],
 					$config['DTL_BL'] => $noDtl
-				])->update([
-					$config['DTL_IS_ACTIVE'] => 'N',
-					$config['DTL_IS_CANCEL'] => 'Y'
-				]);
+				])->update($upd);
 			}
 		}
 

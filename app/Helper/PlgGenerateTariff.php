@@ -166,7 +166,14 @@ class PlgGenerateTariff{
 				$DTL_QTY = 'NULL';
 			}
 		}else{
-			$DTL_QTY = empty($list[$config['DTL_QTY']]) ? 'NULL' : $list[$config['DTL_QTY']];
+			if (empty($list[$config['DTL_QTY']])) {
+				$qty = 'NULL';
+			}else if(!empty($config['DTL_QTY_CANC'])){
+				$qty = $list[$config['DTL_QTY']] - $list[$config['DTL_QTY_CANC']];
+			}else{
+				$qty = $list[$config['DTL_QTY']];
+			}
+			$DTL_QTY = $qty;
 		}
 		return $DTL_QTY;
 	}

@@ -854,7 +854,7 @@ class PlgFunctTOS{
 							"REQUEST_DTL_STATUS": "0",
 							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']].'",
+							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']]-$dtl[$arr['config']['DTL_QTY_CANC']].'",
 							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
@@ -917,7 +917,7 @@ class PlgFunctTOS{
 							"REQUEST_DTL_STATUS": "0",
 							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']].'",
+							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']]-$dtl[$arr['config']['DTL_QTY_CANC']].'",
 							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
