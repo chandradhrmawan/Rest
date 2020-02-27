@@ -164,7 +164,7 @@ class PlgRequestBooking{
 				$cek = (array)$cek;
 				if ($cek[$config['DTL_FL_REAL']] != 1) {
 					return [
-						'Success' => false, 
+						'Success' => false,
 						'no_item' => $cek[$config['DTL_BL']],
 						'result_msg' => 'Fail, '.$cek[$config['DTL_BL']].' telah masuk tahap realisasi'
 					];
@@ -179,20 +179,20 @@ class PlgRequestBooking{
 				])->first();
 				if (empty($reqDtl)) {
 					return [
-						'Success' => false, 
+						'Success' => false,
 						'no_item' => $noDtl,
 						'result_msg' => 'Fail, '.$noDtl.' tidak ditemukan'
 					];
 				}
 				$reqDtl = (array)$reqDtl;
 				if ($config['DTL_QTY'] == 1) {
-					$reqDtlQty = 1
+					$reqDtlQty = 1;
 				}else{
 					$reqDtlQty = $reqDtl[$config['DTL_QTY']];
 				}
 				if ($list->cancl_qty > $reqDtlQty) {
 					return [
-						'Success' => false, 
+						'Success' => false,
 						'no_item' => $reqDtl[$config['DTL_BL']],
 						'result_msg' => 'Fail, '.$reqDtl[$config['DTL_BL']].' qty yang dibatalkan melebihi data request'
 					];
@@ -253,7 +253,7 @@ class PlgRequestBooking{
 					])->first();
 					if (empty($getRecDtlSI)) {
 						return [
-							'Success' => false, 
+							'Success' => false,
 							'no_item' => $dtlDel[$cnf22['DTL_BL']],
 							'result_msg' => 'Fail, '.$dtlDel[$cnf22['DTL_BL']].' tidak ditemukan'
 						];
@@ -262,7 +262,7 @@ class PlgRequestBooking{
 					$getRecDtlSI = (array)$getRecDtlSI;
 					if ($getRecDtlSI['rec_cargo_remaining_qty'] < $dtlDel['del_cargo_dtl_qty']) {
 						return [
-							'Success' => false, 
+							'Success' => false,
 							'no_item' => $dtlDel[$cnf22['DTL_BL']],
 							'result_msg' => 'Fail, '.$dtlDel[$cnf22['DTL_BL']].' qty melebihi yang telah direquest delivery'
 						];
