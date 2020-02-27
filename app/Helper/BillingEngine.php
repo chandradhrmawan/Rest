@@ -853,11 +853,15 @@ class BillingEngine{
               $setD .= ' detail.DTL_FUMI_TYPE := \''.$list['DTL_FUMI_TYPE'].'\';';
             }
           }
-          if (!empty($list['DTL_VIA'])) {
-            if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
-              $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
-            }else{
-              $setD .= ' detail.DTL_VIA := \''.$list['DTL_VIA'].'\';';
+          $getServCode = DB::connection('mdm')->table('TM_NOTA')->where('nota_id',$input['inputH']['P_NOTA_ID'])->first();
+          if ($getServCode->service_code == 2) {
+            $procPKG = 'PKG_BILLING_NPKS';
+            if (!empty($list['DTL_VIA'])) {
+              if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
+                $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
+              }else{
+                $setD .= ' detail.DTL_VIA := \''.$list['DTL_VIA'].'\';';
+              }
             }
           }
           if ($list['DTL_BL'] == NULL or $list['DTL_BL'] == 'NULL') {
