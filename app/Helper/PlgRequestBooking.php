@@ -149,6 +149,12 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result' => 'canceled request not found'];
 			}
 			$reqsHdr = (array)$reqsHdr;
+			static::canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr);
+
+			return ['Success' => true, 'find' => $reqsHdr, 'canc' => (array)$cnclHdr];
+		}
+
+		private static function canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr){
 			DB::connection('omuster')->table($config['head_tab_detil'])->where([
 				$config['head_forigen'] => $reqsHdr[$config['head_primery']]
 			])->update([
@@ -166,17 +172,15 @@ class PlgRequestBooking{
 					$config['DTL_IS_CANCEL'] => 'Y'
 				]);
 			}
-
-			return ['Success' => true, 'find' => $reqsHdr, 'canc' => (array)$cnclHdr];
 		}
 
 	    public static function sendRequestPLG($input){
 			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 			if (empty($config) or empty($config->api_set)) {
-				return ['Success' => false, 'result' => "Fail, nota not set!"];
+				return ['Success' => false, 'result_msg' => "Fail, nota not set!"];
 			}
 			if ($config->flag_status == 'N') {
-				return ['Success' => false, 'result' => "Fail, nota not active!"];
+				return ['Success' => false, 'result_msg' => "Fail, nota not active!"];
 			}
 			$config = json_decode($config->api_set, true);
 
@@ -196,11 +200,11 @@ class PlgRequestBooking{
 				$find = $canceledReqPrepare['find'];
 			}
 			if (empty($find)) {
-				return ['Success' => false, 'result' => "Fail, requst not found!"];
+				return ['Success' => false, 'result_msg' => "Fail, requst not found!"];
 			}
 			$find = (array)$find;
 			if ($find[$config['head_status']] == 3 and empty($canceledReqPrepare)) {
-				return ['Success' => false, 'result' => "Fail, requst already send!"];
+				return ['Success' => false, 'result_msg' => "Fail, requst already send!"];
 			}
 
 			$his_cont = [];
@@ -550,7 +554,7 @@ class PlgRequestBooking{
         		$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' => $table, 'config' => $config]);
         		if (!empty($cekIsCanc)) {
         			DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id', $cekIsCanc['cancelled_id'])->update([
-        				'cancelled_status' => 6
+        				'cancelled_status' => 9
         			]);
         		}
         	}
