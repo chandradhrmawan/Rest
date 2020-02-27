@@ -38,6 +38,8 @@ class PlgGenerateTariff{
 			->where('NO_CONTAINER', $list[$config['DTL_BL']]);
 		if (!in_array($input['nota_id'], [2,16])) {
 			$tglIn->whereIn('KEGIATAN', $in);
+		}else if (in_array($input['nota_id'], [2,16])) {
+			$tglIn->whereIn('KEGIATAN', [12,13,14]);
 		}
 		$tglIn = $tglIn->orderBy("HISTORY_DATE", "DESC")->first();
 		if (empty($tglIn)) {
@@ -269,7 +271,7 @@ class PlgGenerateTariff{
 
 	private static function getDTL_DATE_OUT_OLD($config,$list,$hdr){
 		if (!empty($config['head_ext_status']) and $hdr[$config['head_ext_status']] == 'Y') {
-			$getOldIdHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$hdr[$config['head_no']])->first();
+			$getOldIdHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$hdr[$config['head_ext_from']])->first();
 			$getOldIdHdr = (array)$getOldIdHdr;
 			$getOldIdHdr = $getOldIdHdr[$config['head_primery']];
 			$getOldDtDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
