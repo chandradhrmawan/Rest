@@ -853,7 +853,7 @@ class BillingEngine{
               $setD .= ' detail.DTL_FUMI_TYPE := \''.$list['DTL_FUMI_TYPE'].'\';';
             }
           }
-          $getServCode = DB::connection('mdm')->table('TM_NOTA')->where('nota_id',$input['inputH']['P_NOTA_ID'])->first();
+          $getServCode = DB::connection('mdm')->table('TM_NOTA')->where('nota_id',$input['P_NOTA_ID'])->first();
           if ($getServCode->service_code == 2) {
             $procPKG = 'PKG_BILLING_NPKS';
             if (!empty($list['DTL_VIA'])) {
