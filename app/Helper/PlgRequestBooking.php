@@ -142,33 +142,81 @@ class PlgRequestBooking{
 		private static function canceledReqPrepare($input, $config){
 			$cnclHdr = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
 			if (empty($cnclHdr)) {
-				return ['Success' => false, 'result' => 'canceled request not found'];
+				return ['Success' => false, 'result_msg' => 'canceled request not found'];
 			}
 			$reqsHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$cnclHdr->cancelled_req_no)->first();
 			if (empty($reqsHdr)) {
-				return ['Success' => false, 'result' => 'canceled request not found'];
+				return ['Success' => false, 'result_msg' => 'canceled request not found'];
 			}
 			$reqsHdr = (array)$reqsHdr;
-			static::canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr);
-
+			$pluck = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$input['id'])->pluck('cancl_cont');
+			if (empty($pluck) or empty($pluck[0])) {
+				$pluck = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$input['id'])->pluck('cancl_si');
+				if (empty($pluck) or empty($pluck[0])){
+					return ['Success' => false, 'result_msg' => 'dtl canceled is null'];
+				}
+			}
+			$cekStart = DB::connection('omuster')->table($config['head_tab_detil'])
+				->where($config['head_forigen'],$reqsHdr[$config['head_primery']])
+				->whereIn($config['DTL_BL'],$pluck)
+				->get();
+			foreach ($cekStart as $cek) {
+				$cek = (array)$cek;
+				if ($cek[$config['DTL_FL_REAL']] != 1) {
+					return [
+						'Success' => false, 
+						'no_item' => $cek[$config['DTL_BL']],
+						'result_msg' => 'Fail, '.$cek[$config['DTL_BL']].' telah masuk tahap realisasi'
+					];
+				}
+			}
+			$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get();
+			foreach ($cnclDtl as $list) {
+				$noDtl = $list->cancl_cont.$list->cancl_si;
+				$reqDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+					$config['head_forigen'] => $reqsHdr[$config['head_primery']],
+					$config['DTL_BL'] => $noDtl
+				])->first();
+				if (empty($reqDtl)) {
+					return [
+						'Success' => false, 
+						'no_item' => $noDtl,
+						'result_msg' => 'Fail, '.$noDtl.' tidak ditemukan'
+					];
+				}
+				$reqDtl = (array)$reqDtl;
+				if ($config['DTL_QTY'] == 1) {
+					$reqDtlQty = 1
+				}else{
+					$reqDtlQty = $reqDtl[$config['DTL_QTY']];
+				}
+				if ($list->cancl_qty > $reqDtlQty) {
+					return [
+						'Success' => false, 
+						'no_item' => $reqDtl[$config['DTL_BL']],
+						'result_msg' => 'Fail, '.$reqDtl[$config['DTL_BL']].' qty yang dibatalkan melebihi data request'
+					];
+				}
+			}
+			static::canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr,$cnclDtl);
 			return ['Success' => true, 'find' => $reqsHdr, 'canc' => (array)$cnclHdr];
 		}
 
-		private static function canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr){
-			if (!empty($config['DTL_IS_CANCEL'])) {
+		private static function canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr,$cnclDtl){
+			if (!empty($config['DTL_IS_ACTIVE'])) {
 				$def = [
 					$config['DTL_IS_ACTIVE'] => 'Y',
 					$config['DTL_IS_CANCEL'] => 'N'
 				];
 			}else{
 				$def = [
+					$config['DTL_IS_CANCEL'] => 'N',
 					$config['DTL_QTY_CANC'] => 0
 				];
 			}
 			DB::connection('omuster')->table($config['head_tab_detil'])->where([
 				$config['head_forigen'] => $reqsHdr[$config['head_primery']]
 			])->update($def);
-			$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get();
 			foreach ($cnclDtl as $list) {
 				$noDtl = $list->cancl_cont.$list->cancl_si;
 				if (!empty($config['DTL_IS_CANCEL'])){
@@ -178,6 +226,7 @@ class PlgRequestBooking{
 					];
 				}else{
 					$upd = [
+						$config['DTL_IS_CANCEL'] => 'Y',
 						$config['DTL_QTY_CANC'] => $list->cancl_qty
 					];
 				}
@@ -185,6 +234,71 @@ class PlgRequestBooking{
 					$config['head_forigen'] => $reqsHdr[$config['head_primery']],
 					$config['DTL_BL'] => $noDtl
 				])->update($upd);
+			}
+		}
+
+		private static function changeRecRemaningQty($input,$config,$find,$findCanc){
+			if ($input['nota_id'] != 22) {
+				return ['Success' => true, 'result' => null];
+			}
+			$cnf21 = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 21)->first();
+			$cnf21 = json_decode($cnf21->api_set, true);
+			$cnf22 = $config;
+			if (empty($findCanc)) {
+				$loopDtlDel = DB::connection('omuster')->table($cnf22['head_tab_detil'])->where($cnf22['head_forigen'],$find[$cnf22['head_primery']])->get();
+				foreach ($loopDtlDel as $dtlDel) {
+					$dtlDel = (array)$dtlDel;
+					$getRecDtlSI = DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
+						$cnf21['DTL_BL'] => $dtlDel[$cnf22['DTL_BL']]
+					])->first();
+					if (empty($getRecDtlSI)) {
+						return [
+							'Success' => false, 
+							'no_item' => $dtlDel[$cnf22['DTL_BL']],
+							'result_msg' => 'Fail, '.$dtlDel[$cnf22['DTL_BL']].' tidak ditemukan'
+						];
+					}
+
+					$getRecDtlSI = (array)$getRecDtlSI;
+					if ($getRecDtlSI['rec_cargo_remaining_qty'] < $dtlDel['del_cargo_dtl_qty']) {
+						return [
+							'Success' => false, 
+							'no_item' => $dtlDel[$cnf22['DTL_BL']],
+							'result_msg' => 'Fail, '.$dtlDel[$cnf22['DTL_BL']].' qty melebihi yang telah direquest delivery'
+						];
+					}
+				}
+
+				foreach ($loopDtlDel as $dtlDel){
+					$dtlDel = (array)$dtlDel;
+					$getRecDtlSI = DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
+						$cnf21['DTL_BL'] => $dtlDel[$cnf22['DTL_BL']]
+					])->first();
+					$getRecDtlSI = (array)$getRecDtlSI;
+					$up = $getRecDtlSI['rec_cargo_remaining_qty'] - $dtlDel['del_cargo_dtl_qty'];
+					DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
+						$cnf21['DTL_BL'] => $dtlDel[$cnf22['DTL_BL']]
+					])->update([
+						'rec_cargo_remaining_qty' => $up
+					]);
+
+				}
+				return ['Success' => true, 'result' => count($loopDtlDel)];
+			}else{
+				$loopDtlCanc = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$find['cancelled_id'])->get();
+				foreach ($loopDtlCanc as $dtlCanc) {
+					$getRecDtlSI = DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
+						$cnf21['DTL_BL'] => $dtlCanc->cancl_si
+					])->first();
+					$getRecDtlSI = (array)$getRecDtlSI;
+					$up = $getRecDtlSI['rec_cargo_remaining_qty'] + $dtlCanc->cancl_qty;
+					DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
+						$cnf21['DTL_BL'] => $dtlCanc->cancl_si
+					])->update([
+						'rec_cargo_remaining_qty' => $up
+					]);
+				}
+				return ['Success' => true, 'result' => count($loopDtlCanc)];
 			}
 		}
 
@@ -272,9 +386,7 @@ class PlgRequestBooking{
 			return [ "Success" => true, "result" => $result];
 		}
 
-	    public static function approvalRequestPLG($input){
-			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
-			$config = json_decode($config->api_set, true);
+		private static function cekReqOrCanc($input,$config){
 			$findCanc = null;
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
 				$findCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
@@ -296,6 +408,24 @@ class PlgRequestBooking{
 				$retHeadNo = $findCanc->cancelled_no;
 			}
 
+			return [
+				"Success" => true,
+				'findCanc' => $findCanc,
+				'find' => $find,
+				'retHeadNo' => $retHeadNo
+			];
+		}
+
+	    public static function approvalRequestPLG($input){
+			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
+			$config = json_decode($config->api_set, true);
+			$cekReqOrCanc = static::cekReqOrCanc($input,$config);
+			if ($cekReqOrCanc['Success'] == false) {
+				return $cekReqOrCanc;
+			}
+			$findCanc = $cekReqOrCanc['findCanc'];
+			$find = $cekReqOrCanc['find'];
+			$retHeadNo = $cekReqOrCanc['retHeadNo'];
 			if (
 				(empty($findCanc) and $find[$config['head_status']] == 3 and $input['approved'] == 'true') or
 				(!empty($findCanc) and $findCanc->cancelled_status == 3 and $input['approved'] == 'true')
@@ -321,6 +451,11 @@ class PlgRequestBooking{
 				}
 
 				return ['result' => "Success, rejected requst", 'no_req' => $retHeadNo];
+			}
+
+			$changeRecRemaningQty = static::changeRecRemaningQty($input,$config,$find,$findCanc);
+			if ($changeRecRemaningQty['Success'] == false) {
+				return $changeRecRemaningQty;
 			}
 
 			$migrateTariff = true;
@@ -360,7 +495,8 @@ class PlgRequestBooking{
 				'result' => "Success, approved request! ".$pesan['result'],
 				"note" => $pesan['result'],
 				'no_req' => $retHeadNo,
-				'sendRequestBooking' => $sendRequestBooking
+				'sendRequestBooking' => $sendRequestBooking,
+				'changeRecRemaningQty' => $changeRecRemaningQty
 			];
 	    }
 
