@@ -186,7 +186,7 @@ class PlgRequestBooking{
 				}
 				$reqDtl = (array)$reqDtl;
 				if ($config['DTL_QTY'] == 1) {
-					$reqDtlQty = 1
+					$reqDtlQty = 1;
 				}else{
 					$reqDtlQty = $reqDtl[$config['DTL_QTY']];
 				}
