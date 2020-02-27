@@ -976,7 +976,7 @@ class BillingEngine{
         $setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
         $setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
         if ($getServCode->service_code == 2) {
-          $setH .= " P_EXTENTION => ".$head['P_EXTENTION'].",";
+          $setH .= " P_EXTENTION => '".$head['P_EXTENTION']."',";
           if (empty($head['P_EXT_NOTA_ID']) or $head['P_EXT_NOTA_ID'] == 'NULL') {
             $setH .= " P_EXT_NOTA_ID => ".$head['P_EXT_NOTA_ID'].",";
           }else{
@@ -1039,7 +1039,7 @@ class BillingEngine{
         BEGIN ".$input['detil']." ".$input['eqpt']." ".$input['paysplit'];
       $sql .= " ".$procPKG.".GET_TARIFF( ".$input['head']." );END;";
 
-      // return $sql;
+      // dd($sql);
       $stmt = oci_parse($link,$sql);
 
       // gak nemu buat nerima retun pesan dari prosedur // di ubah cara pengecekannya ngambil dari table TX_LOG
