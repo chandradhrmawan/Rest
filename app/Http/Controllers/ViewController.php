@@ -16,6 +16,7 @@ use Dompdf\Dompdf;
 use App\Helper\ConnectedExternalApps;
 use App\Helper\PlgConnectedExternalApps;
 use App\Helper\PlgRequestBooking;
+use Illuminate\Support\Facades\Input;
 
 class ViewController extends Controller
 {
@@ -172,18 +173,42 @@ class ViewController extends Controller
     return PrintAndExport::printProformaNPKS($id);
   }
 
-  function apiSet($notaId, $branchId) {
+  function postApi() {
+    $id     = Input::get('id');
+    return $this->apiSet($id);
+  }
+
+  function updateTsNota() {
+    $set        = Input::get('set');
+    $notaId     = Input::get('notaId');
+    $branchId   = Input::get('branchId');
+
+    $findNota   = [
+      "NOTA_ID"   => $notaId,
+      "BRANCH_ID" => $branchId
+    ];
+
+    $update     = [
+      "API_SET" => $set
+    ];
+
+    $update     = DB::connection('mdm')->table('TS_NOTA')->where($findNota)->update($update);
+    return $this->apiSet($notaId);
+  }
+
+  function apiSet($notaId) {
+    $search        = DB::connection('mdm')->table('TM_NOTA')->where('SERVICE_CODE', '2')->select(DB::raw('DISTINCT(NOTA_NAME), NOTA_ID'))->get();
     $connect       = DB::connection('mdm')->table('TS_NOTA')->join('TM_NOTA', 'TM_NOTA.NOTA_ID', '=', 'TS_NOTA.NOTA_ID');
-    if (!empty($notaId) && !empty($branchId)) {
+    if (!empty($notaId)) {
       $findNota   = [
         "TS_NOTA.NOTA_ID" => $notaId,
-        "TS_NOTA.BRANCH_ID" => $branchId
+        "TS_NOTA.BRANCH_ID" => 4
       ];
 
       $connect->where($findNota);
     }
     $data = $connect->get();
-    return view('print.apiSet',["data"=>$data]);
+    return view('print.apiSet',["id"=>$notaId,"data"=>$data,"search"=>$search]);
 
   }
 }

@@ -30,7 +30,10 @@ $app->post('/cek', 'IndexController@api');
 $app->post('/get-file', 'StoreController@testview_file');
 $app->post('/tree-menu/{roll_id}'      , 'ViewController@menuTree');
 $app->get('/export_testlainlain'       , 'ViewController@exportToExcel');
-$app->get('/apiSet/{notaId}/{branchId}', 'ViewController@apiSet');
+$app->get('/apiSet/{notaId}', 'ViewController@apiSet');
+$app->post('apiPost', 'ViewController@postApi');
+$app->post('updateTsNota', 'ViewController@updateTsNota');
+
 
 // Print
 $app->get('/print/getPass/{id}'   ,'ViewController@printGetPass');
