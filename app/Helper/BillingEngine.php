@@ -855,7 +855,6 @@ class BillingEngine{
           }
           $getServCode = DB::connection('mdm')->table('TM_NOTA')->where('nota_id',$input['head']['P_NOTA_ID'])->first();
           if ($getServCode->service_code == 2) {
-            $procPKG = 'PKG_BILLING_NPKS';
             if (!empty($list['DTL_VIA'])) {
               if ($list['DTL_VIA'] == NULL or $list['DTL_VIA'] == 'NULL') {
                 $setD .= ' detail.DTL_VIA := '.$list['DTL_VIA'].';';
@@ -976,6 +975,14 @@ class BillingEngine{
         $setH .= " P_RESTITUTION => '".$head['P_RESTITUTION']."',";
         $setH .= " P_BOOKING_NUMBER => '".$head['P_BOOKING_NUMBER']."',";
         $setH .= " P_REALIZATION => '".$head['P_REALIZATION']."',";
+        if ($getServCode->service_code == 2) {
+          $setH .= " P_EXTENTION => ".$head['P_EXTENTION'].",";
+          if (empty($head['P_EXT_NOTA_ID']) or $head['P_EXT_NOTA_ID'] == 'NULL') {
+            $setH .= " P_EXT_NOTA_ID => ".$head['P_EXT_NOTA_ID'].",";
+          }else{
+            $setH .= " P_EXT_NOTA_ID => '".$head['P_EXT_NOTA_ID']."',";
+          }
+        }
         if (empty($head['P_TRADE']) or $head['P_TRADE'] == 'NULL') {
           $setH .= " P_TRADE => ".$head['P_TRADE'].",";
         }else{
