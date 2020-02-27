@@ -484,18 +484,19 @@ class PlgFunctTOS{
 	        $nota_paid_date = null;
 	        if (!empty($nota)) {
 	        	$nota_no = $nota->nota_no;
-	        	$nota_date = date('m/d/Y', strtotime($nota->nota_date));
-	        	$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+	        	$nota_date = date('d-M-y', strtotime($nota->nota_date));
+	        	$nota_paid_date = date('d-M-y', strtotime($nota->nota_paid_date));
 	        }
 	        return $json_body = '{
 	          "action" : "getCancelledReq",
 	          "header": {
 	            "REQ_NO": "'.$head['cancelled_no'].'",
-	            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head['cancelled_create_date'])).'",
+	            "REQ_RECEIVING_DATE": "'.date('d-M-y', strtotime($head['cancelled_create_date'])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
 	            "REQ_MARK": "",
-	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'"
+	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'",
+							"CANCELLED_STATUS" : "'.$arr["config"]["CANCELLED_STATUS"].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
