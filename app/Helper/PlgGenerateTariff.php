@@ -275,7 +275,7 @@ class PlgGenerateTariff{
 			$getOldIdHdr = (array)$getOldIdHdr;
 			$getOldIdHdr = $getOldIdHdr[$config['head_primery']];
 			$getOldDtDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
-				$config['head_forigen'] => $hdr[$config['head_primery']],
+				$config['head_forigen'] => $getOldIdHdr,
 				$config['DTL_BL'] => $list[$config['DTL_BL']]
 			])->first();
 			$getOldDtDtl = (array)$getOldDtDtl;
