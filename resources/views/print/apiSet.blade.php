@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <h1>TS_NOTA | API CONFIG</h1>
+    <h1>TS_NOTA | <font color="red">{{$label}}</font></h1>
     <form action="{{url('apiPost')}}" method="post" >
       <select class="" name="id">
         @foreach ($search as $search)
