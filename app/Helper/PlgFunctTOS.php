@@ -386,6 +386,20 @@ class PlgFunctTOS{
 			"DEL_CARGO_DTL_REAL_DATE"	=>$delBrgRealDate
 		];
 
+		// $storeRealisasi 						= [
+		// 	"REAL_CREATE_BY" 					=> $listR["DELIVERY_CREATE_BY"],
+		// 	"REAL_CREATE_DATE"				=> "",
+		// 	"REAL_DATE"								=> $listR["REAL_DATE"],
+		// 	"REAL_ID"									=> $listR["REAL_STORAGE_ID"],
+		// 	"REAL_QTY"								=> $listR["JUMLAH"],
+		// 	"REAL_REFF_REQ_NO"				=> "",
+		// 	"REAL_REQ_NO"							=> $listR["NO_REQUEST"],
+		// 	"REAL_SI"									=> $listR["NO_CONTAINER"],
+		// 	"REAL_STATUS"							=> $listR["REAL_STORAGE_STATUS"],
+		// 	"REAL_TYPE"								=> "1",
+		// 	"REAL_UNIT_ID"						=> ""
+		// ];
+
 		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update($updateVal);
 		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->first();
 		$qty 												= $dataDetail->del_cargo_dtl_qty;
