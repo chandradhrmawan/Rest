@@ -374,6 +374,7 @@ class PlgFunctTOS{
 	}
 
 	public static function storeRealDateDel($listR,$hdr,$config,$input) {
+		$delBrgRealDate								= $listR["REAL_DATE"];
 		$delBrgJml 									= $listR["JUMLAH"];
 		$findDtlRecBrg 							= [
 			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
@@ -381,7 +382,8 @@ class PlgFunctTOS{
 			];
 
 		$updateVal 						 			= [
-			"DEL_CARGO_DTL_REAL_QTY"	=>$delBrgJml
+			"DEL_CARGO_DTL_REAL_QTY"	=>$delBrgJml,
+			"DEL_CARGO_DTL_REAL_DATE"	=>$delBrgRealDate
 		];
 
 		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlRecBrg)->update($updateVal);
