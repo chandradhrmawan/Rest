@@ -295,7 +295,10 @@ class PlgGenerateTariff{
 			$detil->where($config['DTL_IS_CANCEL'], 'N');
 		}
 		$detil = $detil->get();
-		if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) {
+		if (
+			(in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) or
+			empty($canceledReqPrepare)
+		) {
 			return [
 				"detil_data"=>$detil,
 				"result_flag"=>"S",
