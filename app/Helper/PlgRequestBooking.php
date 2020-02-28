@@ -139,7 +139,7 @@ class PlgRequestBooking{
 			return ['result' => "Created Nota No : ".$no_nota, "Success" => true];
 		}
 
-		private static function canceledReqPrepare($input, $config){
+		private static function canceledReqPrepare($input, $config, $up){
 			$cnclHdr = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
 			if (empty($cnclHdr)) {
 				return ['Success' => false, 'result_msg' => 'canceled request not found'];
@@ -149,6 +149,9 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result_msg' => 'canceled request not found'];
 			}
 			$reqsHdr = (array)$reqsHdr;
+			if ($up == false) {
+				return ['Success' => true, 'find' => $reqsHdr, 'canc' => (array)$cnclHdr];
+			}
 			$pluck = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$input['id'])->pluck('cancl_cont');
 			if (empty($pluck) or empty($pluck[0])) {
 				$pluck = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$input['id'])->pluck('cancl_si');
@@ -321,12 +324,12 @@ class PlgRequestBooking{
 
 			// request batal
 			$canceledReqPrepare = null;
-			// if (!empty($input['canceled']) and $input['canceled'] == 'true') {
-			// 	$canceledReqPrepare = static::canceledReqPrepare($input, $config);
-			// 	if ($canceledReqPrepare['Success'] == false) {
-			// 		return $canceledReqPrepare;
-			// 	}
-			// }
+			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
+				$canceledReqPrepare = static::canceledReqPrepare($input, $config, false);
+				if ($canceledReqPrepare['Success'] == false) {
+					return $canceledReqPrepare;
+				}
+			}
 			// request batal
 
 			if (empty($canceledReqPrepare)) {
@@ -420,7 +423,7 @@ class PlgRequestBooking{
 				$find = (array)$find[0];
 				$retHeadNo = $findCanc->cancelled_no;
 			}
-
+			$canceledReqPrepare = static::canceledReqPrepare($input, $config, true);
 			return [
 				"Success" => true,
 				"migrateTariff" => $migrateTariff,

@@ -301,7 +301,7 @@ class PlgGenerateTariff{
 		$detil = $detil->get();
 		if (
 			(in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) or
-			empty($canceledReqPrepare)
+			!empty($canceledReqPrepare)
 		) {
 			return [
 				"detil_data"=>$detil,
