@@ -207,8 +207,9 @@ class ViewController extends Controller
 
       $connect->where($findNota);
     }
-    $data = $connect->get();
-    return view('print.apiSet',["id"=>$notaId,"data"=>$data,"search"=>$search]);
+    $data   = $connect->get();
+    $label  = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $notaId)->first();
+    return view('print.apiSet',["label"=>$label->nota_label,"id"=>$notaId,"data"=>$data,"search"=>$search]);
 
   }
 }
