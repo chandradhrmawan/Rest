@@ -574,6 +574,7 @@ class PlgFunctTOS{
 	            "RECEIVING_DARI": "'.$dr->reff_name.'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "DI": "",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -632,6 +633,7 @@ class PlgFunctTOS{
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "PERP_DARI": "",
 	            "PERP_KE": "",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -707,6 +709,7 @@ class PlgFunctTOS{
 	            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
 	            "STUFFING_DARI": "'.$dr->reff_name.'",
 	            "RECEIVING_DARI": "'.$dr->reff_name.'",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'",
@@ -782,6 +785,7 @@ class PlgFunctTOS{
 	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 	            "DI" : ""
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -819,6 +823,7 @@ class PlgFunctTOS{
 	            "FUMI_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
 	            "FUMI_CREATE_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 	            "FUMI_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -857,6 +862,7 @@ class PlgFunctTOS{
 	            "PLUG_CREATE_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 	            "PLUG_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
 	            "PLUG_STATUS" : "",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -914,6 +920,7 @@ class PlgFunctTOS{
 							"REQUEST_BL_NO": "",
 							"REQUEST_SPPB_NO": "",
 							"REQUEST_SPPB_DATE": "",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 							"REQUEST_RECEIVING_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 							"REQUEST_NOTA_DATE": "'.date('d-M-y', strtotime($nota_date)).'",
 							"REQUEST_PAID_DATE": "'.date('d-M-y', strtotime($nota_paid_date)).'",
@@ -983,6 +990,7 @@ class PlgFunctTOS{
 							"REQUEST_FROM": "'.$rec_dr->reff_name.'",
 							"REQUEST_STATUS": "'.$head[$arr['config']['head_status']].'",
 							"REQUEST_DI": "",
+							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 						},
 						"arrdetail": ['.$arrdetil.']
