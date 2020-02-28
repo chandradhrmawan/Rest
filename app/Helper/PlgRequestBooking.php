@@ -185,6 +185,13 @@ class PlgRequestBooking{
 					];
 				}
 				$reqDtl = (array)$reqDtl;
+				if ($reqDtl[$config['DTL_FL_REAL']] != 1) {
+					return [
+						'Success' => false,
+						'no_item' => $reqDtl[$config['DTL_BL']],
+						'result_msg' => 'Fail, '.$reqDtl[$config['DTL_BL']].' sudah melakukan realisasi'
+					];
+				}
 				if ($config['DTL_QTY'] == 1) {
 					$reqDtlQty = 1;
 				}else{
