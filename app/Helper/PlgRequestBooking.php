@@ -622,14 +622,14 @@ class PlgRequestBooking{
             	'nota_paid'=>'Y'
             ])->count();
             if ($cekNota > 0) {
-            	return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
+            	// return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no'],
             	'nota_status'=>2
             ])->count();
             if ($cekNota == 0) {
-            	return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
+            	// return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
 			if (empty($input['pay_id'])) {
 		    	$store = new TxPayment;
@@ -642,7 +642,7 @@ class PlgRequestBooking{
 					if (file_exists($store->pay_file)){
 						unlink($store->pay_file);
 					}
-	            }
+	      }
 			}
 
 	    	// pay_id            number,
