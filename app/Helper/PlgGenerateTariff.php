@@ -221,23 +221,23 @@ class PlgGenerateTariff{
 		}else{
 			if (in_array($config['DTL_DATE_IN'], ["TX_GATEIN"])) {
 				$dateIn = static::getLastContFromTX_GATEIN($list,$hdr,$config);
-				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else if (in_array($config['DTL_DATE_IN'], ["TX_HISTORY_CONTAINER"])){
 				$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
 				if (!empty($config['DTL_STACK_DATE'])) {
 					DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
 				}
-				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else if (is_array($config['DTL_DATE_IN'])){
 				$ddiType = $config['DTL_DATE_IN']['paymethod'.$hdr[$config['head_paymethod']]];
 				if (in_array($ddiType, ["TX_HISTORY_CONTAINER"])) {
 					$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
-					$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 				}else{
-					$DTL_DATE_IN = empty($list[$ddiType]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$ddiType])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$DTL_DATE_IN = empty($list[$ddiType]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$ddiType])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 				}
 			} else {
-				$DTL_DATE_IN = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				$DTL_DATE_IN = empty($list[$config['DTL_DATE_IN']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_IN']])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			}
 		}
 		return $DTL_DATE_IN;
@@ -250,7 +250,7 @@ class PlgGenerateTariff{
 			if ($config['head_table'] == 'TX_HDR_DEL_CARGO') {
 				$tglOut = DB::connection('omuster')->table('TX_GATEOUT')->orderBy("GATEOUT_DATE", "DESC")->first();
 				$dateout = $tglOut->gateout_date;
-				$DTL_DATE_OUT = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+				$DTL_DATE_OUT = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else {
 				if (is_array($config['DTL_DATE_OUT'])) {
 					if ($hdr[$config['head_paymethod']] == 2) {
@@ -259,9 +259,9 @@ class PlgGenerateTariff{
 						$outKey = $config['DTL_DATE_OUT']['paymethod1'];
 					}
 					$dtlOut = $list[$outKey];
-					$DTL_DATE_OUT = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$DTL_DATE_OUT = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 				}else{
-					$DTL_DATE_OUT = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					$DTL_DATE_OUT = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 				}
 			}
 		}
@@ -279,7 +279,7 @@ class PlgGenerateTariff{
 				$config['DTL_BL'] => $list[$config['DTL_BL']]
 			])->first();
 			$getOldDtDtl = (array)$getOldDtDtl;
-			$DTL_DATE_OUT_OLD = 'to_date(\''.\Carbon\Carbon::parse($getOldDtDtl[$config['DTL_DATE_OUT']['paymethod1']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+			$DTL_DATE_OUT_OLD = 'to_date(\''.\Carbon\Carbon::parse($getOldDtDtl[$config['DTL_DATE_OUT']['paymethod1']])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 		}else{
 			$DTL_DATE_OUT_OLD = 'NULL';
 		}
