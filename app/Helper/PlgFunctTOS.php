@@ -878,6 +878,7 @@ class PlgFunctTOS{
 					$dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
 					foreach ($dtls as $dtl) {
 						$dtl = (array)$dtl;
+						$total = $dtl[$arr['config']['DTL_QTY']]-$dtl[$arr['config']['DTL_QTY_CANC']];
 						$arrdetil .= '{
 							"REQUEST_DTL_SI": "'.$dtl[$arr['config']['DTL_BL']].'",
 							"REQUEST_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
@@ -890,7 +891,7 @@ class PlgFunctTOS{
 							"REQUEST_DTL_STATUS": "0",
 							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-							"REQUEST_DTL_TOTAL": "'.$dtl[$arr['config']['DTL_QTY']]-$dtl[$arr['config']['DTL_QTY_CANC']].'",
+							"REQUEST_DTL_TOTAL": "'.$total.'",
 							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
