@@ -253,13 +253,17 @@ class PlgGenerateTariff{
 				$DTL_DATE_OUT = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			} else {
 				if (is_array($config['DTL_DATE_OUT'])) {
-					if ($hdr[$config['head_paymethod']] == 3) {
-						$outKey = $config['DTL_DATE_OUT']['paymethod'.$hdr[$config['head_paymethod']]];
+					if ($hdr[$config['head_paymethod']] == 2) {
+						$outKey = $config['DTL_DATE_OUT']['paymethod2'];
 					}else{
 						$outKey = $config['DTL_DATE_OUT']['paymethod1'];
 					}
-					$dtlOut = $list[$outKey];
-					$DTL_DATE_OUT = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					if ($outKey == 'TX_REALISASI_CARGO') {
+						$DTL_DATE_OUT = 'NULL'
+					}else{
+						$dtlOut = $list[$outKey];
+						$DTL_DATE_OUT = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
+					}
 				}else{
 					$DTL_DATE_OUT = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}
