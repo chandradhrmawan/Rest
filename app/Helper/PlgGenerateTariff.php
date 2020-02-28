@@ -253,8 +253,8 @@ class PlgGenerateTariff{
 				$DTL_DATE_OUT = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 			} else {
 				if (is_array($config['DTL_DATE_OUT'])) {
-					if ($hdr[$config['head_paymethod']] == 3) {
-						$outKey = $config['DTL_DATE_OUT']['paymethod'.$hdr[$config['head_paymethod']]];
+					if ($hdr[$config['head_paymethod']] == 2) {
+						$outKey = $config['DTL_DATE_OUT']['paymethod2'];
 					}else{
 						$outKey = $config['DTL_DATE_OUT']['paymethod1'];
 					}
@@ -295,7 +295,10 @@ class PlgGenerateTariff{
 			$detil->where($config['DTL_IS_CANCEL'], 'N');
 		}
 		$detil = $detil->get();
-		if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) {
+		if (
+			(in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) or
+			!empty($canceledReqPrepare)
+		) {
 			return [
 				"detil_data"=>$detil,
 				"result_flag"=>"S",

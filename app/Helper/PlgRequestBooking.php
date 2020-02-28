@@ -139,7 +139,7 @@ class PlgRequestBooking{
 			return ['result' => "Created Nota No : ".$no_nota, "Success" => true];
 		}
 
-		private static function canceledReqPrepare($input, $config){
+		private static function canceledReqPrepare($input, $config, $up){
 			$cnclHdr = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
 			if (empty($cnclHdr)) {
 				return ['Success' => false, 'result_msg' => 'canceled request not found'];
@@ -149,6 +149,9 @@ class PlgRequestBooking{
 				return ['Success' => false, 'result_msg' => 'canceled request not found'];
 			}
 			$reqsHdr = (array)$reqsHdr;
+			if ($up == false) {
+				return ['Success' => true, 'find' => $reqsHdr, 'canc' => (array)$cnclHdr];
+			}
 			$pluck = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$input['id'])->pluck('cancl_cont');
 			if (empty($pluck) or empty($pluck[0])) {
 				$pluck = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$input['id'])->pluck('cancl_si');
@@ -322,7 +325,7 @@ class PlgRequestBooking{
 			// request batal
 			$canceledReqPrepare = null;
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
-				$canceledReqPrepare = static::canceledReqPrepare($input, $config);
+				$canceledReqPrepare = static::canceledReqPrepare($input, $config, false);
 				if ($canceledReqPrepare['Success'] == false) {
 					return $canceledReqPrepare;
 				}
@@ -350,7 +353,11 @@ class PlgRequestBooking{
 				DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 					$config['head_status'] => 2
 				]);
-				$confKgt = $config['kegiatan'];
+				if (!empty($input['canceled']) and $input['canceled'] == 'true') {
+					$confKgt = $config['kegiatan_batal'];
+				}else{
+					$confKgt = $config['kegiatan'];
+				}
 				if (is_array($confKgt)) {
 					$confKgt = $confKgt[0];
 				}
@@ -394,9 +401,11 @@ class PlgRequestBooking{
 		}
 
 		private static function cekReqOrCanc($input,$config){
+			$migrateTariff = true;
 			$findCanc = null;
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
 				$findCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
+				$migrateTariff = false;
 			}
 
 			if (empty($findCanc)) {
@@ -414,9 +423,10 @@ class PlgRequestBooking{
 				$find = (array)$find[0];
 				$retHeadNo = $findCanc->cancelled_no;
 			}
-
+			$canceledReqPrepare = static::canceledReqPrepare($input, $config, true);
 			return [
 				"Success" => true,
+				"migrateTariff" => $migrateTariff,
 				'findCanc' => $findCanc,
 				'find' => $find,
 				'retHeadNo' => $retHeadNo
@@ -433,6 +443,7 @@ class PlgRequestBooking{
 			$findCanc = $cekReqOrCanc['findCanc'];
 			$find = $cekReqOrCanc['find'];
 			$retHeadNo = $cekReqOrCanc['retHeadNo'];
+			$migrateTariff = $cekReqOrCanc['migrateTariff'];
 			if (
 				(empty($findCanc) and $find[$config['head_status']] == 3 and $input['approved'] == 'true') or
 				(!empty($findCanc) and $findCanc->cancelled_status == 3 and $input['approved'] == 'true')
@@ -465,7 +476,6 @@ class PlgRequestBooking{
 				return $changeRecRemaningQty;
 			}
 
-			$migrateTariff = true;
 			if ($find[$config['head_paymethod']] == 2) {
 				$migrateTariff = false;
 			}
@@ -479,8 +489,15 @@ class PlgRequestBooking{
 			}
 
 			$sendRequestBooking = null;
-			if ($find[$config['head_paymethod']] == 2) {
-				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $input['id'], 'table' =>$config['head_table'],'config' => $config]);
+			if ($find[$config['head_paymethod']] == 2 or !empty($findCanc)) {
+				if (!empty($findCanc)) {
+					$id = $findCanc->cancelled_id;
+		        	$table = 'TX_HDR_CANCELLED';
+				}else{
+					$id = $input['id'];
+		        	$table = $config['head_table'];
+				}
+				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' =>$table, 'config' => $config]);
 				if (empty($sendRequestBooking['sendRequestBookingPLG'])) {
 					return ['result' => "Fail, error went send request to TOS!", 'no_req' => $retHeadNo, "Success" => false];
 				}
@@ -493,7 +510,7 @@ class PlgRequestBooking{
 				]);
 			}else{
 				DB::connection('omuster')->table('tx_hdr_cancelled')->where('cancelled_id',$input['id'])->update([
-					'cancelled_status' => 3,
+					'cancelled_status' => 9,
 					'cancelled_mark' => $input['msg']
 				]);
 			}
