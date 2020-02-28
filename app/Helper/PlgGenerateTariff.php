@@ -258,12 +258,8 @@ class PlgGenerateTariff{
 					}else{
 						$outKey = $config['DTL_DATE_OUT']['paymethod1'];
 					}
-					if ($outKey == 'TX_REALISASI_CARGO') {
-						$DTL_DATE_OUT = 'NULL';
-					}else{
-						$dtlOut = $list[$outKey];
-						$DTL_DATE_OUT = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
-					}
+					$dtlOut = $list[$outKey];
+					$DTL_DATE_OUT = empty($dtlOut) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($dtlOut)->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}else{
 					$DTL_DATE_OUT = empty($list[$config['DTL_DATE_OUT']]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$config['DTL_DATE_OUT']])->format('Y-m-d').'\',\'yyyy-MM-dd\')';
 				}
