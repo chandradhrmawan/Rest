@@ -551,6 +551,11 @@ class PlgRequestBooking{
 			DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->update([
 				$config['head_status'] => 5
 			]);
+			if (!empty($config['DTL_IS_ACTIVE'])) {
+				DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'],$input['id'])->update([
+					$config['DTL_IS_ACTIVE'] => 'N'
+				]);
+			}
 			// update utk gabungan
 				if (in_array($input['nota_id'], [7,8,9,10])) {
 					DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$find[$config['head_no']])->update([

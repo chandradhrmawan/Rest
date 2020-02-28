@@ -291,8 +291,8 @@ class PlgGenerateTariff{
 		// build detil
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
-		if (!empty($config['DTL_IS_ACTIVE'])) {
-			$detil->where($config['DTL_IS_ACTIVE'], 'Y');
+		if (!empty($config['DTL_IS_CANCEL'])) {
+			$detil->where($config['DTL_IS_CANCEL'], 'N');
 		}
 		$detil = $detil->get();
 		if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) {
