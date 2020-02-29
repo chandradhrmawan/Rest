@@ -380,7 +380,7 @@ class PlgFunctTOS{
 	}
 
 	public static function storeRealDateDel($listR,$hdr,$config,$input) {
-		$delBrgRealDate								= $listR["REAL_DATE"];
+		$delBrgRealDate							= $listR["REAL_DATE"];
 		$delBrgJml 									= $listR["JUMLAH"];
 		$findDtlDelBrg 							= [
 			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
@@ -389,7 +389,13 @@ class PlgFunctTOS{
 
 		$updateVal 						 			= [
 			"DEL_CARGO_DTL_REAL_QTY"	=>$delBrgJml,
-			"DEL_CARGO_DTL_REAL_DATE"	=>$delBrgRealDate
+			"DEL_CARGO_DTL_REAL_DATE"	=>$delBrgRealDate,
+			"DEL_CARGO_FL_REAL"				=> "1"
+		];
+
+		$findRealDelBrg 						= [
+			"REAL_REQ_NO" 						=> $noRequest,
+			"REAL_SI"									=> $listR["NO_CONTAINER"]
 		];
 
 		$storeRealisasi 						= [
@@ -412,8 +418,8 @@ class PlgFunctTOS{
 		$qtyReal 										= $dataDetail->del_cargo_dtl_real_qty;
 
 		if ($qty <= $qtyReal) {
-			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>$hdr[$config["DTL_FL_REAL_V"]]]);
-			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->get();
+			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
 			if (empty($real)) {
 				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
 			} else {

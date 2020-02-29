@@ -248,8 +248,10 @@ class PlgGenerateTariff{
 			$DTL_DATE_OUT = 'NULL';
 		}else{
 			if ($config['head_table'] == 'TX_HDR_DEL_CARGO') {
-				$tglOut = DB::connection('omuster')->table('TX_GATEOUT')->orderBy("GATEOUT_DATE", "DESC")->first();
-				$dateout = $tglOut->gateout_date;
+				// Surat Cinta Buat Mas Adam
+				// $tglOut = DB::connection('omuster')->table('TX_GATEOUT')->orderBy("GATEOUT_DATE", "DESC")->first();
+				// $dateout = $tglOut->gateout_date;
+				$dateout 	= $list[$config['DTL_DATE_OUT']['paymethod1']];
 				$DTL_DATE_OUT = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else {
 				if (is_array($config['DTL_DATE_OUT'])) {
