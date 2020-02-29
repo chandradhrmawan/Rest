@@ -441,4 +441,15 @@ class StoreController extends Controller
     return PlgConnectedExternalApps::flagRealisationRequest($input);
   }
 
+  function ujiCoba($input) {
+    $notaId = "22";
+    $id     = "72";
+    $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $notaId)->first();
+    $config = json_decode($config->api_set, true);
+    $table  = $config['head_table'];
+
+
+    return PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' =>$table, 'config' => $config]);
+  }
+
 }
