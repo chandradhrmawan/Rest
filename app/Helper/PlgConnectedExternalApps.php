@@ -345,9 +345,11 @@ class PlgConnectedExternalApps{
 									$upStHead = 11;
 								}
 								DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>$upStHead]);
-								DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'],$list[$config['head_primery']])->update([
-									$config['DTL_IS_ACTIVE'] => 'N'
-								]);
+								if ($config['DTL_IS_ACTIVE'] != null) {
+									DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'],$list[$config['head_primery']])->update([
+										$config['DTL_IS_ACTIVE'] => 'N'
+									]);
+								}
 								$trackInpt = [
 									"tab"=>$config['head_table'],
 									"id"=>$list[$config['head_primery']],

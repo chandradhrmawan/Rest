@@ -157,6 +157,11 @@ class PlgFunctTOS{
 		foreach ($data as $listR) {
 			$funfun = $config['funct_REAL_STR'];
 			$real_value = static::$funfun($listR,$hdr,$config,$input);
+
+			if (empty($real_value)) {
+				return "Realization Cargo";
+			}
+
 			$upSttDtl = [
 				$config['DTL_FL_REAL']=>$real_value['real_val']
 			];
@@ -339,8 +344,9 @@ class PlgFunctTOS{
 		];
 
 		$updateVal 						 			= [
-			"REC_CARGO_DTL_REAL_QTY"	=>$recBrgJml,
-			"REC_CARGO_REMAINING_QTY"	=>$recBrgJml
+			"REC_CARGO_DTL_REAL_QTY"	=> $recBrgJml,
+			"REC_CARGO_REMAINING_QTY"	=> $recBrgJml,
+			"REC_CARGO_FL_REAL"				=> "1"
 		];
 
 		$storeRealisasi 						= [
@@ -421,7 +427,7 @@ class PlgFunctTOS{
 		private static function duplicateAndStoreToRec($head,$dtls,$arr){
 			$storeRecDtl = '';
 			foreach ($dtls as $dtl) {
-                                $dtl = (array)$dtl;
+        $dtl = (array)$dtl;
 				$storeRecDtl .= '
 				{
 					"rec_dtl_id": null,
