@@ -382,14 +382,15 @@ class PlgFunctTOS{
 	public static function storeRealDateDel($listR,$hdr,$config,$input) {
 		$delBrgRealDate							= $listR["REAL_DATE"];
 		$delBrgJml 									= $listR["JUMLAH"];
+		$noRequest	 								= $listR["NO_REQUEST"];
 		$findDtlDelBrg 							= [
-			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
-			"REC_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]
+			"DEL_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
+			"DEL_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]
 			];
 
 		$updateVal 						 			= [
 			"DEL_CARGO_DTL_REAL_QTY"	=>$delBrgJml,
-			"DEL_CARGO_DTL_REAL_DATE"	=>$delBrgRealDate,
+			"DEL_CARGO_DTL_REAL_DATE"	=>date('Y-m-d H:i:s', strtotime($delBrgRealDate)),
 			"DEL_CARGO_FL_REAL"				=> "1"
 		];
 
@@ -401,13 +402,13 @@ class PlgFunctTOS{
 		$storeRealisasi 						= [
 			"REAL_CREATE_BY" 					=> $listR["DELIVERY_CREATE_BY"],
 			"REAL_CREATE_DATE"				=> "",
-			"REAL_DATE"								=> $listR["REAL_DATE"],
+			"REAL_DATE"								=> date('Y-m-d H:i:s', strtotime($listR["REAL_DATE"])),
 			"REAL_ID"									=> "",
 			"REAL_QTY"								=> $listR["JUMLAH"],
 			"REAL_REFF_REQ_NO"				=> "",
 			"REAL_REQ_NO"							=> $listR["NO_REQUEST"],
 			"REAL_SI"									=> $listR["DELIVERY_STATUS"],
-			"REAL_STATUS"							=> $listR["REAL_STORAGE_STATUS"],
+			"REAL_STATUS"							=> $listR["DELIVERY_STATUS"],
 			"REAL_TYPE"								=> "1",
 			"REAL_UNIT_ID"						=> ""
 		];
