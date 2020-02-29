@@ -614,7 +614,7 @@ class PlgFunctTOS{
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
 	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-							"REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']].'",
+	            "REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']].'",
 	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
 	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
@@ -646,6 +646,7 @@ class PlgFunctTOS{
 	          "action" : "getDelivery",
 	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
 	            "REQ_DELIVERY_DATE": "'.$delivery_date.'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
@@ -720,6 +721,7 @@ class PlgFunctTOS{
 	          "action" : "'.$actionJ.'",
 	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
 	            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
@@ -793,6 +795,7 @@ class PlgFunctTOS{
 	          "action" : "'.$actionJ.'",
 	          "header": {
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
+	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
 	            "REQ_STRIP_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
