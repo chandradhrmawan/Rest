@@ -298,7 +298,6 @@ class PlgConnectedExternalApps{
 				if ($nota_id_old != $notaData->nota_id) {
 					$config = json_decode($notaData->api_set, true);
 					$hdr = DB::connection('omuster')->table($config['head_table'])->whereIn($config['head_status'], [3,10])->get();
-					return $hdr;
 					foreach ($hdr as $list) {
 						$list = (array)$list;
 						$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
@@ -318,7 +317,6 @@ class PlgConnectedExternalApps{
 								"nota_id"=>$notaData->nota_id,
 								"id"=>$list[$config['head_primery']]
 							];
-
 							$response = PlgFunctTOS::getRealPLG($input);
 
 							$storeHistory = [
