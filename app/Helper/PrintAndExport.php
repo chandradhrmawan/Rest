@@ -912,13 +912,13 @@ class PrintAndExport{
     $nota        = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
 
     // Data Uper And Payment
-    $uper        = 10000;
+    $uper        = 0;
     $notaAmount  = $header[0]->nota_amount;
-    $payAmount   = 100000;
+    $payAmount   = 0;
     $total       = $notaAmount - $payAmount;
     $terbilang   = static::terbilang($total);
 
-    // return $penumpukan;
+    // return $handling;
 
     $html        = view('print.proformaNpks',
                         [

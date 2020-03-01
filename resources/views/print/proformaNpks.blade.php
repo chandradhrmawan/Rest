@@ -19,8 +19,7 @@
 <body>
 		@foreach($header as $header)
 		@foreach($branch as $branch)
-		@foreach($sign as $sign)
-
+		@foreach($label as $label)
   <table width="100%" style="font-size:10px">
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="50"></td>
@@ -52,10 +51,8 @@
     </tr>
   </table>
 
-	@foreach($label as $label)
 	<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800"> PROFORMA {{$label->nota_name}}</center>
-	@endforeach
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
+	<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr style="text-align:center">
 		<td style="vertical-align:top">
       <table style="border-collapse:collapse; font-size:11px;">
@@ -127,64 +124,105 @@
 <?php if ($penumpukan != "0") { ?>
 	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 		<tr style="text-align:center">
-			<th width="5%">No SI</th>
-			<th width="25%">Layanan</th>
-			<th width="10%">Kemasan</th>
-			<th width="10%">BARANG</th>
-			<th width="15%">Kontainer</th>
-			<th width="15%" colspan="2">Jumlah</th>
+			<th rowspan="2" width="25%">Layanan</th>
+			<th colspan="3" width="40%">Container</th>
+			<th rowspan="2" width="10%">Qty</th>
+			<th rowspan="2" width="10%" colspan="2">Tarif Dasar</th>
+			<th rowspan="2" width="15%" colspan="2">Total</th>
+		</tr>
+		<tr>
+			<th style="text-align:center">Size</th>
+			<th style="text-align:center">Type</th>
+			<th style="text-align:center">Status</th>
 		</tr>
 		<?php
 			$no = 0;
 		 ?>
 		@foreach($penumpukan as $penumpukan)
 		<tr>
-			<td>{{$penumpukan["dtl_bl"]}}</td>
 			<td>{{$penumpukan["dtl_group_tariff_name"]}}</td>
-			<td>{{$penumpukan["dtl_package"]}}<</td>
-			<td>{{$penumpukan["dtl_commodity"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_cont_size"]}}/{{$penumpukan["dtl_cont_type"]}}/{{$penumpukan["dtl_cont_status"]}}</td>
+			<td style="text-align:center">{{$penumpukan["dtl_cont_size"]}}</td>
+			<td style="text-align:center">{{$penumpukan["dtl_cont_type"]}}</td>
+			<td style="text-align:center">{{$penumpukan["dtl_cont_status"]}}</td>
+			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
 			<td width="1%" style="border-right:0px">Rp</td>
-			<td width="10%" style="text-align:right;border-left:0px">{{number_format($penumpukan["dtl_amount"])}}</td>
+			<td width="10%" style="text-align:right;border-left:0px">{{number_format($penumpukan["dtl_tariff"])}}</td>
+			<td width="1%" style="border-right:0px">Rp</td>
+			<td width="10%" style="text-align:right;border-left:0px">{{number_format($penumpukan["dtl_dpp"])}}</td>
 		</tr>
 		@endforeach
 	</table>
 <?php } ?>
 
-<?php if ($bl != "0") { ?>
+<?php if ($bl != "0") {  ?>
 <table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+<?php if ($label->nota_id == '21' || $label->nota_id == '22') {?>
 	<tr style="text-align:center">
-		<th  width="15%">NO SI</th>
-		<th  width="15%">Kemasan</th>
-		<th  width="15%">BARANG</th>
-    <th  width="10%">Satuan</th>
-    <th  width="10%">Qty</th>
-    <th  width="10%">Tarif Dasar</th>
-    <th  width="10%">Total</th>
+		<th width="20%">Layanan</th>
+		<th width="20%">Nama Barang</th>
+		<th width="10%">Satuan</th>
+		<th width="10%">Qty</th>
+		<th width="20%">Tarif Dasar</th>
+		<th width="20%">Total</th>
 	</tr>
 	@foreach($bl as $bl)
-  <tr style="background-color:#ff3030;color:#fff;">
-    <td style="border-right: 0;padding-left:9px">{{$bl}}</td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0;text-align:center"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-right: 0;border-left:0"></td>
-    <td style="border-left:  0;"></td>
-  </tr>
-<?php foreach ($handling[$bl] as $value) { ?>
+	<tr style="background-color:#ff3030;color:#fff;">
+		<td style="border-right: 0;padding-left:9px">{{$bl}}</td>
+		<td style="border-right: 0;border-left:0"></td>
+		<td style="border-right: 0;border-left:0;text-align:center"></td>
+		<td style="border-right: 0;border-left:0"></td>
+		<td style="border-right: 0;border-left:0"></td>
+		<td style="border-left:  0;"></td>
+	</tr>
+	<?php foreach ($handling[$bl] as $value) { ?>
 	<tr>
 		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td>{{$value["dtl_package"]}}</td>
-		<td>{{$value["dtl_commodity"]}}</td>
+		<td style="text-align:center">{{$value["dtl_commodity"]}}</td>
 		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
 		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
 		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
 		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
-<?php } ?>
+	<?php } ?>
 	@endforeach
+<?php
+} else {
+?>
+<tr style="text-align:center">
+	<th rowspan="2" width="21%">Layanan</th>
+	<th colspan="3" width="35%">Container</th>
+	<th rowspan="2" width="8%">Qty</th>
+	<th rowspan="2" width="13%">Tarif Dasar</th>
+	<th rowspan="2" width="15%">Total</th>
+</tr>
+<tr style="text-align:center">
+	<th>Size</th>
+	<th>Type</th>
+	<th>Status</th>
+</tr>
+@foreach($bl as $bl)
+<tr style="background-color:#ff3030;color:#fff;">
+	<td style="border-right: 0;padding-left:9px">{{$bl}}</td>
+	<td style="border-right: 0;border-left:0"></td>
+	<td style="border-right: 0;border-left:0"></td>
+	<td style="border-right: 0;border-left:0;text-align:center"></td>
+	<td style="border-right: 0;border-left:0"></td>
+	<td style="border-right: 0;border-left:0"></td>
+	<td style="border-left:  0;"></td>
+</tr>
+<?php foreach ($handling[$bl] as $value) { ?>
+<tr>
+	<td>{{$value["dtl_group_tariff_name"]}}</td>
+	<td style="text-align:center">{{$value["dtl_cont_size"]}}</td>
+	<td style="text-align:center">{{$value["dtl_cont_type"]}}</td>
+	<td style="text-align:center">{{$value["dtl_cont_status"]}}</td>
+	<td style="text-align:center">{{$value["dtl_qty"]}}</td>
+	<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
+	<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
+</tr>
 <?php } ?>
+@endforeach
+<?php }} ?>
 </table>
 
 <?php if ($alat != "0") { ?>
@@ -252,10 +290,10 @@
 </table>
 <p style="font-size:9px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
-	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
-	<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
-	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
-	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
+	<tr><td>Palembang, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
+	<tr><td>A.N. GENERAL MANAGER<br>DEPUTY GM KEUANGAN & ADMINISTRASI</td></tr>
+	<tr><td><div style="margin-top:50px"><u>Ambarwati Legina</u></div></td></tr>
+	<tr><td>NIPP. 285047354</td></tr>
 </table>
 
 <div style="position:absolute;bottom:20px;font-size:11px; width:100%">
