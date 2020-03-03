@@ -38,7 +38,7 @@ class PlgRequestBooking{
 				}else{
 					$headU = TxHdrNota::find($cekOldNota->nota_id);
 				}
-							// $headU->app_id =$find['app_id'];
+				$headU->app_id = $find['app_id'];
 				$headU->nota_group_id = $tarif['nota_id'];
 				$headU->nota_org_id = $tarif['branch_org_id'];
 				$headU->nota_cust_id = $tarif['customer_id'];
