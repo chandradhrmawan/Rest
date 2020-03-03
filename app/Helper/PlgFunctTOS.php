@@ -1076,7 +1076,7 @@ class PlgFunctTOS{
 										        "TL_DTL_OWNER" 					:"'.$dtl[$arr['config']['DTL_OWNER']].'",
 										        "TL_DTL_OWNER_NAME" 		:"'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 										        "TL_DTL_VIA_REC_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-										        "TL_DTL_QTY" 						:"'.$dtl[$arr['config']['DTL_QTY']].'",
+										        "TL_DTL_QTY" 						:"'.$arr['config']['DTL_QTY'].'",
 										        "TL_DTL_CHARACTER_ID" 	:"'.$dtl[$arr['config']['DTL_CHARACTER_ID']].'",
 										        "TL_DTL_CHARACTER_NAME" :"'.$dtl[$arr['config']['DTL_CHARACTER_NAME']].'",
 										        "TL_DTL_PKG_ID" 				:"'.$dtl[$arr['config']['DTL_PKG_ID']].'",
