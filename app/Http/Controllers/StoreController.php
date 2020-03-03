@@ -437,9 +437,14 @@ class StoreController extends Controller
     return GlobalHelper::delHeaderDetail($input);
   }
 
-  function getRealPlug($input) {
+  function hitScheduler($input) {
     return PlgConnectedExternalApps::flagRealisationRequest($input);
   }
+
+  function hitPlacement($input) {
+    return PlgConnectedExternalApps::getUpdatePlacement($input);
+  }
+
 
   function ujiCoba($input) {
     $notaId = "22";

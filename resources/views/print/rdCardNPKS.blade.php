@@ -37,7 +37,7 @@
 		<td>
       <b>Request Number</b>
 		 <div style="padding:5px;width:100%">
-       {{$header[$config["head_primery"]]}}
+       {{$header[$config["head_no"]]}}
 		 </div>
     </td>
 	</tr>

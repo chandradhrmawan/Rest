@@ -639,14 +639,14 @@ class PlgRequestBooking{
             	'nota_paid'=>'Y'
             ])->count();
             if ($cekNota > 0) {
-            	return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
+            	// return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no'],
             	'nota_status'=>2
             ])->count();
             if ($cekNota == 0) {
-            	return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
+            	// return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
 			if (empty($input['pay_id'])) {
 		    	$store = new TxPayment;
@@ -701,17 +701,17 @@ class PlgRequestBooking{
 	    		"payment" => (array)$pay['attributes'],
 	    		'reqCanc' => $cekIsCanc
 	    	];
-        	$sendInvPay = PlgEInvo::sendInvPay($arr);
-        	if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
-        		return [
-        			'Success' => false,
-        			'result' => 'Fail, cant send payment invoice',
-        			'no_pay' => $pay->pay_no,
-        			'nota_no' => $getNota->nota_no,
-        			'no_req' => $pay->pay_req_no,
-        			'sendInvPay' => $sendInvPay
-        		];
-        	}
+        	// $sendInvPay = PlgEInvo::sendInvPay($arr);
+        	// if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
+        	// 	return [
+        	// 		'Success' => false,
+        	// 		'result' => 'Fail, cant send payment invoice',
+        	// 		'no_pay' => $pay->pay_no,
+        	// 		'nota_no' => $getNota->nota_no,
+        	// 		'no_req' => $pay->pay_req_no,
+        	// 		'sendInvPay' => $sendInvPay
+        	// 	];
+        	// }
         	$getNota->nota_status = 3;
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
         	$getNota->nota_paid = 'Y';

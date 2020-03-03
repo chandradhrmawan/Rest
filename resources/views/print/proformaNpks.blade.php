@@ -121,40 +121,6 @@
 	</tr>
 </table>
 
-<?php if ($penumpukan != "0") { ?>
-	<table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
-		<tr style="text-align:center">
-			<th rowspan="2" width="25%">Layanan</th>
-			<th colspan="3" width="40%">Container</th>
-			<th rowspan="2" width="10%">Qty</th>
-			<th rowspan="2" width="10%" colspan="2">Tarif Dasar</th>
-			<th rowspan="2" width="15%" colspan="2">Total</th>
-		</tr>
-		<tr>
-			<th style="text-align:center">Size</th>
-			<th style="text-align:center">Type</th>
-			<th style="text-align:center">Status</th>
-		</tr>
-		<?php
-			$no = 0;
-		 ?>
-		@foreach($penumpukan as $penumpukan)
-		<tr>
-			<td>{{$penumpukan["dtl_group_tariff_name"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_cont_size"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_cont_type"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_cont_status"]}}</td>
-			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
-			<td width="1%" style="border-right:0px">Rp</td>
-			<td width="10%" style="text-align:right;border-left:0px">{{number_format($penumpukan["dtl_tariff"])}}</td>
-			<td width="1%" style="border-right:0px">Rp</td>
-			<td width="10%" style="text-align:right;border-left:0px">{{number_format($penumpukan["dtl_dpp"])}}</td>
-		</tr>
-		@endforeach
-	</table>
-<?php } ?>
-
-<?php if ($bl != "0") {  ?>
 <table  width="100%" align="center" border="1" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 <?php if ($label->nota_id == '21' || $label->nota_id == '22') {?>
 	<tr style="text-align:center">
@@ -165,25 +131,15 @@
 		<th width="20%">Tarif Dasar</th>
 		<th width="20%">Total</th>
 	</tr>
-	@foreach($bl as $bl)
-	<tr style="background-color:#ff3030;color:#fff;">
-		<td style="border-right: 0;padding-left:9px">{{$bl}}</td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-right: 0;border-left:0;text-align:center"></td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-left:  0;"></td>
-	</tr>
-	<?php foreach ($handling[$bl] as $value) { ?>
+	@foreach($detail as $detail)
 	<tr>
-		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:center">{{$value["dtl_commodity"]}}</td>
-		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
+		<td>{{$detail->group_tariff_name}}</td>
+		<td style="text-align:center">{{$detail->commodity}}</td>
+		<td style="text-align:center">{{$detail->unit_name}}</td>
+		<td style="text-align:center">{{$detail->qty}}</td>
+		<td style="text-align:right">{{number_format($detail->tariff)}}</td>
+		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
-	<?php } ?>
 	@endforeach
 <?php
 } else {
@@ -196,58 +152,22 @@
 	<th rowspan="2" width="15%">Total</th>
 </tr>
 <tr style="text-align:center">
-	<th>Size</th>
-	<th>Type</th>
-	<th>Status</th>
-</tr>
-@foreach($bl as $bl)
-<tr style="background-color:#ff3030;color:#fff;">
-	<td style="border-right: 0;padding-left:9px">{{$bl}}</td>
-	<td style="border-right: 0;border-left:0"></td>
-	<td style="border-right: 0;border-left:0"></td>
-	<td style="border-right: 0;border-left:0;text-align:center"></td>
-	<td style="border-right: 0;border-left:0"></td>
-	<td style="border-right: 0;border-left:0"></td>
-	<td style="border-left:  0;"></td>
-</tr>
-<?php foreach ($handling[$bl] as $value) { ?>
+	<td>Size</td>
+	<td>Type</td>
+	<td>Status</td>
+@foreach($detail as $detail)
 <tr>
-	<td>{{$value["dtl_group_tariff_name"]}}</td>
-	<td style="text-align:center">{{$value["dtl_cont_size"]}}</td>
-	<td style="text-align:center">{{$value["dtl_cont_type"]}}</td>
-	<td style="text-align:center">{{$value["dtl_cont_status"]}}</td>
-	<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-	<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-	<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
+	<td>{{$detail->group_tariff_name}}</td>
+	<td style="text-align:center">{{$detail->cont_size}}</td>
+	<td style="text-align:center">{{$detail->cont_type}}</td>
+	<td style="text-align:center">{{$detail->cont_status}}</td>
+	<td style="text-align:center">{{$detail->qty}}</td>
+	<td style="text-align:right">{{number_format($detail->tariff)}}</td>
+	<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 </tr>
-<?php } ?>
 @endforeach
-<?php }} ?>
+<?php } ?>
 </table>
-
-<?php if ($alat != "0") { ?>
-<table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
-	<tr style="text-align:center">
-		<th width="15%">Layanan</th>
-		<th width="15%">Nama Alat</th>
-		<th width="15%">Satuan Alat</th>
-		<th width="15%">Jumlah Alat</th>
-    <th width="15%">Durasi / Lama Pemakaian Alat</th>
-    <th width="10%">Tarif Dasar</th>
-    <th width="10%">Total</th>
-	</tr>
-
-<?php foreach ($alat as $alat) { ?>
-		<tr>
-			<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_equipment"]; ?></td>
-			<td style="padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
-			<td style="text-align:center"><?php echo $alat["dtl_unit_name"]; ?></td>
-			<td style="text-align:center"><?php echo number_format($alat["dtl_eq_qty"]) ?></td>
-			<td style="text-align:center"><?php echo number_format($alat["dtl_qty"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_tariff"]); ?></td>
-			<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
-		</tr>
-<?php }} ?>
 </table>
 
 <table  width="100%" border="1" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
