@@ -134,7 +134,7 @@
 	@foreach($detail as $detail)
 	<tr>
 		<td>{{$detail->group_tariff_name}}</td>
-		<td style="text-align:center">{{$detail->commodity}}</td>
+		<td style="text-align:center">{{$detail->commodity_name}}</td>
 		<td style="text-align:center">{{$detail->unit_name}}</td>
 		<td style="text-align:center">{{$detail->qty}}</td>
 		<td style="text-align:right">{{number_format($detail->tariff)}}</td>

@@ -238,7 +238,7 @@ class ViewExt{
                   ->where("A.CANCELLED_ID", $input["cancelled_id"])
                   ->get();
 
-    $newDt["header"] = $cancel;
+    $newDt["HEADER"] = $cancel;
 
     foreach ($cancel as $value) {
       if ($method == "view") {
@@ -248,16 +248,14 @@ class ViewExt{
           ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
-          ->get();
+          ->first();
         } else {
           $detail  = DB::connection("omuster")
           ->table("TX_DTL_CANCELLED A")
           ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
-          ->get();
+          ->first();
         }
       } else {
         if ($type == "rec") {
@@ -266,28 +264,26 @@ class ViewExt{
           ->leftJoin("TX_DTL_CANCELLED A", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
-          ->get();
+          ->first();
         } else {
           $detail  = DB::connection("omuster")
           ->table("TX_DTL_".strtoupper($type)."_CARGO B")
           ->leftJoin("TX_DTL_CANCELLED A", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->select(DB::raw('(SELECT SUM(C.CANCL_QTY) FROM TX_DTL_CANCELLED C WHERE C.CANCL_SI = A.CANCL_SI) AS jumlah_batal, A.*, B.*'))
-          ->get();
+          ->first();
         }
       }
-      $newDt["detail"][]  = $detail ;
+      $newDt["DETAIL"][]  = $detail ;
     }
 
     if ($type == "rec") {
-      $newDt["file"]    = DB::connection("omuster")
+      $newDt["FILE"]    = DB::connection("omuster")
                         ->table("TX_DOCUMENT")
                         ->where("REQ_NO", $cancel[0]->rec_cargo_no)
                         ->get();
     } else {
-      $newDt["file"]    = DB::connection("omuster")
+      $newDt["FILE"]    = DB::connection("omuster")
                         ->table("TX_DOCUMENT")
                         ->where("REQ_NO", $cancel[0]->del_cargo_no)
                         ->get();

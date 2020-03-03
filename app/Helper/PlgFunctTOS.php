@@ -367,8 +367,11 @@ class PlgFunctTOS{
 		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->first();
 		$qty 												= $dataDetail->rec_cargo_dtl_qty;
 		$qtyReal 										= $dataDetail->rec_cargo_dtl_real_qty;
+		$qtyCancel 									= $dataDetail->rec_cargo_dtl_canc_qty;
+		$total  										= $qtyReal + $qtyCancel;
 
-		if ($qty <= $qtyReal) {
+
+		if ($qty <= $total) {
 			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
 			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->get();
 			if (empty($real)) {
@@ -417,8 +420,10 @@ class PlgFunctTOS{
 		$dataDetail 								= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->first();
 		$qty 												= $dataDetail->del_cargo_dtl_qty;
 		$qtyReal 										= $dataDetail->del_cargo_dtl_real_qty;
+		$qtyCancel 									= $dataDetail->del_cargo_dtl_canc_qty;
+		$total  										= $qtyReal + $qtyCancel;
 
-		if ($qty <= $qtyReal) {
+		if ($qty <= $total) {
 			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
 			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
 			if (empty($real)) {
@@ -1042,6 +1047,11 @@ class PlgFunctTOS{
 										$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 										$head = (array)$head;
 										$dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
+										$dr = static::getHeadFromTmReff10($head,$arr);
+										$rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
+											'reff_tr_id' => 5,
+											'reff_id' => $head[$arr['config']['head_from']]
+										])->first();
 										foreach ($dtls as $dtl) {
 											$dtl = (array)$dtl;
 											$arrdetil .= '{
@@ -1057,7 +1067,7 @@ class PlgFunctTOS{
 										        "TL_DTL_OWNER" 					:"'.$dtl[$arr['config']['DTL_OWNER']].'",
 										        "TL_DTL_OWNER_NAME" 		:"'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 										        "TL_DTL_VIA_REC_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-										        "TL_DTL_QTY" 						:"'.$dtl[$arr['config']['DTL_QTY']].'",
+										        "TL_DTL_QTY" 						:"1",
 										        "TL_DTL_CHARACTER_ID" 	:"'.$dtl[$arr['config']['DTL_CHARACTER_ID']].'",
 										        "TL_DTL_CHARACTER_NAME" :"'.$dtl[$arr['config']['DTL_CHARACTER_NAME']].'",
 										        "TL_DTL_PKG_ID" 				:"'.$dtl[$arr['config']['DTL_PKG_ID']].'",
@@ -1082,10 +1092,6 @@ class PlgFunctTOS{
 											$nota_date = date('m/d/Y', strtotime($nota->nota_date));
 											$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
 										}
-										$rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
-											'reff_tr_id' => 5,
-											'reff_id' => $head[$arr['config']['head_from']]
-										])->first();
 										return $json_body = '{
 											"action" : "getTL",
 											"header": {
@@ -1111,8 +1117,8 @@ class PlgFunctTOS{
 										        "TL_CORRECTION"				: "'.$head[$arr['config']['head_correction']].'",
 										        "TL_CORRECTION_DATE"	: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_correction_date']])).'",
 										        "TL_PRINT_CARD"				: "'.$head[$arr['config']['head_print_card']].'",
-										        "TL_FROM"							: "'.$head[$arr['config']['head_from']].'",
-										        "TL_TO"								: "'.$head[$arr['config']['head_to']].'",
+										        "TL_FROM"							: "'.$dr->reff_name.'",
+										        "TL_TO"								: "'.$rec_dr->reff_name.'",
 										        "TL_VESSEL_AGENT" 		: "'.$head[$arr['config']['head_vessel_agent']].'",
 										        "TL_VESSEL_AGENT_NAME": "'.$head[$arr['config']['head_vessel_agent_name']].'",
 										        "TL_CREATE_DATE"			: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
