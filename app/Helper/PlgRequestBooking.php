@@ -195,7 +195,7 @@ class PlgRequestBooking{
 						'result_msg' => 'Fail, '.$reqDtl[$config['DTL_BL']].' sudah melakukan realisasi'
 					];
 				}
-				if ($config['DTL_QTY'] == 1) {
+				if ($config['DTL_QTY'] == 1 or $config['kegiatan_batal'] == 21) {
 					$reqDtlQty = 1;
 				}else{
 					$reqDtlQty = $reqDtl[$config['DTL_QTY']];

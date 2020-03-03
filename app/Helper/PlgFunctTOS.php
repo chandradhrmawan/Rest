@@ -519,6 +519,16 @@ class PlgFunctTOS{
 	        return GlobalHelper::saveheaderdetail($arr);
 		}
 
+		private static function upOldDetilExt($oldReq,$itemNo,$config){
+			$max = count($config['DTL_FL_REAL_F'])-1;
+			$upSttDtl = [
+				$config['DTL_FL_REAL'] => $config['DTL_FL_REAL_F'][$max]
+			];
+			$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'], $oldReq)->first();
+			$hdr = (array)$hdr;
+			DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $itemNo)->update($upSttDtl);
+		}
+
 		private static function getHeadFromTmReff10($head,$arr){
 			return DB::connection('omuster')->table('TM_REFF')->where([
 	          'reff_tr_id' => 5,
@@ -623,9 +633,14 @@ class PlgFunctTOS{
 
 		private static function buildJsonTX_HDR_DEL($arr){
 	        $arrdetil = '';
+	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = (array)$head;
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
+	          if (!empty($head[$arr['config']['head_ext_from']])) {
+	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
+	          }
 	          $arrdetil .= '{
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
 	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
@@ -640,8 +655,6 @@ class PlgFunctTOS{
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
-	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
-	        $head = (array)$head;
 					$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
 		      $nota_no = null;
 		      $nota_date = null;
@@ -692,7 +705,7 @@ class PlgFunctTOS{
 	        	}
 	        }
 	        $arrdetil = '';
-					$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
 	        $head = (array)$head;
 					$contFromName = DB::connection('omuster')
 											->table($arr['config']['head_table']." A")
@@ -702,6 +715,9 @@ class PlgFunctTOS{
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
+	          if (!empty($head[$arr['config']['head_ext_from']])) {
+	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
+	          }
 	          $arrdetil .= '{
 	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
@@ -770,9 +786,14 @@ class PlgFunctTOS{
 	        	}
 	        }
 	        $arrdetil = '';
+	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = (array)$head;
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
+	          if (!empty($head[$arr['config']['head_ext_from']])) {
+	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
+	          }
 	          $arrdetil .= '{
 	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
@@ -789,8 +810,6 @@ class PlgFunctTOS{
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
-	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
-	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
 	        $nota_no = null;
 	        $nota_date = null;
