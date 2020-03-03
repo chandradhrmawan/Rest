@@ -39,7 +39,6 @@ class PlgContHist{
 	}
 
 	public static function storeTsContAndTxHisCont($arr){
-	    	// history container
 		$storeTsCont = [];
 		$findTsCont = [
 			'cont_no' => $arr['cont_no'],
@@ -68,7 +67,7 @@ class PlgContHist{
 			DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->update($storeTsCont);
 		}
 		$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
-		if ($arr["cont_location"] == "GATO" and $cekTsCont->cont_counter == 0) {
+		if ($arr["cont_location"] == "GATO" and $arr['kegiatan'] == 1) {
 			$counter = $cekTsCont->cont_counter+1;
 		}else{
 			$counter = $cekTsCont->cont_counter;
@@ -82,13 +81,8 @@ class PlgContHist{
 			'status_cont' => $arr['status_cont'],
 			'vvd_id' => $arr['vvd_id'],
 			'counter' => $counter
-					// 'id_yard' => $list[$config['DTL_BL']], ?
-					// 'sub_counter' => $list[$config['DTL_BL']], ?
-					// 'why' => $list[$config['DTL_BL']], ?
-					// 'aktif' => $list[$config['DTL_BL']], ?
 		];
 		DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeTxHisCont);
-			// history container
 		return ['storeTsCont' => $cekTsCont, 'storeTxHisCont'=>$storeTxHisCont];
 	}
 }
