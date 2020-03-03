@@ -135,9 +135,10 @@ class StoreController extends Controller
     }
 
     public function testlain($input, $request){
+      $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 20)->first();
+      $config = json_decode($config->api_set, true);
+      return PlgFunctTOS::sendRequestBookingPLG(['id' => 62, 'table' => 'TX_HDR_TL', 'config' => $config]);
       return PlgConnectedExternalApps::flagRealisationRequest();
-      $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 1)->first();
-      return $config = json_decode($config->api_set, true);
       $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',114)->first();
       $nota = (array)$nota;
       return PlgConnectedExternalApps::sendInvProforma([
