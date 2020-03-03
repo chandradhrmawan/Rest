@@ -39,7 +39,7 @@ class PlgGenerateTariff{
 		if (!in_array($input['nota_id'], [2,16])) {
 			$tglIn->whereIn('KEGIATAN', $in);
 		}else if (in_array($input['nota_id'], [2,16])) {
-			$tglIn->whereIn('KEGIATAN', [2,12,13,14]);
+			$tglIn->whereIn('KEGIATAN', [12,13,14]);
 		}
 		$tglIn = $tglIn->orderBy("HISTORY_DATE", "DESC")->first();
 		if (empty($tglIn)) {
