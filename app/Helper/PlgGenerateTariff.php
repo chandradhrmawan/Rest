@@ -255,7 +255,7 @@ class PlgGenerateTariff{
 				$DTL_DATE_OUT = 'to_date(\''.\Carbon\Carbon::parse($dateout)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else {
 				if (is_array($config['DTL_DATE_OUT'])) {
-					if ($hdr[$config['head_paymethod']] == 2) {
+					if ($hdr[$config['head_paymethod']] == 2 and $hdr[$config['head_status']] == 3) {
 						$outKey = $config['DTL_DATE_OUT']['paymethod2'];
 					}else{
 						$outKey = $config['DTL_DATE_OUT']['paymethod1'];
