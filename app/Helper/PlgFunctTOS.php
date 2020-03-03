@@ -1037,100 +1037,100 @@ class PlgFunctTOS{
 					}';
 				}
 
-		private static function buildJsonTX_HDR_TL($arr) {
-									$arrdetil = '';
-									$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
-									$head = (array)$head;
-									$dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
-									foreach ($dtls as $dtl) {
-										$dtl = (array)$dtl;
-										$arrdetil .= '{
-									        "TL_DTL_CONT"						:"'.$dtl[$arr['config']['DTL_BL']].'",
-									        "TL_DTL_CONT_SIZE"			:"'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-									        "TL_DTL_CONT_TYPE"			:"'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
-									        "TL_DTL_CONT_STATUS"		:"'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-									        "TL_DTL_CONT_DANGER"		:"'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-									        "TL_DTL_CMDTY_ID" 			:"'.$dtl[$arr['config']['DTL_CMDTY_ID']].'",
-									        "TL_DTL_CMDTY_NAME" 		:"'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-									        "TL_DTL_REC_VIA" 				:"'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
-									        "TL_DTL_ACTIVITY_DATE" 	:"'.$dtl[$arr['config']['DTL_ACTIVITY_DATE']].'",
-									        "TL_DTL_OWNER" 					:"'.$dtl[$arr['config']['DTL_OWNER']].'",
-									        "TL_DTL_OWNER_NAME" 		:"'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-									        "TL_DTL_VIA_REC_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-									        "TL_DTL_QTY" 						:"'.$dtl[$arr['config']['DTL_QTY']].'",
-									        "TL_DTL_CHARACTER_ID" 	:"'.$dtl[$arr['config']['DTL_CHARACTER_ID']].'",
-									        "TL_DTL_CHARACTER_NAME" :"'.$dtl[$arr['config']['DTL_CHARACTER_NAME']].'",
-									        "TL_DTL_PKG_ID" 				:"'.$dtl[$arr['config']['DTL_PKG_ID']].'",
-									        "TL_DTL_PKG_NAME" 			:"'.$dtl[$arr['config']['DTL_PKG_NAME']].'",
-									        "TL_DTL_UNIT_ID" 				:"'.$dtl[$arr['config']['DTL_UNIT_ID']].'",
-									        "TL_DTL_UNIT_NAME" 			:"'.$dtl[$arr['config']['DTL_UNIT_NAME']].'",
-									        "TL_DTL_DEL_VIA" 				:"'.$dtl[$arr['config']['DTL_VIA']['del']].'",
-									        "TL_DTL_DEL_VIA_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
-									        "TL_DTL_ISACTIVE" 			:"'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
-									        "TL_DTL_REC_DATE" 			:"'.$dtl[$arr['config']['DTL_DATE_IN']].'",
-									        "TL_DTL_DEL_DATE" 			:"'.$dtl[$arr['config']['DTL_DATE_OUT']].'",
-									        "TL_DTL_IS_TL" 					:"'.$dtl[$arr['config']['DTL_TL']].'"
-										},';
-									}
-									$arrdetil = substr($arrdetil, 0,-1);
-									$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
-									$nota_no = null;
-									$nota_date = null;
-									$nota_paid_date = null;
-									if (!empty($nota)) {
-										$nota_no = $nota->nota_no;
-										$nota_date = date('m/d/Y', strtotime($nota->nota_date));
-										$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
-									}
-									$rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
-										'reff_tr_id' => 5,
-										'reff_id' => $head[$arr['config']['head_from']]
-									])->first();
-									return $json_body = '{
-										"action" : "getTL",
-										"header": {
-									        "TL_NO" 							: "'.$head[$arr['config']['head_no']].'",
-									        "TL_DATE" 						: "'.$head[$arr['config']['head_date']].'",
-									        "TL_PAYMETHOD"				: "'.$head[$arr['config']['head_paymethod']].'",
-									        "TL_CUST_ID"					: "'.$head[$arr['config']['head_cust']].'",
-									        "TL_CUST_NAME"				: "'.$head[$arr['config']['head_cust_name']].'",
-									        "TL_CUST_ADDRESS"			: "'.$head[$arr['config']['head_cust_addr']].'",
-									        "TL_CUST_NPWP"				: "'.$head[$arr['config']['head_cust_npwp']].'",
-									        "TL_CUST_ACCOUNT"			: "'.$head[$arr['config']['head_cust']].'",
-									        "TL_STACKBY_ID"				: "'.$head[$arr['config']['head_shipping_agent_id']].'",
-									        "TL_STACKBY_NAME"			: "'.$head[$arr['config']['head_shipping_agent_name']].'",
-									        "TL_VESSEL_CODE"			: "'.$head[$arr['config']['head_vessel_code']].'",
-									        "TL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
-									        "TL_VOYIN"						: "'.$head[$arr['config']['head_voyin']].'",
-									        "TL_VOYOUT"						: "'.$head[$arr['config']['head_voyout']].'",
-									        "TL_VVD_ID"						: "'.$head[$arr['config']['head_vvd']].'",
-									        "TL_POL"							: "'.$head[$arr['config']['head_pol']].'",
-									        "TL_POD"							: "'.$head[$arr['config']['head_pod']].'",
-									        "TL_BRANCH_ID"				: "'.$head[$arr['config']['head_branch']].'",
-									        "TL_NOTA"							: "'.$head[$arr['config']['head_nota']].'",
-									        "TL_CORRECTION"				: "'.$head[$arr['config']['head_correction']].'",
-									        "TL_CORRECTION_DATE"	: "'.$head[$arr['config']['head_correction_date']].'",
-									        "TL_PRINT_CARD"				: "'.$head[$arr['config']['head_print_card']].'",
-									        "TL_FROM"							: "'.$head[$arr['config']['head_from']].'",
-									        "TL_TO"								: "'.$head[$arr['config']['head_to']].'",
-									        "TL_VESSEL_AGENT" 		: "'.$head[$arr['config']['head_vessel_agent']].'"
-									        "TL_VESSEL_AGENT_NAME": "'.$head[$arr['config']['head_vessel_agent_name']].'",
-									        "TL_CREATE_DATE"			: "'.$head[$arr['config']['head_date']].'",
-									        "TL_CREATE_BY"				: "'.$head[$arr['config']['head_by']].'",
-									        "TL_STATUS"						: "0",
-									        "TL_PBM_ID"						: "'.$head[$arr['config']['head_pbm_id']].'",
-									        "TL_PBM_NAME"					: "'.$head[$arr['config']['head_pbm_name']].'",
-									        "TL_VESSEL_PKK"				: "'.$head[$arr['config']['head_vessel_pkk']].'",
-									        "TL_BRANCH_CODE"			: "'.$head[$arr['config']['head_branch_code']].'",
-									        "TL_BTL_STATUS"				: "'.$head[$arr['config']['head_btl_status']].'",
-									        "TL_BTL_FROM_ID"			: "'.$head[$arr['config']['head_btl_from_id']].'",
-									        "TL_BTL_FROM"					: "'.$head[$arr['config']['head_btl_from']].'",
-									        "TL_MSG"							: "'.$head[$arr['config']['head_mark']].'",
-									        "TL_VESSEL_ETA"				: "'.$head[$arr['config']['head_vessel_eta']].'",
-									        "TL_VESSEL_ETD"				: "'.$head[$arr['config']['head_vessel_etd']].'"
-									},
-										"arrdetail": ['.$arrdetil.']
-									}';
-					}
+				private static function buildJsonTX_HDR_TL($arr) {
+										$arrdetil = '';
+										$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+										$head = (array)$head;
+										$dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->get();
+										foreach ($dtls as $dtl) {
+											$dtl = (array)$dtl;
+											$arrdetil .= '{
+										        "TL_DTL_CONT"						:"'.$dtl[$arr['config']['DTL_BL']].'",
+										        "TL_DTL_CONT_SIZE"			:"'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+										        "TL_DTL_CONT_TYPE"			:"'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+										        "TL_DTL_CONT_STATUS"		:"'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+										        "TL_DTL_CONT_DANGER"		:"'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+										        "TL_DTL_CMDTY_ID" 			:"'.$dtl[$arr['config']['DTL_CMDTY_ID']].'",
+										        "TL_DTL_CMDTY_NAME" 		:"'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+										        "TL_DTL_REC_VIA" 				:"'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
+										        "TL_DTL_ACTIVITY_DATE" 	:"'.date('d/m/Y H:i:s', strtotime($dtl[$arr['config']['DTL_ACTIVITY_DATE']])).'",
+										        "TL_DTL_OWNER" 					:"'.$dtl[$arr['config']['DTL_OWNER']].'",
+										        "TL_DTL_OWNER_NAME" 		:"'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+										        "TL_DTL_VIA_REC_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+										        "TL_DTL_QTY" 						:"'.$dtl[$arr['config']['DTL_QTY']].'",
+										        "TL_DTL_CHARACTER_ID" 	:"'.$dtl[$arr['config']['DTL_CHARACTER_ID']].'",
+										        "TL_DTL_CHARACTER_NAME" :"'.$dtl[$arr['config']['DTL_CHARACTER_NAME']].'",
+										        "TL_DTL_PKG_ID" 				:"'.$dtl[$arr['config']['DTL_PKG_ID']].'",
+										        "TL_DTL_PKG_NAME" 			:"'.$dtl[$arr['config']['DTL_PKG_NAME']].'",
+										        "TL_DTL_UNIT_ID" 				:"'.$dtl[$arr['config']['DTL_UNIT_ID']].'",
+										        "TL_DTL_UNIT_NAME" 			:"'.$dtl[$arr['config']['DTL_UNIT_NAME']].'",
+										        "TL_DTL_DEL_VIA" 				:"'.$dtl[$arr['config']['DTL_VIA']['del']].'",
+										        "TL_DTL_DEL_VIA_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
+										        "TL_DTL_ISACTIVE" 			:"'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
+										        "TL_DTL_REC_DATE" 			:"'.date('d/m/Y H:i:s', strtotime($dtl[$arr['config']['DTL_DATE_IN']])).'",
+										        "TL_DTL_DEL_DATE" 			:"'.date('d/m/Y H:i:s', strtotime($dtl[$arr['config']['DTL_DATE_OUT']])).'",
+										        "TL_DTL_IS_TL" 					:"'.$dtl[$arr['config']['DTL_TL']].'"
+											},';
+										}
+										$arrdetil = substr($arrdetil, 0,-1);
+										$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
+										$nota_no = null;
+										$nota_date = null;
+										$nota_paid_date = null;
+										if (!empty($nota)) {
+											$nota_no = $nota->nota_no;
+											$nota_date = date('m/d/Y', strtotime($nota->nota_date));
+											$nota_paid_date = date('m/d/Y', strtotime($nota->nota_paid_date));
+										}
+										$rec_dr = DB::connection('omuster')->table('TM_REFF')->where([
+											'reff_tr_id' => 5,
+											'reff_id' => $head[$arr['config']['head_from']]
+										])->first();
+										return $json_body = '{
+											"action" : "getTL",
+											"header": {
+										        "TL_NO" 							: "'.$head[$arr['config']['head_no']].'",
+										        "TL_DATE" 						: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
+										        "TL_PAYMETHOD"				: "'.$head[$arr['config']['head_paymethod']].'",
+										        "TL_CUST_ID"					: "'.$head[$arr['config']['head_cust']].'",
+										        "TL_CUST_NAME"				: "'.$head[$arr['config']['head_cust_name']].'",
+										        "TL_CUST_ADDRESS"			: "'.$head[$arr['config']['head_cust_addr']].'",
+										        "TL_CUST_NPWP"				: "'.$head[$arr['config']['head_cust_npwp']].'",
+										        "TL_CUST_ACCOUNT"			: "'.$head[$arr['config']['head_cust']].'",
+										        "TL_STACKBY_ID"				: "'.$head[$arr['config']['head_shipping_agent_id']].'",
+										        "TL_STACKBY_NAME"			: "'.$head[$arr['config']['head_shipping_agent_name']].'",
+										        "TL_VESSEL_CODE"			: "'.$head[$arr['config']['head_vessel_code']].'",
+										        "TL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
+										        "TL_VOYIN"						: "'.$head[$arr['config']['head_voyin']].'",
+										        "TL_VOYOUT"						: "'.$head[$arr['config']['head_voyout']].'",
+										        "TL_VVD_ID"						: "'.$head[$arr['config']['head_vvd']].'",
+										        "TL_POL"							: "'.$head[$arr['config']['head_pol']].'",
+										        "TL_POD"							: "'.$head[$arr['config']['head_pod']].'",
+										        "BRANCH_ID"						: "'.$head[$arr['config']['head_branch']].'",
+										        "TL_NOTA"							: "'.$head[$arr['config']['head_nota']].'",
+										        "TL_CORRECTION"				: "'.$head[$arr['config']['head_correction']].'",
+										        "TL_CORRECTION_DATE"	: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_correction_date']])).'",
+										        "TL_PRINT_CARD"				: "'.$head[$arr['config']['head_print_card']].'",
+										        "TL_FROM"							: "'.$head[$arr['config']['head_from']].'",
+										        "TL_TO"								: "'.$head[$arr['config']['head_to']].'",
+										        "TL_VESSEL_AGENT" 		: "'.$head[$arr['config']['head_vessel_agent']].'",
+										        "TL_VESSEL_AGENT_NAME": "'.$head[$arr['config']['head_vessel_agent_name']].'",
+										        "TL_CREATE_DATE"			: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
+										        "TL_CREATE_BY"				: "'.$head[$arr['config']['head_by']].'",
+										        "TL_STATUS"						: "0",
+										        "TL_PBM_ID"						: "'.$head[$arr['config']['head_pbm_id']].'",
+										        "TL_PBM_NAME"					: "'.$head[$arr['config']['head_pbm_name']].'",
+										        "TL_VESSEL_PKK"				: "'.$head[$arr['config']['head_vessel_pkk']].'",
+										        "TL_BRANCH_CODE"			: "'.$head[$arr['config']['head_branch_code']].'",
+										        "TL_BTL_STATUS"				: "'.$head[$arr['config']['head_btl_status']].'",
+										        "TL_BTL_FROM_ID"			: "'.$head[$arr['config']['head_btl_from_id']].'",
+										        "TL_BTL_FROM"					: "'.$head[$arr['config']['head_btl_from']].'",
+										        "TL_MSG"							: "'.$head[$arr['config']['head_mark']].'",
+										        "TL_VESSEL_ETA"				: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_vessel_eta']])).'",
+										        "TL_VESSEL_ETD"				: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_vessel_etd']])).'"
+										},
+											"arrdetail": ['.$arrdetil.']
+										}';
+							}
 	// store request data to tos
 }
