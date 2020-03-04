@@ -225,6 +225,9 @@ class GlobalHelper {
 
       if (!empty($input["filter"])) {
       $search   = $input["filter"];
+      if (!is_array($search)) {
+        $search = json_decode($search, TRUE);
+      }
       foreach ($search as $value) {
         if ($value["operator"] == "like")
           $connect->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
