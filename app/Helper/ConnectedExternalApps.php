@@ -1700,6 +1700,11 @@ class ConnectedExternalApps{
       $endpoint_url=config('endpoint.sendNotifToIBISQA');
       $data = DB::connection('omcargo')->table('TX_NOTIF')->where('notif_flag_status', 0)->get();
       foreach ($data as $list) {
+        if ($list->branch_id == 12) {
+          $pAppId = 1;
+        }else if ($list->branch_id == 4) {
+          $pAppId = 2;
+        }
         $string_json = '{
           "saveNotifRequest": {
             "esbHeader": {
@@ -1719,7 +1724,7 @@ class ConnectedExternalApps{
                           "pCustomerId": "'.$list->customer_id.'",
                           "pBranchId": "'.$list->branch_id.'",
                           "pBranchCode": "'.$list->branch_code.'",
-                          "pAppId": "1"
+                          "pAppId": "'.$pAppId.'"
                           }
                   }
           }';
