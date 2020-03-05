@@ -861,16 +861,17 @@ class PlgFunctTOS{
 	          $dtl = (array)$dtl;
 		        $getCountCounter = DB::connection('omuster')->table('TS_CONTAINER')->where('cont_no',$dtl[$arr['config']['DTL_BL']])->orderBy('cont_counter','desc')->first();
 	          $arrdetil .= '{
-	            "FUMI_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
-	            "FUMI_DTL_CONT_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-	            "FUMI_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-	            "FUMI_DTL_STATUS": "0",
-	            "FUMI_DTL_CANCELLED": "'.$dtl[$arr['config']['DTL_IS_CANCEL']].'",
-	            "FUMI_DTL_ACTIVE": "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
+	            "FUMI_DTL_CONT"						: "'.$dtl[$arr['config']['DTL_BL']].'",
+	            "FUMI_DTL_CONT_SIZE"			: "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+	            "FUMI_DTL_CONT_STATUS"		: "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+	            "FUMI_DTL_STATUS"					: "0",
+	            "FUMI_DTL_CANCELLED"			: "'.$dtl[$arr['config']['DTL_IS_CANCEL']].'",
+	            "FUMI_DTL_ACTIVE"					: "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
 	            "FUMI_DTL_START_FUMI_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
-	            "FUMI_DTL_END_FUMI_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
-	            "FUMI_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "FUMI_DTL_COUNTER": "'.$getCountCounter->cont_counter.'"
+	            "FUMI_DTL_END_FUMI_PLAN"	: "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+	            "FUMI_DTL_COMMODITY"			: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+							"FUMI_DTL_TYPE"						: "'.$dtl[$arr['config']['DTL_TYPE_NAME']].'",
+	            "FUMI_DTL_COUNTER"				: "'.$getCountCounter->cont_counter.'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -880,13 +881,13 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "getFumigasi",
 	          "header": {
-	          	"FUMI_ID" : "",
-	            "FUMI_NO": "'.$head[$arr['config']['head_no']].'",
-	            "FUMI_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-	            "FUMI_CREATE_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
-	            "FUMI_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+	          	"FUMI_ID" 					: "",
+	            "FUMI_NO"						: "'.$head[$arr['config']['head_no']].'",
+	            "FUMI_CREATE_BY"		: "'.$head[$arr['config']['head_by']].'",
+	            "FUMI_CREATE_DATE"	: "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
+	            "FUMI_CONSIGNEE_ID"	: "'.$head[$arr['config']['head_cust']].'",
+							"PAYMENT_METHOD"		: "'.$head[$arr['config']['head_paymethod']].'",
+	            "BRANCH_ID" 				: "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';

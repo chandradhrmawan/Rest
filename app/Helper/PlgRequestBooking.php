@@ -245,6 +245,21 @@ class PlgRequestBooking{
 					$config['DTL_BL'] => $noDtl
 				])->update($upd);
 			}
+
+			// Tambahan Change Header Flag
+			$dtlIsActive = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+				$config['head_forigen'] => $reqsHdr[$config['head_primery']],
+				$config['DTL_IS_ACTIVE'] => 'Y',
+				$config['DTL_IS_CANCEL'] => 'N'
+			])->get();
+
+			if (count($dtlIsActive) == 0) {
+				$updateHdrFlagCancel = DB::connection('omuster')
+																	->table($config['head_table'])
+																	->where($config['head_primery'], $reqsHdr[$config['head_primery']])
+																	->update([$config['head_status'] => 9]);
+			}
+
 		}
 
 		private static function changeRecRemaningQty($input,$config,$find,$findCanc){
