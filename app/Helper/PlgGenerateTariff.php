@@ -103,15 +103,18 @@ class PlgGenerateTariff{
 	}
 
 	private static function getDTL_CHARACTER($config,$list,$hdr,$input){
+
 		if (empty($config['DTL_CHARACTER'])) {
 			$DTL_CHARACTER = 'NULL';
 		}else{
-			if (empty($list[$config['DTL_CHARACTER']])) {
+			if (empty($list[$config['DTL_CHARACTER']]) and $list[$config['DTL_CHARACTER']] != 0) {
 				$DTL_CHARACTER = 'NULL';
 			}else if ($list[$config['DTL_CHARACTER']] == 'Y'){
 				$DTL_CHARACTER = 2;
 			}else if ($list[$config['DTL_CHARACTER']] == 'N'){
 				$DTL_CHARACTER = 0;
+			}else{
+				$DTL_CHARACTER = $list[$config['DTL_CHARACTER']];
 			}
 		}
 		return $DTL_CHARACTER;
