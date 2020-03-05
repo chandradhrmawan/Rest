@@ -439,7 +439,7 @@ class PlgFunctTOS{
 		private static function duplicateAndStoreToRec($head,$dtls,$arr){
 			$storeRecDtl = '';
 			foreach ($dtls as $dtl) {
-        $dtl = (array)$dtl;
+		        $dtl = (array)$dtl;
 				$storeRecDtl .= '
 				{
 					"rec_dtl_id": null,
