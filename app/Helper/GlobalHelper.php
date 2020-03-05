@@ -75,16 +75,16 @@ class GlobalHelper {
                   $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
                 }
               }
+              if (isset($val["LEFTJOIN"])) {
+                foreach ($val["LEFTJOIN"] as $list) {
+                  $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+                }
+              }
               if (isset($val["JOINRAW"])) {
                 foreach ($val["JOINRAW"] as $list) {
                   $connect->join(strtoupper($list["table"]), DB::raw($list['field']));
                 }
               }
-              if (isset($val["LEFTJOIN"])) {
-                foreach ($val["LEFTJOIN"] as $list) {
-                  $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
-                  }
-                }
                 $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
               }
 

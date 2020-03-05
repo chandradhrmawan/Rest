@@ -65,23 +65,22 @@ class PrintAndExport{
     $title            = $tmNota[0]->nota_name;
 
     $findRequest      = [
-        $config["head_primery"] => $id,
-        $config["head_status"]  => 3
+        $config["head_primery"] => $id
     ];
 
     $findDetail       = [
-        $config["head_forigen"] => $id,
-        $config["DTL_IS_ACTIVE"] => 'Y'
+      $config["head_forigen"] => $id,
+      $config["DTL_IS_CANCEL"] => 'N'
     ];
+
 
     $hdrRequest       = DB::connection('omuster')->table($config["head_table"])->where($findRequest)->first();
     $hdrRequest       = json_decode(json_encode($hdrRequest), TRUE);
     $dtlRequest       = DB::connection('omuster')->table($config["head_tab_detil"])->where($findDetail)->get();
     $dtlRequest       = json_decode(json_encode($dtlRequest), TRUE);
 
-
     $page             = count($dtlRequest);
-    $html             = view('print.rdCardNPKS', ["title"=>$title, "page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
+    $html             = view('print.rdCardNPKS', ["nota_id"=>$notaId, "title"=>$title, "page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
     $filename         = $hdrRequest[$config["head_primery"]];
     $dompdf           = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
