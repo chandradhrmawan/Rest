@@ -248,14 +248,14 @@ class ViewExt{
           ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->first();
+          ->get();
         } else {
           $detail  = DB::connection("omuster")
           ->table("TX_DTL_CANCELLED A")
           ->leftJoin("TX_DTL_".strtoupper($type)."_CARGO B", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->first();
+          ->get();
         }
       } else {
         if ($type == "rec") {
@@ -264,14 +264,14 @@ class ViewExt{
           ->leftJoin("TX_DTL_CANCELLED A", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->rec_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->first();
+          ->get();
         } else {
           $detail  = DB::connection("omuster")
           ->table("TX_DTL_".strtoupper($type)."_CARGO B")
           ->leftJoin("TX_DTL_CANCELLED A", "B.".strtoupper($type)."_CARGO_DTL_SI_NO", "=", "A.CANCL_SI")
           ->where("B.".strtoupper($type)."_CARGO_HDR_ID", $value->del_cargo_id)
           ->where("A.CANCL_HDR_ID ", $input["cancelled_id"])
-          ->first();
+          ->get();
         }
       }
       $newDt["DETAIL"][]  = $detail ;
