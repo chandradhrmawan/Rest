@@ -34,6 +34,7 @@
             "app/Helper/UserAndRoleManagemnt.php",
             "app/Helper/RealisasiHelper.php",
             "app/Helper/GlobalHelper.php",
+            "app/Helper/PlgCanclHelper.php",
             "app/Helper/PlgGenerateTariff.php",
             "app/Helper/PlgContHist.php",
             "app/Helper/PlgEInvo.php",
