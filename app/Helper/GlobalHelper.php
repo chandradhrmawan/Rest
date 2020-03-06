@@ -539,6 +539,7 @@ class GlobalHelper {
           $connect->orwhere(strtoupper($field),"like", "%".strtolower($input["query"])."%");
         }
       } else {
+        return "testing";
         $connect->orwhere(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
         $connect->orwhere(strtoupper($input["field"]),"like", "%".ucwords($input["query"])."%");
         $connect->orwhere(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
@@ -843,23 +844,20 @@ class GlobalHelper {
   }
 
   public static function save($input) {
-    $parameter   = $input['parameter'];
-    if (!empty($input["PK"])) {
-      $cek         = DB::connection($input["db"])->table($input["table"])->where($input["PK"][0], $input["PK"][1])->get();
-      if (!empty($cek)) {
-        $cek       = DB::connection($input["db"])->table($input["table"])->where($input["PK"][0], $input["PK"][1])->delete();
-        $connect   = \DB::connection($input["db"])->table($input["table"]);
-        foreach ($parameter as $value) $connect->insert($parameter);
-        return ["result"=>$parameter, "count"=>count($parameter)];
+    $data        = $input['data'];
+    $connect     = DB::connection($input["db"])->table($input["table"]);
+    $primaryKey  = strtoupper($input["PK"]);
+
+    foreach ($data as $data) {
+      $cek       = $connect->where($primaryKey, $data[$primaryKey])->get();
+      if (empty($cek)) {
+        $insert = $connect->insert($parameter);
+        return ["result"=>$data];
       } else {
-        $connect   = \DB::connection($input["db"])->table($input["table"]);
-        foreach ($parameter as $value) $connect->insert($parameter);
-        return ["result"=>$parameter, "count"=>count($parameter)];
+        $update = $connect->where($primaryKey, $data[$primaryKey])->delete();
+        $insert = $connect->insert($parameter);
+        return ["result"=>$data];
       }
-    } else {
-      $connect   = \DB::connection($input["db"])->table($input["table"]);
-      foreach ($parameter as $value) $connect->insert($parameter);
-      return ["result"=>$parameter];
     }
   }
 
