@@ -266,6 +266,11 @@ class GlobalHelper {
       $connect->whereIn(strtoupper($in[0]), $in[1]);
       }
 
+      if(!empty($input["whereNotIn"][0])) {
+      $in        = $input["whereNotIn"];
+      $connect->whereNotIn(strtoupper($in[0]), $in[1]);
+      }
+
       $count    = $connect->count();
       if (!empty($input['start']) || $input["start"] == '0') {
         if (!empty($input['limit'])) {
@@ -564,8 +569,7 @@ class GlobalHelper {
       }
     }
 
-    $addSlashes = str_replace('?', "'?'", $connect->toSql());
-    $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
+    $count = count($connect->get());
 
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
@@ -583,10 +587,10 @@ class GlobalHelper {
       }
 
       // query builder
-      $addSlashes = str_replace('?', "'?'", $connect->toSql());
-      $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
+      // $addSlashes = str_replace('?', "'?'", $connect->toSql());
+      // $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
 
-      return ["result"=>$data, "count"=>count($data)];
+      return ["result"=>$data, "count"=>$data];
   }
 
   public static function whereQuery($input) {

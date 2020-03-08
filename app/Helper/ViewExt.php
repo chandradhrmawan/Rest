@@ -274,7 +274,7 @@ class ViewExt{
           ->get();
         }
       }
-      $newDt["DETAIL"][]  = $detail ;
+      $newDt["DETAIL"]  = $detail ;
     }
 
     if ($type == "rec") {
