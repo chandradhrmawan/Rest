@@ -410,10 +410,10 @@ class ViewExt{
     $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
-    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
-      $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
-    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
-      $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    if (!empty($input["condition"]["BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input["condition"]["BRANCH_ID"]);
+    }else if (empty($input["condition"]["BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input['user']->user_branch_id);
     }
     if (!empty($input["condition"]["BRANCH_CODE"])) {
       $getRpt->where('BRANCH_CODE',$input["condition"]["BRANCH_CODE"]);
@@ -458,19 +458,19 @@ class ViewExt{
   }
 
   public static function getRekonsilasi($input) {
-    $startDate = date("Y-m-d", strtotime($input["startDate"]));
-    $endDate = date("Y-m-d", strtotime($input["endDate"]));
+    $startDate = date("Y-m-d h:i:s", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d h:i:s", strtotime($input["endDate"]));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
-    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
-      $getRpt->where('NOTA_BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
-    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
-      $getRpt->where('NOTA_BRANCH_ID',$input['user']->user_branch_id);
+    if (!empty($input["condition"]["BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input["condition"]["BRANCH_ID"]);
+    }else if (empty($input["condition"]["BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input['user']->user_branch_id);
     }
-    if (!empty($input["condition"]["NOTA_BRANCH_CODE"])) {
-      $getRpt->where('NOTA_BRANCH_CODE',$input["condition"]["NOTA_BRANCH_CODE"]);
-    }else if (empty($input["condition"]["NOTA_BRANCH_CODE"])) {
-      $getRpt->where('NOTA_BRANCH_CODE',$input['user']->user_branch_code);
+    if (!empty($input["condition"]["BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input["condition"]["BRANCH_CODE"]);
+    }else if (empty($input["condition"]["BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["VESSEL"])) {
       $getRpt->where('VESSEL',$input["condition"]["VESSEL"]);
@@ -479,7 +479,7 @@ class ViewExt{
       $getRpt->where('UKK',$input["condition"]["UKK"]);
     }
     if (!empty($input["condition"]["NOTA"])) {
-      $getRpt->where('NOTA',$input["condition"]["NOTA"]);
+      $getRpt->where('NOTA_NO',$input["condition"]["NOTA"]);
     }
     if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
       $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
@@ -511,19 +511,19 @@ class ViewExt{
   }
 
   public static function getRptDtlPendapatan($input) {
-    $startDate = date("Y-m-d", strtotime($input["startDate"]));
-    $endDate = date("Y-m-d", strtotime($input["endDate"]));
+    $startDate = $input["startYear"];
+    $endDate = $input["endYear"];
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN')->where('DT', 'D');
     if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
       $getRpt->where('BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
     }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
-      $getRpt->where('BRANCH_ID',$input['user']->user_branch_id);
+      $getRpt->where('REAL_BRANCH_ID',$input['user']->user_branch_id);
     }
     if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
       $getRpt->where('BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
     }else if (empty($input["condition"]["REAL_BRANCH_CODE"])) {
-      $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
+      $getRpt->where('REAL_BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["KEMASAN"])) {
       $getRpt->where('KEMASAN',$input["condition"]["KEMASAN"]);
@@ -534,12 +534,12 @@ class ViewExt{
     if (!empty($input["condition"]["SATUAN"])) {
       $getRpt->where('SATUAN',$input["condition"]["SATUAN"]);
     }
-    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
-      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
-    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
-      $getRpt->where('TGL_NOTA', '>', $startDate);
-    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
-      $getRpt->where('TGL_NOTA', '<', $endDate);
+    if (!empty($input["startYear"]) AND !empty($input["endYear"])) {
+      $getRpt->whereBetween('TAHUN',[$startDate,$endDate]);
+    } else if (!empty($input["startYear"]) AND empty($input["endYear"])) {
+      $getRpt->where('TAHUN', '>', $startDate);
+    } else if (empty($input["startYear"]) AND !empty($input["endYear"])) {
+      $getRpt->where('TAHUN', '<', $endDate);
     }
 
     $count  = $getRpt->count();
@@ -560,7 +560,7 @@ class ViewExt{
       }
     $result = $getRpt->get();
 
-    return ["result"=>$result, "count"=>$count];
+    return ["result"=>$result, "total"=>$count];
   }
 
   public static function getTrafikProduksi($input) {
@@ -604,7 +604,7 @@ class ViewExt{
       }
     $result = $getRpt->get();
 
-    return ["result"=>$result, "count"=>$count];
+    return ["result"=>$result, "total"=>$count];
   }
 
 }

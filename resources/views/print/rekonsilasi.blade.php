@@ -59,9 +59,9 @@ a{
       @foreach($result as $data)
       <tr align="center">
           <td>{{$no}}</td>
-          <td style="text-align:left">{{$data->vessel}}</td>
-          <td>{{$data->ukk}}</td>
-          <td class="str">{{$data->nota}}</td>
+          <td style="text-align:left">{{$data->nota_vessel_name}}</td>
+          <td>{{$data->nota_ukk}}</td>
+          <td class="str">{{$data->nota_no}}</td>
           <td style="text-align:left;border-right:0px">Rp</td>
           <td style="text-align:right;border-left:0px">{{number_format($data->kebersihan)}}</td>
           <td style="text-align:left;border-right:0px">Rp</td>
