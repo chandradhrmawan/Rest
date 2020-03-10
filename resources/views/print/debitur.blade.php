@@ -30,7 +30,7 @@ a{
 </style>
 <table width="100%">
   <tr>
-    <td style="border:0px"><img width="180" src="{{ url('/other/logo_ptp.png') }}"></td>
+    <td style="border:0px"><img width="120" src="http://sdnpakis5sby.sch.id/logo.jpg"></td>
     <td style="border:0px"></td>
     <td  style="border:0px" colspan="2">
       <h1 style="text-align:center;font-size:16px">LAPORAN DEBITUR<br/>

@@ -514,16 +514,16 @@ class ViewExt{
     $startDate = date("Y-m-d", strtotime($input["startDate"]));
     $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
-    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN')->where('DT', 'D');
     if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
-      $getRpt->where('REAL_BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
+      $getRpt->where('BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
     }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
-      $getRpt->where('REAL_BRANCH_ID',$input['user']->user_branch_id);
+      $getRpt->where('BRANCH_ID',$input['user']->user_branch_id);
     }
     if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
-      $getRpt->where('REAL_BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
+      $getRpt->where('BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
     }else if (empty($input["condition"]["REAL_BRANCH_CODE"])) {
-      $getRpt->where('REAL_BRANCH_CODE',$input['user']->user_branch_code);
+      $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["KEMASAN"])) {
       $getRpt->where('KEMASAN',$input["condition"]["KEMASAN"]);
@@ -540,6 +540,50 @@ class ViewExt{
       $getRpt->where('TGL_NOTA', '>', $startDate);
     } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
       $getRpt->where('TGL_NOTA', '<', $endDate);
+    }
+
+    $count  = $getRpt->count();
+
+    if (!empty($input['start']) || $input["start"] == '0') {
+      if (!empty($input['limit'])) {
+        $getRpt->skip($input['start'])->take($input['limit']);
+      }
+    }
+
+    if (isset($input["sort"])) {
+      $sort = json_decode($input["sort"]);
+      foreach ($sort as $sort) {
+      $property = $sort->property;
+      $direction = $sort->direction;
+      $getRpt->orderby(strtoupper($property), $direction);
+        }
+      }
+    $result = $getRpt->get();
+
+    return ["result"=>$result, "count"=>$count];
+  }
+
+  public static function getTrafikProduksi($input) {
+    $startDate = date("Y-m-d", strtotime($input["startDate"]));
+    $endDate = date("Y-m-d", strtotime($input["endDate"]));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_TRAFIK_DAN_PROD');
+    if (!empty($input["condition"]["REAL_BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input["condition"]["REAL_BRANCH_ID"]);
+    }else if (empty($input["condition"]["REAL_BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input['user']->user_branch_id);
+    }
+    if (!empty($input["condition"]["REAL_BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input["condition"]["REAL_BRANCH_CODE"]);
+    }else if (empty($input["condition"]["REAL_BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
+    }
+    if (!empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($input["startDate"]) AND empty($input["endDate"])) {
+      $getRpt->where('NOTA_DATE', '>', $startDate);
+    } else if (empty($input["startDate"]) AND !empty($input["endDate"])) {
+      $getRpt->where('NOTA_DATE', '<', $endDate);
     }
 
     $count  = $getRpt->count();

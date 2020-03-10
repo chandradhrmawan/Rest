@@ -911,31 +911,28 @@ class PrintAndExport{
     $end         = $f;
     $branchCode  = $g;
 
-    $startDate = date("Y-m-d", strtotime($start));
-    $endDate = date("Y-m-d", strtotime($end));
-
-    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN')->where('DT', 'D');
     if (!empty($branchId)) {
-      $getRpt->where('REAL_BRANCH_ID',$branchId);
+      $getRpt->where('BRANCH_ID',$branchId);
     }
     if (!empty($branchCode)) {
-      $getRpt->where('REAL_BRANCH_CODE',$branchCode);
+      $getRpt->where('BRANCH_CODE',$branchCode);
     }
     if (!empty($kemasan)) {
-      $getRpt->where('KEMASAN',$kemasan);
+      $getRpt->where('DTL_PACKAGE',$kemasan);
     }
     if (!empty($komoditi)) {
-      $getRpt->where('KOMODITI',$komoditi);
+      $getRpt->where('DTL_COMMODITY',$komoditi);
     }
     if (!empty($satuan)) {
-      $getRpt->where('SATUAN',$satuan);
+      $getRpt->where('DTL_UNIT_NAME',$satuan);
     }
     if (!empty($start) AND !empty($end)) {
-      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+      $getRpt->whereBetween('TAHUN',[$start,$end]);
     } else if (!empty($start) AND empty($end)) {
-      $getRpt->where('TGL_NOTA', '>', $startDate);
+      $getRpt->where('TAHUN', '>', $start);
     } else if (empty($start) AND !empty($end)) {
-      $getRpt->where('TGL_NOTA', '<', $endDate);
+      $getRpt->where('TAHUN', '<', $end);
     }
 
     $raw    = $getRpt;
@@ -943,14 +940,14 @@ class PrintAndExport{
 
     $kemasan = [];
     for ($i=0; $i < count($result); $i++) {
-      if (!in_array($result[$i]->kemasan,$kemasan)) {
-        $kemasan[] = $result[$i]->kemasan;
+      if (!in_array($result[$i]->dtl_package,$kemasan)) {
+        $kemasan[] = $result[$i]->dtl_package;
       }
     }
 
     $newDt = [];
     foreach ($result as $key => $value) {
-      $newDt[$value->kemasan][] = $value;
+      $newDt[$value->dtl_package][] = $value;
     }
 
     $data = $newDt;
@@ -961,6 +958,36 @@ class PrintAndExport{
       "start"=>$start,
       "end"=>$end
     ]);
+  }
+
+  public static function ExportTrafikProduksi($a, $b, $c, $d) {
+    $branchId    = $a;
+    $start       = $b;
+    $end         = $c;
+    $branchCode  = $d;
+
+    $startDate = date("Y-m-d", strtotime($start));
+    $endDate = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_TRAFIK_DAN_PROD');
+    if (!empty($branchId)) {
+      $getRpt->where('BRANCH_ID',$branchId);
+    }
+    if (!empty($branchCode)) {
+      $getRpt->where('BRANCH_CODE',$branchCode);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('NOTA_DATE', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('NOTA_DATE', '<', $endDate);
+    }
+
+    $raw    = $getRpt;
+    $result = $getRpt->get();
+
+    return view('print.trafik',["data"=>$result]);
   }
 
   public static function penyebut($nilai) {

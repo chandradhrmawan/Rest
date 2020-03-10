@@ -582,7 +582,9 @@ class PlgFunctTOS{
 		private static function buildJsonTX_HDR_REC($arr) {
 	        $arrdetil = '';
 	        $dtls = DB::connection('omuster')->table($arr['config']['head_tab_detil'])->where($arr['config']['head_forigen'], $arr['id'])->where($arr['config']['DTL_IS_ACTIVE'],'Y')->get();
-	        foreach ($dtls as $dtl) {
+					$head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
+	        $head = (array)$head;
+					foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
@@ -594,12 +596,14 @@ class PlgFunctTOS{
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'"
+	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+							"REQ_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQ_DTL_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
+							"REC_DTL_VOYIN": "'.$head[$arr['config']['head_voyin']].'",
+							"REC_DTL_VOYOUT": "'.$head[$arr['config']['head_voyout']].'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
-	        $head = DB::connection('omuster')->table($arr['config']['head_table'])->where($arr['config']['head_primery'], $arr['id'])->first();
-	        $head = (array)$head;
 	        $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no', $head[$arr['config']['head_no']])->first();
 	        $nota_no = null;
 	        $nota_date = null;
@@ -685,7 +689,7 @@ class PlgFunctTOS{
 	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
 	            "DELIVERY_KE": "'.$rec_dr->reff_name.'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-	            "PERP_DARI": "",
+	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
 	            "PERP_KE": "",
 							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
