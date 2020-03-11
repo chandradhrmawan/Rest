@@ -125,7 +125,7 @@
 <?php if ($label->nota_id == '21' || $label->nota_id == '22') {?>
 	<tr style="text-align:center">
 		<th width="20%">Layanan</th>
-		<th width="20%">Nama Barang</th>
+		<th width="20%">Kemasan</th>
 		<th width="10%">Satuan</th>
 		<th width="10%">Qty</th>
 		<th width="20%">Tarif Dasar</th>
@@ -134,7 +134,7 @@
 	@foreach($detail as $detail)
 	<tr>
 		<td>{{$detail->group_tariff_name}}</td>
-		<td style="text-align:center">{{$detail->commodity_name}}</td>
+		<td style="text-align:center">{{$detail->package_name}}</td>
 		<td style="text-align:center">{{$detail->unit_name}}</td>
 		<td style="text-align:center">{{$detail->qty}}</td>
 		<td style="text-align:right">{{number_format($detail->tariff)}}</td>

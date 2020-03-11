@@ -118,42 +118,29 @@
 	</tr>
 </table>
 
-<?php if ($bl != "0") {  ?>
 <?php if ($label->nota_id == '21' || $label->nota_id == '22') {?>
 	<table  width="100%" align="center" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
 	<tr style="text-align:center">
 		<th width="3%" style="border-bottom:solid 1px; text-align:center">No</th>
 		<th width="17%" style="border-bottom:solid 1px">Layanan</th>
-		<th width="20%" style="border-bottom:solid 1px">Nama Barang</th>
+		<th width="15%" style="border-bottom:solid 1px">Kemasan</th>
 		<th width="10%" style="border-bottom:solid 1px">Satuan</th>
-		<th width="10%" style="border-bottom:solid 1px">Qty</th>
-		<th width="15%" style="border-bottom:solid 1px">Tarif Dasar</th>
+		<th width="6%" style="border-bottom:solid 1px">Qty</th>
+		<th width="10%" style="border-bottom:solid 1px">Tarif Dasar</th>
 		<th width="5%" style="border-bottom:solid 1px"></th>
 		<th width="20%" style="border-bottom:solid 1px">Total</th>
 	</tr>
-	@foreach($bl as $bl)
-	<tr style="background-color:#ff3030;color:#fff;">
-		<td style="border-right: 0;padding-left:9px">{{$bl}}</td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-right: 0;border-left:0;text-align:center"></td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-right: 0;border-left:0"></td>
-		<td style="border-left:  0;"></td>
-	</tr>
-	<?php foreach ($handling[$bl] as $value) { ?>
+	@foreach($detail as $detail)
 	<tr>
 		<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
-		<td>{{$value["dtl_group_tariff_name"]}}</td>
-		<td>{{$value["dtl_commodity"]}}</td>
-		<td style="text-align:center">{{$value["dtl_unit_name"]}}</td>
-		<td style="text-align:center">{{$value["dtl_qty"]}}</td>
-		<td style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td style="text-align:left">IDR</td>
-		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
+		<td>{{$detail->group_tariff_name}}</td>
+		<td style="text-align:center">{{$detail->package_name}}</td>
+		<td style="text-align:center">{{$detail->unit_name}}</td>
+		<td style="text-align:center">{{$detail->qty}}</td>
+		<td style="text-align:right">{{number_format($detail->tariff)}}</td>
+		<td>IDR</td>
+		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
-	<?php } ?>
 	@endforeach
 </table>
 <?php
@@ -162,46 +149,26 @@
 <table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
 	<tr style="text-transform:uppercase;font-weight:800">
 		<th width="5%" style="border-bottom:solid 1px;text-align:center">No</th>
-		<th width="30%" style="border-bottom:solid 1px">Layanan</th>
-		<th width="20%" style="border-bottom:solid 1px">Container</th>
-		<th width="10%" style="border-bottom:solid 1px;text-align:center">Qty</th>
-		<th width="20%" style="border-bottom:solid 1px;text-align:center">Tarif Dasar</th>
+		<th width="15%" style="border-bottom:solid 1px">Layanan</th>
+		<th width="10%" style="border-bottom:solid 1px">Container</th>
+		<th width="1%" style="border-bottom:solid 1px;text-align:center">Qty</th>
+		<th width="10%" style="border-bottom:solid 1px;text-align:center">Tarif Dasar</th>
 		<th width="5%" style="border-bottom:solid 1px"></th>
 		<th width="10%" style="border-bottom:solid 1px">Jumlah</th>
 	</tr>
-	<?php
-		if ($penumpukan != "0") {
-			$total = count($penumpukan);
-	?>
-		@foreach($penumpukan as $penumpukan)
-		<tr>
-			<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
-			<td>{{$penumpukan["dtl_group_tariff_name"]}}</td>
-			<td >{{$penumpukan["dtl_cont_size"]}}/{{$penumpukan["dtl_cont_type"]}}/{{$penumpukan["dtl_cont_status"]}}</td>
-			<td style="text-align:center"> {{$penumpukan["dtl_qty"]}}</td>
-			<td style="text-align:right">{{number_format($penumpukan["dtl_tariff"])}}</td>
-			<td style="text-align:left">IDR</td>
-			<td style="text-align:right">{{number_format($penumpukan["dtl_dpp"])}}</td>
-		</tr>
-		@endforeach
-	<?php } ?>
-</table>
-<table  width="100%" align="center" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
-@foreach($bl as $bl)
-<?php foreach ($handling[$bl] as $value) { ?>
+	@foreach($detail as $detail)
 	<tr>
-		<td width="5%" style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
-		<td width="30%" style="">{{$value["dtl_group_tariff_name"]}}</td>
-		<td width="20%">{{$value["dtl_cont_size"]}}/{{$value["dtl_cont_type"]}}/{{$value["dtl_cont_status"]}}</td>
-		<td width="10%" style="text-align:center"> {{$value["dtl_qty"]}}</td>
-		<td width="20%" style="text-align:right">{{number_format($value["dtl_tariff"])}}</td>
-		<td width="5%" style="text-align:left">IDR</td>
-		<td width="10%" style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
+		<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
+		<td>{{$detail->group_tariff_name}}</td>
+		<td style="text-align:left">{{$detail->cont_size}} / {{$detail->cont_type}} / {{$detail->cont_status}}</td>
+		<td style="text-align:center">{{$detail->qty}}</td>
+		<td style="text-align:right">{{number_format($detail->tariff)}}</td>
+		<td>IDR</td>
+		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
-<?php } ?>
-@endforeach
+	@endforeach
 </table>
-<?php }} ?>
+<?php } ?>
 
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
   <tr>

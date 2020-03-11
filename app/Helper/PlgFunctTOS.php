@@ -379,6 +379,13 @@ class PlgFunctTOS{
 			} else {
 				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->update($storeRealisasi);
 			}
+		} else {
+			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->get();
+			if (empty($real)) {
+				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
+			} else {
+				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->update($storeRealisasi);
+			}
 		}
 	}
 
@@ -425,6 +432,13 @@ class PlgFunctTOS{
 
 		if ($qty <= $total) {
 			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
+			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
+			if (empty($real)) {
+				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
+			} else {
+				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findDtlDelBrg)->update($storeRealisasi);
+			}
+		} else {
 			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
 			if (empty($real)) {
 				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
