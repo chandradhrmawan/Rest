@@ -158,44 +158,45 @@ class PlgFunctTOS{
 			$funfun = $config['funct_REAL_STR'];
 			$real_value = static::$funfun($listR,$hdr,$config,$input);
 
-			if (empty($real_value)) {
-				return "Realization Cargo";
-			}
-
 			$upSttDtl = [
 				$config['DTL_FL_REAL']=>$real_value['real_val']
 			];
+
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $hdr[$config['head_primery']])->where($config['DTL_BL'], $listR['NO_CONTAINER'])->update($upSttDtl);
 
-			$findTsCont = [
-				'cont_no' => $listR['NO_CONTAINER'],
-				'branch_id' => $hdr[$config['head_branch']],
-				'branch_code' => $hdr[$config['head_branch_code']]
-			];
-			$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first();
-			$cont_counter = $cekTsCont->cont_counter;
-			if ($config['kegiatan_real'] == 3) { //kusus gate in
-				$cont_counter++;
+			if (isset($real_value["nota_id"])) {
+				$his_cont[] = "Realization Cargo";
+			} else {
+				$findTsCont = [
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr[$config['head_branch']],
+					'branch_code' => $hdr[$config['head_branch_code']]
+				];
+				$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->first();
+				$cont_counter = $cekTsCont->cont_counter;
+				if ($config['kegiatan_real'] == 3) { //kusus gate in
+					$cont_counter++;
+				}
+				$arrStoreTsContAndTxHisCont = [
+					'history_date' => date('Y-m-d H:i:s', strtotime($real_value['real_date'])),
+					'cont_no' => $listR['NO_CONTAINER'],
+					'branch_id' => $hdr[$config['head_branch']],
+					'branch_code' => $hdr[$config['head_branch_code']],
+					'cont_location' => $config['cont_loc_on_real'],
+					'cont_size' => null,
+					'cont_type' => null,
+					'cont_counter' => $cont_counter,
+					'no_request' => $listR['NO_REQUEST'],
+					'kegiatan' => $config['kegiatan_real'],
+					'id_user' => "1",
+					'status_cont' => $listR['STATUS'],
+					'vvd_id' => $hdr[$config['head_vvd']]
+				];
+				if (!empty($input["user"])) {
+					$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
+				}
+				$his_cont[] = PlgContHist::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 			}
-			$arrStoreTsContAndTxHisCont = [
-				'history_date' => date('Y-m-d H:i:s', strtotime($real_value['real_date'])),
-				'cont_no' => $listR['NO_CONTAINER'],
-				'branch_id' => $hdr[$config['head_branch']],
-				'branch_code' => $hdr[$config['head_branch_code']],
-				'cont_location' => $config['cont_loc_on_real'],
-				'cont_size' => null,
-				'cont_type' => null,
-				'cont_counter' => $cont_counter,
-				'no_request' => $listR['NO_REQUEST'],
-				'kegiatan' => $config['kegiatan_real'],
-				'id_user' => "1",
-				'status_cont' => $listR['STATUS'],
-				'vvd_id' => $hdr[$config['head_vvd']]
-			];
-			if (!empty($input["user"])) {
-				$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
-			}
-			$his_cont[] = PlgContHist::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 		}
 		return $his_cont;
 	}
@@ -333,6 +334,8 @@ class PlgFunctTOS{
 	public static function storeRealDateRec($listR,$hdr,$config,$input) {
 		$recBrgJml 									= $listR["JUMLAH"];
 		$noRequest									= $listR["NO_REQUEST"];
+		$realDate 									= date('Y-m-d', strtotime($listR["REAL_DATE"]));
+
 		$findDtlRecBrg 							= [
 			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
 			"REC_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]
@@ -371,28 +374,27 @@ class PlgFunctTOS{
 		$total  										= $qtyReal + $qtyCancel;
 
 
+		$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->get();
+		if (empty($real)) {
+			$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
+		} else {
+			$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->update($storeRealisasi);
+		}
+
 		if ($qty <= $total) {
 			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_REC_CARGO')->where($findDtlRecBrg)->update(["REC_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
-			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->get();
-			if (empty($real)) {
-				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
-			} else {
-				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->update($storeRealisasi);
-			}
+			return ["real_val" => $config["DTL_FL_REAL_V"], "real_date" => $realDate, "nota_id" => "21"];
 		} else {
-			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->get();
-			if (empty($real)) {
-				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
-			} else {
-				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealRecBrg)->update($storeRealisasi);
-			}
+			return ["real_val" => "1", "real_date" => $realDate, "nota_id" => "21"];
 		}
+
 	}
 
 	public static function storeRealDateDel($listR,$hdr,$config,$input) {
 		$delBrgRealDate							= $listR["REAL_DATE"];
 		$delBrgJml 									= $listR["JUMLAH"];
 		$noRequest	 								= $listR["NO_REQUEST"];
+		$realDate 									= date('Y-m-d', strtotime($listR["REAL_DATE"]));
 		$findDtlDelBrg 							= [
 			"DEL_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
 			"DEL_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]
@@ -430,21 +432,18 @@ class PlgFunctTOS{
 		$qtyCancel 									= $dataDetail->del_cargo_dtl_canc_qty;
 		$total  										= $qtyReal + $qtyCancel;
 
+		$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
+		if (empty($real)) {
+			$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
+		} else {
+			$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findDtlDelBrg)->update($storeRealisasi);
+		}
+
 		if ($qty <= $total) {
 			$updateFlReal 			= DB::connection('omuster')->table('TX_DTL_DEL_CARGO')->where($findDtlDelBrg)->update(["DEL_CARGO_FL_REAL"=>$config["DTL_FL_REAL_V"]]);
-			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
-			if (empty($real)) {
-				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
-			} else {
-				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findDtlDelBrg)->update($storeRealisasi);
-			}
+			return ["real_val" => $config["DTL_FL_REAL_V"], "real_date" => $realDate, "nota_id" => "22"];
 		} else {
-			$real 							= DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findRealDelBrg)->get();
-			if (empty($real)) {
-				$insertReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->insert($storeRealisasi);
-			} else {
-				$updateReal 		  = DB::connection('omuster')->table('TX_REALISASI_CARGO')->where($findDtlDelBrg)->update($storeRealisasi);
-			}
+			return ["real_val" => "1", "real_date" => $realDate, "nota_id" => "22"];
 		}
 	}
 

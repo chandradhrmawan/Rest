@@ -220,4 +220,5 @@ class ViewController extends Controller
     return view('print.apiSet',["label"=>$label->nota_label,"id"=>$notaId,"data"=>$data,"search"=>$search]);
 
   }
+
 }
