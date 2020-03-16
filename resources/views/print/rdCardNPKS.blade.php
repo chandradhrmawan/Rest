@@ -32,21 +32,21 @@
     </tr>
   </table>
 
-<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
-	<tr style="text-align:center">
-		<td>
-      <b>Request Number</b>
-		 <div style="padding:5px;width:100%">
-       {{$header[$config["head_no"]]}}
-		 </div>
-    </td>
-	</tr>
-</table>
 
 <?php if ($nota_id == 21 || $nota_id == 22) { ?>
+	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+		<tr style="text-align:center">
+			<td>
+				<b>No SI</b>
+				<div style="padding:5px;width:100%;font-size:16px;font-weight:800">
+					{{$detail[$config['DTL_BL']]}}
+				</div>
+			</td>
+		</tr>
+	</table>
 	<table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 		<tr>
-			<td width="35%">No SI<br><b>{{$detail[$config['DTL_BL']]}}</td>
+			<td width="35%">Request Number<br><b>{{$header[$config["head_no"]]}}</td>
 				<?php if ($nota_id = 21) {?>
 					<td width="35%">Tanggal Masuk<br><b>{{date('d/m/Y', strtotime($detail[$config['DTL_DATE_IN']]))}}</td>
 				<?php	} else { ?>
@@ -89,16 +89,16 @@
 	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 		<tr style="text-align:center">
 			<td>
-	      <b>Request Number</b>
-			 <div style="padding:5px;width:100%">
-	       {{$header[$config["head_no"]]}}
-			 </div>
-	    </td>
+				<b>No SI</b>
+				<div style="padding:5px;width:100%;font-size:16px;font-weight:800">
+					{{$detail[$config['DTL_BL']]}}
+				</div>
+			</td>
 		</tr>
 	</table>
 	<table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 		<tr>
-			<td width="35%">No SI<br><b>{{$detail[$config['DTL_BL']]}}</td>
+			<td width="35%">Request Number<br><b>{{$header[$config["head_no"]]}}</td>
 				<?php if ($nota_id = 21) {?>
 					<td width="35%">Tanggal Masuk<br><b>{{date('d/m/Y', strtotime($detail[$config['DTL_DATE_IN']]))}}</td>
 				<?php	} else { ?>
@@ -130,18 +130,40 @@
 		</tr>
 	</table>
 <?php } else { ?>
+	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
+		<tr style="text-align:center">
+			<td>
+				<b>No Container</b>
+				<div style="padding:5px;width:100%;font-size:16px;font-weight:800">
+					{{$detail[$config['DTL_BL']]}}
+				</div>
+			</td>
+		</tr>
+	</table>
 	<table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	  <tr>
-	    <td width="35%">No Container<br><b>{{$detail[$config['DTL_BL']]}}</td>
-	    <td width="35%">Danger<br><b>
+	    <td width="35%">Request Number<br><b>{{$header[$config["head_no"]]}}</td>
+				<?php if ($nota_id == 3 || $nota_id == 4 || $nota_id == 20) { ?>
+	    <td width="35%">Via<br><b>
 				<?php
-				if ($detail[$config['DTL_CHARACTER']] == 'N') {
-	        echo "No";
+				if (!empty($detail[$config["DTL_VIA_NAME"]["rec"]])) {
+	        echo $detail[$config["DTL_VIA_NAME"]["rec"]];
 	      } else {
-					echo "Yes";
+					echo "";
 	      }
 				 ?>
 			</td>
+		<?php } else { ?>
+			<td width="35%">Via<br><b>
+				<?php
+				if (!empty($detail[$config["DTL_VIA_NAME"]])) {
+	        echo $detail[$config["DTL_VIA_NAME"]];
+	      } else {
+					echo "";
+	      }
+				 ?>
+			</td>
+		<?php }?>
 	    <td>Commodity<br><b>
 	      <?php
 	      if (empty($detail[$config['DTL_CMDTY_NAME']])) {
@@ -193,26 +215,37 @@
 	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:10px;margin-top:20px">
 		<tr style="text-align:center">
 			<td>
-	      <b>Request Number</b>
-			 <div style="padding:5px;width:100%">
-	       {{$header[$config["head_primery"]]}}
-			 </div>
-	    </td>
+				<b>No Container</b>
+				<div style="padding:5px;width:100%;font-size:16px;font-weight:800">
+					{{$detail[$config['DTL_BL']]}}
+				</div>
+			</td>
 		</tr>
 	</table>
-
 	<table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	  <tr>
-	    <td width="35%">No Container<br><b>{{$detail[$config['DTL_BL']]}}</td>
-	    <td width="35%">Danger<br><b>
-				<?php
-				if ($detail[$config['DTL_CHARACTER']] == 'N') {
-					echo "No";
-				} else {
-					echo "Yes";
-				}
-				 ?>
-			</td>
+	    <td width="35%">Request Number<br><b>{{$header[$config["head_no"]]}}</td>
+				<?php if ($nota_id == 3 || $nota_id == 4 || $nota_id == 20) { ?>
+		    <td width="35%">Via<br><b>
+					<?php
+					if (!empty($detail[$config["DTL_VIA_NAME"]["rec"]])) {
+		        echo $detail[$config["DTL_VIA_NAME"]["rec"]];
+		      } else {
+						echo "";
+		      }
+					 ?>
+				</td>
+			<?php } else { ?>
+				<td width="35%">Via<br><b>
+					<?php
+					if (!empty($detail[$config["DTL_VIA_NAME"]])) {
+		        echo $detail[$config["DTL_VIA_NAME"]];
+		      } else {
+						echo "";
+		      }
+					 ?>
+				</td>
+			<?php }?>
 	    <td>Commodity<br><b>
 	      <?php
 	      if (empty($detail[$config['DTL_CMDTY_NAME']])) {

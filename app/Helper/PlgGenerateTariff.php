@@ -533,6 +533,8 @@ class PlgGenerateTariff{
 			$setH['P_BOOKING_NUMBER'] = $input['HDR']['P_BOOKING_NUMBER'];
 			$setH['P_REALIZATION'] = $input['HDR']['P_REALIZATION'];
 			$setH['P_RESTITUTION'] = $input['HDR']['P_RESTITUTION'];
+			$setH['P_EXTENTION'] = "N";
+			$setH['P_EXT_NOTA_ID'] = "NULL";
 			$setH['P_TRADE'] = $input['HDR']['P_TRADE'];
 			$setH['P_USER_ID'] = $input['HDR']['P_USER_ID'];
 		// head

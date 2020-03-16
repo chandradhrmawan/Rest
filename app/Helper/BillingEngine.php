@@ -845,7 +845,7 @@ class BillingEngine{
         $countD = 0;
         $setD = '';
         $getServCode = DB::connection('mdm')->table('TM_NOTA')->where('nota_id',$input['head']['P_NOTA_ID'])->first();
-        
+
         foreach ($detil as $list) {
           $countD++;
           if (!empty($list['DTL_FUMI_TYPE'])) {
