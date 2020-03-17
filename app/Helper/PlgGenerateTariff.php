@@ -27,9 +27,9 @@ class PlgGenerateTariff{
 	}
 
 	private static function getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input){
-		if (in_array($input['nota_id'], [3,17])) {
+		if (in_array($input['nota_id'], [3,7,17])) {
 			$in = [12,14];
-		} else if (in_array($input['nota_id'], [4,18])){
+		} else if (in_array($input['nota_id'], [4,10,18])){
 			$in = [12,13];
 		}
 
@@ -234,7 +234,12 @@ class PlgGenerateTariff{
 				}
 				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else if (is_array($config['DTL_DATE_IN'])){
-				$ddiType = $config['DTL_DATE_IN']['paymethod'.$hdr[$config['head_paymethod']]];
+				if ($hdr[$config['head_paymethod']] == 2 and $hdr[$config['head_status']] == 3) {
+					$paymethod = 'paymethod2';
+				}else{
+					$paymethod = 'paymethod1';
+				}
+				$ddiType = $config['DTL_DATE_IN'][$paymethod];
 				if (in_array($ddiType, ["TX_HISTORY_CONTAINER"])) {
 					$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
 					$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
