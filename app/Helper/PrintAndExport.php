@@ -697,9 +697,12 @@ class PrintAndExport{
     $connect        = DB::connection('omuster');
     $det            = [];
     $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
-    $detail         = DB::connection('eng')->table("V_TX_TEMP_TARIFF_DTL_NPKS")->where('BOOKING_NUMBER', $header[0]->nota_req_no)->get();
+    $detail         = DB::connection('eng')->table("V_TX_TEMP_TARIFF_DTL_NPKS")->where('BOOKING_NUMBER', $header[0]->nota_req_no)->where("GROUP_TARIFF_ID", "!=", "10")->get();
     $nota           = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $header[0]->nota_group_id)->get();
-    $branch      = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
+    $branch         = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
+    $penumpukan     = DB::connection('eng')->table("V_TX_TEMP_TARIFF_DTL_NPKS")->where('BOOKING_NUMBER', $header[0]->nota_req_no)->where("GROUP_TARIFF_ID", "=", "10")->get();
+
+
 
     // Data Uper And Payment
     $payment     = DB::connection('omuster')->table("TX_PAYMENT")->where('PAY_REQ_NO', $header[0]->nota_req_no)->first();
@@ -712,7 +715,9 @@ class PrintAndExport{
       $terbilang  = "Nol";
     }
 
-    // return $detail;
+    if (empty($penumpukan)) {
+      $penumpukan = 0;
+    }
 
     $html        = view('print.notaNpks',
                         [
@@ -723,6 +728,7 @@ class PrintAndExport{
                           "header"    => $header,
                           "label"     => $nota,
                           "detail"    => $detail,
+                          "penumpukan"=> $penumpukan,
                           "terbilang" => $terbilang,
                           "qrcode"    => "0"
                         ]);
@@ -740,9 +746,10 @@ class PrintAndExport{
     $connect        = DB::connection('omuster');
     $det            = [];
     $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
-    $detail         = DB::connection('eng')->table("V_TX_TEMP_TARIFF_DTL_NPKS")->where('BOOKING_NUMBER', $header[0]->nota_req_no)->get();
+    $detail         = DB::connection('eng')->table("V_TX_TEMP_TARIFF_DTL_NPKS")->where('BOOKING_NUMBER', $header[0]->nota_req_no)->where("GROUP_TARIFF_ID", "!=", "10")->get();
     $nota           = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $header[0]->nota_group_id)->get();
-    $branch      = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
+    $branch         = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
+    $penumpukan     = DB::connection('eng')->table("V_TX_TEMP_TARIFF_DTL_NPKS")->where('BOOKING_NUMBER', $header[0]->nota_req_no)->where("GROUP_TARIFF_ID", "=", "10")->get();
 
     // Data Uper And Payment
     $uper        = 0;
@@ -750,6 +757,10 @@ class PrintAndExport{
     $payAmount   = 0;
     $total       = $notaAmount - $payAmount;
     $terbilang   = static::terbilang($total);
+
+    if (empty($penumpukan)) {
+      $penumpukan = 0;
+    }
 
     // return $detail;
 
@@ -759,6 +770,7 @@ class PrintAndExport{
                           "uper"      =>$uper,
                           "branch"    =>$branch,
                           "header"    =>$header,
+                          "penumpukan"=>$penumpukan,
                           "detail"    =>$detail,
                           "label"     =>$nota,
                           "terbilang" =>$terbilang

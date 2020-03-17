@@ -166,6 +166,26 @@
 	<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 </tr>
 @endforeach
+	<?php if ($penumpukan != 0) { ?>
+		@foreach($penumpukan as $penumpukan)
+		<tr>
+			<td>{{$penumpukan->group_tariff_name}}</td>
+			<td style="text-align:center">{{$penumpukan->cont_size}}</td>
+			<td style="text-align:center">{{$penumpukan->cont_type}}</td>
+			<td style="text-align:center">{{$penumpukan->cont_status}}</td>
+			<td style="text-align:center">{{$penumpukan->qty}} x
+				<?php
+				if (!empty($penumpukan->masa1)) {
+					echo $penumpukan->masa1;
+				} else {
+					echo $penumpukan->masa2;
+				} ?>
+			</td>
+			<td style="text-align:right">{{number_format($penumpukan->tariff)}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->dpp)}}</td>
+		</tr>
+		@endforeach
+	<?php } ?>
 <?php } ?>
 </table>
 </table>

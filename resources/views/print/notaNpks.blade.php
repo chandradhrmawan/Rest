@@ -142,6 +142,19 @@
 		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
 	@endforeach
+	<?php	if ($penumpukan != 0) { ?>
+		@foreach($penumpukan as $penumpukan)
+		<tr>
+			<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
+			<td>{{$penumpukan->dtl_group_tariff_name}}</td>
+			<td style="text-align:left">{{$penumpukan->dtl_cont_size}} / {{$penumpukan->dtl_cont_type}} / {{$penumpukan->dtl_cont_status}}</td>
+			<td style="text-align:center">{{$penumpukan->dtl_qty}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->dtl_tariff)}}</td>
+			<td>IDR</td>
+			<td style="text-align:right">{{number_format($penumpukan->dtl_dpp)}}</td>
+		</tr>
+		@endforeach
+	<?php } ?>
 </table>
 <?php
 } else {
@@ -167,6 +180,19 @@
 		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
 	@endforeach
+	<?php	if ($penumpukan != 0) { ?>
+		@foreach($penumpukan as $penumpukan)
+		<tr>
+			<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
+			<td>{{$penumpukan->group_tariff_name}}</td>
+			<td style="text-align:left">{{$penumpukan->cont_size}} / {{$penumpukan->cont_type}} / {{$penumpukan->cont_status}}</td>
+			<td style="text-align:center">{{$penumpukan->qty}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->tariff)}}</td>
+			<td>IDR</td>
+			<td style="text-align:right">{{number_format($penumpukan->dpp)}}</td>
+		</tr>
+		@endforeach
+	<?php } ?>
 </table>
 <?php } ?>
 
