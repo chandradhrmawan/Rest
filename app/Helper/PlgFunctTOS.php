@@ -736,7 +736,7 @@ class PlgFunctTOS{
 			if (!is_array($arr['config']['kegiatan']) and $arr['config']['kegiatan'] == 5) {
 	        	$actionJ = 'getStuffing';
 	        }else{
-	        	if ($arr['config']['kegiatan'] == [3,5]) {
+	        	if ($arr['config']['kegiatan'] == [1,5]) {
 	        		$actionJ = 'getRecStuffing';
 	        	}else{
 	        		$actionJ = 'getRecStuffingDel';
