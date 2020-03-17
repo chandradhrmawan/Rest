@@ -136,7 +136,7 @@ class PlgFunctTOS{
 		$msg = 'Success get realisasion';
 		if (count($dtlLoop) > 0) {
 			$arr = static::getRealJsonPLG($find,$dtlLoop,$config);
-			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);			
+			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);
 			if ($res['count'] == 0) {
 				$Success = false;
 				$msg = 'realisasion not finish';
@@ -793,6 +793,7 @@ class PlgFunctTOS{
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
 	            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+							"REQ_RECEIVING_DATE" : "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
 	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
