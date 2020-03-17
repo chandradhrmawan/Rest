@@ -468,9 +468,8 @@ class PlgFunctTOS{
 					"rec_dtl_via_name": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
 					"rec_dtl_cmdty_id": null,
 					"rec_dtl_cmdty_name": "",
-					"rec_dtl_date_plan": "'.$dtl[$arr['config']['DTL_DATE_REC']].'",
-				},
-				';
+					"rec_dtl_date_plan": "'.$dtl[$arr['config']['DTL_DATE_REC']].'"
+				},';
 			}
 	        $storeRecDtl = substr($storeRecDtl, 0,-1);
 			$storeRecHead = '

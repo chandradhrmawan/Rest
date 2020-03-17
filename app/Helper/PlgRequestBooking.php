@@ -523,8 +523,6 @@ class PlgRequestBooking{
 	      }
 			}
 
-	    	// pay_id            number,
-	    	// pay_no            varchar2(20 byte),
 	    	$store->pay_nota_no = $input['pay_nota_no'];
 	    	$store->pay_req_no = $input['pay_req_no'];
 	    	$store->pay_method = $input['pay_method'];
