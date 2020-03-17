@@ -141,6 +141,10 @@ class ViewController extends Controller
     return ViewExt::getRekonsilasi($input);
   }
 
+  function getTrafikProduksi($input) {
+    return ViewExt::getTrafikProduksi($input);
+  }
+
   function getRptDtlPendapatan($input, $request){
     return ViewExt::getRptDtlPendapatan($input);
   }
@@ -155,6 +159,10 @@ class ViewController extends Controller
 
   function ExportPendapatan($a,$b,$c,$d,$e,$f,$g) {
     return PrintAndExport::ExportPendapatanNPK($a,$b,$c,$d,$e,$f,$g);
+  }
+
+  function ExportTrafikProduksi($a,$b,$c,$d) {
+    return PrintAndExport::ExportTrafikProduksi($a,$b,$c,$d);
   }
 
   function getNota($input) {
@@ -212,4 +220,5 @@ class ViewController extends Controller
     return view('print.apiSet',["label"=>$label->nota_label,"id"=>$notaId,"data"=>$data,"search"=>$search]);
 
   }
+
 }

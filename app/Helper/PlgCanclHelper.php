@@ -101,7 +101,7 @@ class PlgCanclHelper{
 	public static function canceledReqPrepareContainerOrBarang($config,$reqsHdr,$cnclHdr,$cnclDtl){
 		foreach ($cnclDtl as $list) {
 			$noDtl = $list->cancl_cont.$list->cancl_si;
-			if (!empty($config['DTL_IS_CANCEL'])){
+			if (!empty($config['DTL_IS_CANCEL']) && !isset($config['DTL_IS_CANCELLED'])){
 				$upd = [
 					$config['DTL_IS_ACTIVE'] => 'N',
 					$config['DTL_IS_CANCEL'] => 'Y'
@@ -119,17 +119,21 @@ class PlgCanclHelper{
 		}
 
 		// Tambahan Change Header Flag
-		$dtlIsActive = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+		if ($config['CANCELLED_STATUS'] == 21 || $config['CANCELLED_STATUS'] == 22) {
+
+		} else {
+			$dtlIsActive = DB::connection('omuster')->table($config['head_tab_detil'])->where([
 			$config['head_forigen'] => $reqsHdr[$config['head_primery']],
 			$config['DTL_IS_ACTIVE'] => 'Y',
 			$config['DTL_IS_CANCEL'] => 'N'
-		])->get();
+			])->get();
 
-		if (count($dtlIsActive) == 0) {
-			$updateHdrFlagCancel = DB::connection('omuster')
+			if (count($dtlIsActive) == 0) {
+				$updateHdrFlagCancel = DB::connection('omuster')
 				->table($config['head_table'])
 				->where($config['head_primery'], $reqsHdr[$config['head_primery']])
 				->update([$config['head_status'] => 9]);
+			}
 		}
 	}
 
@@ -167,7 +171,7 @@ class PlgCanclHelper{
 	}
 
 	public static function undoCanclSet($input,$config,$findCanc,$findReq){
-		$canclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$findCanc['cancelled_id'])->get();
+		$canclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$findCanc->cancelled_id)->get();
 		foreach ($canclDtl as $lcd) {
 			$cndtn = [
 				$config['head_forigen'] => $findReq[$config['head_primery']]

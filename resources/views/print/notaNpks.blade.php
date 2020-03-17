@@ -18,7 +18,11 @@
 </head>
 <body>
 		@foreach($header as $header)
-		<?php if ($header->nota_paid == "I") { ?>
+		@foreach($label as $label)
+		<?php
+		$noa = 0;
+		$nomor = 0;
+		if ($header->nota_paid == "I") { ?>
 			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(-30deg);margin-top:300px;width:80%">
 		<?php } ?>
 		@foreach($branch as $branch)
@@ -54,9 +58,9 @@
     </tr>
   </table>
 
-<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800;text-transform:uppercase">Nota Penjualan Jasa {{$label[0]->nota_name}}</center>
+<center style="width:100%;background-color:#ff3030;color:#fff;margin-top:20px;padding:5px;font-weight:800;text-transform:uppercase">Nota Penjualan Jasa {{$label->nota_name}}</center>
 
-<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
+<table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px;margin-bottom:20px">
 	<tr style="text-align:center">
 		<td style="vertical-align:top;width:60%" >
       <table style="border-collapse:collapse; font-size:11px;" width="100%">
@@ -95,9 +99,9 @@
           <td>-</td>
         </tr>
 				<tr>
-          <td>No. SI</td>
+          <td>PBM</td>
           <td>: </td>
-          <td>-</td>
+          <td>{{$header->nota_pbm_name}}</td>
         </tr>
 				<tr>
           <td>Nama Kapal</td>
@@ -114,78 +118,58 @@
 	</tr>
 </table>
 
-	<?php if ($label[0]->nota_service_om_code != "BM") { ?>
-	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
-		<tr style="text-align:center;text-transform:uppercase;font-weight:800">
-			<th style="border-bottom:solid 1px">No</th>
-			<th style="border-bottom:solid 1px">Layanan</th>
-			<th style="border-bottom:solid 1px">Qty</th>
-			<th style="border-bottom:solid 1px">Satuan</th>
-			<th style="border-bottom:solid 1px">Tarif</th>
-			<th style="border-bottom:solid 1px"></th>
-			<th style="border-bottom:solid 1px">Jumlah</th>
-		</tr>
-		<?php
-			$noa = 0;
-			$nomor = 0;
-			if ($penumpukan != "0") {
-				$total = count($penumpukan);
-		?>
-			@foreach($penumpukan as $penumpukan)
-			<tr>
-				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
-				<td style="padding-left:9px">{{$penumpukan["dtl_group_tariff_name"]}}</td>
-				<td style="text-align:center"> {{$penumpukan["dtl_qty"]}}</td>
-				<td style="text-align:center">{{$penumpukan["dtl_cont_size"]}}/{{$penumpukan["dtl_cont_type"]}}/{{$penumpukan["dtl_cont_status"]}}</td>
-				<td style="text-align:center">{{number_format($penumpukan["dtl_amount"])}}</td>
-				<td style="text-align:left">IDR</td>
-				<td style="text-align:right">{{number_format($penumpukan["dtl_amount"])}}</td>
-			</tr>
-			@endforeach
-		<?php } ?>
-	<?php if ($alat != "0") {?>
-		<?php foreach ($alat as $alat) { ?>
-				<tr>
-					<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
-					<td style="border-right: 0;padding-left:9px"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
-					<td style="text-align:center"></td>
-					<td style="text-align:center"></td>
-					<td style="text-align:center"></td>
-					<td style="text-align:right"></td>
-					<td style="text-align:left">IDR</td>
-					<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
-				</tr>
-		<?php }} ?>
-	</table>
-<?php	} else { ?>
-	<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;margin-top:20px">
+<?php if ($label->nota_id == '21' || $label->nota_id == '22') {?>
+	<table  width="100%" align="center" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
+	<tr style="text-align:center">
+		<th width="3%" style="border-bottom:solid 1px; text-align:center">No</th>
+		<th width="17%" style="border-bottom:solid 1px">Layanan</th>
+		<th width="15%" style="border-bottom:solid 1px">Kemasan</th>
+		<th width="10%" style="border-bottom:solid 1px">Satuan</th>
+		<th width="6%" style="border-bottom:solid 1px">Qty</th>
+		<th width="10%" style="border-bottom:solid 1px">Tarif Dasar</th>
+		<th width="5%" style="border-bottom:solid 1px"></th>
+		<th width="20%" style="border-bottom:solid 1px">Total</th>
+	</tr>
+	@foreach($detail as $detail)
+	<tr>
+		<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
+		<td>{{$detail->group_tariff_name}}</td>
+		<td style="text-align:center">{{$detail->package_name}}</td>
+		<td style="text-align:center">{{$detail->unit_name}}</td>
+		<td style="text-align:center">{{$detail->qty}}</td>
+		<td style="text-align:right">{{number_format($detail->tariff)}}</td>
+		<td>IDR</td>
+		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
+	</tr>
+	@endforeach
+</table>
 <?php
- 	$no = 1;
-	if ($bl != "0") {
+} else {
 ?>
-	<tr>
-		<td colspan="4"><b>Jenis Jasa</b></td>
+<table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
+	<tr style="text-transform:uppercase;font-weight:800">
+		<th width="5%" style="border-bottom:solid 1px;text-align:center">No</th>
+		<th width="15%" style="border-bottom:solid 1px">Layanan</th>
+		<th width="10%" style="border-bottom:solid 1px">Container</th>
+		<th width="1%" style="border-bottom:solid 1px;text-align:center">Qty</th>
+		<th width="10%" style="border-bottom:solid 1px;text-align:center">Tarif Dasar</th>
+		<th width="5%" style="border-bottom:solid 1px"></th>
+		<th width="10%" style="border-bottom:solid 1px">Jumlah</th>
 	</tr>
-<?php foreach ($handling as $value) { ?>
+	@foreach($detail as $detail)
 	<tr>
-		<td width="5%"><?php echo $no; $no++; ?></td>
-		<td width="59%" style="text-align:left">{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:left">IDR</td>
-		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
+		<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
+		<td>{{$detail->group_tariff_name}}</td>
+		<td style="text-align:left">{{$detail->cont_size}} / {{$detail->cont_type}} / {{$detail->cont_status}}</td>
+		<td style="text-align:center">{{$detail->qty}}</td>
+		<td style="text-align:right">{{number_format($detail->tariff)}}</td>
+		<td>IDR</td>
+		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
-<?php } ?>
-<?php } ?>
-<?php if ($alat != "0") {?>
-	<?php foreach ($alat as $alat) { ?>
-			<tr>
-				<td width="5%"><?php echo $no;$no++; ?></td>
-				<td width="66%"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
-				<td style="text-align:left">IDR</td>
-				<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
-			</tr>
-	<?php }} ?>
+	@endforeach
 </table>
 <?php } ?>
+
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
   <tr>
     <td colspan="7">DASAR PENGENAAN PAJAK</td>
@@ -203,30 +187,16 @@
     <td style="text-align:right;">{{number_format($header->nota_amount)}}</td>
   </tr>
 	<tr>
-		<td style="" colspan="7">Uang Jaminan</td>
+		<td style="" colspan="7">Uang Pembayaran</td>
 		<td style="text-align:right;padding-right:9px">IDR</td>
-		<td style="text-align:right">{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no))}}</td>
+		<td style="text-align:right">{{number_format($bayar)}}</td>
 	</tr>
 	<tr>
 		<td style="" colspan="7">
-			<b><?php
-			if((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount > 0) {
-				if ($label[0]->nota_service_om_code == "BM") {
-					echo "<b>Pelunasan</b>";
-				} else {
-					echo "<b>Sisa Uper</b>";
-				}
-			} else {
-				if ($label[0]->nota_service_om_code == "BM") {
-					echo "<b>Pelunasan</b>";
-				} else {
-					echo "<b>Piutang</b>";
-				}
-
-			} ?></b>
+			<b>Piutang</b>
 		</td>
 		<td style="text-align:right;padding-right:9px"><b>IDR</b></td>
-		<td style="text-align:right"><b>{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount)}}</b></td>
+		<td style="text-align:right"><b>{{number_format($total)}}</b></td>
 	</tr>
 </table>
 <p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
@@ -260,6 +230,8 @@
 	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 	@endforeach
 	@endforeach
+	@endforeach
+
 </body>
 </html>
 

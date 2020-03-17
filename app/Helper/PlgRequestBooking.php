@@ -188,7 +188,7 @@ class PlgRequestBooking{
 				}
 				return ['Success' => true, 'result' => count($loopDtlDel)];
 			}else{
-				$loopDtlCanc = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$find['cancelled_id'])->get();
+				$loopDtlCanc = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$findCanc->cancelled_id)->get();
 				foreach ($loopDtlCanc as $dtlCanc) {
 					$getRecDtlSI = DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
 						$cnf21['DTL_BL'] => $dtlCanc->cancl_si

@@ -51,6 +51,7 @@ $app->get('/print/printRDCardNPKS/{branchCode}/{notaId}/{id}','ViewController@pr
 
 
 // Export
-$app->get('/export/debitur/{branchId}/{notaNo}/{custName}/{layanan}/{startDate}/{endDate}/{branchCode}'      ,'ViewController@ExportDebitur');
-$app->get('/export/rekonsilasi/{branchId}/{vessel}/{ukk}/{nota}/{startDate}/{endDate}/{branchCode}'          ,'ViewController@ExportRekonsilasi');
-$app->get('/export/pendapatan/{branchId}/{kemasan}/{komoditi}/{satuan}/{startDate}/{endDate}/{branchCode}'   ,'ViewController@ExportPendapatan');
+$app->get('/export/debitur/{branchId}/{notaNo}/{custName}/{layanan}/{startDate}/{endDate}/{branchCode}'       ,'ViewController@ExportDebitur');
+$app->get('/export/rekonsilasi/{branchId}/{vessel}/{ukk}/{nota}/{startDate}/{endDate}/{branchCode}'           ,'ViewController@ExportRekonsilasi');
+$app->get('/export/pendapatan/{branchId}/{kemasan}/{komoditi}/{satuan}/{startDate}/{endDate}/{branchCode}'    ,'ViewController@ExportPendapatan');
+$app->get('/export/trafikproduksi/{branchId}/{startDate}/{endDate}/{branchCode}'                              ,'ViewController@ExportTrafikProduksi');

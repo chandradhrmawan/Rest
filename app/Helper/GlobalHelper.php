@@ -68,6 +68,21 @@ class GlobalHelper {
             $fk      = $val["FK"][0];
             $fkhdr   = $header[0][$val["FK"][1]];
             if(isset($val["WHERE"][0])) {
+              if (isset($val["JOIN"])) {
+                foreach ($val["JOIN"] as $list) {
+                  $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+                }
+              }
+              if (isset($val["LEFTJOIN"])) {
+                foreach ($val["LEFTJOIN"] as $list) {
+                  $connect->leftJoin(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+                }
+              }
+              if (isset($val["JOINRAW"])) {
+                foreach ($val["JOINRAW"] as $list) {
+                  $connect->join(strtoupper($list["table"]), DB::raw($list['field']));
+                }
+              }
               $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->where($val["WHERE"])->get();
             } else {
               if (isset($val["JOIN"])) {
@@ -264,6 +279,11 @@ class GlobalHelper {
       if(!empty($input["whereIn"][0])) {
       $in        = $input["whereIn"];
       $connect->whereIn(strtoupper($in[0]), $in[1]);
+      }
+
+      if(!empty($input["whereNotIn"][0])) {
+      $in        = $input["whereNotIn"];
+      $connect->whereNotIn(strtoupper($in[0]), $in[1]);
       }
 
       $count    = $connect->count();
@@ -564,8 +584,7 @@ class GlobalHelper {
       }
     }
 
-    $addSlashes = str_replace('?', "'?'", $connect->toSql());
-    $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
+    $count = count($connect->get());
 
     if (!empty($input['start']) || $input["start"] == '0') {
       if (!empty($input['limit'])) {
@@ -583,10 +602,10 @@ class GlobalHelper {
       }
 
       // query builder
-      $addSlashes = str_replace('?', "'?'", $connect->toSql());
-      $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
+      // $addSlashes = str_replace('?', "'?'", $connect->toSql());
+      // $count      = vsprintf(str_replace('?', '%s', $addSlashes), $connect->getBindings());
 
-      return ["result"=>$data, "count"=>count($data)];
+      return ["result"=>$data, "count"=>$data];
   }
 
   public static function whereQuery($input) {

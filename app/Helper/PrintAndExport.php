@@ -693,6 +693,7 @@ class PrintAndExport{
   }
 
   public static function printInvoiceNPKS($id) {
+
     $connect        = DB::connection('omuster');
     $det            = [];
     $header         = $connect->table("TX_HDR_NOTA")->where("NOTA_ID", "=", $id)->get();
@@ -701,72 +702,30 @@ class PrintAndExport{
     $branch      = DB::connection('mdm')->table("TM_BRANCH")->where([['BRANCH_ID', $header[0]->nota_branch_id], ["BRANCH_CODE", $header[0]->nota_branch_code]])->get();
 
     // Data Uper And Payment
-    $uper        = 0;
+    $payment     = DB::connection('omuster')->table("TX_PAYMENT")->where('PAY_REQ_NO', $header[0]->nota_req_no)->first();
+    $uper        = $payment->pay_amount;
     $notaAmount  = $header[0]->nota_amount;
-    $payAmount   = 0;
+    $payAmount   = $uper;
     $total       = $notaAmount - $payAmount;
     $terbilang   = static::terbilang($total);
-
-    $html        = view('print.proformaNpks',
-                        [
-                          "total"     =>$total,
-                          "uper"      =>$uper,
-                          "branch"    =>$branch,
-                          "header"    =>$header,
-                          "detail"    =>$detail,
-                          "label"     =>$nota,
-                          "terbilang" =>$terbilang
-                        ]);
-
-    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
-    $string_json = '{
-                   "getDataCetakRequest":{
-                      "esbHeader":{
-                         "internalId":"",
-                         "externalId":"EDI-2910201921570203666",
-                         "timestamp":"2019-10-29 21:57:020.36665400",
-                         "responseTimestamp":"",
-                         "responseCode":"",
-                         "responseMessage":""
-                      },
-                      "esbBody":{
-                         "kode":"billingedii",
-                         "tipe":"nota",
-                         "nota":"'.$all["header"][0]->nota_no.'"
-                      }
-                   }
-                }';
-
-    $username="billing";
-    $password ="b1Llin9";
-    $client = new Client();
-    $options= array(
-      'auth' => [
-        $username,
-        $password
-      ],
-      'headers'  => ['content-type' => 'application/json', 'Accept' => 'application/json'],
-      'body' => $string_json,
-      "debug" => false
-    );
-    try {
-      $res = $client->post($endpoint_url, $options);
-    } catch (ClientException $e) {
-      return $e->getResponse();
+    if($terbilang == 0) {
+      $terbilang  = "Nol";
     }
-    $results  = json_decode($res->getBody()->getContents(), true);
-    // $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
 
-    return $header;
-    $qrcode      = "0";
-    $html        = view('print.notaNpks',[
-                        "qrcode"  => $qrcode,
-                        "branch"  => $branch,
-                        "header"  => $header,
-                        "label"   => $nota,
-                        "detail"  => $detail,
-                        "terbilang"=> $terbilang
-                      ]);
+    // return $detail;
+
+    $html        = view('print.notaNpks',
+                        [
+                          "total"     => $total,
+                          "uper"      => $uper,
+                          "bayar"     => $payAmount,
+                          "branch"    => $branch,
+                          "header"    => $header,
+                          "label"     => $nota,
+                          "detail"    => $detail,
+                          "terbilang" => $terbilang,
+                          "qrcode"    => "0"
+                        ]);
 
     $filename    = $header[0]->nota_no.rand(10,100000);
     $dompdf      = new Dompdf();
@@ -791,6 +750,8 @@ class PrintAndExport{
     $payAmount   = 0;
     $total       = $notaAmount - $payAmount;
     $terbilang   = static::terbilang($total);
+
+    // return $detail;
 
     $html        = view('print.proformaNpks',
                         [
@@ -862,16 +823,16 @@ class PrintAndExport{
     $vessel      = $b;
     $ukk         = $c;
     $nota        = $d;
-    $start       = $e;
-    $end         = $f;
+    $start       = str_replace("%20"," ",$e);
+    $end         = str_replace("%20"," ",$f);
     $branchCode  = $g;
 
-    $startDate = date("Y-m-d", strtotime($start));
-    $endDate = date("Y-m-d", strtotime($end));
+    $startDate = date("Y-m-d h:i:s", strtotime($start));
+    $endDate = date("Y-m-d h:i:s", strtotime($end));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_REKONSILASI_NOTA');
     if (!empty($branchId)) {
-      $getRpt->where('NOTA_BRANCH_ID',$branchId);
+      $getRpt->where('BRANCH_ID',$branchId);
     }
     if (!empty($branchCode)) {
       $getRpt->where('BRANCH_CODE',$branchCode);
@@ -883,8 +844,9 @@ class PrintAndExport{
       $getRpt->where('UKK',$ukk);
     }
     if (!empty($nota)) {
-      $getRpt->where('NOTA',$nota);
+      $getRpt->where('NOTA_NO',$nota);
     }
+
     if (!empty($start) AND !empty($end)) {
       $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
     } else if (!empty($start) AND empty($end)) {
@@ -911,31 +873,28 @@ class PrintAndExport{
     $end         = $f;
     $branchCode  = $g;
 
-    $startDate = date("Y-m-d", strtotime($start));
-    $endDate = date("Y-m-d", strtotime($end));
-
-    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN');
+    $getRpt = DB::connection('omcargo')->table('V_RPT_DTL_PENDAPATAN')->where('DT', 'D');
     if (!empty($branchId)) {
-      $getRpt->where('REAL_BRANCH_ID',$branchId);
+      $getRpt->where('BRANCH_ID',$branchId);
     }
     if (!empty($branchCode)) {
-      $getRpt->where('REAL_BRANCH_CODE',$branchCode);
+      $getRpt->where('BRANCH_CODE',$branchCode);
     }
     if (!empty($kemasan)) {
-      $getRpt->where('KEMASAN',$kemasan);
+      $getRpt->where('DTL_PACKAGE',$kemasan);
     }
     if (!empty($komoditi)) {
-      $getRpt->where('KOMODITI',$komoditi);
+      $getRpt->where('DTL_COMMODITY',$komoditi);
     }
     if (!empty($satuan)) {
-      $getRpt->where('SATUAN',$satuan);
+      $getRpt->where('DTL_UNIT_NAME',$satuan);
     }
     if (!empty($start) AND !empty($end)) {
-      $getRpt->whereBetween('TGL_NOTA',[$startDate,$endDate]);
+      $getRpt->whereBetween('TAHUN',[$start,$end]);
     } else if (!empty($start) AND empty($end)) {
-      $getRpt->where('TGL_NOTA', '>', $startDate);
+      $getRpt->where('TAHUN', '>', $start);
     } else if (empty($start) AND !empty($end)) {
-      $getRpt->where('TGL_NOTA', '<', $endDate);
+      $getRpt->where('TAHUN', '<', $end);
     }
 
     $raw    = $getRpt;
@@ -943,14 +902,14 @@ class PrintAndExport{
 
     $kemasan = [];
     for ($i=0; $i < count($result); $i++) {
-      if (!in_array($result[$i]->kemasan,$kemasan)) {
-        $kemasan[] = $result[$i]->kemasan;
+      if (!in_array($result[$i]->dtl_package,$kemasan)) {
+        $kemasan[] = $result[$i]->dtl_package;
       }
     }
 
     $newDt = [];
     foreach ($result as $key => $value) {
-      $newDt[$value->kemasan][] = $value;
+      $newDt[$value->dtl_package][] = $value;
     }
 
     $data = $newDt;
@@ -961,6 +920,36 @@ class PrintAndExport{
       "start"=>$start,
       "end"=>$end
     ]);
+  }
+
+  public static function ExportTrafikProduksi($a, $b, $c, $d) {
+    $branchId    = $a;
+    $start       = $b;
+    $end         = $c;
+    $branchCode  = $d;
+
+    $startDate = date("Y-m-d", strtotime($start));
+    $endDate = date("Y-m-d", strtotime($end));
+
+    $getRpt = DB::connection('omcargo')->table('V_RPT_TRAFIK_DAN_PROD');
+    if (!empty($branchId)) {
+      $getRpt->where('BRANCH_ID',$branchId);
+    }
+    if (!empty($branchCode)) {
+      $getRpt->where('BRANCH_CODE',$branchCode);
+    }
+    if (!empty($start) AND !empty($end)) {
+      $getRpt->whereBetween('NOTA_DATE',[$startDate,$endDate]);
+    } else if (!empty($start) AND empty($end)) {
+      $getRpt->where('NOTA_DATE', '>', $startDate);
+    } else if (empty($start) AND !empty($end)) {
+      $getRpt->where('NOTA_DATE', '<', $endDate);
+    }
+
+    $raw    = $getRpt;
+    $result = $getRpt->get();
+
+    return view('print.trafik',["data"=>$result]);
   }
 
   public static function penyebut($nilai) {

@@ -378,5 +378,19 @@ class PlgConnectedExternalApps{
 		public static function storeHistory($inp){
 			DB::connection('omuster')->table('TH_LOGS_API_STORE')->insert($inp);
 		}
+
+		public static function clearScheduler() {
+	    $database    = DB::connection('omuster')->table('TM_USER')->where("USER_LOGIN","1")->get();
+	    foreach ($database as $data) {
+	      $time    = date('H:i:s',strtotime('+7 hour'));
+	      $active  = intval(strtotime($data->user_active));
+	      $now     = intval(strtotime($time));
+	      $selisih = ($now - $active)/60;
+	      if ($selisih >= 240) {
+	        $user[] = [$data->user_name, $selisih];
+	         DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_LOGIN" => "", "API_TOKEN" => ""]);
+	      }
+	    }
+	  }
 	// PLG
 }

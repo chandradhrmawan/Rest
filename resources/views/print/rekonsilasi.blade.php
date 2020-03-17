@@ -30,7 +30,7 @@ a{
 </style>
 <table width="100%">
   <tr>
-    <td style="border:0px"><img width="180" src="{{ url('/other/logo_ptp.png') }}"></td>
+    <td style="border:0px"><img width="120" src="http://sdnpakis5sby.sch.id/logo.jpg"></td>
     <td style="border:0px"></td>
     <td  style="border:0px" colspan="8">
       <h1 style="text-align:center;font-size:16px">LAPORAN REKONSILASI<br/>
@@ -59,9 +59,9 @@ a{
       @foreach($result as $data)
       <tr align="center">
           <td>{{$no}}</td>
-          <td style="text-align:left">{{$data->vessel}}</td>
-          <td>{{$data->ukk}}</td>
-          <td class="str">{{$data->nota}}</td>
+          <td style="text-align:left">{{$data->nota_vessel_name}}</td>
+          <td>{{$data->nota_ukk}}</td>
+          <td class="str">{{$data->nota_no}}</td>
           <td style="text-align:left;border-right:0px">Rp</td>
           <td style="text-align:right;border-left:0px">{{number_format($data->kebersihan)}}</td>
           <td style="text-align:left;border-right:0px">Rp</td>
