@@ -116,6 +116,10 @@ class PlgCanclHelper{
 				$config['head_forigen'] => $reqsHdr[$config['head_primery']],
 				$config['DTL_BL'] => $noDtl
 			])->update($upd);
+
+			if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP") {
+				static::prepareDuplicateRec($reqsHdr[$config['head_no']],$noDtl);
+			}
 		}
 
 		// Tambahan Change Header Flag
@@ -134,6 +138,19 @@ class PlgCanclHelper{
 				->where($config['head_primery'], $reqsHdr[$config['head_primery']])
 				->update([$config['head_status'] => 9]);
 			}
+		}
+	}
+
+	public static function prepareDuplicateRec($recNo,$noDtl){
+		$recHdr = DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$recNo)->first();
+		if (!empty($recHdr)) {
+			DB::connection('omuster')->table('TX_DTL_REC')->where([
+				'rec_hdr_id' => $recHdr->rec_id,
+				'rec_dtl_cont' => $noDtl
+			])->update([
+				'rec_dtl_isactive' => 'N',
+				'rec_dtl_iscancelled' => 'Y'
+			]);
 		}
 	}
 
