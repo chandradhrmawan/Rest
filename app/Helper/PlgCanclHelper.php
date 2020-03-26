@@ -179,6 +179,19 @@ class PlgCanclHelper{
 		}
 	}
 
+	public static function undoPrepareDuplicateRec($recNo,$noDtl){
+		$recHdr = DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$recNo)->first();
+		if (!empty($recHdr)) {
+			DB::connection('omuster')->table('TX_DTL_REC')->where([
+				'rec_hdr_id' => $recHdr->rec_id,
+				'rec_dtl_cont' => $noDtl
+			])->update([
+				'rec_dtl_isactive' => 'Y',
+				'rec_dtl_iscancelled' => 'N'
+			]);
+		}
+	}
+
 	public static function cekReqOrCanc($input,$config){
 		$migrateTariff = true;
 		$findCanc = null;
@@ -224,6 +237,9 @@ class PlgCanclHelper{
 					$config['DTL_IS_ACTIVE'] => 'Y',
 					$config['DTL_IS_CANCEL'] => 'N'
 				];
+				if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP"){
+					static::undoPrepareDuplicateRec($findReq[$config['head_no']],$lcd->cancl_cont);
+				}
 			}else if (!empty($lcd->cancl_si)) {
 				$cndtn[$config['DTL_BL']] = $lcd->cancl_si;
 				$up = [
@@ -239,6 +255,8 @@ class PlgCanclHelper{
 			}
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($cndtn)->update($up);
 		}
-		static::turnDrafReq($config,$findReq);
+		if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP"){
+			static::turnDrafReq($config,$findReq);
+		}
 	}
 }
