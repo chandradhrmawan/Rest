@@ -143,7 +143,7 @@
 	<table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	  <tr>
 	    <td width="35%">Request Number<br><b>{{$header[$config["head_no"]]}}</td>
-				<?php if ($nota_id == 3 || $nota_id == 4 || $nota_id == 20) { ?>
+				<?php if ($nota_id == 3 || $nota_id == 4 || $nota_id == 20 || $nota_id == 7) { ?>
 	    <td width="35%">Via<br><b>
 				<?php
 				if (!empty($detail[$config["DTL_VIA_NAME"]["rec"]])) {
@@ -225,7 +225,7 @@
 	<table width="100%" style="border-collapse:collapse; font-size:9px;margin-top:20px">
 	  <tr>
 	    <td width="35%">Request Number<br><b>{{$header[$config["head_no"]]}}</td>
-				<?php if ($nota_id == 3 || $nota_id == 4 || $nota_id == 20) { ?>
+				<?php if ($nota_id == 3 || $nota_id == 4 || $nota_id == 20|| $nota_id == 7) { ?>
 		    <td width="35%">Via<br><b>
 					<?php
 					if (!empty($detail[$config["DTL_VIA_NAME"]["rec"]])) {

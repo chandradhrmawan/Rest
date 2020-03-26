@@ -80,6 +80,8 @@ class PrintAndExport{
     $dtlRequest       = json_decode(json_encode($dtlRequest), TRUE);
 
     $page             = count($dtlRequest);
+    // return $notaId;
+
     $html             = view('print.rdCardNPKS', ["nota_id"=>$notaId, "title"=>$title, "page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
     $filename         = $hdrRequest[$config["head_primery"]];
     $dompdf           = new Dompdf();
