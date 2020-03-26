@@ -143,7 +143,25 @@ class PlgCanclHelper{
 			->where($config['head_primery'], $reqsHdr[$config['head_primery']])
 			->update([$config['head_status'] => 9]);
 			if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP") {
-				static::trunOffRecDuplicate($reqsHdr[$config['head_no']]);
+				DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$reqsHdr[$config['head_no']])->update(['rec_status'=>12]);
+			}
+		}
+	}
+
+	public static function turnDrafReq($config,$reqsHdr){
+		$dtlIsActive = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+		$config['head_forigen'] => $reqsHdr[$config['head_primery']],
+		$config['DTL_IS_ACTIVE'] => 'Y',
+		$config['DTL_IS_CANCEL'] => 'N'
+		])->get();
+
+		if (count($dtlIsActive) > 0) {
+			$updateHdrFlagCancel = DB::connection('omuster')
+			->table($config['head_table'])
+			->where($config['head_primery'], $reqsHdr[$config['head_primery']])
+			->update([$config['head_status'] => 1]);
+			if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP") {
+				DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$reqsHdr[$config['head_no']])->update(['rec_status'=>1]);
 			}
 		}
 	}
@@ -159,10 +177,6 @@ class PlgCanclHelper{
 				'rec_dtl_iscancelled' => 'Y'
 			]);
 		}
-	}
-
-	public static function trunOffRecDuplicate($recNo){
-		DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$recNo)->update(['rec_status'=>12])
 	}
 
 	public static function cekReqOrCanc($input,$config){
@@ -225,5 +239,6 @@ class PlgCanclHelper{
 			}
 			DB::connection('omuster')->table($config['head_tab_detil'])->where($cndtn)->update($up);
 		}
+		static::turnDrafReq($config,$findReq);
 	}
 }
