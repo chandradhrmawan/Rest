@@ -57,6 +57,9 @@ class PlgContHist{
 		if (!empty($arr['cont_type'])) {
 			$storeTsCont['cont_type'] = $arr['cont_type'];
 		}
+		if (!empty($arr['status_cont'])) {
+			$storeTsCont['cont_status'] = $arr['status_cont'];
+		}
 		if (!empty($arr['cont_counter'])) {
 			$storeTsCont['cont_counter'] = $arr['cont_counter'];
 		}
