@@ -137,6 +137,9 @@ class PlgCanclHelper{
 				->table($config['head_table'])
 				->where($config['head_primery'], $reqsHdr[$config['head_primery']])
 				->update([$config['head_status'] => 9]);
+				if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP") {
+					static::trunOffRecDuplicate($reqsHdr[$config['head_no']]);
+				}
 			}
 		}
 	}
@@ -152,6 +155,10 @@ class PlgCanclHelper{
 				'rec_dtl_iscancelled' => 'Y'
 			]);
 		}
+	}
+
+	public static function trunOffRecDuplicate($recNo){
+		DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$recNo)->update(['rec_status'=>12])
 	}
 
 	public static function cekReqOrCanc($input,$config){
