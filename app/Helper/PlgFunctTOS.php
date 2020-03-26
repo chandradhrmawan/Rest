@@ -137,11 +137,11 @@ class PlgFunctTOS{
 		if (count($dtlLoop) > 0) {
 			$arr = static::getRealJsonPLG($find,$dtlLoop,$config);
 			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);
-			if ($res['count'] == 0) {
+			if ($res['response']['count'] == 0) {
 				$Success = false;
 				$msg = 'realisasion not finish';
 			}else{
-				$his_cont = static::storeRealPLG($res['result'],$find,$config,$input);
+				$his_cont = static::storeRealPLG($res['response']['result'],$find,$config,$input);
 			}
 			// $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 			// if ($res['result']['count'] == 0) {
@@ -1122,7 +1122,7 @@ class PlgFunctTOS{
 										        "TL_DTL_CMDTY_ID" 			:"'.$dtl[$arr['config']['DTL_CMDTY_ID']].'",
 										        "TL_DTL_CMDTY_NAME" 		:"'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
 										        "TL_DTL_REC_VIA" 				:"'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
-										        "TL_DTL_ACTIVITY_DATE" 	:"'.date('d/m/Y H:i:s', strtotime($dtl[$arr['config']['DTL_ACTIVITY_DATE']])).'",
+										        "TL_DTL_ACTIVITY_DATE" 	:"'.date('m/d/Y H:i:s', strtotime($dtl[$arr['config']['DTL_ACTIVITY_DATE']])).'",
 										        "TL_DTL_OWNER" 					:"'.$dtl[$arr['config']['DTL_OWNER']].'",
 										        "TL_DTL_OWNER_NAME" 		:"'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 										        "TL_DTL_VIA_REC_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
@@ -1136,8 +1136,8 @@ class PlgFunctTOS{
 										        "TL_DTL_DEL_VIA" 				:"'.$dtl[$arr['config']['DTL_VIA']['del']].'",
 										        "TL_DTL_DEL_VIA_NAME" 	:"'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
 										        "TL_DTL_ISACTIVE" 			:"'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
-										        "TL_DTL_REC_DATE" 			:"'.date('d/m/Y H:i:s', strtotime($dtl[$arr['config']['DTL_DATE_IN']])).'",
-										        "TL_DTL_DEL_DATE" 			:"'.date('d/m/Y H:i:s', strtotime($dtl[$arr['config']['DTL_DATE_OUT']])).'",
+										        "TL_DTL_REC_DATE" 			:"'.date('m/d/Y H:i:s', strtotime($dtl[$arr['config']['DTL_DATE_IN']])).'",
+										        "TL_DTL_DEL_DATE" 			:"'.date('m/d/Y H:i:s', strtotime($dtl[$arr['config']['DTL_DATE_OUT']])).'",
 										        "TL_DTL_IS_TL" 					:"'.$dtl[$arr['config']['DTL_TL']].'"
 											},';
 										}
@@ -1155,7 +1155,7 @@ class PlgFunctTOS{
 											"action" : "getTL",
 											"header": {
 										        "TL_NO" 							: "'.$head[$arr['config']['head_no']].'",
-										        "TL_DATE" 						: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
+										        "TL_DATE" 						: "'.date('m/d/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
 										        "TL_PAYMETHOD"				: "'.$head[$arr['config']['head_paymethod']].'",
 										        "TL_CUST_ID"					: "'.$head[$arr['config']['head_cust']].'",
 										        "TL_CUST_NAME"				: "'.$head[$arr['config']['head_cust_name']].'",
@@ -1174,13 +1174,13 @@ class PlgFunctTOS{
 										        "BRANCH_ID"						: "'.$head[$arr['config']['head_branch']].'",
 										        "TL_NOTA"							: "'.$head[$arr['config']['head_nota']].'",
 										        "TL_CORRECTION"				: "'.$head[$arr['config']['head_correction']].'",
-										        "TL_CORRECTION_DATE"	: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_correction_date']])).'",
+										        "TL_CORRECTION_DATE"	: "'.date('m/d/Y H:i:s', strtotime($head[$arr['config']['head_correction_date']])).'",
 										        "TL_PRINT_CARD"				: "'.$head[$arr['config']['head_print_card']].'",
 										        "TL_FROM"							: "'.$dr->reff_name.'",
 										        "TL_TO"								: "'.$rec_dr->reff_name.'",
 										        "TL_VESSEL_AGENT" 		: "'.$head[$arr['config']['head_vessel_agent']].'",
 										        "TL_VESSEL_AGENT_NAME": "'.$head[$arr['config']['head_vessel_agent_name']].'",
-										        "TL_CREATE_DATE"			: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
+										        "TL_CREATE_DATE"			: "'.date('m/d/Y H:i:s', strtotime($head[$arr['config']['head_date']])).'",
 										        "TL_CREATE_BY"				: "'.$head[$arr['config']['head_by']].'",
 										        "TL_STATUS"						: "0",
 										        "TL_PBM_ID"						: "'.$head[$arr['config']['head_pbm_id']].'",
@@ -1191,8 +1191,8 @@ class PlgFunctTOS{
 										        "TL_BTL_FROM_ID"			: "'.$head[$arr['config']['head_btl_from_id']].'",
 										        "TL_BTL_FROM"					: "'.$head[$arr['config']['head_btl_from']].'",
 										        "TL_MSG"							: "'.$head[$arr['config']['head_mark']].'",
-										        "TL_VESSEL_ETA"				: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_vessel_eta']])).'",
-										        "TL_VESSEL_ETD"				: "'.date('d/m/Y H:i:s', strtotime($head[$arr['config']['head_vessel_etd']])).'"
+										        "TL_VESSEL_ETA"				: "'.date('m/d/Y H:i:s', strtotime($head[$arr['config']['head_vessel_eta']])).'",
+										        "TL_VESSEL_ETD"				: "'.date('m/d/Y H:i:s', strtotime($head[$arr['config']['head_vessel_etd']])).'"
 										},
 											"arrdetail": ['.$arrdetil.']
 										}';
