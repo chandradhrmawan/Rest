@@ -141,7 +141,7 @@ class PlgFunctTOS{
 				$Success = false;
 				$msg = 'realisasion not finish';
 			}else{
-				$his_cont = static::storeRealPLG($res['response']['result'],$find,$config,$input);
+				return $his_cont = static::storeRealPLG($res['response']['result'],$find,$config,$input);
 			}
 			// $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 			// if ($res['result']['count'] == 0) {
@@ -171,8 +171,7 @@ class PlgFunctTOS{
 		$his_cont = [];
 		foreach ($data as $listR) {
 			$funfun = $config['funct_REAL_STR'];
-			$real_value = static::$funfun($listR,$hdr,$config,$input);
-
+			return $real_value = static::$funfun($listR,$hdr,$config,$input);
 			$upSttDtl = [
 				$config['DTL_FL_REAL']=>$real_value['real_val']
 			];
@@ -467,6 +466,34 @@ class PlgFunctTOS{
 		} else {
 			return ["real_val" => "1", "real_date" => $realDate, "nota_id" => "22"];
 		}
+	}
+
+	public static function storeRealTl($listR,$hdr,$config,$input) {
+		$noContainer 	= $listR["NO_CONTAINER"];
+		$noRequest	 	= $listR["NO_REQUEST"];
+		$contStatus 	= $listR["STATUS"];
+
+		$hdrTL 				= DB::connection('omuster')->table("TX_HDR_TL")->where('TL_NO', $noRequest)->first();
+		$hdrId 				= $hdrTL->tl_id;
+		$findDetail 	= [
+			'TL_HDR_ID' 	=> $hdrId,
+			'TL_DTL_CONT' => $noContainer
+		];
+
+		$dtlTL 				= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->first();
+
+		if (isset($listR["TGL_IN"])) {
+			$RealRec		= $listR["TGL_IN"];
+			// $dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_REC_DATE" => $RealRec]);
+		} else {
+			$RealDel							= $listR["TGL_OUT"];
+			// $dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_DEL_DATE" => $RealDel]);
+		}
+
+		if (!empty($dtlTL->tl_dtl_real_rec_date) AND !empty($dtlTL->tl_dtl_real_del_date)) {
+
+		}
+
 	}
 
 	// store request data to tos
