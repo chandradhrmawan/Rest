@@ -568,7 +568,7 @@ class PlgRequestBooking{
 	    	 	"nota" => (array)$getNota['attributes'],
 	    	 	"payment" => (array)$pay['attributes'],
 	    	 	'reqCanc' => $cekIsCanc
-	     ];
+			];
 	    	// $sendInvPay = "by pass";
          	$sendInvPay = PlgEInvo::sendInvPay($arr);
          	if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
