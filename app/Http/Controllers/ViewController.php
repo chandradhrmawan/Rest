@@ -221,4 +221,33 @@ class ViewController extends Controller
 
   }
 
+  function cekBayarNota($input) {
+    $custId       = $input["custId"];
+    $notaId       = $input["notaId"];
+
+    if (empty($custId)) $custId = "";
+    if (empty($notaId)) $notaId = "";
+
+    $date = date('Y-m-d H:i:s', strtotime('-1 week'));
+
+    $findNota = [
+      "NOTA_PAID" => "N",
+      "NOTA_CUST_ID" => $custId,
+      "NOTA_ID" => $notaId
+    ];
+
+    if (!empty($notaId) AND !empty($custId)) {
+      $nota     = DB::connection('omuster')->table("TX_HDR_NOTA")->whereDate('NOTA_DATE', '<', $date)->where($findNota)->get();
+    } else if(empty($notaId) AND !empty($custId)) {
+      $nota     = DB::connection('omuster')->table("TX_HDR_NOTA")->whereDate('NOTA_DATE', '<', $date)->where('NOTA_PAID', 'N')->where("NOTA_CUST_ID", $custId)->get();
+    } else {
+      $nota     = DB::connection('omuster')->table("TX_HDR_NOTA")->whereDate('NOTA_DATE', '<', $date)->where('NOTA_PAID', 'N')->where("NOTA_ID", $notaId)->get();
+    }
+
+    $count = count($nota);
+    $msg   = "Nota Belum Lunas";
+
+    return ["count" => $count, "message" => $msg, "data" => $nota];
+  }
+
 }
