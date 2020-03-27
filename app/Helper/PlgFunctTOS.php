@@ -137,21 +137,6 @@ class PlgFunctTOS{
 		if (count($dtlLoop) > 0) {
 			$arr = static::getRealJsonPLG($find,$dtlLoop,$config);
 			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);
-<<<<<<< HEAD
-			if ($res['response']['count'] == 0) {
-				$Success = false;
-				$msg = 'realisasion not finish';
-			}else{
-				return $his_cont = static::storeRealPLG($res['response']['result'],$find,$config,$input);
-			}
-			// $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-			// if ($res['result']['count'] == 0) {
-			// 	$Success = false;
-			// 	$msg = 'realisasion not finish';
-			// }else{
-			// 	$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
-			// }
-=======
 			//if ($res['response']['count'] == 0) {
 			//	$Success = false;
 			//	$msg = 'realisasion not finish';
@@ -165,7 +150,6 @@ class PlgFunctTOS{
 			 }else{
 			 	$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
 			 }
->>>>>>> c253cbcb3c4401e6c27b8af55bd31490e278bdae
 		}
 		$res['his_cont'] = $his_cont;
 		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id']);
@@ -187,7 +171,7 @@ class PlgFunctTOS{
 		$his_cont = [];
 		foreach ($data as $listR) {
 			$funfun = $config['funct_REAL_STR'];
-			return $real_value = static::$funfun($listR,$hdr,$config,$input);
+			$real_value = static::$funfun($listR,$hdr,$config,$input);
 			$upSttDtl = [
 				$config['DTL_FL_REAL']=>$real_value['real_val']
 			];
@@ -499,15 +483,17 @@ class PlgFunctTOS{
 		$dtlTL 				= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->first();
 
 		if (isset($listR["TGL_IN"])) {
-			$RealRec		= $listR["TGL_IN"];
-			// $dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_REC_DATE" => $RealRec]);
+			$realDate		= $listR["TGL_IN"];
+			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_REC_DATE" => $realDate]);
 		} else {
-			$RealDel							= $listR["TGL_OUT"];
-			// $dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_DEL_DATE" => $RealDel]);
+			$realDate		= $listR["TGL_OUT"];
+			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_DEL_DATE" => $realDate]);
 		}
 
 		if (!empty($dtlTL->tl_dtl_real_rec_date) AND !empty($dtlTL->tl_dtl_real_del_date)) {
-
+			return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $realDate];
+		} else {
+			return ["real_val" => "1", "real_date" => $realDate];
 		}
 
 	}
