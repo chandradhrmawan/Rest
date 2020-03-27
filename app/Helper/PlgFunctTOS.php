@@ -69,15 +69,15 @@ class PlgFunctTOS{
     	}else{
 	        $toFunct = 'buildJson'.$arr['table'];
 	        $json = static::$toFunct($arr);
-	        $json = json_encode(json_decode($json,true));
-	        $opt = [
-	        	"user" => config('endpoint.DirecTtosPostPLG.user'),
-	        	"pass" => config('endpoint.DirecTtosPostPLG.pass'),
-	        	"target" => config('endpoint.DirecTtosPostPLG.target'),
-	        	"json" => json_encode(json_decode($json,true))
-	        ];
-	        $res = PlgConnectedExternalApps::sendRequestToExtJsonMet($opt);
-	        return ['sendRequestBookingPLG' => $res];
+	        //$json = json_encode(json_decode($json,true));
+	        //$opt = [
+	        //	"user" => config('endpoint.DirecTtosPostPLG.user'),
+	        //	"pass" => config('endpoint.DirecTtosPostPLG.pass'),
+	        //	"target" => config('endpoint.DirecTtosPostPLG.target'),
+	        //	"json" => json_encode(json_decode($json,true))
+	        //];
+	        //$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($opt);
+	        //return ['sendRequestBookingPLG' => $res];
 	        $json = base64_encode(json_encode(json_decode($json,true)));
 	        $json = '
 				{
@@ -137,6 +137,7 @@ class PlgFunctTOS{
 		if (count($dtlLoop) > 0) {
 			$arr = static::getRealJsonPLG($find,$dtlLoop,$config);
 			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);
+<<<<<<< HEAD
 			if ($res['response']['count'] == 0) {
 				$Success = false;
 				$msg = 'realisasion not finish';
@@ -150,6 +151,21 @@ class PlgFunctTOS{
 			// }else{
 			// 	$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
 			// }
+=======
+			//if ($res['response']['count'] == 0) {
+			//	$Success = false;
+			//	$msg = 'realisasion not finish';
+			//}else{
+			//	$his_cont = static::storeRealPLG($res['response']['result'],$find,$config,$input);
+			//}
+			 $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+			 if ($res['result']['count'] == 0) {
+			 	$Success = false;
+			 	$msg = 'realisasion not finish';
+			 }else{
+			 	$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
+			 }
+>>>>>>> c253cbcb3c4401e6c27b8af55bd31490e278bdae
 		}
 		$res['his_cont'] = $his_cont;
 		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id']);
