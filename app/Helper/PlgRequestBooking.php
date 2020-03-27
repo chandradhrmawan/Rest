@@ -534,7 +534,7 @@ class PlgRequestBooking{
 	    	$store->pay_branch_code = $getNota->nota_branch_code;
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
-	    	if (isset($input['pay_amount'])){
+	    	if (isset($input['pay_amount']) and !empty($input['pay_amount'])){
 	    		$store->pay_amount = $input['pay_amount'];
 	    	}else{
 		    	$store->pay_amount = $getNota->nota_amount;
