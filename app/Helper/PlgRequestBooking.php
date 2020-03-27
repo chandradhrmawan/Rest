@@ -547,7 +547,7 @@ class PlgRequestBooking{
 
 	    	if (isset($input['pay_pph23_flag']) and in_array($input['pay_pph23_flag'], ['Y','N'])) {
 	    		$store->pay_pph23_flag = $input['pay_pph23_flag'];
-	    		$store->pay_pph23_value = $getNota->nota_amount*2/100;
+	    		$store->pay_pph23_value = ceil($getNota->nota_amount*2/100);
 	    	}
 	    	$store->save();
 
