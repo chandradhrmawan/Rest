@@ -42,10 +42,10 @@ class PlgFunctTOS{
 	public static function decodeResultAftrSendToTosNPKS($res, $type){
 		$res['request']['json'] = json_decode($res['request']['json'], true);
 		$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
-        $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
-        $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
-        $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
-        return $res;
+    $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
+    $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
+    $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
+    return $res;
 	}
 
 	public static function sendRequestBookingPLG($arr){
@@ -234,12 +234,12 @@ class PlgFunctTOS{
 			"data": ['.$dtl.']
 		}';
 		$json = json_encode(json_decode($json,true));
-		return $arr = [
-        	"user" => config('endpoint.DirecTtosGetPLG.user'),
-        	"pass" => config('endpoint.DirecTtosGetPLG.pass'),
-        	"target" => config('endpoint.DirecTtosGetPLG.target'),
-        	"json" => $json
-        ];
+		// return $arr = [
+    //     	"user" => config('endpoint.DirecTtosGetPLG.user'),
+    //     	"pass" => config('endpoint.DirecTtosGetPLG.pass'),
+    //     	"target" => config('endpoint.DirecTtosGetPLG.target'),
+    //     	"json" => $json
+    //     ];
 		$json = base64_encode(json_encode(json_decode($json,true)));
 		$json = static::jsonGetTOS($json);
         $json = json_encode(json_decode($json,true));
@@ -483,10 +483,10 @@ class PlgFunctTOS{
 		$dtlTL 				= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->first();
 
 		if (isset($listR["TGL_IN"])) {
-			$realDate		= $listR["TGL_IN"];
+			$realDate		= date('Y-m-d H:i:s', strtotime($listR["TGL_IN"]));
 			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_REC_DATE" => $realDate]);
 		} else {
-			$realDate		= $listR["TGL_OUT"];
+			$realDate		= date('Y-m-d H:i:s', strtotime($listR["TGL_OUT"]));
 			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_DEL_DATE" => $realDate]);
 		}
 
