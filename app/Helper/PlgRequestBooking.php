@@ -534,12 +534,21 @@ class PlgRequestBooking{
 	    	$store->pay_branch_code = $getNota->nota_branch_code;
 	    	$store->pay_account_no = $input['pay_account_no'];
 	    	$store->pay_account_name = $input['pay_account_name'];
-	    	$store->pay_amount = $getNota->nota_amount;
+	    	if (isset($input['pay_amount'])){
+	    		$store->pay_amount = $input['pay_amount'];
+	    	}else{
+		    	$store->pay_amount = $getNota->nota_amount;
+	    	}
 	    	$store->pay_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
 	    	$store->pay_note = $input['pay_note'];
 	    	$store->pay_create_by = $input['pay_create_by'];
 	    	$store->pay_create_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
 	    	$store->pay_type = $input['pay_type'];
+
+	    	if (isset($input['pay_pph23_flag']) and in_array($input['pay_pph23_flag'], ['Y','N'])) {
+	    		$store->pay_pph23_flag = $input['pay_pph23_flag'];
+	    		$store->pay_pph23_value = $getNota->nota_amount*2/100;
+	    	}
 	    	$store->save();
 
 	    	$pay = TxPayment::find($store->pay_id);
