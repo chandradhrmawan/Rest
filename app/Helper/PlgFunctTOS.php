@@ -490,7 +490,9 @@ class PlgFunctTOS{
 			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_DEL_DATE" => $realDate]);
 		}
 
+		$dtlTL 				= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->first();
 		if (!empty($dtlTL->tl_dtl_real_rec_date) AND !empty($dtlTL->tl_dtl_real_del_date)) {
+			$updateFl 	= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_FL_REAL" => '12']);
 			return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $realDate];
 		} else {
 			return ["real_val" => "1", "real_date" => $realDate];
