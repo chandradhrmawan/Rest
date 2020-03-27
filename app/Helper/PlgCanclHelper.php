@@ -161,7 +161,7 @@ class PlgCanclHelper{
 			->where($config['head_primery'], $reqsHdr[$config['head_primery']])
 			->update([$config['head_status'] => 1]);
 			if ($config['head_table'] == "TX_HDR_STUFF" or $config['head_table'] == "TX_HDR_STRIPP") {
-				DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$reqsHdr[$config['head_no']])->update(['rec_status'=>1]);
+				DB::connection('omuster')->table('TX_HDR_REC')->where('rec_no',$reqsHdr[$config['head_no']])->update(['rec_status'=>10]);
 			}
 		}
 	}

@@ -221,4 +221,22 @@ class ViewController extends Controller
 
   }
 
+  function cekBayarNota($input) {
+    $custId       = $input["custId"];
+
+    if (empty($custId)) $custId = "";
+
+    $date = date('Y-m-d H:i:s', strtotime('-1 week'));
+
+    $findNota = [
+      "NOTA_PAID" => "N",
+      "NOTA_CUST_ID" => $custId
+    ];
+
+    $nota     = DB::connection('omuster')->table("TX_HDR_NOTA")->whereDate('NOTA_DATE', '<', $date)->where('NOTA_PAID', 'N')->where("NOTA_CUST_ID", $custId)->get();
+    $count = count($nota);
+
+    return ["count" => $count, "result" => $nota];
+  }
+
 }

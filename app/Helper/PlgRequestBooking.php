@@ -191,12 +191,12 @@ class PlgRequestBooking{
 				$loopDtlCanc = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$findCanc->cancelled_id)->get();
 				foreach ($loopDtlCanc as $dtlCanc) {
 					$getRecDtlSI = DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
-						$cnf21['DTL_BL'] => $dtlCanc->cancl_si
+						$cnf21['DTL_BL'] => $dtlCanc->cancl_cont
 					])->first();
 					$getRecDtlSI = (array)$getRecDtlSI;
 					$up = $getRecDtlSI['rec_cargo_remaining_qty'] + $dtlCanc->cancl_qty;
 					DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
-						$cnf21['DTL_BL'] => $dtlCanc->cancl_si
+						$cnf21['DTL_BL'] => $dtlCanc->cancl_cont
 					])->update([
 						'rec_cargo_remaining_qty' => $up
 					]);
@@ -563,24 +563,24 @@ class PlgRequestBooking{
 	    	}
             $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
             $cekIsCanc = (array)$cekIsCanc;
-	    	// $arr = [
-	    	// 	'config' => $config,
-	    	// 	"nota" => (array)$getNota['attributes'],
-	    	// 	"payment" => (array)$pay['attributes'],
-	    	// 	'reqCanc' => $cekIsCanc
-	    	// ];
-	    	$sendInvPay = "by pass";
-      //   	$sendInvPay = PlgEInvo::sendInvPay($arr);
-      //   	if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
-      //   		return [
-      //   			'Success' => false,
-      //   			'result' => 'Fail, cant send payment invoice',
-      //   			'no_pay' => $pay->pay_no,
-      //   			'nota_no' => $getNota->nota_no,
-      //   			'no_req' => $pay->pay_req_no,
-      //   			'sendInvPay' => $sendInvPay
-      //   		];
-      //   	}
+	    	$arr = [
+	    	 	'config' => $config,
+	    	 	"nota" => (array)$getNota['attributes'],
+	    	 	"payment" => (array)$pay['attributes'],
+	    	 	'reqCanc' => $cekIsCanc
+	     ];
+	    	// $sendInvPay = "by pass";
+         	$sendInvPay = PlgEInvo::sendInvPay($arr);
+         	if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
+         		return [
+         			'Success' => false,
+         			'result' => 'Fail, cant send payment invoice',
+         			'no_pay' => $pay->pay_no,
+         			'nota_no' => $getNota->nota_no,
+         			'no_req' => $pay->pay_req_no,
+         			'sendInvPay' => $sendInvPay
+         		];
+         	}
         	$getNota->nota_status = 3;
         	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
         	$getNota->nota_paid = 'Y';
