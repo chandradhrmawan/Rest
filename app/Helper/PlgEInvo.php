@@ -384,21 +384,24 @@ class PlgEInvo{
 		}
 		$branch = (array)$branch;
 		$arr['branch'] = $branch;
-		$bank = DB::connection('mdm')->table('TM_BANK')->where([
-			'bank_code' => $arr['payment']['pay_bank_code'],
-			'branch_id' => $arr['payment']['pay_branch_id'],
-			'branch_code' => $arr['payment']['pay_branch_code']
-		])->first();
-		if (empty($bank)) {
-			return ['Success' =>false, 'response' => 'bank not found!'];
-		}
-		$bank = (array)$bank;
-		$arr['bank'] = $bank;
 
 		$nota_date = $arr['nota']['nota_date'];
 		$nota_date_noHour = date('Y-m-d', strtotime($arr['nota']['nota_date']));
 		$arr['nDateWitHour'] = $nota_date;
 		$arr['nDateNotHour'] = $nota_date_noHour;
+
+		if (!empty($arr['payment'])) {
+			$bank = DB::connection('mdm')->table('TM_BANK')->where([
+				'bank_code' => $arr['payment']['pay_bank_code'],
+				'branch_id' => $arr['payment']['pay_branch_id'],
+				'branch_code' => $arr['payment']['pay_branch_code']
+			])->first();
+			if (empty($bank)) {
+				return ['Success' =>false, 'response' => 'bank not found!'];
+			}
+			$bank = (array)$bank;
+			$arr['bank'] = $bank;
+		}
 
 		if ($arr['nota']['nota_flag_einv'] == 0) {
 			$sendInvAR = static::sendInvAR($arr);
@@ -409,7 +412,8 @@ class PlgEInvo{
 				$arr['nota']['nota_flag_einv'] = 1;
 			}
 		}
-		if ($arr['nota']['nota_flag_einv'] == 1) {
+
+		if ($arr['nota']['nota_flag_einv'] == 1 and !empty($arr['payment'])) {
 			$sendInvPutReceipt = static::sendInvReceipt($arr);
 			$sendInvPutReceipt['request']['json'] = json_decode($sendInvPutReceipt['request']['json'],true);
 			if ($sendInvPutReceipt['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
@@ -419,7 +423,8 @@ class PlgEInvo{
 				$arr['nota']['nota_flag_einv'] = 2;
 			}
 		}
-		if ($arr['nota']['nota_flag_einv'] == 2) {
+
+		if ($arr['nota']['nota_flag_einv'] == 2 and !empty($arr['payment'])) {
 			$sendInvPutApply = static::sendInvApply($arr);
 			$sendInvPutApply['request']['json'] = json_decode($sendInvPutApply['request']['json'],true);
 			if ($sendInvPutApply['response']['arResponseDoc']['esbBody'][0]['errorCode'] != 'S') {
@@ -429,6 +434,7 @@ class PlgEInvo{
 				$arr['nota']['nota_flag_einv'] = 3;
 			}
 		}
+		
 		return [ "Success" => true, "sendInvAR" => $sendInvAR, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply ];
 	}
 }

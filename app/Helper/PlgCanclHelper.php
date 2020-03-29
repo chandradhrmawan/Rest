@@ -214,7 +214,11 @@ class PlgCanclHelper{
 			}
 			$find = (array)$find[0];
 			$retHeadNo = $findCanc->cancelled_no;
+			if ($find[$config['head_paymethod']] == 1) {
+				$migrateTariff = true;
+			}
 		}
+
 		$canceledReqPrepare = static::canceledReqPrepare($input, $config, true);
 		return [
 			"Success" => true,

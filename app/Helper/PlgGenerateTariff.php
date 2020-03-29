@@ -299,7 +299,8 @@ class PlgGenerateTariff{
 	}
 
 	public static function calculateTariffBuild($find, $input, $config, $canceledReqPrepare){
-		$setH = static::calculateTariffBuildHead($find, $input, $config, $canceledReqPrepare);// build head
+		// build head
+		$setH = static::calculateTariffBuildHead($find, $input, $config, $canceledReqPrepare);
 		// build detil
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
@@ -309,7 +310,7 @@ class PlgGenerateTariff{
 		$detil = $detil->get();
 		if (
 			(in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) or
-			!empty($canceledReqPrepare)
+			(!empty($canceledReqPrepare) and $find[$config['head_paymethod']] == 2 )
 		) {
 			return [
 				"detil_data"=>$detil,

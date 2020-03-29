@@ -453,6 +453,7 @@ class PlgRequestBooking{
 	    }
 
 	    public static function approvalProformaPLG($input){
+	    	$sendInvAR = null;
 	    	$getNota = TxHdrNota::find($input['nota_id']);
             if (empty($getNota)) {
             	return ['result' => "Fail, proforma not found!", "Success" => false];
@@ -470,6 +471,15 @@ class PlgRequestBooking{
             if ($input['approved'] == 'true') {
             	$getNota->nota_status = 2;
             	$getNota->save();
+            	if (!empty($cekIsCanc)){
+            		$arr = [
+            			'config' => $config,
+            			"nota" => (array)$getNota['attributes'],
+            			"payment" => null,
+            			'reqCanc' => (array)$cekIsCanc
+            		];
+            		$sendInvAR = PlgEInvo::sendInvPay($arr);
+            	}
             	$msg='Success, approved!';
             }else if ($input['approved'] == 'false') {
             	$getNota->nota_status = 4;
@@ -488,7 +498,7 @@ class PlgRequestBooking{
 
             	$msg='Success, rejected!';
             }
-            return ['result' => $msg, 'nota_no' => $getNota->nota_no];
+            return ['result' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvAR' => $sendInvAR];
 	    }
 
 	    public static function storePaymentPLG($input){
