@@ -479,7 +479,7 @@ class PlgRequestBooking{
             			'reqCanc' => (array)$cekIsCanc
             		];
             		$sendInvAR = PlgEInvo::sendInvPay($arr);
-           	        $getNota->nota_status = 4;
+           	        $getNota->nota_status = 5;
             	        $getNota->save();
             	}
             	$msg='Success, approved!';
