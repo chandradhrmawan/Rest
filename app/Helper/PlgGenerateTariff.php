@@ -396,7 +396,7 @@ class PlgGenerateTariff{
 			$result['P_EXTENTION'] = 'N';
 			$result['P_EXT_NOTA_ID'] = 'NULL';
 		}
-	
+
 		if (empty($config['p_tarde'])) {
 			$result['P_TRADE'] = 'NULL';
 		}else{
