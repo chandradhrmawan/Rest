@@ -106,6 +106,12 @@ class StoreController extends Controller
       $cek = DB::connection('mdm')->table('TS_NOTA')->where($setData)->count();
       if (empty($input['flag_status'])) {
         $input['flag_status'] = 'N';
+      }else if (!empty($input['flag_status'])) {
+        DB::connection('mdm')->table('TS_NOTA')->where([
+        "branch_id" => $input['branch_id'],
+        "nota_id" => $input['nota_id'],
+        "nota_id_parent" => $input['nota_id_parent']
+        ])->update(["flag_status" => $input['flag_status']]);
       }
       $strData = [
         "branch_id" => $input['branch_id'],
