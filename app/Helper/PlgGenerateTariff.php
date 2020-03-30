@@ -383,8 +383,10 @@ class PlgGenerateTariff{
 		$result['P_PBM_INTERNAL'] = 'N';
 		if (empty($canceledReqPrepare)) {
 			$result['P_BOOKING_NUMBER'] = $data[$config['head_no']];
+	$result['P_RESTITUTION'] = 'N';
 		}else{
 			$result['P_BOOKING_NUMBER'] = $canceledReqPrepare['canc']['cancelled_no'];
+	$result['P_RESTITUTION'] = 'Y';
 		}
 		$result['P_REALIZATION'] = 'N';
 		if (!empty($config['nota_id_ext'])) {
@@ -394,7 +396,7 @@ class PlgGenerateTariff{
 			$result['P_EXTENTION'] = 'N';
 			$result['P_EXT_NOTA_ID'] = 'NULL';
 		}
-		$result['P_RESTITUTION'] = 'N';
+	
 		if (empty($config['p_tarde'])) {
 			$result['P_TRADE'] = 'NULL';
 		}else{
