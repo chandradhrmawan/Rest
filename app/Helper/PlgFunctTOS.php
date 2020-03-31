@@ -851,7 +851,7 @@ class PlgFunctTOS{
 	        if (!is_array($arr['config']['kegiatan']) and $arr['config']['kegiatan'] == 6) {
 	        	$actionJ = 'getStripping';
 	        }else{
-	        	if ($arr['config']['kegiatan'] == [3,6]) {
+	        	if ($arr['config']['kegiatan'] == [1,6]) {
 	        		$actionJ = 'getRecStripping';
 	        	}
 	        }
