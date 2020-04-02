@@ -45,8 +45,9 @@ class PlgGenerateTariff{
 		if (empty($tglIn)) {
 			return [
 				"result_flag"=>"F",
-				"result_msg"=>"Not found countainer!",
+				"result_msg"=>"Not found countainer ".$list[$config['DTL_BL']]."!",
 				"no_req"=>$hdr[$config['head_no']],
+				"no_cont"=>$list[$config['DTL_BL']],
 				"Success"=>false
 			];
 		}
@@ -229,6 +230,9 @@ class PlgGenerateTariff{
 				$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			} else if (in_array($config['DTL_DATE_IN'], ["TX_HISTORY_CONTAINER"])){
 				$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
+				if (is_array($dateIn)) {
+					return $dateIn;
+				}
 				if (!empty($config['DTL_STACK_DATE'])) {
 					DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_PRIMARY'],$list[$config['DTL_PRIMARY']])->update([$config['DTL_STACK_DATE']=>$dateIn]);
 				}
@@ -242,6 +246,9 @@ class PlgGenerateTariff{
 				$ddiType = $config['DTL_DATE_IN'][$paymethod];
 				if (in_array($ddiType, ["TX_HISTORY_CONTAINER"])) {
 					$dateIn = static::getLastContFromTX_HISTORY_CONTAINER($list,$hdr,$config,$input);
+					if (is_array($dateIn)) {
+						return $dateIn;
+					}
 					$DTL_DATE_IN = 'to_date(\''.\Carbon\Carbon::parse($dateIn)->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 				}else{
 					$DTL_DATE_IN = empty($list[$ddiType]) ? 'NULL' : 'to_date(\''.\Carbon\Carbon::parse($list[$ddiType])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
@@ -423,7 +430,12 @@ class PlgGenerateTariff{
 		$newD['DTL_BM_TYPE'] = 'NULL';
 		$newD['DTL_STACK_AREA'] = static::getDTL_STACK_AREA($config,$list,$hdr,$input);
 		$newD['DTL_TL'] = static::getDTL_TL($config,$list,$hdr,$input);
-		$newD['DTL_DATE_IN'] = static::getDTL_DATE_IN($config,$list,$hdr,$input);
+		$dateIn = static::getDTL_DATE_IN($config,$list,$hdr,$input);
+		if (is_array($dateIn)) {
+			return $dateIn;
+		}else{
+			$newD['DTL_DATE_IN'] = $dateIn;
+		}
 		$newD['DTL_DATE_OUT'] = static::getDTL_DATE_OUT($config,$list,$hdr,$input);
 		$newD['DTL_DATE_OUT_OLD'] = static::getDTL_DATE_OUT_OLD($config,$list,$hdr,$input);
 		return $newD;
