@@ -330,7 +330,7 @@ class PlgGenerateTariff{
 		foreach ($detil as $list) {
 			$list = (array)$list;
 			$dtl = static::calculateTariffBuildDetail($find, $list, $input, $config);
-			if (!empty($dtl['Success']) and $dtl['Success'] == false) {
+			if (isset($dtl['Success']) and $dtl['Success'] == false) {
 				return $dtl;
 			}
 			$setD[] = $dtl;
