@@ -210,8 +210,8 @@ class StoreController extends Controller
     }
 
     function truckRegistration($input){
-      $cekoldtmtruckcompany = TmTruckCompany::where('truck_cust_id',$input['truck_cust_id'])->get();
-      if (empty($cekoldtmtruckcompany)) {
+      $cekoldtmtruckcompany = DB::connection('mdm')->table('TM_TRUCK')->where('truck_cust_id',$input['truck_cust_id'])->first();
+      if (empty($cekoldtmtruckcompany) or !is_numeric($cekoldtmtruckcompany->truck_cust_id)) {
         $new = new TmTruckCompany;
         $new->comp_name = $input['truck_cust_name'];
         $new->comp_address = $input['truck_cust_address'];
@@ -248,7 +248,7 @@ class StoreController extends Controller
         "truck_date" => $input['truck_date'],
         "truck_cust_address" => $input['truck_cust_address'],
         "truck_type" => $input['truck_type'],
-        "truck_terminal_code" => $terminal->terminal_code,
+        "truck_terminal_code" => $terminal->terminal_id,
         "truck_plat_exp" => $input['truck_plat_exp'],
         "truck_stnk_no" => $input['truck_stnk_no'],
         "truck_stnk_exp" => $input['truck_stnk_exp'],
