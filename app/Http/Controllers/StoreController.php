@@ -211,7 +211,7 @@ class StoreController extends Controller
 
     function truckRegistration($input){
       $cekoldtmtruckcompany = TmTruckCompany::where('truck_cust_id',$input['truck_cust_id'])->get();
-      if (empty($cekoldtmtruckcompany) {
+      if (empty($cekoldtmtruckcompany)) {
         $new = new TmTruckCompany;
         $new->comp_name = $input['truck_cust_name'];
         $new->comp_address = $input['truck_cust_address'];

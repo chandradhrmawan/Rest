@@ -708,7 +708,11 @@ class PrintAndExport{
 
     // Data Uper And Payment
     $payment     = DB::connection('omuster')->table("TX_PAYMENT")->where('PAY_REQ_NO', $header[0]->nota_req_no)->first();
-    $uper        = $payment->pay_amount;
+    if (!empty($payment)) {
+      $uper      = $payment->pay_amount;
+    } else {
+      $uper      = 0;
+    }
     $notaAmount  = $header[0]->nota_amount;
     $payAmount   = $uper;
     $total       = $notaAmount - $payAmount;
