@@ -865,6 +865,8 @@ class PlgFunctTOS{
 	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
 	          }
 	          $arrdetil .= '{
+	          	"REQ_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
+	          	"REQ_DTL_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
 	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
 	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
@@ -873,6 +875,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
 	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
 	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+	            "REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
+	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
 	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
 	            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
 	            "TGL_MULAI": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
@@ -902,6 +906,7 @@ class PlgFunctTOS{
 	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
 	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
 	            "REQ_STRIP_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "REQ_RECEIVING_DATE" : "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
 	            "NO_NOTA": "'.$nota_no.'",
 	            "TGL_NOTA": "'.$nota_date.'",
 	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
