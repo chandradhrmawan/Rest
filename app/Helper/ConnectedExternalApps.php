@@ -919,7 +919,7 @@ class ConnectedExternalApps{
                 "responseMessage": ""
                 },
                 "esbBody": {
-                    "truckId": "'.$input['truck_plat_no'].'",
+                    "truckId": "'.$input['tid'].'",
                     "truckNumber": "'.$input['truck_plat_no'].'",
                     "rfidCode": "'.$input['truck_rfid_code'].'",
                     "customerName": "'.$input['customer_name'].'",
@@ -961,7 +961,8 @@ class ConnectedExternalApps{
 
     public static function getTruckPrimaryIdTos($input){
       $endpoint_url=config('endpoint.getTruckPrimaryIdTos');
-
+      if(isset($input['tid']){ $tid = $input['tid']; }
+      else { $tid = str_replace(' ','',$input['truck_plat_no']); }
       $string_json = '{
           "getTruckRequest": {
               "esbHeader": {
@@ -974,7 +975,7 @@ class ConnectedExternalApps{
               },
               "esbBody":   {
                               "idTerminal":"201",
-                              "tid":"'.str_replace(' ','',$input['truck_plat_no']).'",
+                              "tid":"'.$tid.'",
                               "truckNumber":"'.str_replace(' ','',$input['truck_plat_no']).'"
                       },
               "esbSecurity": {
