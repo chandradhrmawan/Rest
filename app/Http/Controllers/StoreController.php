@@ -256,6 +256,11 @@ class StoreController extends Controller
         "truck_type_name" => $input['truck_type_name']
       ];
       if ($input['type'] == "CREATE") {
+        $input['truck_id'] = str_replace(' ','',$input['truck_plat_no']);
+        $cekOld = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->first();
+        if (!empty($cekOld)) {
+          return ['Success'=>false, 'result'=>'truck number already exists!'];
+        }
         DB::connection('mdm')->table('TM_TRUCK')->insert($set_data_self);
         $res = ConnectedExternalApps::truckRegistration($set_data);
       }else{
@@ -266,7 +271,7 @@ class StoreController extends Controller
       }
         $tid = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->first();
         $set_data['truck_id'] = $tid->truck_id;
-        
+
       $res['getTruckPrimaryIdTos'] = ConnectedExternalApps::getTruckPrimaryIdTos($set_data);
       return $res;
     }
