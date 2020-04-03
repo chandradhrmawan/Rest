@@ -260,7 +260,7 @@ class StoreController extends Controller
         $res = ConnectedExternalApps::truckRegistration($set_data);
       }else{
         $tid = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->first();
-        $set_data['tid'] = $tid->truck_id_seq;
+        $set_data['truck_id'] = $tid->truck_id;
         DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->update($set_data_self);
         $res = ConnectedExternalApps::updateTid($set_data);
       }
