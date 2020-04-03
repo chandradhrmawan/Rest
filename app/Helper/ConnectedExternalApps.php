@@ -961,7 +961,7 @@ class ConnectedExternalApps{
 
     public static function getTruckPrimaryIdTos($input){
       $endpoint_url=config('endpoint.getTruckPrimaryIdTos');
-      if(isset($input['tid']){ $tid = $input['tid']; }
+      if(isset($input['tid'])){ $tid = $input['tid']; }
       else { $tid = str_replace(' ','',$input['truck_plat_no']); }
       $string_json = '{
           "getTruckRequest": {
