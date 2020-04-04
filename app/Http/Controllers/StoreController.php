@@ -319,7 +319,7 @@ class StoreController extends Controller
           "vTruckId" => $truck->truck_id,
           "vTruckNumber" => $truck->truck_plat_no,
           "vBlNumber" => $head->tca_bl,
-          "vTcaCompany" => $head->tca_cust_name,
+          "vTcaCompany" => $list->truck_cust_name,
           "vEi" => $head->tca_req_type == 1 ? 'I' : 'E',
           "vRfidCode" => $truck->truck_rfid,
           "vIdServiceType" => $head->tca_req_type,
