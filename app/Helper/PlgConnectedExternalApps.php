@@ -388,7 +388,7 @@ class PlgConnectedExternalApps{
 	      $selisih = ($now - $active)/60;
 	      if ($selisih >= 240) {
 	        $user[] = [$data->user_name, $selisih];
-	         DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_LOGIN" => "", "API_TOKEN" => ""]);
+	         DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_LOGIN" => "", "USER_ACTIVE" => "", "API_TOKEN" => ""]);
 	      }
 	    }
 	  }
