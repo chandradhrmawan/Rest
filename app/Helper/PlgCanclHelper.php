@@ -59,7 +59,7 @@ class PlgCanclHelper{
 				];
 			}
 		}
-		$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get();
+		$cnclDtl = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$cnclHdr->cancelled_id)->get(); //kurang di SUM
 		foreach ($cnclDtl as $list) {
 			$noDtl = $list->cancl_cont.$list->cancl_si;
 			$reqDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
@@ -108,8 +108,8 @@ class PlgCanclHelper{
 				];
 			}else{
 				$upd = [
-					$config['DTL_IS_CANCEL'] => 'Y',
-					$config['DTL_QTY_CANC'] => $list->cancl_qty
+					$config['DTL_IS_CANCEL'] => 'Y'
+					// $config['DTL_QTY_CANC'] => $list->cancl_qty
 				];
 			}
 			DB::connection('omuster')->table($config['head_tab_detil'])->where([

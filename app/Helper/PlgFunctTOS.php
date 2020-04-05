@@ -153,9 +153,13 @@ class PlgFunctTOS{
 		}
 		$res['his_cont'] = $his_cont;
 		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id']);
-		if (!empty($config['DTL_IS_CANCEL'])) {
-			$dtl = $dtl->where($config['DTL_IS_CANCEL'],'N');
+
+		if ($config["CANCELLED_STATUS"] != "21" || $config["CANCELLED_STATUS"] != "22") {
+			if (!empty($config['DTL_IS_CANCEL'])) {
+				$dtl = $dtl->where($config['DTL_IS_CANCEL'],'N');
+			}
 		}
+
 		$dtl = $dtl->get();
         return [
         	'response' => $Success,
