@@ -554,15 +554,34 @@ class GlobalHelper {
     if (!empty($input["query"]) && !empty($input["field"])) {
       if (is_array($input["field"])) {
         foreach ($input["field"] as $field) {
-          $connect->orwhere(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
-          $connect->orwhere(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
-          $connect->orwhere(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+          $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%")->get();
+          $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
+          $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtolower($input["query"])."%")->get();
+
+          if (!empty($upper)) {
+            $connect->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
+          } else if(!empty($capit)) {
+            $connect->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
+          } else if(!empty($lower)) {
+            $connect->where(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+          } else {
+            $connect->where($input["field"], "like", "%".$input["query"]."%");
+          }
         }
       } else {
-        return "testing";
-        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
-        $connect->orwhere(strtoupper($input["field"]),"like", "%".ucwords($input["query"])."%");
-        $connect->orwhere(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+        $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%")->get();
+        $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
+        $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%")->get();
+
+        if (!empty($upper)) {
+          $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
+        } else if(!empty($capit)) {
+          $connect->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%");
+        } else if(!empty($lower)) {
+          $connect->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+        } else {
+          $connect->where($input["field"], "like", "%".$input["query"]."%");
+        }
       }
     }
 
