@@ -82,7 +82,7 @@ class PrintAndExport{
     $page             = count($dtlRequest);
     // return $notaId;
 
-    $html             = view('print.rdCardNPKS', ["nota_id"=>$notaId, "title"=>$title, "page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
+    return $html             = view('print.rdCardNPKS', ["nota_id"=>$notaId, "title"=>$title, "page"=>$page, "header"=>$hdrRequest, "detail" => $dtlRequest, "config"=>$config]);
     $filename         = $hdrRequest[$config["head_primery"]];
     $dompdf           = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
