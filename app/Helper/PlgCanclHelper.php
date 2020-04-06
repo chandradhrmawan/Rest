@@ -107,14 +107,14 @@ class PlgCanclHelper{
 					$config['DTL_IS_CANCEL'] => 'Y'
 				];
 			}else{
-                                $oldDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
-				        $config['head_forigen'] => $reqsHdr[$config['head_primery']],
-				        $config['DTL_BL'] => $noDtl
-			        ])->get();
-                                $oldDtl = $oldDtl[0];
-                                $oldDtl = (array)$oldDtl;
+        $oldDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+					        $config['head_forigen'] => $reqsHdr[$config['head_primery']],
+					        $config['DTL_BL'] => $noDtl
+			        		])->get();
+        $oldDtl = $oldDtl[0];
+        $oldDtl = (array)$oldDtl;
 				$upd = [
-					$config['DTL_IS_CANCEL'] => 'Y'
+					$config['DTL_IS_CANCEL'] => 'Y',
 					$config['DTL_QTY_CANC'] => $list->cancl_qty + $oldDtl[$config['DTL_QTY_CANC']]
 				];
 			}
