@@ -311,7 +311,7 @@ class PlgGenerateTariff{
 		// build detil
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
-		if (!empty($config['DTL_IS_CANCEL']) and !in_array($input['nota_id'], [21,22])) {
+		if (!empty($config['DTL_IS_CANCEL']) and !in_array($input['nota_id'], [21,22,23])) {
 			$detil->where($config['DTL_IS_CANCEL'], 'N');
 		}
 		$detil = $detil->get();

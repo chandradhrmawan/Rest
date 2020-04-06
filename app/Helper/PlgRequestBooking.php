@@ -191,7 +191,7 @@ class PlgRequestBooking{
 				$loopDtlCanc = DB::connection('omuster')->table('TX_DTL_CANCELLED')->where('cancl_hdr_id',$findCanc->cancelled_id)->get();
 				foreach ($loopDtlCanc as $dtlCanc) {
 					$getRecDtlSI = DB::connection('omuster')->table($cnf21['head_tab_detil'])->where([
-						$cnf21['DTL_BL'] => $dtlCanc->cancl_cont
+						$cnf21['DTL_BL'] => $dtlCanc->cancl_si
 					])->first();
 					$getRecDtlSI = (array)$getRecDtlSI;
 					$up = $getRecDtlSI['rec_cargo_remaining_qty'] + $dtlCanc->cancl_qty;
