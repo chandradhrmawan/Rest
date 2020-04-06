@@ -84,7 +84,7 @@ class PlgCanclHelper{
 			if ($config['DTL_QTY'] == 1 or $config['kegiatan_batal'] == 21) {
 				$reqDtlQty = 1;
 			}else{
-				$reqDtlQty = $reqDtl[$config['DTL_QTY']];
+				$reqDtlQty = $reqDtl[$config['DTL_QTY']]-$reqDtl[$config['DTL_QTY_CANC']];
 			}
 			if ($list->cancl_qty > $reqDtlQty) {
 				return [
@@ -107,9 +107,15 @@ class PlgCanclHelper{
 					$config['DTL_IS_CANCEL'] => 'Y'
 				];
 			}else{
+                                $oldDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+				        $config['head_forigen'] => $reqsHdr[$config['head_primery']],
+				        $config['DTL_BL'] => $noDtl
+			        ])->get();
+                                $oldDtl = $oldDtl[0];
+                                $oldDtl = (array)$oldDtl;
 				$upd = [
 					$config['DTL_IS_CANCEL'] => 'Y'
-					// $config['DTL_QTY_CANC'] => $list->cancl_qty
+					$config['DTL_QTY_CANC'] => $list->cancl_qty + $oldDtl[$config['DTL_QTY_CANC']]
 				];
 			}
 			DB::connection('omuster')->table($config['head_tab_detil'])->where([
