@@ -489,6 +489,7 @@ class PlgFunctTOS{
 		if (isset($listR["TGL_IN"])) {
 			$realDate		= date('Y-m-d H:i:s', strtotime($listR["TGL_IN"]));
 			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_REC_DATE" => $realDate]);
+			$updateHdr 	= DB::connection('omuster')->table('TX_HDR_TL')->where("TL_NO", $noRequest)->update(["TL_STATUS" => '5']);
 		} else {
 			$realDate		= date('Y-m-d H:i:s', strtotime($listR["TGL_OUT"]));
 			$dtlTL 			= DB::connection('omuster')->table('TX_DTL_TL')->where($findDetail)->update(["TL_DTL_REAL_DEL_DATE" => $realDate]);
