@@ -25,6 +25,9 @@ class PlgRequestBooking{
 				$findReqNo = $find[$config['head_no']];
 			}else{
 				$findReqNo = $findCanc->cancelled_no;
+				// Tambahan untuk ambil no nota lama
+				$getNotaNoReqCanc = DB::connection('omuster')->table('TX_HDR_NOTA')->where('NOTA_REQ_NO', $find[$config['head_no']])->first();
+				$getNotaNoReqCanc = $getNotaNoReqCanc->nota_no;
 			}
 			$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$findReqNo."'";
 			$tarifs = DB::connection('eng')->select(DB::raw($query));
@@ -39,6 +42,9 @@ class PlgRequestBooking{
 				}else{
 					$headU = TxHdrNota::find($cekOldNota->nota_id);
 				}
+
+				// Tambahan Untuk Koreksi
+				if (!empty($findCanc)) $headU->nota_no = $tarif['tax_code'].substr($getNotaNoReqCanc,3);
 				$headU->app_id = $find['app_id'];
 				$headU->nota_group_id = $tarif['nota_id'];
 				$headU->nota_org_id = $tarif['branch_org_id'];
