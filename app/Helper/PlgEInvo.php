@@ -95,7 +95,7 @@ class PlgEInvo{
 		            "attribute13": "",
 		            "attribute14": "'.$arr['nota']['nota_no'].'",
 		            "attribute15": "",
-		            "interfaceHeaderAttribute1": "",
+		            "interfaceHeaderAttribute1": "'.$arr['cancNotaFrom'].'",
 		            "interfaceHeaderAttribute2": "'.$arr['nota']['nota_vessel_name'].'",
 		            "interfaceHeaderAttribute3": "",
 		            "interfaceHeaderAttribute4": "",
