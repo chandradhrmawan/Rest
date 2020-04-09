@@ -961,7 +961,7 @@ class ConnectedExternalApps{
 
     public static function getTruckPrimaryIdTos($input){
       $endpoint_url=config('endpoint.getTruckPrimaryIdTos');
-     
+
       $string_json = '{
           "getTruckRequest": {
               "esbHeader": {
