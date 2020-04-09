@@ -603,6 +603,10 @@ class GlobalHelper {
       }
     }
 
+    if (!empty($input["selectraw"])) {
+      $result = $connect->select(DB::raw($input["selectraw"]));
+    }
+
     $count = count($connect->get());
 
     if (!empty($input['start']) || $input["start"] == '0') {
