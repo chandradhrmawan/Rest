@@ -84,7 +84,9 @@ class PlgCanclHelper{
 			if ($config['DTL_QTY'] == 1 or $config['kegiatan_batal'] == 21) {
 				$reqDtlQty = 1;
 			}else{
-				$reqDtlQty = $reqDtl[$config['DTL_QTY']]-$reqDtl[$config['DTL_QTY_CANC']]; // nb : kurangkan dengan qty real nya
+				$reqDtlQty = $reqDtl[$config['DTL_QTY']]-$reqDtl[$config['DTL_QTY_CANC']];
+                                if($input['nota_id'] == 21) { $reqDtlQty = $reqDtlQty-$reqDtl['rec_cargo_dtl_real_qty']; }
+                                else if($input['nota_id'] == 22) { $reqDtlQty = $reqDtlQty-$reqDtl['del_cargo_dtl_real_qty']; }
 			}
 			if ($list->cancl_qty > $reqDtlQty) {
 				return [
