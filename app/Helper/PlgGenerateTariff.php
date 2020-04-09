@@ -312,7 +312,7 @@ class PlgGenerateTariff{
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
 		//tambahan dari chalid
-		if($input["canceled"] == "true") {
+		if(!empty($input["canceled"])) {
 			$detil->where($config['DTL_IS_CANCEL'], 'Y');
 		} else
 		//

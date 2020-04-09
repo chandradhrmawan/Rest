@@ -239,4 +239,8 @@ class ViewController extends Controller
     return ["count" => $count, "result" => $nota];
   }
 
+  function listRdSpps($input) {
+    
+  }
+
 }
