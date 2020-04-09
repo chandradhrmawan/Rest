@@ -311,10 +311,17 @@ class PlgGenerateTariff{
 		// build detil
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
+		//tambahan dari chalid
+		if($input["canceled"] == "true") {
+			$detil->where($config['DTL_IS_CANCEL'], 'Y');
+		} else
+		//
+
 		if (!empty($config['DTL_IS_CANCEL']) and !in_array($input['nota_id'], [21,22,23])) {
 			$detil->where($config['DTL_IS_CANCEL'], 'N');
 		}
 		$detil = $detil->get();
+
 		if (
 			(in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 1) or
 			(!empty($canceledReqPrepare) and $find[$config['head_paymethod']] == 2 )
