@@ -235,22 +235,22 @@ class BillingEngine{
         if (!empty($list['KONTAINER'])) {
           $each           = explode('/', $list['KONTAINER']);
           $query = "SELECT FNC_CREATE_ISO('CONT',";
-          if ($each[0] == 'null') {
+          if ($each[0] == 'null' || empty($each[0])) {
             $query .= "'',";
           }else{
             $query .= "'".$each[0]."',";
           }
-          if ($each[1] == 'null') {
+          if ($each[1] == 'null' || empty($each[1])) {
             $query .= "'',";
           }else{
             $query .= "'".$each[1]."',";
           }
-          if ($each[2] == 'null') {
+          if ($each[2] == 'null' || empty($each[2])) {
             $query .= "'',";
           }else{
             $query .= "'".$each[2]."',";
           }
-          if ($each[3] == 'null') {
+          if ($each[3] == 'null' || empty($each[3])) {
             $query .= "''";
           }else{
             $query .= "'".$each[3]."'";
