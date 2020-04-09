@@ -51,7 +51,7 @@ class PlgCanclHelper{
 
 		foreach ($cekStart as $cek) {
 			$cek = (array)$cek;
-			if ($cek[$config['DTL_FL_REAL']] != 1) {
+			if ($cek[$config['DTL_FL_REAL']] != 1 and !in_array($input['nota_id'],[21,22])) {
 				return [
 					'Success' => false,
 					'no_item' => $cek[$config['DTL_BL']],
@@ -74,7 +74,7 @@ class PlgCanclHelper{
 				];
 			}
 			$reqDtl = (array)$reqDtl;
-			if ($reqDtl[$config['DTL_FL_REAL']] != 1) {
+			if ($reqDtl[$config['DTL_FL_REAL']] != 1 and !in_array($input['nota_id'],[21,22])) {
 				return [
 					'Success' => false,
 					'no_item' => $reqDtl[$config['DTL_BL']],
@@ -84,7 +84,7 @@ class PlgCanclHelper{
 			if ($config['DTL_QTY'] == 1 or $config['kegiatan_batal'] == 21) {
 				$reqDtlQty = 1;
 			}else{
-				$reqDtlQty = $reqDtl[$config['DTL_QTY']]-$reqDtl[$config['DTL_QTY_CANC']];
+				$reqDtlQty = $reqDtl[$config['DTL_QTY']]-$reqDtl[$config['DTL_QTY_CANC']]; // nb : kurangkan dengan qty real nya
 			}
 			if ($list->cancl_qty > $reqDtlQty) {
 				return [
