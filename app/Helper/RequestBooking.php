@@ -79,7 +79,7 @@ class RequestBooking{
 					$newD['DTL_BM_TYPE'] = $DTL_BM_TYPE;
 
 					$DTL_STACK_AREA = 'NULL';
-					if (in_array($input['nota_id'], ["14", "15", 14, 15])) {
+					if (in_array($input['nota_id'], ["14", "15","19", 14, 15, 19])) {
 						$DTL_STACK_AREA = empty($list['dtl_stacking_type_id']) ? 'NULL' : $list['dtl_stacking_type_id'];
 					}
 					$newD['DTL_STACK_AREA'] = $DTL_STACK_AREA;
