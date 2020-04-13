@@ -57,13 +57,13 @@ class PlgGenerateTariff{
 	private static function getDTL_VIA($config,$list,$hdr,$input){
 		if (empty($config['DTL_VIA'])) {
 			$DTL_VIA = 'NULL';
-		}else if (is_array($config['DTL_VIA'])) {
-			if ($list[$config['DTL_VIA']['rec']]+$list[$config['DTL_VIA']['del']] > 2) {
+		} else if (is_array($config['DTL_VIA'])) {
+			if ($list[$config['DTL_VIA']['rec']]+$list[$config['DTL_VIA']['del']] >= 2) {
 				$DTL_VIA = 2;
 			}else{
 				$DTL_VIA = 1;
 			}
-		}else{
+		} else {
 			$DTL_VIA = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
 		}
 		return $DTL_VIA;
