@@ -600,7 +600,7 @@ class PlgGenerateTariff{
 		if (empty($tariffResp['result_flag']) or $tariffResp['result_flag'] != 'S') {
 			return $tariffResp;
 		}
-		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$input['P_BOOKING_NUMBER']."'";
+		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$input['HDR']['P_BOOKING_NUMBER']."'";
 		$result = static::showTempTariff($query,null,null);
 		return [ "Success" => true, "result" => $result];
 	}

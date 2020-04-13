@@ -442,21 +442,36 @@ class GlobalHelper {
 
     if (!empty($input["query"]) && !empty($input["field"])) {
       if (is_array($input["field"])) {
+        $no = 0;
         foreach ($input["field"] as $field) {
           $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%")->get();
           $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
           $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtolower($input["query"])."%")->get();
 
           if (!empty($upper)) {
-            $connect->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
+            $upper = $connect->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%")->get();
           } else if(!empty($capit)) {
-            $connect->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
+            $upper = $connect->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
           } else if(!empty($lower)) {
-            $connect->where(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+            $upper = $connect->where(strtoupper($field),"like", "%".strtolower($input["query"])."%")->get();
           } else {
-            $connect->where($input["field"], "like", "%".$input["query"]."%");
+            $upper = $connect->where($field, "like", "%".$input["query"]."%")->get();
+          }
+
+          if (!empty($upper)) {
+            $result[] = $upper;
+            $no++;
           }
         }
+
+        if ($no == 0) {
+            $count   = 0;
+            $result  = [];
+        } else {
+            $count   = count($result[0]);
+            $result  = $result[0];
+        }
+
       } else {
         $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%")->get();
         $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
@@ -471,17 +486,20 @@ class GlobalHelper {
         } else {
           $connect->where($input["field"], "like", "%".$input["query"]."%");
         }
-      }
-    }
 
+        $count    = $connect->count();
+        if (!empty($input['start']) || $input["start"] == '0') {
+          if (!empty($input['limit'])) {
+            $connect->skip($input['start'])->take($input['limit']);
+          }
+        }
+        $result   = $connect->get();
 
-    $count    = $connect->count();
-    if (!empty($input['start']) || $input["start"] == '0') {
-      if (!empty($input['limit'])) {
-        $connect->skip($input['start'])->take($input['limit']);
       }
+    } else {
+      $result   = $connect->get();
+      $count    = count($result);
     }
-    $result   = $connect->get();
 
     return ["result"=>$result, "count"=>$count];
   }

@@ -308,6 +308,10 @@ class ViewExt{
                   A.COMP_NOTA_TL,
                   E.REFF_NAME COMP_NOTA_TL_NAME,
                   A.COMP_NOTA_VIEW,
+                  A.COMP_FORM_ORDER,
+                  A.COMP_REQUIRED,
+                  A.PROC_NAME,
+                  A.COMP_FORM_SHOW,
                   F.REFF_NAME COMP_NOTA_VIEW_NAME
                  ";
 
@@ -325,6 +329,11 @@ class ViewExt{
                   D.REFF_NAME,
                   A.COMP_NOTA_TL,
                   E.REFF_NAME,
+                  A.COMP_NOTA_VIEW,
+                  A.COMP_FORM_ORDER,
+                  A.COMP_REQUIRED,
+                  A.PROC_NAME,
+                  A.COMP_FORM_SHOW,
                   A.COMP_NOTA_VIEW,
                   F.REFF_NAME
                   ";
