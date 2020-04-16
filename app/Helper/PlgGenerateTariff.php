@@ -568,6 +568,27 @@ class PlgGenerateTariff{
 
 		$setD = [];
 		foreach ($input['DTL'] as $list) {
+			if ($list['DTL_PFS'] == 'NULL' or $list['DTL_PFS'] == NULL or empty($list['DTL_PFS'])) {
+				$pfs = 'N';
+			}else{
+				$pfs = $list['DTL_PFS'];
+			}
+			if ($list['DTL_DATE_IN'] == 'NULL' or $list['DTL_DATE_IN'] == NULL or empty($list['DTL_DATE_IN'])) {
+				$dateIn = 'NULL';
+			}else{
+				$dateIn = 'to_date(\''.\Carbon\Carbon::parse($list['DTL_DATE_IN'])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
+			}
+			if ($list['DTL_DATE_OUT'] == 'NULL' or $list['DTL_DATE_OUT'] == NULL or empty($list['DTL_DATE_OUT'])) {
+				$dateOt = 'NULL';
+			}else{
+				$dateOt = 'to_date(\''.\Carbon\Carbon::parse($list['DTL_DATE_OUT'])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
+			}
+			if ($list['DTL_DATE_OUT_OLD'] == 'NULL' or $list['DTL_DATE_OUT_OLD'] == NULL or empty($list['DTL_DATE_OUT_OLD'])) {
+				$dateOO = 'NULL';
+			}else{
+				$dateOO = 'to_date(\''.\Carbon\Carbon::parse($list['DTL_DATE_OUT_OLD'])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
+			}
+			
 			$newD = [];
 			$newD['DTL_VIA'] = $list['DTL_VIA'];
 			$newD['DTL_BL'] = $list['DTL_BL'];
@@ -580,13 +601,13 @@ class PlgGenerateTariff{
 			$newD['DTL_CONT_STATUS'] = $list['DTL_CONT_STATUS'];
 			$newD['DTL_UNIT_ID'] = $list['DTL_UNIT_ID'];
 			$newD['DTL_QTY'] = $list['DTL_QTY'];
-			$newD['DTL_PFS'] = $list['DTL_PFS'];
+			$newD['DTL_PFS'] = $pfs;
 			$newD['DTL_BM_TYPE'] = $list['DTL_BM_TYPE'];
 			$newD['DTL_STACK_AREA'] = $list['DTL_STACK_AREA'];
-			$newD['DTL_TL'] = $list['DTL_TL'];
-			$newD['DTL_DATE_IN'] = $list['DTL_DATE_IN'];
-			$newD['DTL_DATE_OUT'] = $list['DTL_DATE_OUT'];
-			$newD['DTL_DATE_OUT_OLD'] = $list['DTL_DATE_OUT_OLD'];
+			$newD['DTL_TL'] = strtoupper($list['DTL_TL']);
+			$newD['DTL_DATE_IN'] = $dateIn;
+			$newD['DTL_DATE_OUT'] = $dateOt;
+			$newD['DTL_DATE_OUT_OLD'] = $dateOO;
 			$setD[] = $newD;
 		}
 
@@ -602,6 +623,6 @@ class PlgGenerateTariff{
 		}
 		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$input['HDR']['P_BOOKING_NUMBER']."'";
 		$result = static::showTempTariff($query,null,null);
-		return [ "Success" => true, "result" => $result];
+		return [ "Success" => true, "result" => $result, "tariffResp" => $tariffResp ];
 	}
 }
