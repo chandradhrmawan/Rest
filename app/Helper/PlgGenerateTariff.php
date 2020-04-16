@@ -623,6 +623,6 @@ class PlgGenerateTariff{
 		}
 		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$input['HDR']['P_BOOKING_NUMBER']."'";
 		$result = static::showTempTariff($query,null,null);
-		return [ "Success" => true, "result" => $result];
+		return [ "Success" => true, "result" => $result, "tariffResp" => $tariffResp ];
 	}
 }
