@@ -134,14 +134,10 @@
 			<tr>
 				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
 				<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
-				<?php if ($noa == 0) { ?>
 					<td rowspan="<?php echo $total; ?>" style="padding-left:9px;text-align:center">
-						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, 0)}}
+						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, $penumpukan->dtl_id)}}
 						<?php $noa++; ?>
 					</td>
-				<?php } else { ?>
-
-				<?php } ?>
 				<td style="text-align:center">
 					{{number_format($penumpukan["masa1"])}}<br>
 					{{number_format($penumpukan["masa2"])}}

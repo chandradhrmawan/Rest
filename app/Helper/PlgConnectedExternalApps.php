@@ -222,56 +222,58 @@ class PlgConnectedExternalApps{
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
 				if (empty($tsContainer)) {
-					return "TS_CONTAINER up to date";
+					$container[] =  $listR["NO_CONTAINER"]." Already In Yard";
+				} else {
+					$container[] =  $listR["NO_CONTAINER"]." Change To In Yard";
+					$storePlacement  	= [
+						"PLACEMENT_ID"	=> $placementID[0]->nextval,
+						"NO_REQUEST"		=> $listR["NO_REQUEST"],
+						"NO_CONTAINER"	=> $listR["NO_CONTAINER"],
+						"YBC_SLOT"			=> $listR["YBC_SLOT"],
+						"YBC_ROW"				=> $listR["YBC_ROW"],
+						"YBC_BLOCK_ID"	=> $listR["YBC_BLOCK_ID"],
+						"TIER"					=> $listR["TIER"],
+						"ID_YARD"				=> $listR["ID_YARD"],
+						"ID_USER"				=> $listR["ID_USER"],
+						"CONT_STATUS"		=> $listR["CONT_STATUS"],
+						"TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
+						"BRANCH_ID"			=> $listR["BRANCH_ID"],
+						"CONT_COUNTER"	=> $tsContainer[0]->cont_counter
+					];
+
+					$storeHistory 		= [
+						"NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+						"NO_REQUEST"		=> $listR["NO_REQUEST"],
+						"KEGIATAN"			=> "12",
+						"HISTORY_DATE"		=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
+						"ID_USER"				=> $listR["ID_USER"],
+						"ID_YARD"				=> $listR["ID_YARD"],
+						"STATUS_CONT"		=> $listR["CONT_STATUS"],
+						"VVD_ID"				=> "",
+						"COUNTER"				=> $tsContainer[0]->cont_counter,
+						"SUB_COUNTER"		=> "",
+						"WHY"						=> ""
+					];
+
+					$headerID 				= DB::connection('omuster')->table('TX_HDR_REC')->where('REC_NO', $listR["NO_REQUEST"])->first();
+
+					$updateFlReal 		= DB::connection('omuster')
+					->table("TX_DTL_REC")
+					->where('REC_DTL_CONT', $listR["NO_CONTAINER"])
+					->where('REC_HDR_ID', $headerID->rec_id)
+					->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])), "rec_fl_real"=>"3"]);
+
+					DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
+
+					$cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+					if (empty($cekHistory)) {
+						DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+					} else {
+						DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+					}
 				}
-
-		    $storePlacement  	= [
-		      "PLACEMENT_ID"	=> $placementID[0]->nextval,
-		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
-		      "NO_CONTAINER"	=> $listR["NO_CONTAINER"],
-		      "YBC_SLOT"			=> $listR["YBC_SLOT"],
-		      "YBC_ROW"				=> $listR["YBC_ROW"],
-		      "YBC_BLOCK_ID"	=> $listR["YBC_BLOCK_ID"],
-		      "TIER"					=> $listR["TIER"],
-		      "ID_YARD"				=> $listR["ID_YARD"],
-		      "ID_USER"				=> $listR["ID_USER"],
-		      "CONT_STATUS"		=> $listR["CONT_STATUS"],
-		      "TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
-		      "BRANCH_ID"			=> $listR["BRANCH_ID"],
-		      "CONT_COUNTER"	=> $tsContainer[0]->cont_counter
-		    ];
-
-		    $storeHistory 		= [
-		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
-		      "NO_REQUEST"		=> $listR["NO_REQUEST"],
-		      "KEGIATAN"			=> "12",
-		      "HISTORY_DATE"		=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
-		      "ID_USER"				=> $listR["ID_USER"],
-		      "ID_YARD"				=> $listR["ID_YARD"],
-		      "STATUS_CONT"		=> $listR["CONT_STATUS"],
-		      "VVD_ID"				=> "",
-		      "COUNTER"				=> $tsContainer[0]->cont_counter,
-		      "SUB_COUNTER"		=> "",
-		      "WHY"						=> ""
-		    ];
-
-				$headerID 				= DB::connection('omuster')->table('TX_HDR_REC')->where('REC_NO', $listR["NO_REQUEST"])->first();
-
-		    $updateFlReal 		= DB::connection('omuster')
-														->table("TX_DTL_REC")
-														->where('REC_DTL_CONT', $listR["NO_CONTAINER"])
-														->where('REC_HDR_ID', $headerID->rec_id)
-														->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])), "rec_fl_real"=>"3"]);
-
-	      DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
-
-		    $cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
-		    if (empty($cekHistory)) {
-		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
-		    } else {
-		      DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
-		    }
 		  }
+			return $container;
 		}
 
 		public static function storeTxServices($json, $jsonRequest, $jsonResponse) {
