@@ -100,6 +100,12 @@ class GlobalHelper {
                   $connect->join(strtoupper($list["table"]), DB::raw($list['field']));
                 }
               }
+
+              if(!empty($input["ORDERBY"][0])) {
+              $in        = $input["ORDERBY"];
+              $connect->orderby($in[0], $in[1]);
+              }
+
                 $detail  = $connect->where(strtoupper($fk), "like", strtoupper($fkhdr))->get();
               }
 
