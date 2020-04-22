@@ -175,7 +175,12 @@ class StoreController extends Controller
       }
 
       function storePaymentPLG($input, $request){
-        return PlgRequestBooking::storePaymentPLG($input);
+        if (!empty($user)) {
+          $user = json_decode(json_encode($user), TRUE);
+          return PlgRequestBooking::storePaymentPLG($input,$user);
+        } else {
+          return PlgRequestBooking::storePaymentPLG($input,$request);
+        }
       }
 
       function getRealPLG($input, $request){

@@ -260,11 +260,11 @@ class PrintAndExport{
               END AS PBM_NAME,
               CASE
                     WHEN A.NOTA_GROUP_ID = 13
-                      THEN (SELECT TO_CHAR(BM_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(BM_ETD,'DD MONTH YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
+                      THEN (SELECT TO_CHAR(BM_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MONTH-YYYY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
                     WHEN A.NOTA_GROUP_ID = 14
-                      THEN (SELECT TO_CHAR(REC_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(REC_ETD,'DD MONTH YY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
+                      THEN (SELECT TO_CHAR(REC_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MONTH-YYYY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
                     WHEN A.NOTA_GROUP_ID IN (15,19)
-                      THEN (SELECT TO_CHAR(DEL_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD MONTH YY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
+                      THEN (SELECT TO_CHAR(DEL_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MONTH-YYYY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
                     END AS PERIODE
             FROM
               TX_HDR_NOTA A
@@ -281,18 +281,18 @@ class PrintAndExport{
                   A.UPER_VESSEL_NAME,
                   CASE
                   WHEN A.UPER_NOTA_ID = 13
-                    THEN (SELECT TO_CHAR(BM_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(BM_ETD,'DD MONTH YY') FROM TX_HDR_BM WHERE BM_NO = A.UPER_REQ_NO)
+                    THEN (SELECT TO_CHAR(BM_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MONTH-YYYY') FROM TX_HDR_BM WHERE BM_NO = A.UPER_REQ_NO)
                   WHEN A.UPER_NOTA_ID = 14
-                    THEN (SELECT TO_CHAR(REC_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(REC_ETD,'DD MONTH YY') FROM TX_HDR_REC WHERE REC_NO = A.UPER_REQ_NO)
+                    THEN (SELECT TO_CHAR(REC_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MONTH-YYYY') FROM TX_HDR_REC WHERE REC_NO = A.UPER_REQ_NO)
                   WHEN A.UPER_NOTA_ID IN (15,19)
-                    THEN (SELECT TO_CHAR(DEL_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD MONTH YY') FROM TX_HDR_DEL WHERE DEL_NO = A.UPER_REQ_NO)
+                    THEN (SELECT TO_CHAR(DEL_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MONTH-YYYY') FROM TX_HDR_DEL WHERE DEL_NO = A.UPER_REQ_NO)
                   END AS PERIODE,
                   A.UPER_NO,
                   A.UPER_TRADE_TYPE,
                   A.UPER_AMOUNT,
                   B.PAY_AMOUNT,
                   B.PAY_ACCOUNT_NAME,
-                  TO_CHAR(B.PAY_DATE,'DD MONTH YY') PAY_DATE,
+                  TO_CHAR(B.PAY_DATE,'DD-MONTH-YYYY') PAY_DATE,
                   B.PAY_NOTE,
                   B.PAY_CUST_ID
                 FROM
@@ -314,13 +314,12 @@ class PrintAndExport{
     }
     $total       = $notaAmount - $payAmount;
     $terbilang   = static::terbilang($total);
-
-    if($terbilang == 0) {
+    if(empty($total)) {
       $terbilang  = "Nol";
     }
 
     $sign        = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_TYPE', "3")->where('SIGN_BRANCH_ID', $branch[0]->branch_id)->where('SIGN_BRANCH_CODE', $branch[0]->branch_code)->get();
-    $html        = view('print.proforma2',["sign"=>$sign,"total"=>$total,"uper"=>$uper, "bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
+    $html        = view('print.proforma2',["sign"=>$sign, "total"=>$total,"uper"=>$uper, "bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan,"label"=>$nota, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
     $filename    = $all["header"][0]->nota_no.rand(10,100000);
     $dompdf      = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
@@ -435,7 +434,6 @@ class PrintAndExport{
                         ";
     $a                 = DB::connection('omcargo')->select($querya);
     $b                 = DB::connection('omcargo')->select($queryb);
-
     if (!empty($a[0]->rec_id)) {
       $data            = json_encode($a);
       $change          = str_replace("rec", "req", $data);
@@ -451,10 +449,11 @@ class PrintAndExport{
       $b               = json_decode($change);
       $all["request"]  = $b;
       $branch          = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $b[0]->req_branch_id)->where('BRANCH_CODE', $b[0]->req_branch_code)->get();
-      $sign            = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_TYPE', "1")->where('SIGN_BRANCH_ID', $a[0]->req_branch_id)->where('SIGN_BRANCH_CODE', $a[0]->req_branch_code)->get();
+      $sign            = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_TYPE', "1")->where('SIGN_BRANCH_ID', $b[0]->req_branch_id)->where('SIGN_BRANCH_CODE', $b[0]->req_branch_code)->get();
       $html            = view('print.bprp',["sign"=>$sign, "branch"=>$branch,"header"=>$all["header"],"detail"=>$all["detail"], "request"=>$all["request"]]);
 
     }
+
     $filename   = $all["header"][0]->bprp_id.rand(10,100000);
     $dompdf     = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
@@ -553,7 +552,7 @@ class PrintAndExport{
 
     $all = ["header"=>$header]+$det;
     $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->where('BRANCH_CODE', $header[0]->nota_branch_code)->get();
-    $terbilang   = static::terbilang($header[0]->nota_amount);
+    $terbilang   = $this->terbilang($header[0]->nota_amount);
     if (!array_key_exists("alat",$all)) {
       $alat = 0;
     } else {
@@ -600,11 +599,11 @@ class PrintAndExport{
               END AS KADE,
               CASE
                     WHEN A.NOTA_GROUP_ID = 13
-                      THEN (SELECT TO_CHAR(BM_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(BM_ETD,'DD MONTH YY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
+                      THEN (SELECT TO_CHAR(BM_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(BM_ETD,'DD-MONTH-YYYY') FROM TX_HDR_BM WHERE BM_NO = A.NOTA_REQ_NO)
                     WHEN A.NOTA_GROUP_ID = 14
-                      THEN (SELECT TO_CHAR(REC_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(REC_ETD,'DD MONTH YY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
+                      THEN (SELECT TO_CHAR(REC_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(REC_ETD,'DD-MONTH-YYYY') FROM TX_HDR_REC WHERE REC_NO = A.NOTA_REQ_NO)
                     WHEN A.NOTA_GROUP_ID IN (15,19)
-                      THEN (SELECT TO_CHAR(DEL_ETA,'DD MONTH YY')|| ' / ' || TO_CHAR(DEL_ETD,'DD MONTH YY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
+                      THEN (SELECT TO_CHAR(DEL_ETA,'DD-MONTH-YYYY')|| ' / ' || TO_CHAR(DEL_ETD,'DD-MONTH-YYYY') FROM TX_HDR_DEL WHERE DEL_NO = A.NOTA_REQ_NO)
                     END AS PERIODE
             FROM
               TX_HDR_NOTA A
@@ -612,7 +611,7 @@ class PrintAndExport{
               A.NOTA_ID = '$id'
             ";
 
-    $endpoint_url="http://10.88.48.57:5555/restv2/inquiryData/getDataCetak";
+    $endpoint_url="http://10.88.56.40:5556/restv2/inquiryData/getDataCetak";
     $string_json = '{
                    "getDataCetakRequest":{
                       "esbHeader":{
@@ -648,8 +647,10 @@ class PrintAndExport{
     } catch (ClientException $e) {
       return $e->getResponse();
     }
+
     $results  = json_decode($res->getBody()->getContents(), true);
-    $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+    $qrcode   = $results['getDataCetakResponse']['esbBody']['url']; //dari esb
+    $qrcode = "https://eservice.indonesiaport.co.id/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=nota&no=".$header[0]->nota_no; //optional
     $kapal    = DB::connection('omcargo')->select($query);
     $nota     = DB::connection('mdm')->table('TM_NOTA')->where('NOTA_ID', $all['header'][0]->nota_group_id)->get();
     $handa     = $connect->table("V_TX_DTL_NOTA")->where('NOTA_HDR_ID','=', $id)->get();
@@ -678,6 +679,7 @@ class PrintAndExport{
       }
     }
 
+    // return $results;
     $sign        = DB::connection('mdm')->table("TM_SIGNATURE")->where('SIGN_TYPE', "4")->where('SIGN_BRANCH_ID', $branch[0]->branch_id)->where('SIGN_BRANCH_CODE', $branch[0]->branch_code)->get();
     if (!empty($dat["handling"])) {
       $handlingbm  = $dat["handling"];
@@ -685,7 +687,7 @@ class PrintAndExport{
     } else {
       $html       = view('print.invoice',["sign"=>$sign,"label"=>$nota,"qrcode"=>$qrcode,"bl"=>$bl,"branch"=>$branch,"header"=>$header,"penumpukan"=>$penumpukan, "handling"=>$handling, "alat"=>$alat, "kapal"=>$kapal,"terbilang"=>$terbilang]);
     }
-    $filename   = "Test";
+    $filename   = $header[0]->nota_no;
     $dompdf     = new Dompdf();
     $dompdf->set_option('isRemoteEnabled', true);
     $dompdf->loadHtml($html);

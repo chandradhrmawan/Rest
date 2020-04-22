@@ -20,7 +20,6 @@
 		@foreach($header as $header)
 		@foreach($kapal as $kapal)
 		@foreach($sign as $sign)
-
 		<?php if ($header->nota_paid == "I") { ?>
 			<img src="{{ url('/other/belum_lunas.png')}}" alt="" style="position:absolute;opacity:0.3;margin-left:100px;transform: rotate(-30deg);margin-top:300px;width:80%">
 		<?php } ?>
@@ -29,10 +28,10 @@
     <tr>
       <td width="13%"><img src="{{ url('/other/logo_ptp.png') }}" height="70"></td>
 			<td width="45%" style="vertical-align:top;font-size:12px">
-				<div>PT. Pelabuhan Tanjung Priok <br>Jln. Raya Pelabuhan No.9 Tanjung Priok <div style="margin-top:3px;font-size:10px">NPWP. 03.276.305.4-093.000</div></div>
+				<div<b>{{$sign->sign_hdr_name}} <br>{{$sign->sign_hdr_address}} </b><div style="margin-top:5px;font-size:10px">NPWP. {{$sign->sign_hdr_npwp}}</div></div>
 				</td>
-      <td style="vertical-align:top;text-align:right">
-        <table style="border-collapse:collapse; font-size:11px;width:70%">
+      <td width="42%" style="vertical-align:top;text-align:right">
+        <table style="border-collapse:collapse; font-size:10px;width:70%">
           <tr>
             <td>No. Nota</td>
             <td>: {{$header->nota_no}}</td>
@@ -42,7 +41,7 @@
             <td>:
 							<?php
 							$originalDate = $header->nota_date;
-							$newDate = date("d-M-y", strtotime($originalDate));
+							$newDate = date("d F Y", strtotime($originalDate));
 							echo strtoupper($newDate);
 							?>
 						</td>
@@ -105,7 +104,7 @@
 				<tr>
 					<td>No. Request </td>
 					<td>: </td>
-					<td>{{$header->nota_id}}</td>
+					<td>{{$header->nota_req_no}}</td>
 				</tr>
       </table>
     </td>
@@ -134,9 +133,8 @@
 			<tr>
 				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
 				<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
-					<td rowspan="<?php echo $total; ?>" style="padding-left:9px;text-align:center">
-						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, $penumpukan->dtl_id)}}
-						<?php $noa++; ?>
+					<td style="padding-left:9px;text-align:center">
+						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, $penumpukan["dtl_id"])}}
 					</td>
 				<td style="text-align:center">
 					{{number_format($penumpukan["masa1"])}}<br>
@@ -183,8 +181,8 @@
 <?php foreach ($handling as $value) { ?>
 	<tr>
 		<td width="5%"><?php echo $no; $no++; ?></td>
-		<td width="59%" style="text-align:left">{{$value["dtl_group_tariff_name"]}}</td>
-		<td style="text-align:left">IDR</td>
+		<td width="485px" style="text-align:left">{{$value["dtl_group_tariff_name"]}}</td>
+		<td style="text-align:left" width="50px">IDR</td>
 		<td style="text-align:right">{{number_format($value["dtl_dpp"])}}</td>
 	</tr>
 <?php } ?>
@@ -192,8 +190,8 @@
 <?php if ($alat != "0") {?>
 	<?php foreach ($alat as $alat) { ?>
 			<tr>
-				<td width="5%"><?php echo $no;$no++; ?></td>
-				<td width="66%"><?php echo $alat["dtl_group_tariff_name"]; ?></td>
+				<td><?php echo $no;$no++; ?></td>
+				<td><?php echo $alat["dtl_group_tariff_name"]; ?></td>
 				<td style="text-align:left">IDR</td>
 				<td style="text-align:right"><?php echo number_format($alat["dtl_dpp"]); ?></td>
 			</tr>
@@ -202,23 +200,23 @@
 <?php } ?>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
   <tr>
-    <td colspan="7">DASAR PENGENAAN PAJAK</td>
-    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td colspan="7" width="469px">DASAR PENGENAAN PAJAK</td>
+    <td style="text-align:right;padding-right:9px" width="50px">IDR</td>
     <td style="text-align:right">{{number_format($header->nota_dpp)}}</td>
   </tr>
   <tr>
     <td colspan="7">PPN 10%</td>
-    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td style="text-align:right;padding-right:9px" width="50px">IDR</td>
     <td style="text-align:right;border-bottom:solid 1px">{{number_format($header->nota_ppn)}}</td>
   </tr>
   <tr>
     <td style="" colspan="7">Jumlah Tagihan</td>
-    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td style="text-align:right;padding-right:9px" width="50px">IDR</td>
     <td style="text-align:right;">{{number_format($header->nota_amount)}}</td>
   </tr>
 	<tr>
 		<td style="" colspan="7">Uang Jaminan</td>
-		<td style="text-align:right;padding-right:9px">IDR</td>
+		<td style="text-align:right;padding-right:9px" width="50px">IDR</td>
 		<td style="text-align:right">{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no))}}</td>
 	</tr>
 	<tr>
@@ -251,22 +249,31 @@
 		</td>
 		<td style="vertical-align:top">
 			<table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
-				<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->nota_date))); ?></td></tr>
-				<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
-				<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
+				<tr><td>Banten, <?php  echo strtoupper(date("d F Y", strtotime($header->nota_date))); ?></td></tr>
+				<tr><td>{{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+				<tr>
+					<td>
+						<?php if (!empty($sign->sing_file_name)) { ?>
+							<img src="{{$sign->sing_file_name}}" alt="" width="200px">
+						<?php } else { ?>
+							<div style="margin-bottom:50px"><br></div>
+						<?php } ?>
+					</td>
+				</tr>
+				<tr><td><u>{{$sign->sign_name}}</u></td></tr>
 				<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 			</table>
 		</td>
 	</tr>
 </table>
 
-	<div style="position:absolute;bottom:20px;font-size:11px; width:100%">
-		{{$branch->branch_name}} <br>{{$branch->branch_address}}
-		<div style="margin-top:50px;font-size:8px">
-				{{$header->nota_no}}
-		</div>
+<div style="margin-top:180px;font-size:12px; width:100%">
+	{{$sign->sign_footer_name}} <br>{{$sign->sign_footer_address}}
+	<div style="margin-top:10px;font-size:8px">
+			{{$header->nota_no}}
 	</div>
-	<p style="position:absolute;right:0px;bottom:15px;font-size:8px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
+</div>
+<p style="position:absolute;right:0px;margin-top:-20px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
 	@endforeach
 	@endforeach
 	@endforeach

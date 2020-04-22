@@ -509,7 +509,7 @@ class PlgRequestBooking{
             return ['result' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvAR' => $sendInvAR];
 	    }
 
-	    public static function storePaymentPLG($input){
+	    public static function storePaymentPLG($input, $request) {
 	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
 	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
         	$config = json_decode($config->api_set, true);
@@ -521,25 +521,24 @@ class PlgRequestBooking{
             	return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
             $cekNota = TxHdrNota::where([
-            	'nota_no'=>$input['pay_nota_no'],
-            	'nota_status'=>2
-            ])->count();
+            	'nota_no'=>$input['pay_nota_no']
+            ])->whereIn('nota_status',[2,6])->count();
             if ($cekNota == 0) {
             	return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
-			if (empty($input['pay_id'])) {
-		    	$store = new TxPayment;
-		    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
-	              return ["Success"=>false, "result" => "Fail, file is required"];
-	            }
-			}else{
-				$store = TxPayment::find($input['pay_id']);
-				if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
-					if (file_exists($store->pay_file)){
-						unlink($store->pay_file);
-					}
-	      }
-			}
+				if (empty($input['pay_id'])) {
+			    	$store = new TxPayment;
+			    	if (empty($input['pay_file']['PATH']) or empty($input['pay_file']['BASE64']) or empty($input['pay_file'])) {
+		              return ["Success"=>false, "result" => "Fail, file is required"];
+		            }
+				}else{
+					$store = TxPayment::find($input['pay_id']);
+					if (!empty($input['pay_file']['PATH']) and !empty($input['pay_file']['BASE64']) and !empty($input['pay_file'])) {
+						if (file_exists($store->pay_file)){
+							unlink($store->pay_file);
+						}
+		      }
+				}
 
 	    	$store->pay_nota_no = $input['pay_nota_no'];
 	    	$store->pay_req_no = $input['pay_req_no'];
@@ -579,59 +578,88 @@ class PlgRequestBooking{
 	    			]);
 	    		}
 	    	}
-            $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
-            $cekIsCanc = (array)$cekIsCanc;
-	    	$arr = [
-	    	 	'config' => $config,
-	    	 	"nota" => (array)$getNota['attributes'],
-	    	 	"payment" => (array)$pay['attributes'],
-	    	 	'reqCanc' => $cekIsCanc
-			];
-	    	// $sendInvPay = "by pass";
-         	$sendInvPay = PlgEInvo::sendInvPay($arr);
-         	if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
-         		return [
-         			'Success' => false,
-         			'result' => 'Fail, cant send payment invoice',
-         			'no_pay' => $pay->pay_no,
-         			'nota_no' => $getNota->nota_no,
-         			'no_req' => $pay->pay_req_no,
-         			'sendInvPay' => $sendInvPay
-         		];
-         	}
-        	$getNota->nota_status = 3;
-        	$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
-        	$getNota->nota_paid = 'Y';
-        	$getNota->save();
-        	if (empty($cekIsCanc)) {
-	        	$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
-	        	$getReq = (array)$getReq;
-	        	$id = $getReq[$config['head_primery']];
-	        	$table = $config['head_table'];
-        	}else{
-        		$id = $cekIsCanc['cancelled_id'];
-	        	$table = 'TX_HDR_CANCELLED';
-        	}
-        	$sendRequestBooking = null;
-        	if (
-        		(!empty($getReq) and $getReq[$config['head_paymethod']] == 1) or
-        		!empty($cekIsCanc)
-        	) {
-        		$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' => $table, 'config' => $config]);
-        		if (!empty($cekIsCanc)) {
-        			DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id', $cekIsCanc['cancelled_id'])->update([
-        				'cancelled_status' => 9
-        			]);
-        		}
-        	}
-        	return [
-        		'result' => "Success, pay proforma!",
-        		'no_pay' => $pay->pay_no,
-        		'no_nota' => $input['pay_nota_no'],
-        		'no_req' => $pay->pay_req_no,
-        		'sendInvPay' => $sendInvPay,
-        		'sendRequestBooking' => $sendRequestBooking
-        	];
+
+				if (!empty($request["user_id"])) {
+					if ($request["user_id"] == "58") {
+						$getNota->nota_status = 6;
+						$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
+						$getNota->nota_paid = 'W';
+						$getNota->save();
+						return [
+							'result' => "Success, pay proforma, Waiting confirmation Admin !",
+							'no_pay' => $pay->pay_no,
+							'no_nota' => $input['pay_nota_no'],
+							'no_req' => $pay->pay_req_no
+						];
+					}
+				} else {
+					if ($request["user"]->user_id == "58") {
+						$getNota->nota_status = 6;
+						$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
+						$getNota->nota_paid = 'W';
+						$getNota->save();
+						return [
+							'result' => "Success, pay proforma, Waiting confirmation Admin !",
+							'no_pay' => $pay->pay_no,
+							'no_nota' => $input['pay_nota_no'],
+							'no_req' => $pay->pay_req_no
+						];
+					}
+				}
+
+					$cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
+					$cekIsCanc = (array)$cekIsCanc;
+					$arr = [
+						'config' => $config,
+						"nota" => (array)$getNota['attributes'],
+						"payment" => (array)$pay['attributes'],
+						'reqCanc' => $cekIsCanc
+					];
+					// $sendInvPay = "by pass";
+					$sendInvPay = PlgEInvo::sendInvPay($arr);
+					if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
+						return [
+							'Success' => false,
+							'result' => 'Fail, cant send payment invoice',
+							'no_pay' => $pay->pay_no,
+							'nota_no' => $getNota->nota_no,
+							'no_req' => $pay->pay_req_no,
+							'sendInvPay' => $sendInvPay
+						];
+					}
+					$getNota->nota_status = 3;
+					$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
+					$getNota->nota_paid = 'Y';
+					$getNota->save();
+					if (empty($cekIsCanc)) {
+						$getReq = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$getNota->nota_req_no)->first();
+						$getReq = (array)$getReq;
+						$id = $getReq[$config['head_primery']];
+						$table = $config['head_table'];
+					}else{
+						$id = $cekIsCanc['cancelled_id'];
+						$table = 'TX_HDR_CANCELLED';
+					}
+					$sendRequestBooking = null;
+					if (
+						(!empty($getReq) and $getReq[$config['head_paymethod']] == 1) or
+						!empty($cekIsCanc)
+					) {
+						$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' => $table, 'config' => $config]);
+						if (!empty($cekIsCanc)) {
+							DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id', $cekIsCanc['cancelled_id'])->update([
+								'cancelled_status' => 9
+							]);
+						}
+					}
+					return [
+						'result' => "Success, pay proforma!",
+						'no_pay' => $pay->pay_no,
+						'no_nota' => $input['pay_nota_no'],
+						'no_req' => $pay->pay_req_no,
+						'sendInvPay' => $sendInvPay,
+						'sendRequestBooking' => $sendRequestBooking
+						];
 	    }
 	// PLG
 }

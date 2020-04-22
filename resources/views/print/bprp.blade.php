@@ -27,7 +27,7 @@
     <tr>
       <td width="10%"><img src="{{ url('/other/logo.jpg') }}" height="110"></td>
 			<td width="55%">
-				<div style="font-size:16px;"><b>PT. Pelabuhan Indonesia II (Persero)<br> Jl. Pasoso No.1, Tanjung Priok, Jakarta Utara 1430 </b></div>
+				<div><b>{{$sign->sign_hdr_name}} <br>{{$sign->sign_hdr_address}} </b><div style="margin-top:5px;font-size:10px">NPWP. {{$sign->sign_hdr_npwp}}</div></div>
         <p style="font-size:12px;">NPWP. 01.061.005.3-093.000</p>
 				</td>
         <td style="vertical-align:top">ID BPRP : {{$header->bprp_no}}</td>
@@ -143,6 +143,18 @@
           <td>:</td>
           <td>{{$header->bprp_kade_name}}</td>
         </tr>
+        <!-- <tr>
+          <td>11.</td>
+          <td>No. BPRP Lanjutan</td>
+          <td>:</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>12.</td>
+          <td>Keterangan Lain</td>
+          <td>:</td>
+          <td></td>
+        </tr> -->
       </table>
     </td>
 	</tr>
@@ -189,17 +201,17 @@
 </table>
 <table style="border-collapse:collapse; font-size:11px;margin-top:60px;float:right;text-align:center">
 	<tr><td>Banten, <?php  echo strtoupper(date("d-M-y", strtotime($header->bprp_date))); ?></td></tr>
-	<tr><td>A.N. {{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
+	<tr><td>{{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
 	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
 	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 </table>
 
-	<div style="position:absolute;bottom:20px;font-size:12px; width:100%">
-		{{$branch->branch_name}} <br>{{$branch->branch_address}}
-		<div style="margin-top:50px;font-size:11px">
-				{{$header->bprp_no}}
-		</div>
+<div style="position:absolute;bottom:150px;font-size:12px; width:100%">
+	{{$sign->sign_footer_name}} <br>{{$sign->sign_footer_address}}
+	<div style="margin-top:10px;font-size:8px">
+			{{$header->bprp_no}}
 	</div>
+</div>
 	<p style="position:absolute;right:20px;bottom:0px;font-size:11px">Print Date : <?php echo date("d-M-Y H:s:i")." | Page 1/1"; ?></p>
 	@endforeach
   @endforeach
