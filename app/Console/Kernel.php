@@ -30,5 +30,6 @@ class Kernel extends ConsoleKernel
       $schedule->call('App\Helper\ConnectedExternalApps@sendNotifToIBISQA')->everyMinute();
       $schedule->call('App\Helper\PlgConnectedExternalApps@flagRealisationRequest');
       $schedule->call('App\Helper\PlgConnectedExternalApps@getUpdatePlacement');
+      $schedule->call('App\Helper\PlgConnectedExternalApps@getUpdateRename');
     }
 }

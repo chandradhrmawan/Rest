@@ -103,6 +103,159 @@ class PlgConnectedExternalApps{
 			return ["result"=>$result, "count"=>count($result)];
 		}
 
+		public static function getUpdateRename() {
+			$json = '
+		  {
+		    "action" : "generateRename"
+		  }';
+
+		  $json = base64_encode(json_encode(json_decode($json,true)));
+		  $json = '
+		    {
+		        "repoGetRequest": {
+		            "esbHeader": {
+		                "internalId": "",
+		                "externalId": "",
+		                "timestamp": "",
+		                "responseTimestamp": "",
+		                "responseCode": "",
+		                "responseMessage": ""
+		            },
+		            "esbBody": {
+		                "request": "'.$json.'"
+		            },
+		            "esbSecurity": {
+		                "orgId": "",
+		                "batchSourceId": "",
+		                "lastUpdateLogin": "",
+		                "userId": "",
+		                "respId": "",
+		                "ledgerId": "",
+		                "respAppId": "",
+		                "batchSourceName": ""
+		            }
+		        }
+		    }
+		      ';
+		  $json = json_encode(json_decode($json,true));
+		  $arr = [
+		          "user"		 	=> config('endpoint.tosGetPLG.user'),
+		          "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		          "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		          "json" 		 	=> $json
+		        ];
+		  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		  $res				 			 	= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+			if (empty($res["result"]["result"])) {
+				return "TX_RENAME Up to Date";
+			}
+
+			// return $res["result"]["result"];
+
+			foreach ($res["result"]["result"] as $result) {
+					if (empty($result["RENAMED_CONT"])) {
+						$error[] = $result["RENAMED_CONT_OLD"];
+					} else {
+					// For TS_CONTAINER
+					$tsContainer 	 		= DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT"])->first();
+					// Rename Not Exist
+					if (empty($tsContainer->cont_no)) {
+						$updateData 		= [
+							"CONT_NO" 		=> $result["RENAMED_CONT"],
+						];
+						$updateContOld 	= DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT_OLD"])->update($updateData);
+						$updateHistOld  = DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where('NO_CONTAINER', $result["RENAMED_CONT_OLD"])->update(["NO_CONTAINER"=>$result["RENAMED_CONT"]]);
+					} else {
+						$tsContainerOld = DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT_OLD"])->first();
+						$counter 				= $tsContainer->cont_counter + 1;
+						$contLocOld 		= $tsContainerOld->cont_location;
+						$dataUpdate 		= [
+							"CONT_COUNTER"  => $counter,
+							"CONT_LOCATON" 	=> $contLocOld,
+						];
+						$dataUpdateHist = [
+							"COUNTER"  		 => $counter,
+							"NO_CONTAINER" => $result["RENAMED_CONT"]
+						];
+						$updateTsCont 	= DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT"])->update($dataUpdate);
+						$updateHist		  = DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where('NO_CONTAINER', $result["RENAMED_CONT_OLD"])->update($dataUpdateHist);
+
+					}
+
+					// FOR REQUEST
+					$request = [
+						"TX_DTL_REC" 		=> "REC_DTL_CONT",
+						"TX_DTL_STUFF" 	=> "STUFF_DTL_CONT",
+						"TX_DTL_PLUG" 	=> "PLUG_DTL_CONT",
+						"TX_DTL_FUMI" 	=> "FUMI_DTL_CONT",
+						"TX_DTL_STRIPP" => "STRIPP_DTL_CONT",
+						"TX_DTL_TL"  		=> "TL_DTL_CONT"
+					];
+
+					foreach ($request as $key => $value) {
+					  $field = strtolower($value);
+						$getRequest 		= DB::connection('omuster')->table($key)->where($value, $result["RENAMED_CONT_OLD"])->first();
+						if (!empty($getRequest->$field)) {
+							$updateReq 			 = [
+								"$value" => $result["RENAMED_CONT"]
+							];
+							$updateReqDtlCont = DB::connection('omuster')->table($key)->where($value, $result["RENAMED_CONT_OLD"])->update($updateReq);
+						}
+					}
+
+					//Update Repo
+					$json = '
+				  {
+				    "action" : "getUpateRename",
+						"header" : {
+						 "BRANCH_ID" : "'.$result["RENAMED_BRANCH_ID"].'",
+						 "CONT_NO" : "'.$result["RENAMED_CONT_OLD"].'"
+						}
+				  }';
+					$json = base64_encode(json_encode(json_decode($json,true)));
+	        $json = '
+					{
+					    "repoPostRequest": {
+					        "esbHeader": {
+					            "internalId": "",
+					            "externalId": "",
+					            "timestamp": "",
+					            "responseTimestamp": "",
+					            "responseCode": "",
+					            "responseMessage": ""
+					        },
+					        "esbBody": {
+					            "request": "'.$json.'"
+					        },
+					        "esbSecurity": {
+					            "orgId": "",
+					            "batchSourceId": "",
+					            "lastUpdateLogin": "",
+					            "userId": "",
+					            "respId": "",
+					            "ledgerId": "",
+					            "respAppId": "",
+					            "batchSourceName": ""
+					        }
+					    }
+					}
+	        ';
+	        $opt = [
+	        	"user" => config('endpoint.tosPostPLG.user'),
+	        	"pass" => config('endpoint.tosPostPLG.pass'),
+	        	"target" => config('endpoint.tosPostPLG.target'),
+	        	"json" => json_encode(json_decode($json,true))
+	        ];
+	        $res = static::sendRequestToExtJsonMet($opt);
+	        $res = PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoPost');
+					$containerUpdate[] = $res["result"]["CONT_NO"];
+				}
+			}
+
+			return ["Success" => $containerUpdate, "Rename Not Found"=>$error];
+		}
+
 		public static function getUpdatePlacement(){
 		  $all 						 = [];
 		  $det 						 = DB::connection('omuster')->table('TX_DTL_REC')->where('REC_FL_REAL', "2")->get();
