@@ -45,6 +45,7 @@ class PlgRequestBooking{
 
 				// Tambahan Untuk Koreksi
 				if (!empty($findCanc)) $headU->nota_no = $tarif['tax_code'].substr($getNotaNoReqCanc,3);
+				$headU->nota_id = $tarif['nota_id'];
 				$headU->app_id = $find['app_id'];
 				$headU->nota_group_id = $tarif['nota_id'];
 				$headU->nota_org_id = $tarif['branch_org_id'];
