@@ -353,6 +353,7 @@ class ViewExt{
                 ->selectraw($selectraw)
                 ->join('TM_NOTA B', 'A.NOTA_ID', '=', 'B.NOTA_ID')
                 ->join('TM_BRANCH C', 'A.BRANCH_CODE', '=', 'C.BRANCH_CODE')
+                ->orderBy('A.COMP_NOTA_ORDER', "ASC")
                 ->groupBy($grupbyraw);
 
     if(!empty($input["where"][0])) {

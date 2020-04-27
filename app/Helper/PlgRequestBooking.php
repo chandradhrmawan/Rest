@@ -593,21 +593,7 @@ class PlgRequestBooking{
 							'no_req' => $pay->pay_req_no
 						];
 					}
-				} else {
-					if ($request["user"]->user_id == "58") {
-						$getNota->nota_status = 6;
-						$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
-						$getNota->nota_paid = 'W';
-						$getNota->save();
-						return [
-							'result' => "Success, pay proforma, Waiting confirmation Admin !",
-							'no_pay' => $pay->pay_no,
-							'no_nota' => $input['pay_nota_no'],
-							'no_req' => $pay->pay_req_no
-						];
-					}
 				}
-
 					$cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
 					$cekIsCanc = (array)$cekIsCanc;
 					$arr = [
