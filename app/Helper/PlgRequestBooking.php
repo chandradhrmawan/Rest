@@ -580,7 +580,9 @@ class PlgRequestBooking{
 	    		}
 	    	}
 
-				if (!empty($request["user_id"])) {
+				// If Send From E-Service
+				if (!empty($request["user_id"]) || !isset($request["user"])) {
+					$request = json_decode(json_encode($request), true);
 					if ($request["user_id"] == "58") {
 						$getNota->nota_status = 6;
 						$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
@@ -594,6 +596,7 @@ class PlgRequestBooking{
 						];
 					}
 				}
+				
 					$cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
 					$cekIsCanc = (array)$cekIsCanc;
 					$arr = [
