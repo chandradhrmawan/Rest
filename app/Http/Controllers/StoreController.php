@@ -86,11 +86,9 @@ class StoreController extends Controller
     public function storeTsNota($input, $request){
       if ($input['flag_status'] == 'Y') {
         $cekSelf = DB::connection('mdm')->table('TS_NOTA')->where([
-          "flag_status" => $input['flag_status'],
           "branch_id" => $input['branch_id'],
           "branch_code" => $input['branch_code'],
-          "nota_id" => $input['nota_id'],
-          "nota_id_parent" => $input['nota_id_parent']
+          "nota_id" => $input['nota_id']
         ])->first();
         if (empty($cekSelf->nota_ext_id)) {
           $cekActive = DB::connection('mdm')->table('TS_NOTA')->where([
