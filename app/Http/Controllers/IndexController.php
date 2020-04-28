@@ -80,6 +80,24 @@ class IndexController extends Controller
           $data->skip($input['start'])->take($input['limit']);
         }
       }
+
+      if (!empty($input["filter"])) {
+      $search   = $input["filter"];
+      if (!is_array($search)) {
+        $search = json_decode($search, TRUE);
+      }
+      foreach ($search as $value) {
+        if ($value["operator"] == "like")
+          $data->Where(strtoupper($value["property"]),$value["operator"],"%".strtoupper($value["value"])."%");
+        else if($value["operator"] == "eq")
+          $data->whereDate($value["property"],'=',$value["value"]);
+        else if($value["operator"] == "gt")
+          $data->whereDate($value["property"],'>=',$value["value"]);
+        else if($value["operator"] == "lt")
+          $data->whereDate($value["property"],'<=',$value["value"]);
+        }
+      }
+
       $data = $data->get();
 
 

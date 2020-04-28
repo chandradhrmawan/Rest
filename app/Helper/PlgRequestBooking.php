@@ -45,7 +45,7 @@ class PlgRequestBooking{
 
 				// Tambahan Untuk Koreksi
 				if (!empty($findCanc)) $headU->nota_no = $tarif['tax_code'].substr($getNotaNoReqCanc,3);
-				$headU->nota_id = $tarif['nota_id'];
+				// $headU->nota_id = $tarif['nota_id'];
 				$headU->app_id = $find['app_id'];
 				$headU->nota_group_id = $tarif['nota_id'];
 				$headU->nota_org_id = $tarif['branch_org_id'];
@@ -213,14 +213,7 @@ class PlgRequestBooking{
 		}
 
 	    public static function sendRequestPLG($input){
-			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
-			if (empty($config) or empty($config->api_set)) {
-				return ['Success' => false, 'result_msg' => "Fail, nota not set!"];
-			}
-			if ($config->flag_status == 'N') {
-				return ['Success' => false, 'result_msg' => "Fail, nota not active!"];
-			}
-			$config = json_decode($config->api_set, true);
+			$config	 = static::getApiConfig($input);
 
 			// request batal
 			$canceledReqPrepare = null;
@@ -596,7 +589,7 @@ class PlgRequestBooking{
 						];
 					}
 				}
-				
+
 					$cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
 					$cekIsCanc = (array)$cekIsCanc;
 					$arr = [
@@ -651,5 +644,30 @@ class PlgRequestBooking{
 						'sendRequestBooking' => $sendRequestBooking
 						];
 	    }
+
+			public static function getApiConfig($input) {
+				$getTmNota 	 = DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
+				$notaConfig  = json_decode($getTmNota->nota_config_request, TRUE);
+				$getRequest  = json_decode(json_encode(DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["pk"], $input['id'])->first()), TRUE);
+				$branch_code = $getRequest[$notaConfig["branch_code"]];
+				$branch_id 	 = $getRequest[$notaConfig["branch_id"]];
+				$whereConfig = [
+						"nota_id" => $input['nota_id'],
+						"branch_id" => $branch_id,
+						"branch_code" => $branch_code
+				];
+
+				$config = DB::connection('mdm')->table('TS_NOTA')->where($whereConfig)->first();
+
+				if (empty($config) or empty($config->api_set)) {
+					return ['Success' => false, 'result_msg' => "Fail, nota not set!"];
+				}
+				if ($config->flag_status == 'N') {
+					return ['Success' => false, 'result_msg' => "Fail, nota not active!"];
+				}
+				$config = json_decode($config->api_set, true);
+
+				return $config;
+			}
 	// PLG
 }
