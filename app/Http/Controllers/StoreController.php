@@ -96,7 +96,7 @@ class StoreController extends Controller
             "branch_id" => $input['branch_id'],
             "branch_code" => $input['branch_code'],
             "nota_id_parent" => $input['nota_id_parent']
-          ])->count();
+          ])->whereNull('nota_ext_id')->count();
           if ($cekActive > 0 ) {
             return [ "Success" => false, "response" => "Fail, tidak boleh ada 2 data yang active" ];
           }
