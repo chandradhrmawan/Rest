@@ -44,8 +44,12 @@ class PlgRequestBooking{
 				}
 
 				// Tambahan Untuk Koreksi
-				if (isset($getNotaNoReqCanc)) {$headU->nota_no = $tarif['tax_code'].substr($getNotaNoReqCanc,3);}
-				$headU->nota_id = $tarif['nota_id'];
+				if (isset($getNotaNoReqCanc)) {
+					$sequence = DB::connection('omuster')->table("SYS.DUAL")->select("SEQ_TX_HDR_NOTA.NEXTVAL")->get();
+		      $sequence = $sequence[0]->nextval;
+					$headU->nota_id = $sequence;
+					$headU->nota_no = $tarif['tax_code'].substr($getNotaNoReqCanc,3);
+				}
 				$headU->app_id = $find['app_id'];
 				$headU->nota_group_id = $tarif['nota_id'];
 				$headU->nota_org_id = $tarif['branch_org_id'];
@@ -213,8 +217,8 @@ class PlgRequestBooking{
 		}
 
 	    public static function sendRequestPLG($input){
-			$config	 = static::getApiConfig($input);
-
+			return $config	 = static::getApiConfig($input);
+			$config 	= $config['config'];
 			// request batal
 			$canceledReqPrepare = null;
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
@@ -646,12 +650,21 @@ class PlgRequestBooking{
 	    }
 
 			public static function getApiConfig($input) {
-				$getTmNota 	 = DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
-				$notaConfig  = json_decode($getTmNota->nota_config_request, TRUE);
-				$getRequest  = json_decode(json_encode(DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["pk"], $input['id'])->first()), TRUE);
-				$branch_code = $getRequest[$notaConfig["branch_code"]];
-				$branch_id 	 = $getRequest[$notaConfig["branch_id"]];
-				$whereConfig = [
+				$getTmNota 	 	= DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
+				$notaConfig  	= json_decode($getTmNota->nota_config_request, TRUE);
+				if (!empty($input['canceled']) and $input['canceled'] == 'true') {
+					$tableCanc 	= DB::connection('omuster')->table('TX_HDR_CANCELLED')->where("CANCELLED_ID", $input['id'])->first();
+					$canclReqNo	= $tableCanc->cancelled_req_no;
+					// $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->get();
+					$getRequest  	= json_decode(json_encode(DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->first()), TRUE);
+				} else {
+					// $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["pk"], $input['id'])->get();
+					$getRequest  	= json_decode(json_encode(DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["pk"], $input['id'])->first()), TRUE);
+
+				}
+				$branch_code 	= $getRequest[$notaConfig["branch_code"]];
+				$branch_id 	 	= $getRequest[$notaConfig["branch_id"]];
+				$whereConfig 	= [
 						"nota_id" => $input['nota_id'],
 						"branch_id" => $branch_id,
 						"branch_code" => $branch_code
@@ -667,7 +680,7 @@ class PlgRequestBooking{
 				}
 				$config = json_decode($config->api_set, true);
 
-				return $config;
+				return ['Success' => true, 'config'=>$config, 'branch_id'=>$branch_id, 'branch_code'=>$branch_code];
 			}
 	// PLG
 }
