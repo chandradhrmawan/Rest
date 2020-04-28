@@ -85,14 +85,21 @@ class StoreController extends Controller
 
     public function storeTsNota($input, $request){
       if ($input['flag_status'] == 'Y') {
-        $cekActive = DB::connection('mdm')->table('TS_NOTA')->where([
-          "flag_status" => $input['flag_status'],
+        $cekSelf = DB::connection('mdm')->table('TS_NOTA')->where([
           "branch_id" => $input['branch_id'],
           "branch_code" => $input['branch_code'],
-          "nota_id_parent" => $input['nota_id_parent']
-        ])->count();
-        if ($cekActive > 0 ) {
-          return [ "Success" => false, "response" => "Fail, tidak boleh ada 2 data yang active" ];
+          "nota_id" => $input['nota_id']
+        ])->first();
+        if (empty($cekSelf->nota_ext_id)) {
+          $cekActive = DB::connection('mdm')->table('TS_NOTA')->where([
+            "flag_status" => $input['flag_status'],
+            "branch_id" => $input['branch_id'],
+            "branch_code" => $input['branch_code'],
+            "nota_id_parent" => $input['nota_id_parent']
+          ])->count();
+          if ($cekActive > 0 ) {
+            return [ "Success" => false, "response" => "Fail, tidak boleh ada 2 data yang active" ];
+          }
         }
       }
 
