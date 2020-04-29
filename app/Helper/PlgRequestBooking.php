@@ -650,12 +650,14 @@ class PlgRequestBooking{
 	    }
 
 			public static function getApiConfig($input) {
+				// $getTmNota 	 	= DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
+				// return $getTmNota->nota_config_request;
 				$getTmNota 	 	= DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
-				$notaConfig  	= json_decode($getTmNota->nota_config_request, TRUE);
+				return $notaConfig  	= json_decode($getTmNota->nota_config_request, TRUE);
 				if (!empty($input['canceled']) and $input['canceled'] == 'true') {
 					$tableCanc 	= DB::connection('omuster')->table('TX_HDR_CANCELLED')->where("CANCELLED_ID", $input['id'])->first();
-					$canclReqNo	= $tableCanc->cancelled_req_no;
-					// $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->get();
+					return $canclReqNo	= $tableCanc->cancelled_req_no;
+					// return $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->get();
 					$getRequest  	= json_decode(json_encode(DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->first()), TRUE);
 				} else {
 					// $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["pk"], $input['id'])->get();
