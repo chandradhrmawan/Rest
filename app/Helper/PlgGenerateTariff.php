@@ -198,7 +198,7 @@ class PlgGenerateTariff{
 
 	private static function getDTL_STACK_AREA($config,$list,$hdr,$input){
 		$DTL_STACK_AREA = 'NULL';
-		if ($config['head_table'] == "TX_HDR_DEL" || $config['head_table'] == 'TX_HDR_DEL_CARGO') {
+		if ($config['head_table'] == "TX_HDR_DEL") {
 			$DTL_STACK_AREA = '1';
 		}
 		if (!empty($config['DTL_STACK_AREA'])) {
@@ -588,7 +588,7 @@ class PlgGenerateTariff{
 			}else{
 				$dateOO = 'to_date(\''.\Carbon\Carbon::parse($list['DTL_DATE_OUT_OLD'])->format('Y-m-d H:i:s').'\',\'YYYY-MM-DD HH24:MI:SS\')';
 			}
-			
+
 			$newD = [];
 			$newD['DTL_VIA'] = $list['DTL_VIA'];
 			$newD['DTL_BL'] = $list['DTL_BL'];
