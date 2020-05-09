@@ -70,15 +70,15 @@
           </td>
         </tr>
         <tr>
-          <td width="10%">Perusahaan</td>
+          <td width="10%">Nama</td>
           <td width="1%">: </td>
           <td>{{$header->nota_cust_name}}</td>
         </tr>
-				<tr>
-          <td>Pemilik</td>
+				<!-- <tr>
+          <td>Nomor</td>
           <td>: </td>
           <td>{{$header->nota_cust_id}}</td>
-        </tr>
+        </tr> -->
         <tr>
           <td>Alamat</td>
           <td>: </td>
@@ -89,39 +89,29 @@
           <td>: </td>
           <td>{{$header->nota_cust_npwp}}</td>
         </tr>
-				<tr>
-					<td>No Doc</td>
-					<td>: </td>
-					<td>{{$header->nota_req_no}}</td>
-				</tr>
       </table>
     </td>
 		<td>
 			<table style="border-collapse:collapse; font-size:11px;">
 				<tr>
-          <td>Kade</td>
+          <td>No. DO</td>
           <td>: </td>
           <td>-</td>
         </tr>
 				<tr>
-          <td>No I BPR/BL/DO</td>
-          <td>: </td>
-          <td>-</td>
-        </tr>
-				<!-- <tr>
           <td>PBM</td>
           <td>: </td>
           <td>{{$header->nota_pbm_name}}</td>
-        </tr> -->
+        </tr>
 				<tr>
-          <td>Kapal/Voy/Tgl</td>
+          <td>Nama Kapal</td>
           <td>: </td>
           <td>{{$header->nota_vessel_name}}</td>
         </tr>
 				<tr>
-					<td>Jenis Perdagangan </td>
+					<td>Periode Kunjungan </td>
 					<td>: </td>
-					<td>-</td>
+					<td>{{$header->nota_id}}</td>
 				</tr>
       </table>
     </td>
@@ -171,30 +161,20 @@
 ?>
 <table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
 	<tr style="text-transform:uppercase;font-weight:800">
-		<th width="15%" style="border-top:solid 1px;border-bottom:solid 1px;">Keterangan</th>
-		<th width="10%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Tgl Awal</th>
-		<th width="10%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Tgl Akhir</th>
-		<th width="1%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Box</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Sz</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Ty</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">St</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Hz</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Hr</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px;text-align:center">Tarif</th>
-		<th width="5%" style="border-top:solid 1px;border-bottom:solid 1px">Val</th>
-		<th width="10%" style="border-top:solid 1px;border-bottom:solid 1px;">Jumlah</th>
+		<th width="5%" style="border-bottom:solid 1px;text-align:center">No</th>
+		<th width="15%" style="border-bottom:solid 1px">Layanan</th>
+		<th width="10%" style="border-bottom:solid 1px">Container</th>
+		<th width="1%" style="border-bottom:solid 1px;text-align:center">Qty</th>
+		<th width="10%" style="border-bottom:solid 1px;text-align:center">Tarif Dasar</th>
+		<th width="5%" style="border-bottom:solid 1px"></th>
+		<th width="10%" style="border-bottom:solid 1px">Jumlah</th>
 	</tr>
 	@foreach($detail as $detail)
 	<tr>
+		<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
 		<td>{{$detail->group_tariff_name}}</td>
-		<td style="text-align:center">-</td>
-		<td style="text-align:center">-</td>
+		<td style="text-align:left">{{$detail->cont_size}} / {{$detail->cont_type}} / {{$detail->cont_status}}</td>
 		<td style="text-align:center">{{$detail->qty}}</td>
-		<td style="text-align:center">{{$detail->cont_size}}</td>
-		<td style="text-align:center">{{$detail->cont_type}}</td>
-		<td style="text-align:center">{{$detail->cont_status}}</td>
-		<td style="text-align:center">-</td>
-		<td style="text-align:center">-</td>
 		<td style="text-align:right">{{number_format($detail->tariff)}}</td>
 		<td>IDR</td>
 		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
@@ -203,70 +183,47 @@
 	<?php	if ($penumpukan != 0) { ?>
 		@foreach($penumpukan as $penumpukan)
 		<tr>
+			<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
 			<td>{{$penumpukan->group_tariff_name}}</td>
-			<td style="text-align:center">-</td>
-			<td style="text-align:center">-</td>
+			<td style="text-align:left">{{$penumpukan->cont_size}} / {{$penumpukan->cont_type}} / {{$penumpukan->cont_status}}</td>
 			<td style="text-align:center">{{$penumpukan->qty}}</td>
-			<td style="text-align:center">{{$penumpukan->cont_size}}</td>
-			<td style="text-align:center">{{$penumpukan->cont_type}}</td>
-			<td style="text-align:center">{{$penumpukan->cont_status}}</td>
-			<td style="text-align:center">-</td>
-			<td style="text-align:center">-</td>
 			<td style="text-align:right">{{number_format($penumpukan->tariff)}}</td>
 			<td>IDR</td>
-			<td style="text-align:right">{{number_format($detail->dpp)}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->dpp)}}</td>
 		</tr>
 		@endforeach
 	<?php } ?>
-	<tr>
-		<td colspan="12" style="border-bottom:solid 1px;"></td>
-	</tr>
 </table>
 <?php } ?>
 
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
-	<tr>
-    <td colspan="7" style="text-align:right">Discount</td>
-    <td style="text-align:right;">:</td>
-    <td style="text-align:right">0</td>
-  </tr>
-	<tr>
-    <td colspan="7" style="text-align:right">Administrasi</td>
-    <td style="text-align:right;">:</td>
-    <td style="text-align:right">0</td>
-  </tr>
-	<tr>
-    <td colspan="7" style="text-align:right">Dasar Pengenaan Pajak</td>
-    <td style="text-align:right;">:</td>
+  <tr>
+    <td colspan="7">DASAR PENGENAAN PAJAK</td>
+    <td style="text-align:right;padding-right:9px">IDR</td>
     <td style="text-align:right">{{number_format($header->nota_dpp)}}</td>
   </tr>
   <tr>
-    <td colspan="7" style="text-align:right">Jumlah PPN</td>
-    <td style="text-align:right;">:</td>
-    <td style="text-align:right;">{{number_format($header->nota_ppn)}}</td>
+    <td colspan="7">PPN 10%</td>
+    <td style="text-align:right;padding-right:9px">IDR</td>
+    <td style="text-align:right;border-bottom:solid 1px">{{number_format($header->nota_ppn)}}</td>
   </tr>
-  <!-- <tr>
-    <td colspan="7" style="text-align:right">Jumlah Tagihan</td>
-    <td style="text-align:right;">:</td>
+  <tr>
+    <td style="" colspan="7">Jumlah Tagihan</td>
+    <td style="text-align:right;padding-right:9px">IDR</td>
     <td style="text-align:right;">{{number_format($header->nota_amount)}}</td>
-  </tr> -->
+  </tr>
 	<tr>
-		<td colspan="7" style="text-align:right">Materai</td>
-		<td style="text-align:right;">:</td>
-		<td style="text-align:right">0</td>
-	</tr>
-	<tr>
-		<td colspan="7" style="text-align:right">Jumlah Dibayar</td>
-		<td style="text-align:right;">:</td>
+		<td style="" colspan="7">Uang Pembayaran</td>
+		<td style="text-align:right;padding-right:9px">IDR</td>
 		<td style="text-align:right">{{number_format($bayar)}}</td>
 	</tr>
-	<!-- <tr>
-		<td colspan="7" style="text-align:right">
+	<tr>
+		<td style="" colspan="7">
 			<b>Piutang</b>
 		</td>
-		<td style="text-align:right;"><b>:</b></td>
+		<td style="text-align:right;padding-right:9px"><b>IDR</b></td>
 		<td style="text-align:right"><b>{{number_format($total)}}</b></td>
-	</tr> -->
+	</tr>
 </table>
 <p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="width:100%">

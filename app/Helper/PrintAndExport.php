@@ -715,14 +715,13 @@ class PrintAndExport{
     } else {
       $uper      = 0;
     }
-    $notaAmount  = $header[0]->nota_amount;
+    $notaAmount  = ceil($header[0]->nota_amount);
     $payAmount   = $uper;
     $total       = $notaAmount - $payAmount;
-    $terbilang   = static::terbilang($total);
-    if($terbilang == 0) {
-      $terbilang  = "Nol";
-    }
-
+    $terbilang   = static::terbilang($notaAmount);
+    // if($terbilang == 0) {
+    //   $terbilang  = "Nol";
+    // }
     if (empty($penumpukan)) {
       $penumpukan = 0;
     }

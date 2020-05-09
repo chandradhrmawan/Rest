@@ -58,10 +58,14 @@ class PlgGenerateTariff{
 		if (empty($config['DTL_VIA'])) {
 			$DTL_VIA = 'NULL';
 		} else if (is_array($config['DTL_VIA'])) {
-			if ($list[$config['DTL_VIA']['rec']]+$list[$config['DTL_VIA']['del']] >= 2) {
-				$DTL_VIA = 2;
-			}else{
-				$DTL_VIA = 1;
+			if ($input["nota_id"] == 20) {
+				if ($list[$config['DTL_VIA']['rec']]+$list[$config['DTL_VIA']['del']] >= 2) {
+					$DTL_VIA = 2;
+				}else{
+					$DTL_VIA = 1;
+				}
+			} else {
+				$DTL_VIA = empty($list[$config['DTL_VIA']['rec']]) ? 'NULL' : $list[$config['DTL_VIA']['rec']];
 			}
 		} else {
 			$DTL_VIA = empty($list[$config['DTL_VIA']]) ? 'NULL' : $list[$config['DTL_VIA']];
