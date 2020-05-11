@@ -180,7 +180,7 @@ class PlgFunctTOS{
 				if ($config['kegiatan_real'] == 3) { //kusus gate in
 					$cont_counter++;
 				}
-				$keg_real = $config['kegiatan_real']
+				$keg_real = $config['kegiatan_real'];
 				if (is_array($keg_real)) {
 					$keg_real = $keg_real[1];
 				}
