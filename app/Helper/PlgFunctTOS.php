@@ -331,7 +331,8 @@ class PlgFunctTOS{
 			$config['head_forigen'] => $hdr[$config['head_primery']],
 			$config['DTL_BL'] => $listR['NO_CONTAINER']
 		])->update([
-			$config['DTL_REAL_DATE']['uster'] =>date('Y-m-d H:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tos']]))
+			$config['DTL_REAL_DATE']['uster'] => date('Y-m-d H:i:s', strtotime($listR[$config['DTL_REAL_DATE']['tos']])),
+			$config['DTL_IS_ACTIVE'] => 'N'
 		]);
 
 		return ["real_val" => $config['DTL_FL_REAL_V'], "real_date" => $listR[$config['DTL_REAL_DATE']['tos']]];
@@ -341,11 +342,11 @@ class PlgFunctTOS{
 		if ($listR["STATUS_PLUG"] == 1) {
 			$ret_val =  $config['DTL_FL_REAL_V'][0];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['usterStart'] => date('Y-m-d H:i:s', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['usterStart'] => date('Y-m-d H:i:s', strtotime($ret_date)), $config['DTL_IS_ACTIVE'] => 'N' ];
 		}else if ($listR["STATUS_PLUG"] == 2){
 			$ret_val = $config['DTL_FL_REAL_V'][1];
 			$ret_date = $listR[$config['DTL_REAL_DATE']['date']];
-			$up = [ $config['DTL_REAL_DATE']['usterEnd'] => date('Y-m-d H:i:s', strtotime($ret_date)) ];
+			$up = [ $config['DTL_REAL_DATE']['usterEnd'] => date('Y-m-d H:i:s', strtotime($ret_date)), $config['DTL_IS_ACTIVE'] => 'N' ];
 		}
 
 		DB::connection('omuster')->table($config['head_tab_detil'])->where([
@@ -359,7 +360,7 @@ class PlgFunctTOS{
 	public static function storeRealDateRec($listR,$hdr,$config,$input) {
 		$recBrgJml 									= $listR["JUMLAH"];
 		$noRequest									= $listR["NO_REQUEST"];
-		$realDate 									= date('Y-m-d', strtotime($listR["REAL_DATE"]));
+		$realDate 									= date('Y-m-d H:i:s', strtotime($listR["REAL_DATE"]));
 
 		$findDtlRecBrg 							= [
 			"REC_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
@@ -380,7 +381,7 @@ class PlgFunctTOS{
 		$storeRealisasi 						= [
 			"REAL_CREATE_BY" 					=> $listR["REAL_STORAGE_CREATE_BY"],
 			"REAL_CREATE_DATE"				=> "",
-			"REAL_DATE"								=> date('Y-m-d', strtotime($listR["REAL_DATE"])),
+			"REAL_DATE"								=> date('Y-m-d H:i:s', strtotime($listR["REAL_DATE"])),
 			"REAL_ID"									=> $listR["REAL_STORAGE_ID"],
 			"REAL_QTY"								=> $listR["JUMLAH"],
 			"REAL_REFF_REQ_NO"				=> "",
@@ -419,7 +420,7 @@ class PlgFunctTOS{
 		$delBrgRealDate							= $listR["REAL_DATE"];
 		$delBrgJml 									= $listR["JUMLAH"];
 		$noRequest	 								= $listR["NO_REQUEST"];
-		$realDate 									= date('Y-m-d', strtotime($listR["REAL_DATE"]));
+		$realDate 									= date('Y-m-d H:i:s', strtotime($listR["REAL_DATE"]));
 		$findDtlDelBrg 							= [
 			"DEL_CARGO_HDR_ID"				=> $hdr[$config["head_primery"]],
 			"DEL_CARGO_DTL_SI_NO"			=> $listR["NO_CONTAINER"]

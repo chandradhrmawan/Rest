@@ -156,19 +156,90 @@
 		@foreach($penumpukan as $penumpukan)
 		<tr>
 			<td style="text-align:center"><?php $nomor++;echo $nomor; ?></td>
-			<td>{{$penumpukan->dtl_group_tariff_name}}</td>
-			<td style="text-align:left">{{$penumpukan->dtl_cont_size}} / {{$penumpukan->dtl_cont_type}} / {{$penumpukan->dtl_cont_status}}</td>
-			<td style="text-align:center">{{$penumpukan->dtl_qty}}</td>
-			<td style="text-align:right">{{number_format($penumpukan->dtl_tariff)}}</td>
+			<td>{{$penumpukan->group_tariff_name}}</td>
+			<td style="text-align:center">{{$penumpukan->package_name}}</td>
+			<td style="text-align:center">{{$penumpukan->unit_name}}</td>
+			<td style="text-align:center">{{$penumpukan->qty}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->tariff)}}</td>
 			<td>IDR</td>
-			<td style="text-align:right">{{number_format($penumpukan->dtl_dpp)}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->dpp)}}</td>
 		</tr>
 		@endforeach
 	<?php } ?>
 </table>
-<?php
-} else {
-?>
+<?php } else if (in_array($label->nota_id, [4,3,7,10,17,18])) {  ?>
+	<table  width="100%" align="center" border="0" cellspacing="2" cellpadding="4" style="border-collapse:collapse; font-size:11px;">
+		<tr>
+			<td colspan="4" style="text-align:left">
+				<?php	if ($penumpukan != 0) { ?>
+				<p><b>Jenis Jasa</b><br>JML x SIZE : {{$penumpukan[0]->qty}} x  {{$penumpukan[0]->cont_size}}"</p>
+			<?php } else {  ?>
+				<p><b>Jenis Jasa</b><br>JML x SIZE : {{$detail[0]->qty}} x  {{$detail[0]->cont_size}}"</p>
+			<?php } ?>
+			</td>
+		</tr>
+	@foreach($detail as $detail)
+	<tr>
+		<td>{{$detail->group_tariff_name}}</td>
+		<td>:Rp. </td>
+		<td>{{$detail->qty}} x {{number_format($detail->tariff)}}</td>
+		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
+	</tr>
+	@endforeach
+	<?php	if ($penumpukan != 0) { ?>
+		@foreach($penumpukan as $penumpukan)
+		<tr>
+			<td>{{$penumpukan->group_tariff_name}}</td>
+			<td>:Rp. </td>
+			<td>{{$penumpukan->qty}} x {{number_format($penumpukan->tariff)}}</td>
+			<td style="text-align:right">{{number_format($penumpukan->dpp)}}</td>
+		</tr>
+		@endforeach
+	<?php } ?>
+	<tr>
+		<td>Uang Jasa</td>
+		<td>:Rp.</td>
+		<td></td>
+		<td style="text-align:right">{{number_format($header->nota_dpp)}}</td>
+	</tr>
+	<tr>
+		<td>PPN</td>
+		<td>:Rp.</td>
+		<td></td>
+		<td style="text-align:right">{{number_format($header->nota_ppn)}}</td>
+	</tr>
+	<tr>
+		<td>Materai</td>
+		<td>:Rp.</td>
+		<td></td>
+		<td style="text-align:right">0</td>
+	</tr>
+	<tr>
+		<td>Jumlah</td>
+		<td style="border-top:solid thin">:Rp.</td>
+		<td style="border-top:solid thin"></td>
+		<td style="text-align:right;border-top:solid thin">{{number_format($header->nota_amount)}}</td>
+	</tr>
+	<tr>
+		<td>PPN ditanggung Pemerintah</td>
+		<td>:Rp.</td>
+		<td></td>
+		<td style="text-align:right">0</td>
+	</tr>
+	<tr>
+		<td>Jumlah Uper</td>
+		<td>:Rp.</td>
+		<td></td>
+		<td style="text-align:right">0</td>
+	</tr>
+	<tr>
+		<td>Piutang</td>
+		<td>:Rp.</td>
+		<td></td>
+		<td style="text-align:right">{{number_format($bayar)}}</td>
+	</tr>
+</table>
+<?php } else { ?>
 <table  width="100%" align="center" border="0" cellspacing="1" cellpadding="2" style="border-collapse:collapse; font-size:11px;">
 	<tr style="text-transform:uppercase;font-weight:800">
 		<th width="15%" style="border-top:solid 1px;border-bottom:solid 1px;">Keterangan</th>
@@ -224,6 +295,7 @@
 </table>
 <?php } ?>
 
+<?php if (!in_array($label->nota_id, [4,3,7,10,17,18])) {  ?>
 <table  width="100%" border="0" cellspacing="1" cellpadding="1" style="border-collapse:collapse; font-size:11px;margin-top:20px">
 	<tr>
     <td colspan="7" style="text-align:right">Discount</td>
@@ -258,7 +330,8 @@
 	<tr>
 		<td colspan="7" style="text-align:right">Jumlah Dibayar</td>
 		<td style="text-align:right;">:</td>
-		<td style="text-align:right">{{number_format($bayar)}}</td>
+		<td style="text-align:right">{{number_format($header->nota_amount)}}</td>
+		<!-- <td style="text-align:right">{{number_format($bayar)}}</td> -->
 	</tr>
 	<!-- <tr>
 		<td colspan="7" style="text-align:right">
@@ -268,6 +341,7 @@
 		<td style="text-align:right"><b>{{number_format($total)}}</b></td>
 	</tr> -->
 </table>
+<?php } ?>
 <p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
 <table style="width:100%">
 	<tr>
