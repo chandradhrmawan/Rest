@@ -180,6 +180,10 @@ class PlgFunctTOS{
 				if ($config['kegiatan_real'] == 3) { //kusus gate in
 					$cont_counter++;
 				}
+				$keg_real = $config['kegiatan_real']
+				if (is_array($keg_real)) {
+					$keg_real = $keg_real[1];
+				}
 				$arrStoreTsContAndTxHisCont = [
 					'history_date' => date('Y-m-d H:i:s', strtotime($real_value['real_date'])),
 					'cont_no' => $listR['NO_CONTAINER'],
@@ -190,7 +194,7 @@ class PlgFunctTOS{
 					'cont_type' => null,
 					'cont_counter' => $cont_counter,
 					'no_request' => $listR['NO_REQUEST'],
-					'kegiatan' => $config['kegiatan_real'],
+					'kegiatan' => $keg_real,
 					'id_user' => "1",
 					'status_cont' => $listR['STATUS'],
 					'vvd_id' => $hdr[$config['head_vvd']]
