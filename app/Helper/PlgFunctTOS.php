@@ -42,10 +42,10 @@ class PlgFunctTOS{
 	public static function decodeResultAftrSendToTosNPKS($res, $type){
 		$res['request']['json'] = json_decode($res['request']['json'], true);
 		$res['request']['json'][$type.'Request']['esbBody']['request'] = json_decode(base64_decode($res['request']['json'][$type.'Request']['esbBody']['request']),true);
-    $res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
-    $res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
-    $res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
-    return $res;
+		$res['response'][$type.'Response']['esbBody']['result'] = json_decode($res['response'][$type.'Response']['esbBody']['result'],true);
+		$res['response'][$type.'Response']['esbBody']['result']['result'] = json_decode(base64_decode($res['response'][$type.'Response']['esbBody']['result']['result']),true);
+		$res['result'] = $res['response'][$type.'Response']['esbBody']['result']['result'];
+		return $res;
 	}
 
 	public static function sendRequestBookingPLG($arr){
@@ -69,15 +69,6 @@ class PlgFunctTOS{
     	}else{
 	        $toFunct = 'buildJson'.$arr['table'];
 	        $json = static::$toFunct($arr);
-	        //$json = json_encode(json_decode($json,true));
-	        //$opt = [
-	        //	"user" => config('endpoint.DirecTtosPostPLG.user'),
-	        //	"pass" => config('endpoint.DirecTtosPostPLG.pass'),
-	        //	"target" => config('endpoint.DirecTtosPostPLG.target'),
-	        //	"json" => json_encode(json_decode($json,true))
-	        //];
-	        //$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($opt);
-	        //return ['sendRequestBookingPLG' => $res];
 	        $json = base64_encode(json_encode(json_decode($json,true)));
 	        $json = '
 				{
@@ -137,19 +128,13 @@ class PlgFunctTOS{
 		if (count($dtlLoop) > 0) {
 			$arr = static::getRealJsonPLG($find,$dtlLoop,$config);
 			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);
-			//if ($res['response']['count'] == 0) {
-			//	$Success = false;
-			//	$msg = 'realisasion not finish';
-			//}else{
-			//	$his_cont = static::storeRealPLG($res['response']['result'],$find,$config,$input);
-			//}
-			 $res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
-			 if ($res['result']['count'] == 0) {
-			 	$Success = false;
-			 	$msg = 'realisasion not finish';
-			 }else{
-			 	$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
-			 }
+			$res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+			if ($res['result']['count'] == 0) {
+				$Success = false;
+				$msg = 'realisasion not finish';
+			}else{
+				$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
+			}
 		}
 		$res['his_cont'] = $his_cont;
 		$dtl = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id']);
@@ -238,12 +223,6 @@ class PlgFunctTOS{
 			"data": ['.$dtl.']
 		}';
 		$json = json_encode(json_decode($json,true));
-		// return $arr = [
-    //     	"user" => config('endpoint.DirecTtosGetPLG.user'),
-    //     	"pass" => config('endpoint.DirecTtosGetPLG.pass'),
-    //     	"target" => config('endpoint.DirecTtosGetPLG.target'),
-    //     	"json" => $json
-    //     ];
 		$json = base64_encode(json_encode(json_decode($json,true)));
 		$json = static::jsonGetTOS($json);
         $json = json_encode(json_decode($json,true));
