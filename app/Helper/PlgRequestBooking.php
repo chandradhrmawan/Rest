@@ -217,7 +217,7 @@ class PlgRequestBooking{
 		}
 
 	    public static function sendRequestPLG($input){
-			return $config	 = static::getApiConfig($input);
+			$config	 = static::getApiConfig($input);
 			$config 	= $config['config'];
 			// request batal
 			$canceledReqPrepare = null;
