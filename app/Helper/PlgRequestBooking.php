@@ -578,9 +578,7 @@ class PlgRequestBooking{
 	    	}
 
 				// If Send From E-Service
-				if (!empty($request["user_id"]) || !isset($request["user"])) {
-					$request = json_decode(json_encode($request), true);
-					if ($request["user_id"] == "58") {
+					if (isset($input['encode']) and $input['encode'] == 'true') {
 						$getNota->nota_status = 6;
 						$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
 						$getNota->nota_paid = 'W';
@@ -592,7 +590,29 @@ class PlgRequestBooking{
 							'no_req' => $pay->pay_req_no
 						];
 					}
-				}
+					// else {
+					// 	$request = json_decode(json_encode($request), true);
+					// 	foreach ($request as $key => $value) {
+					// 		if ($key == "user_id") {
+					// 			$userId = $value;
+					// 		} else if ($key == "user") {
+					// 			$userId = $value;
+					// 		}
+					// 	}
+					//
+					// 	if ($userId == "58") {
+					// 		$getNota->nota_status = 6;
+					// 		$getNota->nota_paid_date = \DB::raw("TO_DATE('".$input['pay_date']."', 'YYYY-MM-DD HH24:MI')");
+					// 		$getNota->nota_paid = 'W';
+					// 		$getNota->save();
+					// 		return [
+					// 			'result' => "Success, pay proforma, Waiting confirmation Admin !",
+					// 			'no_pay' => $pay->pay_no,
+					// 			'no_nota' => $input['pay_nota_no'],
+					// 			'no_req' => $pay->pay_req_no
+					// 		];
+					// 	}
+					// }
 
 					$cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
 					$cekIsCanc = (array)$cekIsCanc;

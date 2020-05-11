@@ -371,7 +371,7 @@ class PlgConnectedExternalApps{
 		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->get();
 
 				// return $tsContainer;
-		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD"]);
+		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD", 'CONT_ISACTIVE' => "N"]);
 		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
 
 				if (empty($tsContainer)) {
