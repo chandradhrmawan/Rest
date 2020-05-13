@@ -613,13 +613,13 @@ class PlgFunctTOS{
 	        foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
-	            "REQ_DTL_CONT": "'.$dtl['cancl_cont'].'",
-	            "REQ_DTL_SI": "'.$dtl['cancl_si'].'",
-	            "REQ_DTL_COMMODITY": "'.$dtl['cancl_cmdty_id'].'",
-	            "REQ_DTL_PKG": "'.$dtl['cancl_pkg_id'].'",
-	            "REQ_DTL_PKG_PARENT": "'.$dtl['cancl_pkg_parent_id'].'",
-	            "REQ_DTL_UNIT": "'.$dtl['cancl_unit_id'].'",
-	            "REQ_DTL_QTY": "'.$dtl['cancl_qty'].'"
+	            "REQ_DTL_CONT"				: "'.$dtl['cancl_cont'].'",
+	            "REQ_DTL_SI"					: "'.$dtl['cancl_si'].'",
+	            "REQ_DTL_COMMODITY"		: "'.$dtl['cancl_cmdty_id'].'",
+	            "REQ_DTL_PKG"					: "'.$dtl['cancl_pkg_id'].'",
+	            "REQ_DTL_PKG_PARENT"	: "'.$dtl['cancl_pkg_parent_id'].'",
+	            "REQ_DTL_UNIT"				: "'.$dtl['cancl_unit_id'].'",
+	            "REQ_DTL_QTY"					: "'.$dtl['cancl_qty'].'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -637,14 +637,14 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "getCancelledReq",
 	          "header": {
-	            "REQ_NO": "'.$head['cancelled_req_no'].'",
-	            "REQ_RECEIVING_DATE": "'.date('d-M-y', strtotime($head['cancelled_create_date'])).'",
-	            "NO_NOTA": "'.$nota_no.'",
-	            "TGL_NOTA": "'.$nota_date.'",
-	            "REQ_MARK": "",
-	            "BRANCH_ID" : "'.$head['cancelled_branch_id'].'",
-							"CANCELLED_STATUS" : "'.$arr["config"]["CANCELLED_STATUS"].'",
-							"REQ_CANCEL_NO" : "'.$head['cancelled_no'].'"
+	            "REQ_NO"							: "'.$head['cancelled_req_no'].'",
+	            "REQ_RECEIVING_DATE"	: "'.date('d-M-y', strtotime($head['cancelled_create_date'])).'",
+	            "NO_NOTA"							: "'.$nota_no.'",
+	            "TGL_NOTA"						: "'.$nota_date.'",
+	            "REQ_MARK"						: "",
+	            "BRANCH_ID" 					: "'.$head['cancelled_branch_id'].'",
+							"CANCELLED_STATUS" 		: "'.$arr["config"]["CANCELLED_STATUS"].'",
+							"REQ_CANCEL_NO" 			: "'.$head['cancelled_no'].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -658,20 +658,20 @@ class PlgFunctTOS{
 					foreach ($dtls as $dtl) {
 	          $dtl = (array)$dtl;
 	          $arrdetil .= '{
-	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
-	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-							"REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']].'",
-	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
-	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
-	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-	            "REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-							"REQ_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
-							"REQ_DTL_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
-							"REC_DTL_VOYIN": "'.$head[$arr['config']['head_voyin']].'",
-							"REC_DTL_VOYOUT": "'.$head[$arr['config']['head_voyout']].'"
+	            "REQ_DTL_CONT"						: "'.$dtl[$arr['config']['DTL_BL']].'",
+	            "REQ_DTL_CONT_STATUS"			: "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+	            "REQ_DTL_COMMODITY"				: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+							"REQ_DTL_VIA_ID"					: "'.$dtl[$arr['config']['DTL_VIA']].'",
+	            "REQ_DTL_VIA_NAME"				: "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
+	            "REQ_DTL_SIZE"						: "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+	            "REQ_DTL_TYPE"						: "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+	            "REQ_DTL_CONT_HAZARD"			: "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+	            "REQ_DTL_OWNER_CODE"			: "'.$dtl[$arr['config']['DTL_OWNER']].'",
+	            "REQ_DTL_OWNER_NAME"			: "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+							"REQ_DTL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQ_DTL_VESSEL_CODE"			: "'.$head[$arr['config']['head_vessel_code']].'",
+							"REC_DTL_VOYIN"						: "'.$head[$arr['config']['head_voyin']].'",
+							"REC_DTL_VOYOUT"					: "'.$head[$arr['config']['head_voyout']].'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -688,19 +688,23 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "getReceiving",
 	          "header": {
-	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
-	            "REQ_RECEIVING_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
-	            "NO_NOTA": "'.$nota_no.'",
-	            "TGL_NOTA": "'.$nota_date.'",
-	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
-	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
-	            "REQ_MARK": "",
-	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-	            "RECEIVING_DARI": "'.$dr->reff_name.'",
-	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-	            "DI": "",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+	            "REQ_NO"									: "'.$head[$arr['config']['head_no']].'",
+	            "REQ_RECEIVING_DATE"			: "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "NO_NOTA"									: "'.$nota_no.'",
+	            "TGL_NOTA"								: "'.$nota_date.'",
+	            "NM_CONSIGNEE"						: "'.$head[$arr['config']['head_cust_name']].'",
+	            "ALAMAT"									: "'.$head[$arr['config']['head_cust_addr']].'",
+	            "REQ_MARK"								: "",
+	            "NPWP"										: "'.$head[$arr['config']['head_cust_npwp']].'",
+	            "RECEIVING_DARI"					: "'.$dr->reff_name.'",
+	            "TANGGAL_LUNAS"						: "'.$nota_paid_date.'",
+	            "DI"											: "",
+							"PAYMENT_METHOD"					: "'.$head[$arr['config']['head_paymethod']].'",
+							"VESSEL_NAME"							: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"							: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"										: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"									: "'.$head[$arr['config']['head_voyout']].'",
+	            "BRANCH_ID" 							: "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -717,16 +721,20 @@ class PlgFunctTOS{
 	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
 	          }
 	          $arrdetil .= '{
-	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
-	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']].'",
-	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
-	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
-	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-	            "REQ_DTL_DEL_DATE": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_HIS_CONT']])).'",
-	            "REQ_DTL_NO_SEAL": ""
+	            "REQ_DTL_CONT"						: "'.$dtl[$arr['config']['DTL_BL']].'",
+	            "REQ_DTL_CONT_STATUS"			: "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+	            "REQ_DTL_COMMODITY"				: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+	            "REQ_DTL_VIA_ID"					: "'.$dtl[$arr['config']['DTL_VIA']].'",
+	            "REQ_DTL_VIA_NAME"				: "'.$dtl[$arr['config']['DTL_VIA_NAME']].'",
+	            "REQ_DTL_SIZE"						: "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+	            "REQ_DTL_TYPE"						: "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+	            "REQ_DTL_CONT_HAZARD"			: "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+	            "REQ_DTL_DEL_DATE"				: "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_HIS_CONT']])).'",
+							"REQ_DTL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQ_DTL_VESSEL_CODE"			: "'.$head[$arr['config']['head_vessel_code']].'",
+							"REC_DTL_VOYIN"						: "'.$head[$arr['config']['head_voyin']].'",
+							"REC_DTL_VOYOUT"					: "'.$head[$arr['config']['head_voyout']].'"
+	            "REQ_DTL_NO_SEAL"					: ""
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -749,21 +757,25 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "getDelivery",
 	          "header": {
-	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
-	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
-	            "REQ_DELIVERY_DATE": "'.$delivery_date.'",
-	            "NO_NOTA": "'.$nota_no.'",
-	            "TGL_NOTA": "'.$nota_date.'",
-	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
-	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
-	            "REQ_MARK": "",
-	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-	            "DELIVERY_KE": "'.$rec_dr->reff_name.'",
-	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
-	            "PERP_KE": "",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+	            "REQ_NO"							: "'.$head[$arr['config']['head_no']].'",
+	            "REQ_NO_OLD"					: "'.$head[$arr['config']['head_ext_from']].'",
+	            "REQ_DELIVERY_DATE"		: "'.$delivery_date.'",
+	            "NO_NOTA"							: "'.$nota_no.'",
+	            "TGL_NOTA"						: "'.$nota_date.'",
+	            "NM_CONSIGNEE"				: "'.$head[$arr['config']['head_cust_name']].'",
+	            "ALAMAT"							: "'.$head[$arr['config']['head_cust_addr']].'",
+	            "REQ_MARK"						: "",
+	            "NPWP"								: "'.$head[$arr['config']['head_cust_npwp']].'",
+	            "DELIVERY_KE"					: "'.$rec_dr->reff_name.'",
+	            "TANGGAL_LUNAS"				: "'.$nota_paid_date.'",
+	            "PERP_DARI"						: "'.$head[$arr['config']['head_ext_from']].'",
+	            "PERP_KE"							: "",
+							"PAYMENT_METHOD"			: "'.$head[$arr['config']['head_paymethod']].'",
+							"VESSEL_NAME"					: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"					: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"								: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"							: "'.$head[$arr['config']['head_voyout']].'",
+							"BRANCH_ID" 					: "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -794,26 +806,26 @@ class PlgFunctTOS{
 	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
 	          }
 	          $arrdetil .= '{
-	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
-	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
-	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-	            "REQ_DTL_REMARK_SP2": "",
-	            "REQ_DTL_ORIGIN": "'.$contFromName->reff_name.'",
-							"REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
-							"REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-							"REQ_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
-							"REQ_DTL_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
-							"REC_DTL_VOYIN": "'.$head[$arr['config']['head_vin']].'",
-							"REC_DTL_VOYOUT": "'.$head[$arr['config']['head_vout']].'",
-	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-	            "REQ_DTL_DEL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
-	            "TGL_MULAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
-	            "TGL_SELESAI": "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
+	          	"REQ_DTL_OWNER_CODE"			: "'.$dtl[$arr['config']['DTL_OWNER']].'",
+	            "REQ_DTL_OWNER_NAME"			: "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+	            "REQ_DTL_CONT"						: "'.$dtl[$arr['config']['DTL_BL']].'",
+	            "REQ_DTL_CONT_STATUS"			: "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+	            "REQ_DTL_COMMODITY"				: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+	            "REQ_DTL_SIZE"						: "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+	            "REQ_DTL_TYPE"						: "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+	            "REQ_DTL_CONT_HAZARD"			: "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+	            "REQ_DTL_REMARK_SP2"			: "",
+	            "REQ_DTL_ORIGIN"					: "'.$contFromName->reff_name.'",
+							"REQ_DTL_VIA_ID"					: "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
+							"REQ_DTL_VIA_NAME"				: "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+							"REQ_DTL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQ_DTL_VESSEL_CODE"			: "'.$head[$arr['config']['head_vessel_code']].'",
+							"REC_DTL_VOYIN"						: "'.$head[$arr['config']['head_vin']].'",
+							"REC_DTL_VOYOUT"					: "'.$head[$arr['config']['head_vout']].'",
+	            "REQ_DTL_VIA"							: "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+	            "REQ_DTL_DEL_VIA"					: "'.$dtl[$arr['config']['DTL_VIA_NAME']['del']].'",
+	            "TGL_MULAI"								: "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+	            "TGL_SELESAI"							: "'.date('m/d/Y h:i:s', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -833,27 +845,31 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "'.$actionJ.'",
 	          "header": {
-	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
-	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
-	            "REQ_STUFF_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
-							"REQ_RECEIVING_DATE" : "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
-	            "NO_NOTA": "'.$nota_no.'",
-	            "TGL_NOTA": "'.$nota_date.'",
-	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
-	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
-	            "REQ_MARK": "",
-	            "NO_UKK": "'.$head[$arr['config']['head_vvd']].'",
-	            "NO_BOOKING": "",
-	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-	            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
-	            "STUFFING_DARI": "'.$dr->reff_name.'",
-	            "RECEIVING_DARI": "'.$dr->reff_name.'",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
-	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'",
-	            "DI" : ""
+	            "REQ_NO"									: "'.$head[$arr['config']['head_no']].'",
+	            "REQ_NO_OLD"							: "'.$head[$arr['config']['head_ext_from']].'",
+	            "REQ_STUFF_DATE"					: "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+							"REQ_RECEIVING_DATE" 			: "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "NO_NOTA"									: "'.$nota_no.'",
+	            "TGL_NOTA"								: "'.$nota_date.'",
+	            "NM_CONSIGNEE"						: "'.$head[$arr['config']['head_cust_name']].'",
+	            "ALAMAT"									: "'.$head[$arr['config']['head_cust_addr']].'",
+	            "REQ_MARK"								: "",
+	            "NO_UKK"									: "'.$head[$arr['config']['head_vvd']].'",
+	            "NO_BOOKING"							: "",
+	            "NPWP"										: "'.$head[$arr['config']['head_cust_npwp']].'",
+	            "TANGGAL_LUNAS"						: "'.$nota_paid_date.'",
+	            "NO_REQUEST_RECEIVING"		: "'.$head[$arr['config']['head_rec_no']].'",
+	            "STUFFING_DARI"						: "'.$dr->reff_name.'",
+	            "RECEIVING_DARI"					: "'.$dr->reff_name.'",
+							"PAYMENT_METHOD"					: "'.$head[$arr['config']['head_paymethod']].'",
+	            "PERP_DARI"								: "'.$head[$arr['config']['head_ext_from']].'",
+	            "PERP_KE"									: "'.$head[$arr['config']['head_ext_loop']].'",
+	            "BRANCH_ID" 							: "'.$head[$arr['config']['head_branch']].'",
+							"VESSEL_NAME"							: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"							: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"										: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"									: "'.$head[$arr['config']['head_voyout']].'",
+	            "DI" 											: ""
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -877,22 +893,22 @@ class PlgFunctTOS{
 	          	static::upOldDetilExt($head[$arr['config']['head_ext_from']],$dtl[$arr['config']['DTL_BL']],$arr['config']);
 	          }
 	          $arrdetil .= '{
-	          	"REQ_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
-	          	"REQ_DTL_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
-	          	"REQ_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-	            "REQ_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-	            "REQ_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
-	            "REQ_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-	            "REQ_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "REQ_DTL_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-	            "REQ_DTL_TYPE": "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
-	            "REQ_DTL_VIA": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-	            "REQ_DTL_VIA_ID": "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
-	            "REQ_DTL_VIA_NAME": "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
-	            "REQ_DTL_CONT_HAZARD": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-	            "REQ_DTL_ORIGIN": "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
-	            "TGL_MULAI": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
-	            "TGL_SELESAI": "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
+	          	"REQ_DTL_VESSEL_NAME"		: "'.$head[$arr['config']['head_vessel_name']].'",
+	          	"REQ_DTL_VESSEL_CODE"		: "'.$head[$arr['config']['head_vessel_code']].'",
+	          	"REQ_DTL_OWNER_CODE"		: "'.$dtl[$arr['config']['DTL_OWNER']].'",
+	            "REQ_DTL_OWNER_NAME"		: "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+	            "REQ_DTL_CONT"					: "'.$dtl[$arr['config']['DTL_BL']].'",
+	            "REQ_DTL_CONT_STATUS"		: "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+	            "REQ_DTL_COMMODITY"			: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+	            "REQ_DTL_SIZE"					: "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+	            "REQ_DTL_TYPE"					: "'.$dtl[$arr['config']['DTL_CONT_TYPE']].'",
+	            "REQ_DTL_VIA"						: "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+	            "REQ_DTL_VIA_ID"				: "'.$dtl[$arr['config']['DTL_VIA']['rec']].'",
+	            "REQ_DTL_VIA_NAME"			: "'.$dtl[$arr['config']['DTL_VIA_NAME']['rec']].'",
+	            "REQ_DTL_CONT_HAZARD"		: "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+	            "REQ_DTL_ORIGIN"				: "'.$dtl[$arr['config']['DTL_CONT_FROM']].'",
+	            "TGL_MULAI"							: "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_START_DATE']])).'",
+	            "TGL_SELESAI"						: "'.date('m/d/Y', strtotime($dtl[$arr['config']['DTL_DATE_END_DATE']])).'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -915,27 +931,31 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "'.$actionJ.'",
 	          "header": {
-	            "REQ_NO": "'.$head[$arr['config']['head_no']].'",
-	            "REQ_NO_OLD": "'.$head[$arr['config']['head_ext_from']].'",
-	            "REQ_STRIP_DATE": "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
-	            "REQ_RECEIVING_DATE" : "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
-	            "NO_NOTA": "'.$nota_no.'",
-	            "TGL_NOTA": "'.$nota_date.'",
-	            "NM_CONSIGNEE": "'.$head[$arr['config']['head_cust_name']].'",
-	            "ALAMAT": "'.$head[$arr['config']['head_cust_addr']].'",
-	            "REQ_MARK": "",
-	            "NPWP": "'.$head[$arr['config']['head_cust_npwp']].'",
-	            "DO": "'.$head[$arr['config']['head_do']].'",
-	            "BL": "'.$head[$arr['config']['head_bl']].'",
-	            "NO_REQUEST_RECEIVING": "'.$head[$arr['config']['head_rec_no']].'",
-	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
-	            "STRIP_DARI": "'.$rec_dr->reff_name.'",
-	            "RECEIVING_DARI": "'.$rec_dr->reff_name.'",
-	            "PERP_DARI": "'.$head[$arr['config']['head_ext_from']].'",
-	            "PERP_KE": "'.$head[$arr['config']['head_ext_loop']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-	            "DI" : ""
+	            "REQ_NO"								: "'.$head[$arr['config']['head_no']].'",
+	            "REQ_NO_OLD"						: "'.$head[$arr['config']['head_ext_from']].'",
+	            "REQ_STRIP_DATE"				: "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "REQ_RECEIVING_DATE" 		: "'.date('m/d/Y', strtotime($head[$arr['config']['head_date']])).'",
+	            "NO_NOTA"								: "'.$nota_no.'",
+	            "TGL_NOTA"							: "'.$nota_date.'",
+	            "NM_CONSIGNEE"					: "'.$head[$arr['config']['head_cust_name']].'",
+	            "ALAMAT"								: "'.$head[$arr['config']['head_cust_addr']].'",
+	            "REQ_MARK"							: "",
+	            "NPWP"									: "'.$head[$arr['config']['head_cust_npwp']].'",
+	            "DO"										: "'.$head[$arr['config']['head_do']].'",
+	            "BL"										: "'.$head[$arr['config']['head_bl']].'",
+	            "NO_REQUEST_RECEIVING"	: "'.$head[$arr['config']['head_rec_no']].'",
+	            "TANGGAL_LUNAS"					: "'.$nota_paid_date.'",
+	            "STRIP_DARI"						: "'.$rec_dr->reff_name.'",
+	            "RECEIVING_DARI"				: "'.$rec_dr->reff_name.'",
+	            "PERP_DARI"							: "'.$head[$arr['config']['head_ext_from']].'",
+	            "PERP_KE"								: "'.$head[$arr['config']['head_ext_loop']].'",
+	            "BRANCH_ID" 						: "'.$head[$arr['config']['head_branch']].'",
+							"PAYMENT_METHOD"				: "'.$head[$arr['config']['head_paymethod']].'",
+							"VESSEL_NAME"						: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"						: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"									: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"								: "'.$head[$arr['config']['head_voyout']].'",
+	            "DI" 										: ""
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -974,6 +994,10 @@ class PlgFunctTOS{
 	            "FUMI_CREATE_DATE"	: "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
 	            "FUMI_CONSIGNEE_ID"	: "'.$head[$arr['config']['head_cust']].'",
 							"PAYMENT_METHOD"		: "'.$head[$arr['config']['head_paymethod']].'",
+							"VESSEL_NAME"				: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"				: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"							: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"						: "'.$head[$arr['config']['head_voyout']].'",
 	            "BRANCH_ID" 				: "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
@@ -987,16 +1011,16 @@ class PlgFunctTOS{
 	          $dtl = (array)$dtl;
 		        $getCountCounter = DB::connection('omuster')->table('TS_CONTAINER')->where('cont_no',$dtl[$arr['config']['DTL_BL']])->orderBy('cont_counter','desc')->first();
 	          $arrdetil .= '{
-	            "PLUG_DTL_CONT": "'.$dtl[$arr['config']['DTL_BL']].'",
-	            "PLUG_DTL_CONT_SIZE": "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
-	            "PLUG_DTL_CONT_STATUS": "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
-	            "PLUG_DTL_STATUS": "0",
-	            "PLUG_DTL_CANCELLED": "'.$dtl[$arr['config']['DTL_IS_CANCEL']].'",
-	            "PLUG_DTL_ACTIVE": "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
-	            "PLUG_DTL_START_PLUG_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
-	            "PLUG_DTL_END_PLUG_PLAN": "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
-	            "PLUG_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-	            "PLUG_DTL_COUNTER": "'.$getCountCounter->cont_counter.'"
+	            "PLUG_DTL_CONT"							: "'.$dtl[$arr['config']['DTL_BL']].'",
+	            "PLUG_DTL_CONT_SIZE"				: "'.$dtl[$arr['config']['DTL_CONT_SIZE']].'",
+	            "PLUG_DTL_CONT_STATUS"			: "'.$dtl[$arr['config']['DTL_CONT_STATUS']].'",
+	            "PLUG_DTL_STATUS"						: "0",
+	            "PLUG_DTL_CANCELLED"				: "'.$dtl[$arr['config']['DTL_IS_CANCEL']].'",
+	            "PLUG_DTL_ACTIVE"						: "'.$dtl[$arr['config']['DTL_IS_ACTIVE']].'",
+	            "PLUG_DTL_START_PLUG_PLAN"	: "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+	            "PLUG_DTL_END_PLUG_PLAN"		: "'.date('d-M-y', strtotime($dtl[$arr['config']['DTL_DATE_ACTIVITY']])).'",
+	            "PLUG_DTL_COMMODITY"				: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+	            "PLUG_DTL_COUNTER"					: "'.$getCountCounter->cont_counter.'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
@@ -1006,14 +1030,18 @@ class PlgFunctTOS{
 	        return $json_body = '{
 	          "action" : "getPlugging",
 	          "header": {
-	          	"PLUG_ID" : "",
-	            "PLUG_NO": "'.$head[$arr['config']['head_no']].'",
-	            "PLUG_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-	            "PLUG_CREATE_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
-	            "PLUG_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
-	            "PLUG_STATUS" : "",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+	          	"PLUG_ID" 					: "",
+	            "PLUG_NO"						: "'.$head[$arr['config']['head_no']].'",
+	            "PLUG_CREATE_BY"		: "'.$head[$arr['config']['head_by']].'",
+	            "PLUG_CREATE_DATE"	: "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
+	            "PLUG_CONSIGNEE_ID"	: "'.$head[$arr['config']['head_cust']].'",
+	            "PLUG_STATUS" 			: "",
+							"PAYMENT_METHOD"		: "'.$head[$arr['config']['head_paymethod']].'",
+							"VESSEL_NAME"				: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"				: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"							: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"						: "'.$head[$arr['config']['head_voyout']].'",
+	            "BRANCH_ID" 				: "'.$head[$arr['config']['head_branch']].'"
 	          },
 	          "arrdetail": ['.$arrdetil.']
 	        }';
@@ -1028,19 +1056,19 @@ class PlgFunctTOS{
 						$dtl = (array)$dtl;
 						$total = $dtl[$arr['config']['DTL_QTY']]-$dtl[$arr['config']['DTL_QTY_CANC']];
 						$arrdetil .= '{
-							"REQUEST_DTL_SI": "'.$dtl[$arr['config']['DTL_BL']].'",
-							"REQUEST_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-							"REQUEST_DTL_DANGER": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-							"REQUEST_DTL_VOY": "",
-							"REQUEST_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
-							"REQUEST_DTL__VESSEL_CODE": "",
-							"REQUEST_DTL_CALL_SIGN": "",
-							"REQUEST_DTL_DEST_DEPO": "",
-							"REQUEST_DTL_STATUS": "0",
-							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-							"REQUEST_DTL_TOTAL": "'.$total.'",
-							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
+							"REQUEST_DTL_SI"							: "'.$dtl[$arr['config']['DTL_BL']].'",
+							"REQUEST_DTL_COMMODITY"				: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+							"REQUEST_DTL_DANGER"					: "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+							"REQUEST_DTL_VOY"							: "",
+							"REQUEST_DTL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQUEST_DTL__VESSEL_CODE"		: "",
+							"REQUEST_DTL_CALL_SIGN"				: "",
+							"REQUEST_DTL_DEST_DEPO"				: "",
+							"REQUEST_DTL_STATUS"					: "0",
+							"REQUEST_DTL_OWNER_CODE"			: "'.$dtl[$arr['config']['DTL_OWNER']].'",
+							"REQUEST_DTL_OWNER_NAME"			: "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+							"REQUEST_DTL_TOTAL"						: "'.$total.'",
+							"REQUEST_DTL_UNIT"						: "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
 					$arrdetil = substr($arrdetil, 0,-1);
@@ -1060,25 +1088,29 @@ class PlgFunctTOS{
 					return $json_body = '{
 						"action" : "getReceivingBrg",
 						"header": {
-							"REQUEST_NO": "'.$head[$arr['config']['head_no']].'",
-							"REQUEST_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
-							"REQUEST_MARK": "'.$head[$arr['config']['head_mark']].'",
-							"REQUEST_CREATE_DATE": "'.date('d-M-y').'",
-							"REQUEST_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-							"REQUEST_NOTA": "'.$nota_no.'",
-							"REQUEST_NO_TPK": "",
-							"REQUEST_DO_NO": "",
-							"REQUEST_BL_NO": "",
-							"REQUEST_SPPB_NO": "",
-							"REQUEST_SPPB_DATE": "",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
+							"REQUEST_NO"						: "'.$head[$arr['config']['head_no']].'",
+							"REQUEST_CONSIGNEE_ID"	: "'.$head[$arr['config']['head_cust']].'",
+							"REQUEST_MARK"					: "'.$head[$arr['config']['head_mark']].'",
+							"REQUEST_CREATE_DATE"		: "'.date('d-M-y').'",
+							"REQUEST_CREATE_BY"			: "'.$head[$arr['config']['head_by']].'",
+							"REQUEST_NOTA"					: "'.$nota_no.'",
+							"REQUEST_NO_TPK"				: "",
+							"REQUEST_DO_NO"					: "",
+							"REQUEST_BL_NO"					: "",
+							"REQUEST_SPPB_NO"				: "",
+							"REQUEST_SPPB_DATE"			: "",
+							"PAYMENT_METHOD"				: "'.$head[$arr['config']['head_paymethod']].'",
 							"REQUEST_RECEIVING_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
-							"REQUEST_NOTA_DATE": "'.date('d-M-y', strtotime($nota_date)).'",
-							"REQUEST_PAID_DATE": "'.date('d-M-y', strtotime($nota_paid_date)).'",
-							"REQUEST_FROM": "'.$rec_dr->reff_name.'",
-							"REQUEST_STATUS": "0",
-							"REQUEST_DI": "",
-							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+							"REQUEST_NOTA_DATE"			: "'.date('d-M-y', strtotime($nota_date)).'",
+							"REQUEST_PAID_DATE"			: "'.date('d-M-y', strtotime($nota_paid_date)).'",
+							"REQUEST_FROM"					: "'.$rec_dr->reff_name.'",
+							"REQUEST_STATUS"				: "0",
+							"REQUEST_DI"						: "",
+							"VESSEL_NAME"						: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"						: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"									: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"								: "'.$head[$arr['config']['head_voyout']].'",
+							"BRANCH_ID" 						: "'.$head[$arr['config']['head_branch']].'"
 						},
 						"arrdetail": ['.$arrdetil.']
 					}';
@@ -1093,19 +1125,19 @@ class PlgFunctTOS{
 						$dtl = (array)$dtl;
 						$total = $dtl[$arr['config']['DTL_QTY']]-$dtl[$arr['config']['DTL_QTY_CANC']];
 						$arrdetil .= '{
-							"REQUEST_DTL_SI": "'.$dtl[$arr['config']['DTL_BL']].'",
-							"REQUEST_DTL_COMMODITY": "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
-							"REQUEST_DTL_DANGER": "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
-							"REQUEST_DTL_VOY": "",
-							"REQUEST_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
-							"REQUEST_DTL__VESSEL_CODE": "",
-							"REQUEST_DTL_CALL_SIGN": "",
-							"REQUEST_DTL_DEST_DEPO": "",
-							"REQUEST_DTL_STATUS": "0",
-							"REQUEST_DTL_OWNER_CODE": "'.$dtl[$arr['config']['DTL_OWNER']].'",
-							"REQUEST_DTL_OWNER_NAME": "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
-							"REQUEST_DTL_TOTAL": "'.$total.'",
-							"REQUEST_DTL_UNIT": "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
+							"REQUEST_DTL_SI"						: "'.$dtl[$arr['config']['DTL_BL']].'",
+							"REQUEST_DTL_COMMODITY"			: "'.$dtl[$arr['config']['DTL_CMDTY_NAME']].'",
+							"REQUEST_DTL_DANGER"				: "'.$dtl[$arr['config']['DTL_CHARACTER']].'",
+							"REQUEST_DTL_VOY"						: "",
+							"REQUEST_DTL_VESSEL_NAME"		: "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQUEST_DTL__VESSEL_CODE"	: "",
+							"REQUEST_DTL_CALL_SIGN"			: "",
+							"REQUEST_DTL_DEST_DEPO"			: "",
+							"REQUEST_DTL_STATUS"				: "0",
+							"REQUEST_DTL_OWNER_CODE"		: "'.$dtl[$arr['config']['DTL_OWNER']].'",
+							"REQUEST_DTL_OWNER_NAME"		: "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
+							"REQUEST_DTL_TOTAL"					: "'.$total.'",
+							"REQUEST_DTL_UNIT"					: "'.$dtl[$arr['config']['DTL_UNIT_NAME']].'"
 						},';
 					}
 					$arrdetil = substr($arrdetil, 0,-1);
@@ -1125,25 +1157,29 @@ class PlgFunctTOS{
 					return $json_body = '{
 						"action" : "getDeliveryBrg",
 						"header": {
-							"REQUEST_NO": "'.$head[$arr['config']['head_no']].'",
-							"REQUEST_CONSIGNEE_ID": "'.$head[$arr['config']['head_cust']].'",
-							"REQUEST_MARK": "'.$head[$arr['config']['head_mark']].'",
-							"REQUEST_CREATE_DATE": "'.date('d-M-y').'",
-							"REQUEST_CREATE_BY": "'.$head[$arr['config']['head_by']].'",
-							"REQUEST_NOTA": "'.$nota_no.'",
-							"REQUEST_NO_TPK": "",
-							"REQUEST_DO_NO": "",
-							"REQUEST_BL_NO": "",
-							"REQUEST_SPPB_NO": "",
-							"REQUEST_SPPB_DATE": "",
-							"REQUEST_DATE": "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
-							"REQUEST_NOTA_DATE": "'.date('d-M-y', strtotime($nota_date)).'",
-							"REQUEST_PAID_DATE": "'.date('d-M-y', strtotime($nota_paid_date)).'",
-							"REQUEST_FROM": "'.$rec_dr->reff_name.'",
-							"REQUEST_STATUS": "0",
-							"REQUEST_DI": "",
-							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
-							"BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
+							"REQUEST_NO"						: "'.$head[$arr['config']['head_no']].'",
+							"REQUEST_CONSIGNEE_ID"	: "'.$head[$arr['config']['head_cust']].'",
+							"REQUEST_MARK"					: "'.$head[$arr['config']['head_mark']].'",
+							"REQUEST_CREATE_DATE"		: "'.date('d-M-y').'",
+							"REQUEST_CREATE_BY"			: "'.$head[$arr['config']['head_by']].'",
+							"REQUEST_NOTA"					: "'.$nota_no.'",
+							"REQUEST_NO_TPK"				: "",
+							"REQUEST_DO_NO"					: "",
+							"REQUEST_BL_NO"					: "",
+							"REQUEST_SPPB_NO"				: "",
+							"REQUEST_SPPB_DATE"			: "",
+							"REQUEST_DATE"					: "'.date('d-M-y', strtotime($head[$arr['config']['head_date']])).'",
+							"REQUEST_NOTA_DATE"			: "'.date('d-M-y', strtotime($nota_date)).'",
+							"REQUEST_PAID_DATE"			: "'.date('d-M-y', strtotime($nota_paid_date)).'",
+							"REQUEST_FROM"					: "'.$rec_dr->reff_name.'",
+							"REQUEST_STATUS"				: "0",
+							"REQUEST_DI"						: "",
+							"PAYMENT_METHOD"				: "'.$head[$arr['config']['head_paymethod']].'",
+							"VESSEL_NAME"						: "'.$head[$arr['config']['head_vessel_name']].'",
+							"VESSEL_CODE"						: "'.$head[$arr['config']['head_vessel_code']].'",
+							"VOYIN"									: "'.$head[$arr['config']['head_voyin']].'",
+							"VOYOUT"								: "'.$head[$arr['config']['head_voyout']].'",
+							"BRANCH_ID" 						: "'.$head[$arr['config']['head_branch']].'"
 						},
 						"arrdetail": ['.$arrdetil.']
 					}';

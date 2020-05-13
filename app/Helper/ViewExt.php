@@ -415,19 +415,19 @@ class ViewExt{
     return ["link" => $qrcode];
   }
 
-  public static function getDebitur($input) {
+  function getDebitur($input, $request) {
     $startDate = date("Y-m-d", strtotime($input["startDate"]));
     $endDate = date("Y-m-d", strtotime($input["endDate"]));
 
     $getRpt = DB::connection('omcargo')->table('V_RPT_DEBITUR');
-    if (!empty($input["condition"]["BRANCH_ID"])) {
-      $getRpt->where('BRANCH_ID',$input["condition"]["BRANCH_ID"]);
-    }else if (empty($input["condition"]["BRANCH_ID"])) {
+    if (!empty($input["condition"]["NOTA_BRANCH_ID"])) {
+      $getRpt->where('BRANCH_ID',$input["condition"]["NOTA_BRANCH_ID"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_ID"])) {
       $getRpt->where('BRANCH_ID',$input['user']->user_branch_id);
     }
-    if (!empty($input["condition"]["BRANCH_CODE"])) {
-      $getRpt->where('BRANCH_CODE',$input["condition"]["BRANCH_CODE"]);
-    }else if (empty($input["condition"]["BRANCH_CODE"])) {
+    if (!empty($input["condition"]["NOTA_BRANCH_CODE"])) {
+      $getRpt->where('BRANCH_CODE',$input["condition"]["NOTA_BRANCH_CODE"]);
+    }else if (empty($input["condition"]["NOTA_BRANCH_CODE"])) {
       $getRpt->where('BRANCH_CODE',$input['user']->user_branch_code);
     }
     if (!empty($input["condition"]["NOTA_NO"])) {
