@@ -653,8 +653,8 @@ class PlgFunctTOS{
 	            "REQ_DTL_OWNER_NAME"			: "'.$dtl[$arr['config']['DTL_OWNER_NAME']].'",
 							"REQ_DTL_VESSEL_NAME"			: "'.$head[$arr['config']['head_vessel_name']].'",
 							"REQ_DTL_VESSEL_CODE"			: "'.$head[$arr['config']['head_vessel_code']].'",
-							"REC_DTL_VOYIN"						: "'.$head[$arr['config']['head_voyin']].'",
-							"REC_DTL_VOYOUT"					: "'.$head[$arr['config']['head_voyout']].'"
+							"REQ_DTL_VOYIN"						: "'.$head[$arr['config']['head_voyin']].'",
+							"REQ_DTL_VOYOUT"					: "'.$head[$arr['config']['head_voyout']].'"
 	          },';
 	        }
 	        $arrdetil = substr($arrdetil, 0,-1);
