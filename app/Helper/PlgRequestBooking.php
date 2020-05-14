@@ -32,7 +32,7 @@ class PlgRequestBooking{
 			$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$findReqNo."'";
 			$tarifs = DB::connection('eng')->select(DB::raw($query));
 			if (count($tarifs) == 0) {
-				return ['result' => "Fail, proforma and tariff not found!", "Success" => false];
+				return ['result_msg' => "Fail, proforma and tariff not found!", "Success" => false];
 			}
 			foreach ($tarifs as $tarif) {
 				$tarif = (array)$tarif;
@@ -312,11 +312,11 @@ class PlgRequestBooking{
 				(empty($findCanc) and $find[$config['head_status']] == 3 and $input['approved'] == 'true') or
 				(!empty($findCanc) and $findCanc->cancelled_status == 3 and $input['approved'] == 'true')
 			) {
-				return ['result' => "Fail, requst already approved!", 'no_req' => $retHeadNo, "Success" => false];
+				return ['result_msg' => "Fail, requst already approved!", 'no_req' => $retHeadNo, "Success" => false];
 			}
 			$nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$retHeadNo)->whereNotIn('nota_status', [4])->get();
 			if (count($nota) > 0) {
-				return ['result' => "Fail, request already exist on proforma!", 'no_req' => $retHeadNo, "Success" => false];
+				return ['result_msg' => "Fail, request already exist on proforma!", 'no_req' => $retHeadNo, "Success" => false];
 			}
 
 			if ($input['approved'] == 'false') {
@@ -364,7 +364,7 @@ class PlgRequestBooking{
 				}
 				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' =>$table, 'config' => $config]);
 				if (empty($sendRequestBooking['sendRequestBookingPLG'])) {
-					return ['result' => "Fail, error went send request to TOS!", 'no_req' => $retHeadNo, "Success" => false];
+					return ['result_msg' => "Fail, error went send request to TOS!", 'no_req' => $retHeadNo, "Success" => false];
 				}
 			}
 
@@ -397,7 +397,7 @@ class PlgRequestBooking{
 			if ($find[$config['head_status']] == 5) {
 				return [
 					'Success' => false,
-					'result' => "Fail, realisasion is confirmed!",
+					'result_msg' => "Fail, realisasion is confirmed!",
 					'no_req' => $find[$config['head_no']]
 				];
 			}
@@ -408,7 +408,7 @@ class PlgRequestBooking{
 				if (count($dtl) > 0) {
 					return [
 						'Success' => false,
-						'result' => "Fail, realisasion is not finish!",
+						'result_msg' => "Fail, realisasion is not finish!",
 						'no_req' => $find[$config['head_no']]
 					];
 				}
@@ -460,14 +460,14 @@ class PlgRequestBooking{
 	    	$sendInvAR = null;
 	    	$getNota = TxHdrNota::find($input['nota_id']);
             if (empty($getNota)) {
-            	return ['result' => "Fail, proforma not found!", "Success" => false];
+            	return ['result_msg' => "Fail, proforma not found!", "Success" => false];
             }
 	    	$cekNota = TxHdrNota::where([
             	'nota_id'=>$input['nota_id'],
             	'nota_status'=>'1'
             ])->count();
             if ($cekNota = 0) {
-            	return ['result' => "Fail, proforma not waiting approval!", 'nota_no' => $getNota->nota_no, "Success" => false];
+            	return ['result_msg' => "Fail, proforma not waiting approval!", 'nota_no' => $getNota->nota_no, "Success" => false];
             }
             $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
             $config = json_decode($config->api_set, true);
@@ -516,13 +516,13 @@ class PlgRequestBooking{
             	'nota_paid'=>'Y'
             ])->count();
             if ($cekNota > 0) {
-            	return ['result' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
+            	return ['result_msg' => "Fail, invoice already paid!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
             $cekNota = TxHdrNota::where([
             	'nota_no'=>$input['pay_nota_no']
             ])->whereIn('nota_status',[2,6])->count();
             if ($cekNota == 0) {
-            	return ['result' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
+            	return ['result_msg' => "Fail, proforma not approved!", "Success" => false, 'nota_no'=>$input['pay_nota_no']];
             }
 				if (empty($input['pay_id'])) {
 			    	$store = new TxPayment;
@@ -670,14 +670,12 @@ class PlgRequestBooking{
 	    }
 
 			public static function getApiConfig($input) {
-				// $getTmNota 	 	= DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
-				// return $getTmNota->nota_config_request;
 				$getTmNota 	 	= DB::connection('mdm')->table('TM_NOTA')->where('nota_id', $input['nota_id'])->first();
-				return $notaConfig  	= json_decode($getTmNota->nota_config_request, TRUE);
+				$notaConfig  	= json_decode($getTmNota->nota_config_request, TRUE);
 				if (!empty($input['canceled']) and $input['canceled'] == 'true') {
 					$tableCanc 	= DB::connection('omuster')->table('TX_HDR_CANCELLED')->where("CANCELLED_ID", $input['id'])->first();
-					return $canclReqNo	= $tableCanc->cancelled_req_no;
-					// return $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->get();
+					$canclReqNo	= $tableCanc->cancelled_req_no;
+					// $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->get();
 					$getRequest  	= json_decode(json_encode(DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["no_req"], $canclReqNo)->first()), TRUE);
 				} else {
 					// $table 			= DB::connection('omuster')->table($notaConfig["table"])->where($notaConfig["pk"], $input['id'])->get();
