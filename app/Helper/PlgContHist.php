@@ -63,6 +63,12 @@ class PlgContHist{
 		if (!empty($arr['cont_counter'])) {
 			$storeTsCont['cont_counter'] = $arr['cont_counter'];
 		}
+
+                if ( in_array($arr['kegiatan'], [1,2,5,6,7,8]) ){
+                        $storeTsCont['cont_isactive'] = 'Y';
+		} else if ( in_array($arr['kegiatan'], [4,12,13,14,15,16]) ){
+                        $storeTsCont['cont_isactive'] = 'N';
+		}
 		$cekTsCont = DB::connection('omuster')->table('TS_CONTAINER')->where($findTsCont)->orderBy('cont_counter', 'desc')->first();
 		if (empty($cekTsCont)) {
 			DB::connection('omuster')->table('TS_CONTAINER')->insert($storeTsCont);
