@@ -141,6 +141,18 @@
 		<td style="text-align:right">{{number_format($detail->dpp)}}</td>
 	</tr>
 	@endforeach
+		<?php if ($penumpukan != 0) { ?>
+			@foreach($penumpukan as $penumpukan)
+			<tr>
+				<td>{{$penumpukan->group_tariff_name}}</td>
+				<td style="text-align:center">{{$penumpukan->package_name}}</td>
+				<td style="text-align:center">{{$penumpukan->unit_name}}</td>
+				<td style="text-align:center">{{$penumpukan->qty}}</td>
+				<td style="text-align:right">{{number_format($penumpukan->tariff)}}</td>
+				<td style="text-align:right">{{number_format($penumpukan->dpp)}}</td>
+			</tr>
+			@endforeach
+		<?php } ?>
 <?php
 } else {
 ?>
