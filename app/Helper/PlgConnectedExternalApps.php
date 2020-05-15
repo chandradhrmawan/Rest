@@ -36,7 +36,7 @@ class PlgConnectedExternalApps{
 	        return ["Success"=>true, "request" => $arr, "response" => $res];
 		}
 
-		public static function getVesselNpks($input){
+		public static function getVesselNpks($input, $user){
 			$json = '
 			{
 				"getVesselNpksRequest": {
@@ -49,7 +49,9 @@ class PlgConnectedExternalApps{
 			        	"responseMessage": ""
 						},
 						"esbBody":   {
-							"vessel":"'.$input['query'].'"
+							"vessel":"'.$input['query'].'",
+							"branchId":"'.$user->user_branch_id.'",
+							"branchCode":"'.$user->user_branch_code.'"
 							},
 						"esbSecurity": {
 							"orgId":"",

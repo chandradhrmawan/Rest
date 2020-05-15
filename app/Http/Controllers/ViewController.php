@@ -49,7 +49,8 @@ class ViewController extends Controller
     }
 
     function getVesselNpks($input, $request){
-      return PlgConnectedExternalApps::getVesselNpks($input);
+      $user = $request['user'];
+      return PlgConnectedExternalApps::getVesselNpks($input,$user);
     }
 
     function splitNota($input, $request){
@@ -240,7 +241,7 @@ class ViewController extends Controller
   }
 
   function listRdSpps($input) {
-    
+
   }
 
 }
