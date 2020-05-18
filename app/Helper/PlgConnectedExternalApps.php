@@ -36,7 +36,7 @@ class PlgConnectedExternalApps{
 	        return ["Success"=>true, "request" => $arr, "response" => $res];
 		}
 
-		public static function getVesselNpks($input, $request){
+		public static function getVesselNpks($input){
 			$json = '
 			{
 				"getVesselNpksRequest": {
