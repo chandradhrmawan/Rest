@@ -27,7 +27,7 @@
     <tr>
       <td width="13%"><img src="{{ url('/other/logo.jpg') }}" height="60"></td>
 			<td width="45%">
-				<div<b>{{$branch->branch_name}} <br>{{$branch->branch_address}} </b><div style="margin-top:5px;font-size:8px">NPWP. {{$branch->branch_npwp}}</div></div>
+				<div><b>{{$sign->sign_hdr_name}} <br>{{$sign->sign_hdr_address}} </b><div style="margin-top:5px;font-size:10px">NPWP. {{$sign->sign_hdr_npwp}}</div></div>
 				</td>
       <td width="42%" style="vertical-align:top;text-align:right">
         <table style="border-collapse:collapse; font-size:11px;">
@@ -157,7 +157,7 @@
 			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
 			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
 			<td style="text-align:center">
-				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar("BPRP", $header->nota_req_no, $no)}}
+				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label->nota_service_om_code, $header->nota_req_no, $penumpukan['dtl_id'])}}
 			</td>
 			<td style="text-align:center">
 				<?php if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
@@ -315,20 +315,29 @@
 	</tr>
 </table>
 <p style="font-size:10px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
-<table style="border-collapse:collapse; font-size:12px;margin-top:60px;float:right;text-align:center">
+<table style="border-collapse:collapse; font-size:12px;margin-top:10px;float:right;text-align:center">
 	<tr><td>Banten, <?php  echo strtoupper(date("d F Y", strtotime($header->nota_date))); ?></td></tr>
 	<tr><td>{{$sign->sign_an}}<br>{{$sign->sign_position}}</td></tr>
-	<tr><td><div style="margin-top:50px"><u>{{$sign->sign_name}}</u></div></td></tr>
+	<tr>
+		<td>
+			<?php if (!empty($sign->sing_file_name)) { ?>
+				<img src="{{$sign->sing_file_name}}" alt="" width="200px">
+			<?php } else { ?>
+				<div style="margin-bottom:50px"><br></div>
+			<?php } ?>
+		</td>
+	</tr>
+	<tr><td><u>{{$sign->sign_name}}</u></td></tr>
 	<tr><td>NIPP. {{$sign->sign_nipp}}</td></tr>
 </table>
 
-<div style="position:absolute;bottom:150px;font-size:12px; width:100%">
-	{{$branch->branch_name}} <br>{{$branch->branch_address}}
+<div style="margin-top:220px;font-size:12px; width:100%">
+	{{$sign->sign_footer_name}} <br>{{$sign->sign_footer_address}}
 	<div style="margin-top:10px;font-size:8px">
 			{{$header->nota_no}}
 	</div>
 </div>
-<p style="position:absolute;right:0px;bottom:155px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
+<p style="position:absolute;right:0px;margin-top:-20px;font-size:8px">Print Date : <?php echo date('Y-m-d H:i:s', strtotime('7 hour 10 minute'))." | Page 1/1"; ?></p>
 @endforeach
 @endforeach
 @endforeach

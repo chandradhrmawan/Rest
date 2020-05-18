@@ -48,9 +48,8 @@ class ViewController extends Controller
       }
     }
 
-    function getVesselNpks($input, $request){
-      $user = $request['user'];
-      return PlgConnectedExternalApps::getVesselNpks($input,$user);
+    function getVesselNpks($input){
+      return PlgConnectedExternalApps::getVesselNpks($input);
     }
 
     function splitNota($input, $request){
