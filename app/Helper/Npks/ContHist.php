@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class PlgContHist{
+class ContHist{
 	public static function saveHisCont($find,$list,$config,$input,$confKgt){
 		$findTsCont = [
 			'cont_no' => $list[$config['DTL_BL']],

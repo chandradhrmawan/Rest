@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npk;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\OmCargo\TxHdrNota;
 use Carbon\Carbon;
-use App\Helper\ConnectedExternalApps;
-use App\Helper\FileUpload;
+
+use App\Models\OmCargo\TxHdrNota;
 use App\Models\OmCargo\TxPayment;
 use App\Models\OmCargo\TxHdrUper;
+
+use App\Helper\FileUpload;
+use App\Helper\Npk\ConnectedExternalAppsNPK;
 
 class RealisasiHelper{
 
@@ -400,7 +402,7 @@ class RealisasiHelper{
     if ($count == 0) {
       $loop = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->get();
       foreach ($loop as $list) {
-        $sendNota = ConnectedExternalApps::sendNotaProforma($list->nota_id);
+        $sendNota = ConnectedExternalAppsNPK::sendNotaProforma($list->nota_id);
         // if ($sendNota['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
         //   return [
         //     'sendNotaErrCode' => $sendNota['arResponseDoc']['esbBody'][0]['errorCode'],
@@ -412,7 +414,7 @@ class RealisasiHelper{
         $sendNotaTracking[] = $sendNota;
         $pay = TxPayment::where('pay_req_no', $list->nota_req_no)->where('pay_cust_id', $list->nota_cust_id)->first();
         if (!empty($pay)) {
-          // ConnectedExternalApps::notaProformaPutApply($list->nota_id, $pay);
+          // ConnectedExternalAppsNPK::notaProformaPutApply($list->nota_id, $pay);
           if ($pay->pay_amount >= $list->nota_amount) {
             TxHdrNota::where('nota_id', $input['id'])->update(['nota_paid'=>'L']);
           }else{

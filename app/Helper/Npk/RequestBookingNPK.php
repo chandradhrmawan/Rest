@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npk;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Helper\ConnectedExternalApps;
+
+use App\Helper\Npk\ConnectedExternalAppsNPK;
 use App\Helper\BillingEngine;
+
 use App\Models\OmCargo\TxHdrUper;
 
-class RequestBooking{
+class RequestBookingNPK{
 	// BTN
 		public static function sendRequest($input){
 			$input['table'] = strtoupper($input['table']);
@@ -349,7 +351,7 @@ class RequestBooking{
 			if ($migrateTariff == true) {
 				$pesan = "Created Uper No : ".$createdUperNo;
 			}else if($migrateTariff == false) {
-				$sendRequestBooking = ConnectedExternalApps::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
+				$sendRequestBooking = ConnectedExternalAppsNPK::sendRequestBooking(['req_no' => $find[$config['head_no']], 'paid_date' => null ]);
 				$pesan = "Uper Not created, uper percent for this request is 0%";
 			}
 

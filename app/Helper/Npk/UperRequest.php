@@ -1,21 +1,23 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npk;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 use App\Models\OmCargo\TxHdrUper;
 use App\Models\OmCargo\TxPayment;
-use Carbon\Carbon;
-use App\Helper\ConnectedExternalApps;
-use App\Helper\RequestBooking;
 use App\Models\OmCargo\TxHdrNota;
+
+use App\Helper\Npk\ConnectedExternalAppsNPK;
+use App\Helper\Npk\RequestBookingNPK;
 
 class UperRequest{
 
   public static function viewTempUper($input){
       $input['table'] = strtoupper($input['table']);
-      $config = RequestBooking::config($input['table']);
+      $config = RequestBookingNPK::config($input['table']);
       $find = DB::connection('omcargo')->table($input['table'])->where($config['head_primery'],$input['id'])->get();
       if (count($find) == 0) {
         return ['Success' => false, 'result' => 'fail, not found data!'];
@@ -211,7 +213,7 @@ class UperRequest{
         if ($input['pay_type'] == 1){
         	$res = '';
             if ($pay->pay_status == 1) {
-              $res = ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
+              $res = ConnectedExternalAppsNPK::sendUperPutReceipt($uper->uper_id, $pay);
               if ($res['response']['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
                 TxPayment::where('pay_id',$pay->pay_id)->update(['pay_status'=>2]);
                 $updateUperStatus = static::updateUperStatus([
@@ -241,8 +243,8 @@ class UperRequest{
             }
             return ["result" => "Success, store paid uper", 'pay_no' => $pay->pay_no, 'note' => $res, 'updateUperStatus' => $updateUperStatus];
         } else if ($input['pay_type'] == 2) {
-            $res = ConnectedExternalApps::sendNotaPutReceipt($nota->nota_id, $pay);
-            ConnectedExternalApps::notaProformaPutApply($nota->nota_id, $pay);
+            $res = ConnectedExternalAppsNPK::sendNotaPutReceipt($nota->nota_id, $pay);
+            ConnectedExternalAppsNPK::notaProformaPutApply($nota->nota_id, $pay);
             static::updateNotaStatus([
               'nota_id' => $nota->nota_id,
               'nota_paid' => 'W',
@@ -264,7 +266,7 @@ class UperRequest{
 
     if ($input['approved'] == 'true') {
       $uper = TxHdrUper::where('uper_no',$pay->pay_no)->first();
-      $res = ConnectedExternalApps::sendUperPutReceipt($uper->uper_id, $pay);
+      $res = ConnectedExternalAppsNPK::sendUperPutReceipt($uper->uper_id, $pay);
       if ($res['arResponseDoc']['esbBody'][0]['errorCode'] == 'F') {
         TxPayment::where('pay_id',$pay->pay_id)->update(['pay_status'=>2]);
         return ["Success"=>false, "result" => "Fail, send receipt", 'pay_no' => $pay->pay_no, 'note' => $res['arResponseDoc']['esbBody'][0]['errorMessage']];
@@ -306,7 +308,7 @@ class UperRequest{
   public static function sendRequestBooking($input){
     $cekStatus = TxHdrUper::where('uper_req_no',$input['req_no'])->whereIn('uper_paid', ['N', 'W', 'V', 'F'])->count();
     if ($cekStatus == 0) {
-      return ConnectedExternalApps::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['uper_paid_date']]);
+      return ConnectedExternalAppsNPK::sendRequestBooking(['req_no' => $input['req_no'], 'paid_date' => $input['uper_paid_date']]);
     }else{
       return ['response' => 'not send request'];
     }
@@ -314,7 +316,7 @@ class UperRequest{
 
   private static function updateNotaStatus($input){
       TxHdrNota::where('nota_id',$input['nota_id'])->update(['nota_paid' => $input['nota_paid']]);
-      ConnectedExternalApps::sendNotaPutReceipt($input['nota_id'], $input['pay']);
-      ConnectedExternalApps::notaProformaPutApply($input['nota_id'], $input['pay']);
+      ConnectedExternalAppsNPK::sendNotaPutReceipt($input['nota_id'], $input['pay']);
+      ConnectedExternalAppsNPK::notaProformaPutApply($input['nota_id'], $input['pay']);
   }
 }

@@ -25,11 +25,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-      $schedule->call('App\Helper\PlgConnectedExternalApps@clearScheduler');
-      $schedule->call('App\Helper\ConnectedExternalApps@sendNotifToIBISQA')->everyMinute();
-      $schedule->call('App\Helper\ConnectedExternalApps@sendNotifToIBISQA')->everyMinute();
-      $schedule->call('App\Helper\PlgConnectedExternalApps@flagRealisationRequest');
-      $schedule->call('App\Helper\PlgConnectedExternalApps@getUpdatePlacement');
-      $schedule->call('App\Helper\PlgConnectedExternalApps@getUpdateRename');
+      $schedule->call('App\Helper\Npks\ConnectedExternalAppsNPKS@clearScheduler');
+      $schedule->call('App\Helper\Npk\ConnectedExternalAppsNPK@sendNotifToIBISQA')->everyMinute();
+      $schedule->call('App\Helper\Npk\ConnectedExternalAppsNPK@sendNotifToIBISQA')->everyMinute();
+      $schedule->call('App\Helper\Npks\ConnectedExternalAppsNPKS@flagRealisationRequest');
+      $schedule->call('App\Helper\Npks\ConnectedExternalAppsNPKS@getUpdatePlacement');
+      $schedule->call('App\Helper\Npks\ConnectedExternalAppsNPKS@getUpdateRename');
     }
 }

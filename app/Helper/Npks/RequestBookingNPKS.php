@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Helper\PlgEInvo;
-use App\Helper\PlgFunctTOS;
-use App\Helper\PlgConnectedExternalApps;
-use App\Helper\PlgGenerateTariff;
-use App\Helper\PlgContHist;
-use App\Helper\PlgCanclHelper;
+
+use App\Helper\Npks\EInvo;
+use App\Helper\Npks\FunctTOS;
+use App\Helper\Npks\GenerateTariff;
+use App\Helper\Npks\ContHist;
+use App\Helper\Npks\CanclHelper;
+
 use App\Models\OmUster\TxHdrNota;
 use App\Models\OmUster\TxPayment;
 
-class PlgRequestBooking{
+class RequestBookingNPKS{
 	// PLG
 		private static function migrateNotaData($find, $config, $findCanc){
 			if (in_array($config['kegiatan'], [8]) and $find[$config['head_status']] == 2) {
@@ -216,13 +217,13 @@ class PlgRequestBooking{
 			}
 		}
 
-	    public static function sendRequestPLG($input){
+	    public static function sendRequestNPKS($input){
 			$config	 = static::getApiConfig($input);
 			$config 	= $config['config'];
 			// request batal
 			$canceledReqPrepare = null;
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
-				$canceledReqPrepare = PlgCanclHelper::canceledReqPrepare($input, $config, false);
+				$canceledReqPrepare = CanclHelper::canceledReqPrepare($input, $config, false);
 				if ($canceledReqPrepare['Success'] == false) {
 					return $canceledReqPrepare;
 				}
@@ -243,7 +244,7 @@ class PlgRequestBooking{
 			}
 
 			$his_cont = [];
-			$tariffResp = PlgGenerateTariff::calculateTariffBuild($find, $input, $config, $canceledReqPrepare);
+			$tariffResp = GenerateTariff::calculateTariffBuild($find, $input, $config, $canceledReqPrepare);
 			if (empty($tariffResp['result_flag']) or $tariffResp['result_flag'] != 'S') {
 				return $tariffResp;
 			} else if ($tariffResp['result_flag'] == 'S' and empty($canceledReqPrepare)) {
@@ -261,7 +262,7 @@ class PlgRequestBooking{
 				if (!in_array($confKgt, [10,11])) {
 					foreach ($tariffResp['detil_data'] as $list) {
 						$list = (array)$list;
-						$his_cont = PlgContHist::saveHisCont($find,$list,$config,$input,$confKgt);
+						$his_cont = ContHist::saveHisCont($find,$list,$config,$input,$confKgt);
 					}
 				}
 			}
@@ -272,7 +273,7 @@ class PlgRequestBooking{
 			return $tariffResp;
 	    }
 
-	    public static function viewTempTariffPLG($input){
+	    public static function viewTempTariffNPKS($input){
 	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 			$config = json_decode($config->api_set, true);
 			$findCanc = null;
@@ -292,15 +293,15 @@ class PlgRequestBooking{
 	    		$query = "SELECT * FROM V_PAY_SPLIT WHERE booking_number= '".$findCanc->cancelled_no."'";
 	    	}
 
-	    	$result = PlgGenerateTariff::showTempTariff($query, $config, $find);
+	    	$result = GenerateTariff::showTempTariff($query, $config, $find);
 
 			return [ "Success" => true, "result" => $result];
 		}
 
-	    public static function approvalRequestPLG($input){
+	    public static function approvalRequestNPKS($input){
 			$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 			$config = json_decode($config->api_set, true);
-			$cekReqOrCanc = PlgCanclHelper::cekReqOrCanc($input,$config);
+			$cekReqOrCanc = CanclHelper::cekReqOrCanc($input,$config);
 			if ($cekReqOrCanc['Success'] == false) {
 				return $cekReqOrCanc;
 			}
@@ -330,7 +331,7 @@ class PlgRequestBooking{
 						'cancelled_status' => 4,
 						'cancelled_mark' => $input['msg']
 					]);
-					PlgCanclHelper::undoCanclSet($input,$config,$findCanc,$find);
+					CanclHelper::undoCanclSet($input,$config,$findCanc,$find);
 				}
 
 				return ['result' => "Success, rejected requst", 'no_req' => $retHeadNo];
@@ -362,8 +363,8 @@ class PlgRequestBooking{
 					$id = $input['id'];
 		        	$table = $config['head_table'];
 				}
-				$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' =>$table, 'config' => $config]);
-				if (empty($sendRequestBooking['sendRequestBookingPLG'])) {
+				$sendRequestBooking = FunctTOS::sendRequestBookToTosNPKS(['id' => $id, 'table' =>$table, 'config' => $config]);
+				if (empty($sendRequestBooking['sendRequestBookToTosNPKS'])) {
 					return ['result_msg' => "Fail, error went send request to TOS!", 'no_req' => $retHeadNo, "Success" => false];
 				}
 			}
@@ -418,7 +419,7 @@ class PlgRequestBooking{
 			$pesan['result'] = null;
 			if ($find[$config['head_paymethod']] == 2) {
 				// calculate tariff
-					$tariffResp = PlgGenerateTariff::calculateTariffBuild($find, $input, $config, null);
+					$tariffResp = GenerateTariff::calculateTariffBuild($find, $input, $config, null);
 					if ($tariffResp['result_flag'] != 'S') {
 						return $tariffResp;
 					}
@@ -456,7 +457,7 @@ class PlgRequestBooking{
 			];
 	    }
 
-	    public static function approvalProformaPLG($input){
+	    public static function approvalProformaNPKS($input){
 	    	$sendInvAR = null;
 	    	$getNota = TxHdrNota::find($input['nota_id']);
             if (empty($getNota)) {
@@ -482,7 +483,7 @@ class PlgRequestBooking{
             			"payment" => null,
             			'reqCanc' => (array)$cekIsCanc
             		];
-            		$sendInvAR = PlgEInvo::sendInvPay($arr);
+            		$sendInvAR = EInvo::sendInvPay($arr);
            	        $getNota->nota_status = 5; $getNota->nota_paid = 'Y';
             	        $getNota->save();
             	}
@@ -507,7 +508,7 @@ class PlgRequestBooking{
             return ['result' => $msg, 'nota_no' => $getNota->nota_no, 'sendInvAR' => $sendInvAR];
 	    }
 
-	    public static function storePaymentPLG($input, $request) {
+	    public static function storePaymentNPKS($input, $request) {
 	    	$getNota = TxHdrNota::where([ 'nota_no'=>$input['pay_nota_no'] ])->first();
 	    	$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $getNota->nota_group_id)->first();
         	$config = json_decode($config->api_set, true);
@@ -623,7 +624,7 @@ class PlgRequestBooking{
 						'reqCanc' => $cekIsCanc
 					];
 					// $sendInvPay = "by pass";
-					$sendInvPay = PlgEInvo::sendInvPay($arr);
+					$sendInvPay = EInvo::sendInvPay($arr);
 					if (empty($sendInvPay['Success']) or $sendInvPay['Success'] == false) {
 						return [
 							'Success' => false,
@@ -652,7 +653,7 @@ class PlgRequestBooking{
 						(!empty($getReq) and $getReq[$config['head_paymethod']] == 1) or
 						!empty($cekIsCanc)
 					) {
-						$sendRequestBooking = PlgFunctTOS::sendRequestBookingPLG(['id' => $id, 'table' => $table, 'config' => $config]);
+						$sendRequestBooking = FunctTOS::sendRequestBookToTosNPKS(['id' => $id, 'table' => $table, 'config' => $config]);
 						if (!empty($cekIsCanc)) {
 							DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id', $cekIsCanc['cancelled_id'])->update([
 								'cancelled_status' => 9

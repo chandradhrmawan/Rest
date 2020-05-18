@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Helper\BillingEngine;
 
-class PlgGenerateTariff{
+class GenerateTariff{
 	private static function calculateHours($st,$ed){
 		$st = strtotime($st);
 		$ed = strtotime($ed);
@@ -552,7 +552,7 @@ class PlgGenerateTariff{
     	return $result;
 	}
 
-	public static function simulationTariffPLG($input){
+	public static function simulationTariffNPKS($input){
 		$setH = [];
 		// head
 			$setH['P_SOURCE_ID'] = "NPKS_BILLING";
