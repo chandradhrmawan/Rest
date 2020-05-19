@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Globalconfig;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

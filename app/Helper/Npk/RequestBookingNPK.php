@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 use App\Helper\Npk\ConnectedExternalAppsNPK;
-use App\Helper\BillingEngine;
+use App\Helper\Globalconfig\BillingEngine;
 
 use App\Models\OmCargo\TxHdrUper;
 

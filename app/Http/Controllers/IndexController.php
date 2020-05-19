@@ -5,9 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-use App\Helper\GlobalHelper;
-use App\Helper\UserAndRoleManagemnt;
-use App\Helper\ListIndexExt;
+use App\Helper\Globalconfig\GlobalHelper;
+use App\Helper\Globalconfig\UserAndRoleManagemnt;
+use App\Helper\Globalconfig\ListIndexExt;
 use App\Helper\Npk\ConnectedExternalAppsNpk;
 
 use App\Models\OmUster\TmUser;

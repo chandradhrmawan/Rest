@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Globalconfig;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr;
@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Dompdf\Dompdf;
 use Firebase\JWT\JWT;
-use App\Helper\Global\FileUpload;
+use App\Helper\Globalconfig\FileUpload;
 
 class PrintAndExport{
 

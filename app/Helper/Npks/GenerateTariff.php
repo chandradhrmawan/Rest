@@ -4,7 +4,7 @@ namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Helper\BillingEngine;
+use App\Helper\Globalconfig\BillingEngine;
 
 class GenerateTariff{
 	private static function calculateHours($st,$ed){

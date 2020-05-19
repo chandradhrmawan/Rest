@@ -12,10 +12,10 @@ use Dompdf\Dompdf;
 use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
 
-use App\Helper\BillingEngine;
-use App\Helper\UserAndRoleManagemnt;
-use App\Helper\ViewExt;
-use App\Helper\PrintAndExport;
+use App\Helper\Globalconfig\BillingEngine;
+use App\Helper\Globalconfig\UserAndRoleManagemnt;
+use App\Helper\Globalconfig\ViewExt;
+use App\Helper\Globalconfig\PrintAndExport;
 
 use App\Helper\Npk\ConnectedExternalAppsNPK;
 use App\Helper\Npks\ConnectedExternalAppsNPKS;
