@@ -27,13 +27,13 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Helper/Global/BillingEngine.php",
-            "app/Helper/Global/FileUpload.php",
-            "app/Helper/Global/GlobalHelper.php",
-            "app/Helper/Global/ListIndexExt.php",
-            "app/Helper/Global/PrintAndExport.php",
-            "app/Helper/Global/UserAndRoleManagemnt.php",
-            "app/Helper/Global/ViewExt.php",
+            "app/Helper/Globalconfig/BillingEngine.php",
+            "app/Helper/Globalconfig/FileUpload.php",
+            "app/Helper/Globalconfig/GlobalHelper.php",
+            "app/Helper/Globalconfig/ListIndexExt.php",
+            "app/Helper/Globalconfig/PrintAndExport.php",
+            "app/Helper/Globalconfig/UserAndRoleManagemnt.php",
+            "app/Helper/Globalconfig/ViewExt.php",
 
             "app/Helper/Npk/ConnectedExternalAppsNPK.php",
             "app/Helper/Npk/RealisasiHelper.php",

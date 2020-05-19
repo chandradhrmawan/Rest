@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Globalconfig;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr;
@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use App\Models\OmUster\TmUser;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
-use App\Helper\Global\FileUpload;
 
 class ListIndexExt{
 
