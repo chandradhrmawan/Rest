@@ -7,21 +7,23 @@ use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
 use App\Helper\FileUpload;
-use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
-use App\Helper\RequestBooking;
-use App\Helper\UperRequest;
+use App\Helper\GlobalHelper;
+use App\Helper\BillingEngine;
+
+use App\Helper\Npk\ConnectedExternalAppsNPK;
+use App\Helper\Npk\RequestBookingNPK;
+use App\Helper\Npk\UperRequest;
+use App\Helper\Npk\RealisasiHelper;
+
+use App\Helper\Npks\GenerateTariff;
+use App\Helper\Npks\RequestBookingNPKS;
+use App\Helper\Npks\ConnectedExternalAppsNPKS;
+use App\Helper\Npks\FunctTOS;
+
+use App\Models\Mdm\TmTruckCompany;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
-use App\Helper\GlobalHelper;
-use App\Helper\ConnectedExternalApps;
-use App\Helper\RealisasiHelper;
-use App\Models\Mdm\TmTruckCompany;
-use App\Helper\PlgGenerateTariff;
-use App\Helper\PlgRequestBooking;
-use App\Helper\PlgConnectedExternalApps;
-use App\Helper\PlgFunctTOS;
-use App\Helper\PlgEInvo;
 
 class StoreController extends Controller
 {
@@ -150,51 +152,51 @@ class StoreController extends Controller
     public function testlain($input, $request){
       $config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', 20)->first();
       $config = json_decode($config->api_set, true);
-      return PlgFunctTOS::sendRequestBookingPLG(['id' => 62, 'table' => 'TX_HDR_TL', 'config' => $config]);
-      return PlgConnectedExternalApps::flagRealisationRequest();
+      return FunctTOS::sendRequestBookingNPKPLG(['id' => 62, 'table' => 'TX_HDR_TL', 'config' => $config]);
+      return ConnectedExternalAppsNPKS::flagRealisationRequest();
       $nota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_id',114)->first();
       $nota = (array)$nota;
-      return PlgConnectedExternalApps::sendInvProforma([
+      return ConnectedExternalAppsNPKS::sendInvProforma([
         'nota' => $nota,
         'id' => 170
       ]);
     }
 
-    // PLG
-      function simulationTariffPLG($input, $request){
-        return PlgGenerateTariff::simulationTariffPLG($input);
+    // NPKS
+      function simulationTariffNPKS($input, $request){
+        return GenerateTariff::simulationTariffNPKS($input);
       }
 
-      function sendRequestPLG($input, $request){
-        return PlgRequestBooking::sendRequestPLG($input);
+      function sendRequestNPKS($input, $request){
+        return RequestBookingNPKS::sendRequestNPKS($input);
       }
 
-      function approvalRequestPLG($input, $request){
-        return PlgRequestBooking::approvalRequestPLG($input);
+      function approvalRequestNPKS($input, $request){
+        return RequestBookingNPKS::approvalRequestNPKS($input);
       }
 
       function confirmRealisasion($input, $request){
-        return PlgRequestBooking::confirmRealisasion($input);
+        return RequestBookingNPKS::confirmRealisasion($input);
       }
 
-      function approvalProformaPLG($input, $request){
-        return PlgRequestBooking::approvalProformaPLG($input);
+      function approvalProformaNPKS($input, $request){
+        return RequestBookingNPKS::approvalProformaNPKS($input);
       }
 
-      function storePaymentPLG($input, $request){
+      function storePaymentNPKS($input, $request){
         if (!empty($user)) {
           $user = json_decode(json_encode($user), TRUE);
-          return PlgRequestBooking::storePaymentPLG($input,$user);
+          return RequestBookingNPKS::storePaymentNPKS($input,$user);
         } else {
-          return PlgRequestBooking::storePaymentPLG($input,$request);
+          return RequestBookingNPKS::storePaymentNPKS($input,$request);
         }
       }
 
-      function getRealPLG($input, $request){
-        return PlgFunctTOS::getRealPLG($input);
+      function getRealNPKS($input, $request){
+        return FunctTOS::getRealNPKS($input);
       }
 
-    // PLG
+    // NPKS
 
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
@@ -274,17 +276,17 @@ class StoreController extends Controller
           return ['Success'=>false, 'result'=>'truck number already exists!'];
         }
         DB::connection('mdm')->table('TM_TRUCK')->insert($set_data_self);
-        $res = ConnectedExternalApps::truckRegistration($set_data);
+        $res = ConnectedExternalAppsNPK::truckRegistration($set_data);
       }else{
         $tid = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->first();
         $set_data['truck_id'] = $tid->truck_id;
         DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->update($set_data_self);
-        $res = ConnectedExternalApps::updateTid($set_data);
+        $res = ConnectedExternalAppsNPK::updateTid($set_data);
       }
         $tid = DB::connection('mdm')->table('TM_TRUCK')->where('truck_id',$input['truck_id'])->first();
         $set_data['truck_id'] = $tid->truck_id;
 
-      $res['getTruckPrimaryIdTos'] = ConnectedExternalApps::getTruckPrimaryIdTos($set_data);
+      $res['getTruckPrimaryIdTos'] = ConnectedExternalAppsNPK::getTruckPrimaryIdTos($set_data);
       return $res;
     }
 
@@ -362,11 +364,11 @@ class StoreController extends Controller
         "detail" => $detil
       ];
 
-      return ConnectedExternalApps::createTCA($set_data, $input['id']);
+      return ConnectedExternalAppsNPK::createTCA($set_data, $input['id']);
     }
 
     function closeTCA($input, $request){
-      return ConnectedExternalApps::closeTCA($input);
+      return ConnectedExternalAppsNPK::closeTCA($input);
     }
 
     function save($input, $request) {
@@ -387,15 +389,15 @@ class StoreController extends Controller
       ]);
     }
 
-    // RequestBooking
+    // RequestBookingNPK
       function sendRequest($input, $request){
-        return RequestBooking::sendRequest($input);
+        return RequestBookingNPK::sendRequest($input);
       }
 
       function approvalRequest($input, $request){
-        return RequestBooking::approvalRequest($input);
+        return RequestBookingNPK::approvalRequest($input);
       }
-    // RequestBooking
+    // RequestBookingNPK
 
     // BillingEngine
       function storeProfileTariff($input, $request){
@@ -425,11 +427,11 @@ class StoreController extends Controller
       }
 
       function uperSimkeuCek($input, $request){
-        return ConnectedExternalApps::uperSimkeuCek($input);
+        return ConnectedExternalAppsNPK::uperSimkeuCek($input);
       }
 
       function notaProformaSimkeuCek($input, $request){
-        return ConnectedExternalApps::notaProformaSimkeuCek($input);
+        return ConnectedExternalAppsNPK::notaProformaSimkeuCek($input);
       }
     // UperRequest
 
@@ -468,16 +470,16 @@ class StoreController extends Controller
   }
 
   function hitScheduler($input) {
-    return PlgConnectedExternalApps::flagRealisationRequest($input);
+    return ConnectedExternalAppsNPKS::flagRealisationRequest($input);
   }
 
   function hitPlacement($input) {
-    return PlgConnectedExternalApps::getUpdatePlacement($input);
+    return ConnectedExternalAppsNPKS::getUpdatePlacement($input);
   }
 
 
   function hitRename($input) {
-    return PlgConnectedExternalApps::getUpdateRename($input);
+    return ConnectedExternalAppsNPKS::getUpdateRename($input);
   }
 
 }

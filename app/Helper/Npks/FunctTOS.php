@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Helper\PlgContHist;
-use App\Helper\PlgConnectedExternalApps;
+use App\Helper\Npks\ContHist;
+use App\Helper\Npks\ConnectedExternalAppsNPKS;
 
-class PlgFunctTOS{
+class FunctTOS{
 	private static function jsonGetTOS($base64){
 		return '
 			{
@@ -48,7 +48,7 @@ class PlgFunctTOS{
 		return $res;
 	}
 
-	public static function sendRequestBookingPLG($arr){
+	public static function sendRequestBookToTosNPKS($arr){
     	$in_array = [
     		'TX_HDR_CANCELLED',
     		'TX_HDR_REC',
@@ -103,16 +103,16 @@ class PlgFunctTOS{
 	        	"target" => config('endpoint.tosPostPLG.target'),
 	        	"json" => json_encode(json_decode($json,true))
 	        ];
-	        $res = PlgConnectedExternalApps::sendRequestToExtJsonMet($opt);
+	        $res = ConnectedExternalAppsNPKS::sendRequestToExtJsonMet($opt);
 	        $res = static::decodeResultAftrSendToTosNPKS($res, 'repoPost');
 			// Simpan ke TX_SERVICES error lit ini
-			// PlgConnectedExternalApps::storeTxServices($json,json_decode($json,true)["repoPostRequest"]["esbBody"]["request"],$res["result"]["result"]);
+			// ConnectedExternalAppsNPKS::storeTxServices($json,json_decode($json,true)["repoPostRequest"]["esbBody"]["request"],$res["result"]["result"]);
 
     	}
-        return ['sendRequestBookingPLG' => $res];
+        return ['sendRequestBookToTosNPKS' => $res];
 	}
 
-	public static function getRealPLG($input){
+	public static function getRealNPKS($input){
 		$config = DB::connection('mdm')->table('TS_NOTA')->where('nota_id', $input['nota_id'])->first();
 		$config = json_decode($config->api_set, true);
 		$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
@@ -126,14 +126,14 @@ class PlgFunctTOS{
 		$Success = true;
 		$msg = 'Success get realisasion';
 		if (count($dtlLoop) > 0) {
-			$arr = static::getRealJsonPLG($find,$dtlLoop,$config);
-			$res = PlgConnectedExternalApps::sendRequestToExtJsonMet($arr);
+			$arr = static::getRealTosJsonNPKS($find,$dtlLoop,$config);
+			$res = ConnectedExternalAppsNPKS::sendRequestToExtJsonMet($arr);
 			$res = static::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 			if ($res['result']['count'] == 0) {
 				$Success = false;
 				$msg = 'realisasion not finish';
 			}else{
-				$his_cont = static::storeRealPLG($res['result']['result'],$find,$config,$input);
+				$his_cont = static::storeRealTosNPKS($res['result']['result'],$find,$config,$input);
 			}
 		}
 		$res['his_cont'] = $his_cont;
@@ -156,7 +156,7 @@ class PlgFunctTOS{
         ];
 	}
 
-	private static function storeRealPLG($data,$hdr,$config,$input){
+	private static function storeRealTosNPKS($data,$hdr,$config,$input){
 		$his_cont = [];
 		foreach ($data as $listR) {
 			$funfun = $config['funct_REAL_STR'];
@@ -202,13 +202,13 @@ class PlgFunctTOS{
 				if (!empty($input["user"])) {
 					$arrStoreTsContAndTxHisCont['id_user'] = $input["user"]->user_id;
 				}
-				$his_cont[] = PlgContHist::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
+				$his_cont[] = ContHist::storeTsContAndTxHisCont($arrStoreTsContAndTxHisCont);
 			}
 		}
 		return $his_cont;
 	}
 
-	public static function getRealJsonPLG($find,$dtlLoop,$config){
+	public static function getRealTosJsonNPKS($find,$dtlLoop,$config){
 		$dtl = '';
 		$arrdtl = [];
 		foreach ($dtlLoop as $list) {

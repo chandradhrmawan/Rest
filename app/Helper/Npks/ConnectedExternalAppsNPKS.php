@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Models\OmUster\TxHdrNota;
-use App\Helper\PlgRequestBooking;
-use App\Helper\PlgFunctTOS;
+use App\Helper\Npks\FunctTOS;
 
-class PlgConnectedExternalApps{
-	// PLG
+class ConnectedExternalAppsNPKS{
 		public static function sendRequestToExtJsonMet($arr){
 	        $client = new Client();
 	        $options= array(
@@ -148,7 +146,7 @@ class PlgConnectedExternalApps{
 		          "json" 		 	=> $json
 		        ];
 		  $res 							 	= static::sendRequestToExtJsonMet($arr);
-		  $res				 			 	= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		  $res				 			 	= FunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
 			if (empty($res["result"]["result"])) {
 				return "TX_RENAME Up to Date";
@@ -251,7 +249,7 @@ class PlgConnectedExternalApps{
 	        	"json" => json_encode(json_decode($json,true))
 	        ];
 	        $res = static::sendRequestToExtJsonMet($opt);
-	        $res = PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoPost');
+	        $res = FunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoPost');
 					$containerUpdate[] = $res["result"]["CONT_NO"];
 				}
 			}
@@ -344,7 +342,7 @@ class PlgConnectedExternalApps{
 		          "json" 		 	=> $json
 		        ];
 		  $res 							 	= static::sendRequestToExtJsonMet($arr);
-		  $res				 			 	= PlgFunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+		  $res				 			 	= FunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
 
 			if (empty($res["result"]["result"])) {
 				return "Placement is uptodate";
@@ -475,7 +473,7 @@ class PlgConnectedExternalApps{
 								"nota_id"=>$notaData->nota_id,
 								"id"=>$list[$config['head_primery']]
 							];
-							$response = PlgFunctTOS::getRealPLG($input);
+							$response = FunctTOS::getRealNPKS($input);
 
 							$storeHistory = [
 								"create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
@@ -550,5 +548,4 @@ class PlgConnectedExternalApps{
 	      }
 	    }
 	  }
-	// PLG
 }

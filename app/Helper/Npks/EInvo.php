@@ -1,12 +1,12 @@
 <?php
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\Helper\PlgConnectedExternalApps;
+use App\Helper\Npks\ConnectedExternalAppsNPKS;
 
-class PlgEInvo{
+class EInvo{
 
 	private static function getJsonInvAR($arr){
 		$hdr = static::getHdrInvAR($arr);
@@ -192,7 +192,7 @@ class PlgEInvo{
 
 	public static function sendInvAR($arr){
 		$json = static::getJsonInvAR($arr);
-		$res = PlgConnectedExternalApps::sendRequestToExtJsonMet([
+		$res = ConnectedExternalAppsNPKS::sendRequestToExtJsonMet([
         	"user" => config('endpoint.esbInvoicePutAR.user'),
         	"pass" => config('endpoint.esbInvoicePutAR.pass'),
         	"target" => config('endpoint.esbInvoicePutAR.target'),
@@ -296,7 +296,7 @@ class PlgEInvo{
 
 		$json = json_encode(json_decode($json,true));
 
-		return $res = PlgConnectedExternalApps::sendRequestToExtJsonMet([ // kirim putReceipt
+		return $res = ConnectedExternalAppsNPKS::sendRequestToExtJsonMet([ // kirim putReceipt
 			"user" => config('endpoint.esbInvoicePutReceipt.user'),
 			"pass" => config('endpoint.esbInvoicePutReceipt.pass'),
 			"target" => config('endpoint.esbInvoicePutReceipt.target'),
@@ -357,7 +357,7 @@ class PlgEInvo{
 
 		$json = json_encode(json_decode($json,true));
 
-		return $res = PlgConnectedExternalApps::sendRequestToExtJsonMet([ // kirim putReceipt
+		return $res = ConnectedExternalAppsNPKS::sendRequestToExtJsonMet([ // kirim putReceipt
 			"user" => config('endpoint.esbInvoicePutApply.user'),
 			"pass" => config('endpoint.esbInvoicePutApply.pass'),
 			"target" => config('endpoint.esbInvoicePutApply.target'),
