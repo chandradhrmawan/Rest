@@ -29,7 +29,7 @@
         "files": [
             "app/Helper/Global/BillingEngine.php",
             "app/Helper/Global/FileUpload.php",
-            "app/Helper/Global/Helper.php",
+            "app/Helper/Global/GlobalHelper.php",
             "app/Helper/Global/ListIndexExt.php",
             "app/Helper/Global/PrintAndExport.php",
             "app/Helper/Global/UserAndRoleManagemnt.php",
