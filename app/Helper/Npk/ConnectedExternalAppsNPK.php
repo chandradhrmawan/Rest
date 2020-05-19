@@ -16,7 +16,7 @@ use App\Models\OmCargo\TxHdrDel;
 use App\Models\OmCargo\TxHdrRec;
 use App\Models\OmCargo\TxHdrNota;
 
-class ConnectedExternalApps{
+class ConnectedExternalAppsNPK{
 
   // BTN
     public static function getListTCA($input){

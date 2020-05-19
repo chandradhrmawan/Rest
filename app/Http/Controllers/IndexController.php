@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Helper\Globalconfig\GlobalHelper;
 use App\Helper\Globalconfig\UserAndRoleManagemnt;
 use App\Helper\Globalconfig\ListIndexExt;
-use App\Helper\Npk\ConnectedExternalAppsNpk;
+use App\Helper\Npk\ConnectedExternalAppsNPK;
 
 use App\Models\OmUster\TmUser;
 use App\Models\OmCargo\TsUnit;
@@ -49,7 +49,7 @@ class IndexController extends Controller
     }
 
     function getListTCA($input, $request){
-      return ConnectedExternalAppsNpk::getListTCA($input);
+      return ConnectedExternalAppsNPK::getListTCA($input);
     }
 
     function listProfileTariffDetil($input, $request){
@@ -112,15 +112,15 @@ class IndexController extends Controller
     }
 
     function vessel_index($input, $request) {
-      return ConnectedExternalAppsNpk::vessel_index($input);
+      return ConnectedExternalAppsNPK::vessel_index($input);
     }
 
     function peb_index($input, $request) {
-     return ConnectedExternalAppsNpk::peb_index($input);
+     return ConnectedExternalAppsNPK::peb_index($input);
     }
 
     function getRealisasionTOS($input, $request){
-      return ConnectedExternalAppsNpk::realTos($input);
+      return ConnectedExternalAppsNPK::realTos($input);
     }
 
     function join_filter($input) {
