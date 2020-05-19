@@ -10,7 +10,7 @@ use App\Models\OmCargo\TxHdrNota;
 use App\Models\OmCargo\TxPayment;
 use App\Models\OmCargo\TxHdrUper;
 
-use App\Helper\FileUpload;
+use App\Helper\Global\FileUpload;
 use App\Helper\Npk\ConnectedExternalAppsNPK;
 
 class RealisasiHelper{

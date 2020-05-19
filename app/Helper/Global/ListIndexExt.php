@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use App\Models\OmUster\TmUser;
 use Illuminate\Support\Facades\Hash;
 use Firebase\JWT\JWT;
-use App\Helper\FileUpload;
+use App\Helper\Global\FileUpload;
 
 class ListIndexExt{
 
