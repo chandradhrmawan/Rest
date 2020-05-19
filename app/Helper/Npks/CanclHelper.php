@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Support\Facades\DB;
 
-class PlgCanclHelper{
+class CanclHelper{
 	public static function canceledReqPrepareGD($input,$config){
 		$cnclHdr = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
 		if (empty($cnclHdr)) {

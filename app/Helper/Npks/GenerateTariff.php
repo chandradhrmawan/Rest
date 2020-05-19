@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npks;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Helper\BillingEngine;
 
-class PlgGenerateTariff{
+class GenerateTariff{
 	private static function calculateHours($st,$ed){
 		$st = strtotime($st);
 		$ed = strtotime($ed);
@@ -315,10 +315,11 @@ class PlgGenerateTariff{
 		// build detil
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
-		//tambahan dari chalid
-		if(!empty($input["canceled"])) {
-			$detil->where($config['DTL_IS_CANCEL'], 'Y');
-		} else
+		/* ini gunanya buat apa ya lit? logic nya gmna maksudny? */
+		//tambahan dari chalid ?
+		// if(!empty($input["canceled"])) {
+		// 	$detil->where($config['DTL_IS_CANCEL'], 'Y');
+		// } else
 		//
 
 		if (!empty($config['DTL_IS_CANCEL']) and !in_array($input['nota_id'], [21,22,23])) {
@@ -552,7 +553,7 @@ class PlgGenerateTariff{
     	return $result;
 	}
 
-	public static function simulationTariffPLG($input){
+	public static function simulationTariffNPKS($input){
 		$setH = [];
 		// head
 			$setH['P_SOURCE_ID'] = "NPKS_BILLING";

@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Npk;
 
 use Illuminate\Http\Request;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use GuzzleHttp\Client;
+
+use App\Helper\Npk\RequestBookingNPK;
+use App\Helper\Npk\UperRequest;
+
 use App\Models\OmCargo\TxHdrUper;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrDel;
 use App\Models\OmCargo\TxHdrRec;
 use App\Models\OmCargo\TxHdrNota;
-use App\Helper\RequestBooking;
-use App\Helper\UperRequest;
-use Carbon\Carbon;
 
 class ConnectedExternalApps{
 
@@ -369,7 +371,7 @@ class ConnectedExternalApps{
         }
       }
 
-      $config = RequestBooking::config($table);
+      $config = RequestBookingNPK::config($table);
       if (!empty($header)) {
         $condition = DB::connection('omcargo')->table('TS_SEND_TOS')->pluck('pkg_id');
         $detil = DB::connection('omcargo')->table($config['head_tab_detil'])->where($config['head_forigen'],$header[$config['head_primery']])->whereIn('dtl_pkg_id', $condition)->get();

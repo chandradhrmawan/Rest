@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
 use App\Helper\GlobalHelper;
-use App\Helper\ConnectedExternalApps;
 use App\Helper\UserAndRoleManagemnt;
 use App\Helper\ListIndexExt;
-use Firebase\JWT\ExpiredException;
+use App\Helper\Npk\ConnectedExternalAppsNpk;
+
 use App\Models\OmUster\TmUser;
 use App\Models\OmCargo\TsUnit;
+
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
-use Illuminate\Support\Facades\Hash;
 
 class IndexController extends Controller
 {
@@ -46,7 +49,7 @@ class IndexController extends Controller
     }
 
     function getListTCA($input, $request){
-      return ConnectedExternalApps::getListTCA($input);
+      return ConnectedExternalAppsNpk::getListTCA($input);
     }
 
     function listProfileTariffDetil($input, $request){
@@ -109,15 +112,15 @@ class IndexController extends Controller
     }
 
     function vessel_index($input, $request) {
-      return ConnectedExternalApps::vessel_index($input);
+      return ConnectedExternalAppsNpk::vessel_index($input);
     }
 
     function peb_index($input, $request) {
-     return ConnectedExternalApps::peb_index($input);
+     return ConnectedExternalAppsNpk::peb_index($input);
     }
 
     function getRealisasionTOS($input, $request){
-      return ConnectedExternalApps::realTos($input);
+      return ConnectedExternalAppsNpk::realTos($input);
     }
 
     function join_filter($input) {

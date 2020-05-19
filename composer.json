@@ -27,23 +27,26 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Helper/ConnectedExternalApps.php",
-            "app/Helper/FileUpload.php",
-            "app/Helper/RequestBooking.php",
             "app/Helper/BillingEngine.php",
-            "app/Helper/UserAndRoleManagemnt.php",
-            "app/Helper/RealisasiHelper.php",
+            "app/Helper/FileUpload.php",
             "app/Helper/GlobalHelper.php",
-            "app/Helper/PlgCanclHelper.php",
-            "app/Helper/PlgGenerateTariff.php",
-            "app/Helper/PlgContHist.php",
-            "app/Helper/PlgEInvo.php",
-            "app/Helper/PlgFunctTOS.php",
-            "app/Helper/PlgRequestBooking.php",
-            "app/Helper/PlgConnectedExternalApps.php",
-            "app/Helper/PrintAndExport.php",
             "app/Helper/ListIndexExt.php",
-            "app/Helper/ViewExt.php"
+            "app/Helper/PrintAndExport.php",
+            "app/Helper/UserAndRoleManagemnt.php",
+            "app/Helper/ViewExt.php",
+
+            "app/Helper/Npk/ConnectedExternalAppsNPK.php",
+            "app/Helper/Npk/RealisasiHelper.php",
+            "app/Helper/Npk/RequestBookingNPK.php",
+            "app/Helper/Npk/UperRequest.php",
+            
+            "app/Helper/Npks/CanclHelper.php",
+            "app/Helper/Npks/ConnectedExternalAppsNPKS.php",
+            "app/Helper/Npks/ContHist.php",
+            "app/Helper/Npks/EInvo.php",
+            "app/Helper/Npks/FunctTOS.php",
+            "app/Helper/Npks/GenerateTariff.php",
+            "app/Helper/Npks/RequestBookingNPKS.php"
         ]
     },
     "autoload-dev": {

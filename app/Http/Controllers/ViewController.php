@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Input;
+
+use GuzzleHttp\Client;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
+
 use App\Models\Billing\TxProfileTariffHdr;
 use App\Models\Billing\TsTariff;
-use Carbon\Carbon;
-use GuzzleHttp\Client;
+
 use App\Helper\BillingEngine;
 use App\Helper\UserAndRoleManagemnt;
-use App\Helper\UperRequest;
 use App\Helper\ViewExt;
 use App\Helper\PrintAndExport;
-use Dompdf\Dompdf;
-use App\Helper\ConnectedExternalApps;
-use App\Helper\PlgConnectedExternalApps;
-use App\Helper\PlgRequestBooking;
-use Illuminate\Support\Facades\Input;
+
+use App\Helper\Npk\ConnectedExternalAppsNPK;
+use App\Helper\Npks\ConnectedExternalAppsNPKS;
+use App\Helper\Npks\RequestBookingNPKS;
+use App\Helper\Npk\UperRequest;
 
 class ViewController extends Controller
 {
@@ -49,7 +53,7 @@ class ViewController extends Controller
     }
 
     function getVesselNpks($input){
-      return PlgConnectedExternalApps::getVesselNpks($input);
+      return ConnectedExternalAppsNPKS::getVesselNpks($input);
     }
 
     function splitNota($input, $request){
@@ -57,7 +61,7 @@ class ViewController extends Controller
     }
 
     function getViewDetilTCA($input, $request){
-      return ConnectedExternalApps::getViewDetilTCA($input);
+      return ConnectedExternalAppsNPK::getViewDetilTCA($input);
     }
 
     public function getViewNotaPLB($input, $request) {
@@ -76,8 +80,8 @@ class ViewController extends Controller
         return UperRequest::viewTempUper($input);
     }
 
-    function viewTempTariffPLG($input, $request) {
-        return PlgRequestBooking::viewTempTariffPLG($input);
+    function viewTempTariffNPKS($input, $request) {
+        return RequestBookingNPKS::viewTempTariffNPKS($input);
     }
 
     // BillingEngine
