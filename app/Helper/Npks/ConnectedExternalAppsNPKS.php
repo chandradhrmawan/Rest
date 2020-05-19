@@ -542,7 +542,7 @@ class ConnectedExternalAppsNPKS{
 	      $active  = intval(strtotime($data->user_active));
 	      $now     = intval(strtotime($time));
 	      $selisih = ($now - $active)/60;
-	      if ($selisih >= 240) {
+	      if ($selisih >= 960) { // ditambahin awalnya 240
 	        $user[] = [$data->user_name, $selisih];
 	         DB::connection('omuster')->table('TM_USER')->where('USER_ID', $data->user_id)->update(["USER_LOGIN" => "", "USER_ACTIVE" => "", "API_TOKEN" => ""]);
 	      }
