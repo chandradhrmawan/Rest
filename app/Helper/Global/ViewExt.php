@@ -8,7 +8,7 @@ use App\Models\Billing\TsTariff;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Firebase\JWT\JWT;
-use App\Helper\FileUpload;
+use App\Helper\Global\FileUpload;
 
 class ViewExt{
 

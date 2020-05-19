@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Dompdf\Dompdf;
 use Firebase\JWT\JWT;
-use App\Helper\FileUpload;
+use App\Helper\Global\FileUpload;
 
 class PrintAndExport{
 
