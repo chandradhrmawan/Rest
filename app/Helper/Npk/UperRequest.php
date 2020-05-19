@@ -12,6 +12,7 @@ use App\Models\OmCargo\TxHdrNota;
 
 use App\Helper\Npk\ConnectedExternalAppsNPK;
 use App\Helper\Npk\RequestBookingNPK;
+use App\Helper\Globalconfig\FileUpload;
 
 class UperRequest{
 
