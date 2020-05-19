@@ -315,10 +315,11 @@ class GenerateTariff{
 		// build detil
 		$setD = [];
 		$detil = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $find[$config['head_primery']]);
-		//tambahan dari chalid
-		if(!empty($input["canceled"])) {
-			$detil->where($config['DTL_IS_CANCEL'], 'Y');
-		} else
+		/* ini gunanya buat apa ya lit? logic nya gmna maksudny? */
+		//tambahan dari chalid ?
+		// if(!empty($input["canceled"])) {
+		// 	$detil->where($config['DTL_IS_CANCEL'], 'Y');
+		// } else
 		//
 
 		if (!empty($config['DTL_IS_CANCEL']) and !in_array($input['nota_id'], [21,22,23])) {
