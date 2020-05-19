@@ -396,7 +396,8 @@ class RealisasiHelper{
         'nota_no' => $nota->nota_no
       ];
     }
-    TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2]);
+    $datenow    = Carbon::now()->format('Y-m-d');
+    TxHdrNota::where('nota_id', $input['id'])->update(['nota_status'=>2, 'nota_date'=>\DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')")]);
     $count = TxHdrNota::where('nota_real_no', $nota->nota_real_no)->whereIn('nota_status', [1,3])->count();
     $sendNotaTracking = [];
     if ($count == 0) {
