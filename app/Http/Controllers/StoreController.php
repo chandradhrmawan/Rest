@@ -240,7 +240,10 @@ class StoreController extends Controller
         'branch_code' => $input['truck_branch_code']
       ])->first();
 
+      $datenow    = Carbon::now()->format('Y-m-d');
       $set_data = [
+        "truck_create_by" => $input["user"]->user_id,
+        "truck_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD')"),
         "terminal_id" => $terminal->terminal_id,
         "truck_plat_no" => strtoupper($input['truck_plat_no']),
         "truck_rfid_code" => strtoupper($input['truck_rfid']),
