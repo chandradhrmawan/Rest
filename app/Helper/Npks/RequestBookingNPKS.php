@@ -474,6 +474,8 @@ class RequestBookingNPKS{
             $config = json_decode($config->api_set, true);
             $cekIsCanc = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_no', $getNota->nota_req_no)->first();
             if ($input['approved'] == 'true') {
+            	$datenow = Carbon::now()->format('Y-m-d');
+            	$getNota->nota_date = \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:MI')");
             	$getNota->nota_status = 2;
             	$getNota->save();
             	if (!empty($cekIsCanc)){
