@@ -5,6 +5,7 @@ namespace App\Helper\Npks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Helper\Globalconfig\GlobalHelper;
 use App\Helper\Npks\ContHist;
 use App\Helper\Npks\ConnectedExternalAppsNPKS;
 

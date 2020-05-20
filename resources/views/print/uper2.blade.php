@@ -124,7 +124,7 @@
 			<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
 			<td style="text-align:center">{{$penumpukan["dtl_qty"]}}</td>
 			<td style="text-align:center">
-				{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label->nota_service_om_code, $header->uper_req_no, $no)}}
+				{{(new \App\Helper\Globalconfig\GlobalHelper)->tanggalMasukKeluar($label->nota_service_om_code, $header->uper_req_no, $no)}}
 			</td>
 			<td style="text-align:center">
 				<?php if(!empty($penumpukan["masa1"])) { echo $penumpukan["masa1"]; } else { echo "0"; } ?><br>
