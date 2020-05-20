@@ -789,7 +789,7 @@ class GlobalHelper {
       if ($data == "HEADER") {
         $hdr   = json_decode(json_encode($val["VALUE"]), TRUE);
         if ($hdr[0][$cek] == '' || $sq == "N") {
-          if ($dbhdr == "omuster") {
+          if ($dbhdr == "omuster" or $dbhdr == "omuster_ilcs") {
             $sequence = DB::connection($dbhdr)->table("DUAL")->select($tblhdr."_SEQ.NEXTVAL")->get();
             $seq      = ($sequence[0]->nextval);
           } else {
