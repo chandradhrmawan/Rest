@@ -10,6 +10,7 @@ use App\Helper\Npks\FunctTOS;
 use App\Helper\Npks\GenerateTariff;
 use App\Helper\Npks\ContHist;
 use App\Helper\Npks\CanclHelper;
+use App\Helper\Globalconfig\FileUpload;
 
 use App\Models\OmUster\TxHdrNota;
 use App\Models\OmUster\TxPayment;
