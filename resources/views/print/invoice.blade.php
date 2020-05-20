@@ -134,7 +134,7 @@
 				<td style="padding-left:9px"><?php $nomor++;echo $nomor; ?></td>
 				<td style="padding-left:9px">{{$penumpukan["dtl_commodity"]}}</td>
 					<td style="padding-left:9px;text-align:center">
-						{{(new \App\Helper\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, $penumpukan["dtl_id"])}}
+						{{(new \App\Helper\Globalconfig\GlobalHelper)->tanggalMasukKeluar($label[0]->nota_service_om_code, $header->nota_req_no, $penumpukan["dtl_id"])}}
 					</td>
 				<td style="text-align:center">
 					{{number_format($penumpukan["masa1"])}}<br>
@@ -217,12 +217,12 @@
 	<tr>
 		<td style="" colspan="7">Uang Jaminan</td>
 		<td style="text-align:right;padding-right:9px" width="50px">IDR</td>
-		<td style="text-align:right">{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no))}}</td>
+		<td style="text-align:right">{{number_format((new \App\Helper\Globalconfig\GlobalHelper)->getUper($header->nota_req_no))}}</td>
 	</tr>
 	<tr>
 		<td style="" colspan="7">
 			<b><?php
-			if((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount > 0) {
+			if((new \App\HelperGlobalconfig\\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount > 0) {
 				if ($label[0]->nota_service_om_code == "BM") {
 					echo "<b>Pelunasan</b>";
 				} else {
@@ -238,7 +238,7 @@
 			} ?></b>
 		</td>
 		<td style="text-align:right;padding-right:9px"><b>IDR</b></td>
-		<td style="text-align:right"><b>{{number_format((new \App\Helper\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount)}}</b></td>
+		<td style="text-align:right"><b>{{number_format((new \App\Helper\Globalconfig\GlobalHelper)->getUper($header->nota_req_no)-$header->nota_amount)}}</b></td>
 	</tr>
 </table>
 <p style="font-size:11px;margin-top:50px">Terbilang : <font style="text-transform:capitalize">{{$terbilang}} Rupiah</font></p>
