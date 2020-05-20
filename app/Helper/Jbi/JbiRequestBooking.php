@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Jbi;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -547,7 +547,7 @@ class JbiRequestBooking{
 				'sendRequestBooking' => $sendRequestBooking,
 				'changeRecRemaningQty' => $changeRecRemaningQty
 			];
-	    }
+		} // end approvalRequestJbi
 
 	    public static function confirmRealisasion($input){
 			$config = DB::connection('mdm_ilcs')
