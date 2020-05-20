@@ -966,24 +966,41 @@ class GlobalHelper {
 
   public static function tanggalMasukKeluar($service, $req_no, $dtl_id) {
     if ($service == "DEL") {
+        // echo $dtl_id;
         $header = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->first();
-        $dtl    = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header->del_id)->where('DTL_ID', $dtl_id)->first();
-        $date2  =date_create($dtl->dtl_out);
-        $date1  =date_create($dtl->dtl_in);
+        $dtlReq = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header->del_id)->where('DTL_'.$service.'_ID', $dtl_id)->first();
+
+        // BPRP
+        // $header = DB::connection('omcargo')->table('TX_HDR_BPRP')->where('BPRP_REQ_NO', '=', $req_no)->first();
+        // $dtl    = DB::connection('omcargo')->table('TX_DTL_BPRP')->where('HDR_BPRP_ID', '=', $header->bprp_id)->where('DTL_BPRP_ID', $dtl_id)->first();
+        // $date1  =date_create($dtl->dtl_datein);
+        // $date2  = date_add(date_create($dtl->dtl_dateout), date_interval_create_from_date_string('1 days'));
+
+        $date1  =date_create($dtlReq->dtl_in);
+        $date2  =date_add(date_create($dtlReq->dtl_out), date_interval_create_from_date_string('1 days'));
         $count = date_diff($date1,$date2);
-        // echo
-        echo date("d-m-y", strtotime($dtl->dtl_in))."<br>".date("d-m-y", strtotime($dtl->dtl_out))."<br>".$count->format('%a Hari');
+        echo date("d-m-y", strtotime($dtlReq->dtl_in))."<br>".date("d-m-y", strtotime($dtlReq->dtl_out))."<br>".$count->format('%a Hari');
+
+        // echo date("d-m-y", strtotime($dtl->dtl_datein))."<br>".date("d-m-y", strtotime($dtl->dtl_dateout))."<br>".$count->format('%a Hari');
     }
     else if ($service == "REC") {
         $dtlIn  = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_NO', '=', $req_no)->first();
-        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn->rec_id)->where('DTL_ID', $dtl_id)->first();
-        $date1  =date_create($dtlOut->dtl_in);
-        $date2  =date_create($dtlIn->rec_etd);
+        $dtlOut = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $dtlIn->rec_id)->first();
+
+        // BPRP
+        $header = DB::connection('omcargo')->table('TX_HDR_BPRP')->where('BPRP_REQ_NO', '=', $req_no)->first();
+        $dtl    = DB::connection('omcargo')->table('TX_DTL_BPRP')->where('HDR_BPRP_ID', '=', $header->bprp_id)->first();
+
+        // $date1  =date_create($dtlOut->dtl_in);
+        $date1  =date_create($dtl->dtl_datein);
+
+        $date2  = date_add(date_create($dtl->dtl_dateout), date_interval_create_from_date_string('1 days'));
+        // $date2  =date_create($dtlIn->rec_etd);
         $count = date_diff($date1,$date2);
-        echo date("d-m-y", strtotime($dtlOut->dtl_in))."<br>".date("d-m-y", strtotime($dtlIn->rec_etd))."<br>".$count->format('%a Hari');
+        echo date("d-m-y", strtotime($dtl->dtl_datein))."<br>".date("d-m-y", strtotime($dtl->dtl_dateout))."<br>".$count->format('%a Hari');
     } else if($service == "BPRP") {
       $header = DB::connection('omcargo')->table('TX_HDR_'.$service)->where($service.'_REQ_NO', '=', $req_no)->first();
-      $dtl    = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header->bprp_id)->where('DTL_ID', $dtl_id)->first();
+      $dtl    = DB::connection('omcargo')->table('TX_DTL_'.$service)->where('HDR_'.$service.'_ID', '=', $header->bprp_id)->where('DTL_'.$service.'_ID', $dtl_id)->first();
       $date2  = date_add(date_create($dtl->dtl_dateout), date_interval_create_from_date_string('1 days'));
       $date1  = date_create($dtl->dtl_datein);
       $count  = date_diff($date1,$date2);

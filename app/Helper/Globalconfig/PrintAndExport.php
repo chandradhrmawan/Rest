@@ -552,7 +552,7 @@ class PrintAndExport{
 
     $all = ["header"=>$header]+$det;
     $branch      = DB::connection('mdm')->table("TM_BRANCH")->where('BRANCH_ID', $header[0]->nota_branch_id)->where('BRANCH_CODE', $header[0]->nota_branch_code)->get();
-    $terbilang   = $this->terbilang($header[0]->nota_amount);
+    $terbilang   = static::terbilang($header[0]->nota_amount);
     if (!array_key_exists("alat",$all)) {
       $alat = 0;
     } else {
