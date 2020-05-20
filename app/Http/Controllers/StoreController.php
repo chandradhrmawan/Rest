@@ -25,6 +25,8 @@ use App\Models\Mdm\TmTruckCompany;
 use App\Models\OmCargo\TxHdrBm;
 use App\Models\OmCargo\TxHdrRec;
 
+use App\Helper\Jbi\JbiRequestBooking;
+
 class StoreController extends Controller
 {
     /**
@@ -197,6 +199,11 @@ class StoreController extends Controller
       }
 
     // NPKS
+
+    // Start JBI
+    function sendRequestJBI($input, $request){
+        return JbiRequestBooking::sendRequestJBI($input);
+      }
 
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
