@@ -411,6 +411,7 @@ class ViewExt{
     }
     $results  = json_decode($res->getBody()->getContents(), true);
     $qrcode   = $results['getDataCetakResponse']['esbBody']['url'];
+    $qrcode = "https://eservice.indonesiaport.co.id/index.php/eservice/api/getdatacetak?kode=billingedii&tipe=nota&no=".$input["nota_no"]; //optional
 
     return ["link" => $qrcode];
   }
@@ -615,6 +616,58 @@ class ViewExt{
     $result = $getRpt->get();
 
     return ["result"=>$result, "total"=>$count];
+  }
+
+  public function readExcelImport(Request $request)
+  {
+    $json_request = $request->json()->get('TCARequest');
+    $encoded_string = $json_request['esbBody']['base64'];
+
+    $target_dir = 'temp_truck/';
+    if (!file_exists($target_dir)){
+      mkdir($target_dir, 0777);
+    }
+
+    $decoded_file = base64_decode($encoded_string); // decode the file
+    $mime_type = finfo_buffer(finfo_open(), $decoded_file, FILEINFO_MIME_TYPE); // extract mime type
+    $extension = $this->mime2ext($mime_type); // extract extension from mime type
+    $name = Carbon::now()->format('mdY_h_i_s');
+    $file = $name.'.'.$extension; // rename file as a unique name
+    $file_dir = $target_dir.$name.'.'.$extension;
+    try {
+      file_put_contents($file_dir, $decoded_file);
+      $response = true;
+    } catch (Exception $e) {
+      $response = $e->getMessage();
+    }
+
+    $objPHPExcel = PHPExcel_IOFactory::load($file_dir);
+    $sheet = $objPHPExcel->getSheet(0);
+    $highestRow = $sheet->getHighestRow();
+    // $highestColumn = $sheet->getHighestColumn();
+    $responseData = [];
+    for ($row = 2; $row <= $highestRow; $row++){
+      // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+      $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
+    }
+
+    unlink($file_dir);
+    return response()->json([
+      'TCAResponse' => [
+        'esbHeader' => [
+          'internalId' => '537750c2-3912-4cbb-a5ed-ed98f7d312f9',
+          'responseTimestamp' => '20190717 09:54:02.173',
+          'responseCode' => '0',
+          'responseMessage' => 'Success'
+        ],
+        'esbBody' => [
+          'results' => [
+            'response' => $responseData,
+            'status' => 'success',
+            'message' => 'Successfully, Payment']
+        ]
+      ]
+    ]);
   }
 
 }
