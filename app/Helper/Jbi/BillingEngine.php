@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Jbi;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Billing\TxProfileTariffHdr_ilcs;

@@ -75,6 +75,8 @@ class StoreController extends Controller
         $connection = 'omcargo';
       }else if ($branch_id == 4) {
         $connection = 'omuster';
+      }else if ($branch_id == 10){
+        $connection = 'omuster_ilcs';
       }
       DB::connection($connection)->table('TH_LOGS_API_STORE')->insert([
         "create_date" => \DB::raw("TO_DATE('".Carbon::now()->format('Y-m-d H:i:s')."', 'YYYY-MM-DD HH24:mi:ss')"),
@@ -204,6 +206,10 @@ class StoreController extends Controller
     function sendRequestJBI($input, $request){
         return JbiRequestBooking::sendRequestJBI($input);
       }
+
+    function approvalRequestJbi($input, $request){
+      return JbiRequestBooking::approvalRequestJbi($input);
+    }
 
     public function testview_file(){
       $file = file_get_contents(url("omcargo/tx_payment/5/users.png"));
