@@ -22,6 +22,8 @@ use App\Helper\Npks\ConnectedExternalAppsNPKS;
 use App\Helper\Npks\RequestBookingNPKS;
 use App\Helper\Npk\UperRequest;
 
+use App\Helper\Jbi\JbiRequestBooking;
+
 class ViewController extends Controller
 {
     /**
@@ -82,6 +84,10 @@ class ViewController extends Controller
 
     function viewTempTariffNPKS($input, $request) {
         return RequestBookingNPKS::viewTempTariffNPKS($input);
+    }
+
+    function viewTempTariffJBI($input, $request) {
+        return JbiRequestBooking::viewTempTariffJBI($input);
     }
 
     // BillingEngine

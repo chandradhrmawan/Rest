@@ -417,7 +417,7 @@ class JbiGenerateTariff {
 		];
 
 		// set data
-		$tariffResp = BillingEngine::calculateTariff($set_data);
+		$tariffResp = Billingeng_ilcsine::calculateTariff($set_data);
 		if (!in_array($config['kegiatan'], [10, 11])) {
 			$tariffResp['detil_data'] = $detil;
 		}
@@ -485,7 +485,7 @@ class JbiGenerateTariff {
 	public static function showTempTariff($query, $config, $find)
 	{
 		$result = [];
-		$getHS = DB::connection('eng')->select(DB::raw($query));
+		$getHS = DB::connection('eng_ilcs')->select(DB::raw($query));
 		foreach ($getHS as $getH) {
 			$comp_notas = DB::connection('mdm_ilcs')->table('TM_REFF')->where([
 				'reff_tr_id' => 10
@@ -503,12 +503,12 @@ class JbiGenerateTariff {
 				$nv = [];
 				if (count($grArr) > 0) {
 					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '" . $getH->temp_hdr_id . "' AND CUSTOMER_ID = '" . $getH->customer_id . "'";
-					$group_tariff = DB::connection('eng')->select(DB::raw($queryAgain));
+					$group_tariff = DB::connection('eng_ilcs')->select(DB::raw($queryAgain));
 					$resultD = [];
 					foreach ($group_tariff as $grpTrf) {
 						$grpTrf = (array) $grpTrf;
 						if (in_array($grpTrf['group_tariff_id'], $grArr)) {
-							$uperD = DB::connection('eng')->table('V_TX_TEMP_TARIFF_DTL_NPKS')->where('TEMP_HDR_ID', $getH->temp_hdr_id)->where('group_tariff_id', $grpTrf['group_tariff_id'])->get();
+							$uperD = DB::connection('eng_ilcs')->table('V_TX_TEMP_TARIFF_DTL_NPKS')->where('TEMP_HDR_ID', $getH->temp_hdr_id)->where('group_tariff_id', $grpTrf['group_tariff_id'])->get();
 							$countLine = 0;
 							foreach ($uperD as $list) {
 								$resultD[] = $list;
