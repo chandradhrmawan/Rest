@@ -207,8 +207,16 @@ class StoreController extends Controller
         return JbiRequestBooking::sendRequestJBI($input);
       }
 
-    function approvalRequestJbi($input, $request){
-      return JbiRequestBooking::approvalRequestJbi($input);
+    function approvalRequestJBI($input, $request){
+      return JbiRequestBooking::approvalRequestJBI($input);
+    }
+
+    function approvalProformaJBI($input, $request){
+      return JbiRequestBooking::approvalProformaJBI($input);
+    }
+
+    function storePaymentJBI($input, $request){
+      return JbiRequestBooking::storePaymentJBI($input);
     }
 
     public function testview_file(){
