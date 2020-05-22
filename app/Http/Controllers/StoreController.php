@@ -272,9 +272,11 @@ class StoreController extends Controller
         "date" => date('d-m-Y', strtotime($input['truck_plat_exp']))
       ];
 
-      $datenow    = Carbon::now()->format('Y-m-d H:i:s');
+      // $datenow    = Carbon::now()->format('Y-m-d H:i:s', '+7 hour');
+      $datenow    = date('Y-m-d H:i:s', strtotime('+7 hour'));
       $set_data_self = [
         "truck_create_by" => $input["user"]->user_id,
+        "truck_create_by_name" => $input["user"]->user_name,
         "truck_create_date" => \DB::raw("TO_DATE('".$datenow."', 'YYYY-MM-DD HH24:mi:ss')"),
         "truck_id" => str_replace(' ','',$input['truck_plat_no']),
         "truck_name" => $input['truck_name'],
