@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Jbi;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;

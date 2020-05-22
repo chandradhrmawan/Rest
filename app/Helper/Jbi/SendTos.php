@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helper;
+namespace App\Helper\Jbi;
 
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -13,7 +13,7 @@ class SendTos{
     public static function send_data($nota_no){
 
         $nota_type = DB::connection('omuster_ilcs')->table('TX_HDR_NOTA A')
-            ->join('BILLING_mdm_ilcs.TM_NOTA B', 'A.NOTA_GROUP_ID', '=', 'B.NOTA_ID')
+            ->join('BILLING_MDM.TM_NOTA B', 'A.NOTA_GROUP_ID', '=', 'B.NOTA_ID')
             ->select('B.NOTA_ID','B.NOTA_NAME')
             ->where('A.NOTA_NO', $nota_no)
             ->get();
@@ -60,7 +60,7 @@ class SendTos{
           // print_r($data_head);die;
           foreach ($data_head as $key => $value) {
             $sql_req_id   = "SELECT SEQ_REQ_RECEIVING_HDR.NEXTVAL FROM DUAL";
-            $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+            $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
             $request_id   = $data_req_id[0]->nextval;
 
             $head['request_id']             = $request_id;
@@ -84,7 +84,7 @@ class SendTos{
             $head['request_di']             = 'I';
             $head['request_rd']             = 'N';
             $head['request_payment_method'] = $value->rec_paymethod;
-            DB::connection('npks')->table('TX_REQ_RECEIVING_HDR')->insert($head);
+            DB::connection('npks_ilcs')->table('TX_REQ_RECEIVING_HDR')->insert($head);
         }
 
         $request_hdr_id = $data_head[0]->rec_id;
@@ -97,7 +97,7 @@ class SendTos{
 
         foreach ($data_dtl as $keyx => $valuex) {
             $sql_req_dtl_id  = "SELECT SEQ_REQ_RECEIVING_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
             $dtl['request_dtl_id']              = $request_dtl_id;
@@ -121,7 +121,7 @@ class SendTos{
             $dtl['request_dtl_tl']              = 'N';
             $dtl['request_dtl_cancelled']       = $valuex->rec_dtl_iscancelled;
 
-            DB::connection('npks')->table('TX_REQ_RECEIVING_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_RECEIVING_DTL')->insert($dtl);
         }
 
         foreach ($data_dtl as $keyz => $valuez) {
@@ -136,7 +136,7 @@ class SendTos{
             $tm_cont['CONTAINER_STATUS']       = NULL;
             $tm_cont['CONTAINER_DATE']         = NULL;
 
-            DB::connection('npks')->table('TM_CONTAINER')->insert($tm_cont);
+            DB::connection('npks_ilcs')->table('TM_CONTAINER')->insert($tm_cont);
         }
 
         return 'success';
@@ -152,7 +152,7 @@ class SendTos{
 
         foreach ($data_head as $key => $value) {
             $sql_req_id   = "SELECT SEQ_REQ_DELIVERY_HDR.NEXTVAL FROM DUAL";
-            $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+            $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
             $request_id   = $data_req_id[0]->nextval;
 
             $head['REQ_ID']                 = $request_id;
@@ -173,7 +173,7 @@ class SendTos{
             $head['REQUEST_RD']             = "N";
             $head['REQUEST_PAYMENT_METHOD'] = $value->del_paymethod;
             $head['REQUEST_NOTA']           = $value->nota_no;
-            DB::connection('npks')->table('TX_REQ_DELIVERY_HDR')->insert($head);
+            DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_HDR')->insert($head);
         }
 
         $request_dtl_id = $data_head[0]->del_id;
@@ -185,7 +185,7 @@ class SendTos{
 
         foreach ($data_dtl as $keyx => $valuex) {
             $sql_req_dtl_id  = "SELECT SEQ_REQ_DELIVERY_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
             $dtl['REQ_DTL_ID']          = $request_dtl_id;
@@ -207,7 +207,7 @@ class SendTos{
             $dtl['REQ_DTL_VIA_ID']      = $valuex->del_dtl_via;
             $dtl['REQ_DTL_TL']          = "N"; #sementara N dulu
 
-            DB::connection('npks')->table('TX_REQ_DELIVERY_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_DTL')->insert($dtl);
         }
 
         return 'success';
@@ -224,7 +224,7 @@ class SendTos{
 
         foreach ($data_head as $key => $value) {
             $sql_req_id   = "SELECT SEQ_TX_REQ_DELIVERY_BRG_HDR.NEXTVAL FROM DUAL";
-            $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+            $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
             $request_id   = $data_req_id[0]->nextval;
 
             $head['REQUEST_ID']             = $request_id;
@@ -248,7 +248,7 @@ class SendTos{
             $head['REQUEST_DI']             = "";
             $head['REQUEST_PAYMENT_METHOD'] = "2";
 
-            DB::connection('npks')->table('TX_REQ_DELIVERY_BRG_HDR')->insert($head);
+            DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_BRG_HDR')->insert($head);
         }
 
         $request_dtl_id = $data_head[0]->del_cargo_id;
@@ -261,7 +261,7 @@ class SendTos{
 
           foreach ($data_dtl as $keyx => $valuex) {
             $sql_req_dtl_id  = "SELECT SEQ_TX_REQ_DELIVERY_BRG_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
 
@@ -281,7 +281,7 @@ class SendTos{
             $dtl['REQUEST_DTL_TOTAL']           = $valuex->del_cargo_dtl_qty;
             $dtl['REQUEST_DTL_UNIT']            = $valuex->del_cargo_dtl_unit_name;
 
-            DB::connection('npks')->table('TX_REQ_DELIVERY_BRG_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_BRG_DTL')->insert($dtl);
         }
     return 'success';
 
@@ -306,13 +306,13 @@ class SendTos{
             ->where('A.NOTA_NO', $nota_no)
             ->first();
 
-        $data_req = DB::connection('npks')
+        $data_req = DB::connection('npks_ilcs')
                     ->table('TX_REQ_DELIVERY_HDR')
                     ->select('REQ_ID')
                     ->where('REQ_NO', $data_head->del_ext_from)
                     ->first();
 
-        $affected1 = DB::connection('npks')->table('TX_REQ_DELIVERY_HDR')
+        $affected1 = DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_HDR')
               ->where('REQ_ID', $data_req->req_id)
               ->update([
                     'REQ_NO'                => $data_head->del_no,
@@ -331,7 +331,7 @@ class SendTos{
                         ->get();
 
         foreach ($data_dtl as $key => $value) {
-            $affected2 = DB::connection('npks')->table('TX_REQ_DELIVERY_DTL')
+            $affected2 = DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_DTL')
               ->where('REQ_HDR_ID', $data_req->req_id)
               ->where('REQ_DTL_CONT', $value->del_dtl_cont)
               ->update([
@@ -365,13 +365,13 @@ class SendTos{
             ->where('A.NOTA_NO', $nota_no)
             ->first();
 
-        $data_req = DB::connection('npks')
+        $data_req = DB::connection('npks_ilcs')
                     ->table('TX_REQ_STUFF_HDR')
                     ->select('STUFF_ID')
                     ->where('STUFF_NO', $data_head->stuff_ext_from)
                     ->first();
 
-        $affected1 = DB::connection('npks')->table('TX_REQ_STUFF_HDR')
+        $affected1 = DB::connection('npks_ilcs')->table('TX_REQ_STUFF_HDR')
               ->where('REQ_ID', $data_req->stuff_id)
               ->update([
                     'STUFF_NO'            => $data_head->stuff_no,
@@ -389,7 +389,7 @@ class SendTos{
                         ->get();
 
         foreach ($data_dtl as $key => $value) {
-            $affected2 = DB::connection('npks')->table('TX_REQ_STUFF_DTL')
+            $affected2 = DB::connection('npks_ilcs')->table('TX_REQ_STUFF_DTL')
               ->where('STUFF_DTL_HDR_ID', $data_req->stuff_id)
               ->where('STUFF_DTL_CONT', $value->stuff_dtl_cont)
               ->update([
@@ -418,13 +418,13 @@ class SendTos{
             ->where('A.NOTA_NO', $nota_no)
             ->first();
 
-        $data_req = DB::connection('npks')
+        $data_req = DB::connection('npks_ilcs')
                     ->table('TX_REQ_STRIP_HDR')
                     ->select('STRIP_ID')
                     ->where('STRIP_NO', $data_head->stripp_ext_from)
                     ->first();
 
-        $affected1 = DB::connection('npks')->table('TX_REQ_STRIP_HDR')
+        $affected1 = DB::connection('npks_ilcs')->table('TX_REQ_STRIP_HDR')
               ->where('STRIP_ID', $data_req->strip_id)
               ->update([
                     'STRIP_NO'            => $data_head->stripp_no,
@@ -442,7 +442,7 @@ class SendTos{
                         ->get();
 
         foreach ($data_dtl as $key => $value) {
-            $affected2 = DB::connection('npks')->table('TX_REQ_STRIP_DTL')
+            $affected2 = DB::connection('npks_ilcs')->table('TX_REQ_STRIP_DTL')
               ->where('STRIP_DTL_HDR_ID', $data_req->strip_id)
               ->where('STRIP_DTL_CONT', $value->stripp_dtl_cont)
               ->update([
@@ -507,7 +507,7 @@ class SendTos{
 
             foreach ($data_head as $key => $value) {
                 $sql_req_id   = "SELECT SEQ_REQ_REC_BRG_HDR.NEXTVAL FROM DUAL";
-                $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+                $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
                 $request_id   = $data_req_id[0]->nextval;
 
                 $head['request_id']             = $request_id;
@@ -530,7 +530,7 @@ class SendTos{
                 $head['request_status']         = '1';
                 $head['request_di']             = '';
                 $head['request_payment_method'] = $value->rec_cargo_paymethod;
-                DB::connection('npks')->table('TX_REQ_RECEIVING_BRG_HDR')->insert($head);
+                DB::connection('npks_ilcs')->table('TX_REQ_RECEIVING_BRG_HDR')->insert($head);
         }
 
         $request_hdr_id = $data_head[0]->rec_cargo_id;
@@ -567,7 +567,7 @@ class SendTos{
 
         foreach ($data_dtl as $keyx => $valuex) {
             $sql_req_dtl_id  = "SELECT SEQ_REQ_REC_BRG_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
             $dtl['request_dtl_id']              = $request_dtl_id;
@@ -586,7 +586,7 @@ class SendTos{
             $dtl['request_dtl_total']           = $valuex->rec_cargo_dtl_qty;
             $dtl['request_dtl_unit']            = $valuex->rec_cargo_dtl_unit_name;
 
-            DB::connection('npks')->table('TX_REQ_RECEIVING_BRG_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_RECEIVING_BRG_DTL')->insert($dtl);
         }
         return 'success';
     }
@@ -646,7 +646,7 @@ class SendTos{
         //print_r($data_head);
         foreach ($data_head as $key => $value) {
             $sql_req_id   = "SELECT SEQ_TX_REQ_RELOKASI_HDR.NEXTVAL FROM DUAL";
-            $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+            $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
             $request_id   = $data_req_id[0]->nextval;
 
             $head['request_id']             = $request_id;
@@ -664,7 +664,7 @@ class SendTos{
             $head['id_relokasi_type']       = $value->id_relokasi_type;
             $head['request_nota']           = $value->nota_no;
 
-            DB::connection('npks')->table('TX_REQ_RELOKASI_HDR')->insert($head);
+            DB::connection('npks_ilcs')->table('TX_REQ_RELOKASI_HDR')->insert($head);
         }
 
         $request_hdr_id = $data_head[0]->relokasi_id;
@@ -697,7 +697,7 @@ class SendTos{
             //print_r($data_dtl);
         foreach ($data_dtl as $key => $value) {
             $sql_req_dtl_id  = "SELECT SEQ_TX_REQ_RELOKASI_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
             $dtl['request_dtl_id']          = $request_dtl_id;
@@ -714,7 +714,7 @@ class SendTos{
             $dtl['plan_start_date']         = $value->relokasi_dtl_start_date;
             $dtl['plan_end_date']           = $value->relokasi_dtl_end_date;
 
-            DB::connection('npks')->table('TX_REQ_RELOKASI_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_RELOKASI_DTL')->insert($dtl);
         }
 
         return 'success';
@@ -783,7 +783,7 @@ class SendTos{
             ->first();
 
         $sql_req_id   = "SELECT SEQ_REQ_STRIP_HDR.NEXTVAL FROM DUAL";
-        $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+        $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
         $request_id   = $data_req_id[0]->nextval;
 
         $head['STRIP_BL']                         = $data_head->stripp_bl;
@@ -807,7 +807,7 @@ class SendTos{
         $head['STRIP_SPPB_DATE']                  = '';
         $head['STRIP_STATUS']                     = $data_head->stripp_status;
         $head['STRIP_TYPE']                       = '';
-        DB::connection('npks')->table('TX_REQ_STRIP_HDR')->insert($head);
+        DB::connection('npks_ilcs')->table('TX_REQ_STRIP_HDR')->insert($head);
 
         $request_hdr_id = $data_head->stripp_id;
         $data_dtl = DB::connection('omuster_ilcs')->table('TX_DTL_STRIPP A')
@@ -850,7 +850,7 @@ class SendTos{
         $branch_id = $data_head->stripp_branch_id;
         foreach ($data_dtl as $data) {
             $sql_req_dtl_id  = "SELECT SEQ_REQ_STRIP_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
             $dtl = [
@@ -879,7 +879,7 @@ class SendTos{
                 'STRIP_DTL_COUNTER'           => ''
             ];
 
-            DB::connection('npks')->table('TX_REQ_STRIP_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_STRIP_DTL')->insert($dtl);
         }
 
         return 'success';
@@ -949,7 +949,7 @@ class SendTos{
           // dd($data_head);
           foreach ($data_head as $key => $value) {
             $sql_req_id   = "SELECT SEQ_REQ_STUFF_HDR.NEXTVAL FROM DUAL";
-            $data_req_id  = DB::connection('npks')->select(DB::raw($sql_req_id));
+            $data_req_id  = DB::connection('npks_ilcs')->select(DB::raw($sql_req_id));
             $request_id   = $data_req_id[0]->nextval;
 
             $head['STUFF_ID']                         = $request_id;
@@ -971,7 +971,7 @@ class SendTos{
             $head['STUFF_ALIH_KAPAL']                 = 'T';
             $head['STUFF_MARK']                       = '';
             $head['STUFF_PAYMENT_METHOD']             = $value->stuff_paymethod;
-            DB::connection('npks')->table('TX_REQ_STUFF_HDR')->insert($head);
+            DB::connection('npks_ilcs')->table('TX_REQ_STUFF_HDR')->insert($head);
         }
 
         $request_hdr_id = $data_head[0]->stuff_id;
@@ -1015,7 +1015,7 @@ class SendTos{
         // dd($data_dtl);
         foreach ($data_dtl as $keyx => $valuex) {
             $sql_req_dtl_id  = "SELECT SEQ_REQ_STUFF_DTL.NEXTVAL FROM DUAL";
-            $data_req_dtl_id = DB::connection('npks')->select(DB::raw($sql_req_dtl_id));
+            $data_req_dtl_id = DB::connection('npks_ilcs')->select(DB::raw($sql_req_dtl_id));
             $request_dtl_id  = $data_req_dtl_id[0]->nextval;
 
                 $dtl['STUFF_DTL_ID']                = $request_dtl_id;
@@ -1035,7 +1035,7 @@ class SendTos{
                 $dtl['STUFF_DTL_CANCELLED']         = $valuex->stuff_dtl_iscancelled;
                 $dtl['STUFF_DTL_COUNTER']           = 1;
                 $dtl['STUFF_DTL_VIA']               = $valuex->stuff_dtl_via_name;
-            DB::connection('npks')->table('TX_REQ_STUFF_DTL')->insert($dtl);
+            DB::connection('npks_ilcs')->table('TX_REQ_STUFF_DTL')->insert($dtl);
         }
 
         return 'success';

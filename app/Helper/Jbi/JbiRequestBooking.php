@@ -11,6 +11,7 @@ use App\Helper\Jbi\JbiConnectedExternalApps;
 use App\Helper\Jbi\JbiGenerateTariff;
 use App\Helper\Jbi\JbiContHist;
 use App\Helper\Jbi\SendTos;
+use App\Helper\Jbi\FileUpload;
 
 use App\Models\OmUster\TxHdrNota_ilcs;
 use App\Models\OmUster\TxPayment_ilcs;
