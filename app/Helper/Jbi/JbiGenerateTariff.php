@@ -417,7 +417,7 @@ class JbiGenerateTariff {
 		];
 
 		// set data
-		$tariffResp = Billingeng_ilcsine::calculateTariff($set_data);
+		$tariffResp = BillingEngine::calculateTariff($set_data);
 		if (!in_array($config['kegiatan'], [10, 11])) {
 			$tariffResp['detil_data'] = $detil;
 		}
