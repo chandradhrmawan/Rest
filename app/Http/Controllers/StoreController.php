@@ -508,8 +508,16 @@ class StoreController extends Controller
     return ConnectedExternalAppsNPKS::getUpdateRename($input);
   }
 
-  function getRealNPKS($input) {
+  function hitRealNPKS($input) {
     return ConnectedExternalAppsNPKS::realisationByHit($input);
+  }
+
+  function hitPlacementNPKS($input) {
+    return ConnectedExternalAppsNPKS::placementByHit($input);
+  }
+
+  function hitRenameNPKS($input) {
+    return ConnectedExternalAppsNPKS::renameByHit($input);
   }
 
 }

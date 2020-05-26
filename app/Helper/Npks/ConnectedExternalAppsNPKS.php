@@ -532,14 +532,33 @@ class ConnectedExternalAppsNPKS{
 		}
 
 		public static function realisationByHit($input){
-			return $input;
+			$activity = [
+				"rec" 			=> "1",
+				"del" 			=> "2",
+				"stuff" 		=> "3",
+				"strip" 		=> "4",
+				"fumi" 			=> "5",
+				"plug" 			=> "6",
+				"rec_cargo" => "21",
+				"del_cargo" => "22"
+			];
+
+			$nota_id 			= $activity[$input["activity"]];
+
+			$nota_cond 		= [
+				"FLAG_STATUS" => 'Y',
+				"NOTA_ID" => $nota_id,
+				"BRANCH_ID" => $input["branch_id"]
+				// "BRANCH_CODE" => $input["branch_code"]
+			];
+
 			$res = [];
-			$nota = DB::connection('mdm')->table('TS_NOTA')->where('FLAG_STATUS','Y')->whereNotNull('API_SET')->orderBy('nota_id', 'asc')->get();
+			$nota = DB::connection('mdm')->table('TS_NOTA')->where($nota_cond)->whereNotNull('API_SET')->orderBy('nota_id', 'asc')->get();
 			$nota_id_old = 0;
 			foreach ($nota as $notaData) {
 				if ($nota_id_old != $notaData->nota_id) {
 					$config = json_decode($notaData->api_set, true);
-					$hdr = DB::connection('omuster')->table($config['head_table'])->whereIn($config['head_status'], [3,10])->get();
+					$hdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'], $input["no_req"])->get();
 					foreach ($hdr as $list) {
 						$list = (array)$list;
 						$cekNota = DB::connection('omuster')->table('TX_HDR_NOTA')->where('nota_req_no',$list[$config['head_no']])->first();
@@ -557,8 +576,10 @@ class ConnectedExternalAppsNPKS{
 							 $input = [
 								"sceduler"=>true,
 								"nota_id"=>$notaData->nota_id,
+								"no_cont" => $input["no_cont"],
 								"id"=>$list[$config['head_primery']]
 							];
+
 							$response = FunctTOS::getRealNPKS($input);
 
 							$storeHistory = [
@@ -615,6 +636,300 @@ class ConnectedExternalAppsNPKS{
 				$nota_id_old = $notaData->nota_id;
 			}
 			return $res;
+		}
+
+		public static function placementByHit($input){
+		   $dtl = '
+		    {
+		      "NO_CONTAINER"	: "'.$input["no_cont"].'",
+		      "NO_REQUEST"		: "'.$input["no_req"].'",
+		      "BRANCH_ID"			: "'.$input["branch_id"].'"
+		    }';
+
+		  $json = '
+		  {
+		    "action" : "generatePlacement",
+		    "data": ['.$dtl.']
+		  }';
+
+		  $json = base64_encode(json_encode(json_decode($json,true)));
+		  $json = '
+		    {
+		        "repoGetRequest": {
+		            "esbHeader": {
+		                "internalId": "",
+		                "externalId": "",
+		                "timestamp": "",
+		                "responseTimestamp": "",
+		                "responseCode": "",
+		                "responseMessage": ""
+		            },
+		            "esbBody": {
+		                "request": "'.$json.'"
+		            },
+		            "esbSecurity": {
+		                "orgId": "",
+		                "batchSourceId": "",
+		                "lastUpdateLogin": "",
+		                "userId": "",
+		                "respId": "",
+		                "ledgerId": "",
+		                "respAppId": "",
+		                "batchSourceName": ""
+		            }
+		        }
+		    }
+		      ';
+		  $json = json_encode(json_decode($json,true));
+		  $arr = [
+		          "user"		 	=> config('endpoint.tosGetPLG.user'),
+		          "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		          "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		          "json" 		 	=> $json
+		        ];
+		  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		  $res				 			 	= FunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+			if (empty($res["result"]["result"])) {
+				return "Placement is uptodate";
+			}
+			static::storeTxServices($json,json_decode($json,true)["repoGetRequest"]["esbBody"]["request"],$res["result"]["result"]);
+			// return $res["result"]["result"];
+
+		  foreach ($res["result"]["result"] as $listR) {
+		    $findCont 				= [
+		      "CONT_NO" 			=> $listR["NO_CONTAINER"],
+		      "CONT_LOCATION" => "GATI",
+					"BRANCH_ID"			=> $listR["BRANCH_ID"]
+		    ];
+
+
+		   $findPlacement 		= [
+		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"]
+		    ];
+
+				$findHistory 			= [
+		      "NO_REQUEST" 		=> $listR["NO_REQUEST"],
+		      "NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+					"KEGIATAN"			=> "12"
+		    ];
+
+		    $tsContainer 		 	= DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->get();
+
+				// return $tsContainer;
+		                        DB::connection('omuster')->table('TS_CONTAINER')->where($findCont)->update(['CONT_LOCATION'=>"IN_YARD", 'CONT_ISACTIVE' => "N"]);
+		    $placementID 			= DB::connection('omuster')->table('DUAL')->select('SEQ_TX_PLACEMENT.NEXTVAL')->get();
+
+				if (empty($tsContainer)) {
+					$container[] =  $listR["NO_CONTAINER"]." Already In Yard";
+				} else {
+					$container[] =  $listR["NO_CONTAINER"]." Change To In Yard";
+					$storePlacement  	= [
+						"PLACEMENT_ID"	=> $placementID[0]->nextval,
+						"NO_REQUEST"		=> $listR["NO_REQUEST"],
+						"NO_CONTAINER"	=> $listR["NO_CONTAINER"],
+						"YBC_SLOT"			=> $listR["YBC_SLOT"],
+						"YBC_ROW"				=> $listR["YBC_ROW"],
+						"YBC_BLOCK_ID"	=> $listR["YBC_BLOCK_ID"],
+						"TIER"					=> $listR["TIER"],
+						"ID_YARD"				=> $listR["ID_YARD"],
+						"ID_USER"				=> $listR["ID_USER"],
+						"CONT_STATUS"		=> $listR["CONT_STATUS"],
+						"TGL_PLACEMENT"	=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
+						"BRANCH_ID"			=> $listR["BRANCH_ID"],
+						"CONT_COUNTER"	=> $tsContainer[0]->cont_counter
+					];
+
+					$storeHistory 		= [
+						"NO_CONTAINER" 	=> $listR["NO_CONTAINER"],
+						"NO_REQUEST"		=> $listR["NO_REQUEST"],
+						"KEGIATAN"			=> "12",
+						"HISTORY_DATE"		=> date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])),
+						"ID_USER"				=> $listR["ID_USER"],
+						"ID_YARD"				=> $listR["ID_YARD"],
+						"STATUS_CONT"		=> $listR["CONT_STATUS"],
+						"VVD_ID"				=> "",
+						"COUNTER"				=> $tsContainer[0]->cont_counter,
+						"SUB_COUNTER"		=> "",
+						"WHY"						=> ""
+					];
+
+					$headerID 				= DB::connection('omuster')->table('TX_HDR_REC')->where('REC_NO', $listR["NO_REQUEST"])->first();
+
+					$updateFlReal 		= DB::connection('omuster')
+					->table("TX_DTL_REC")
+					->where('REC_DTL_CONT', $listR["NO_CONTAINER"])
+					->where('REC_HDR_ID', $headerID->rec_id)
+					->update(["rec_dtl_real_date"=>date('Y-m-d h:i:s', strtotime($listR['PLACEMENT_DATE'])), "rec_fl_real"=>"3"]);
+
+					DB::connection('omuster')->table('TX_PLACEMENT')->insert($storePlacement);
+
+					$cekHistory 			= DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->first();
+					if (empty($cekHistory)) {
+						DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->insert($storeHistory);
+					} else {
+						DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where($findHistory)->update($storeHistory);
+					}
+				}
+		  }
+			return $container;
+		}
+
+		public static function renameByHit($input) {
+			$json = '
+		  {
+		    "action" 		: "generateRename",
+				"no_cont" 	: "'.$input["no_cont"].'",
+				"no_req" 		: "'.$input["no_req"].'",
+				"branch_id" : "'.$input["branch_id"].'"
+		  }';
+
+		  $json = base64_encode(json_encode(json_decode($json,true)));
+		  $json = '
+		    {
+		        "repoGetRequest": {
+		            "esbHeader": {
+		                "internalId": "",
+		                "externalId": "",
+		                "timestamp": "",
+		                "responseTimestamp": "",
+		                "responseCode": "",
+		                "responseMessage": ""
+		            },
+		            "esbBody": {
+		                "request": "'.$json.'"
+		            },
+		            "esbSecurity": {
+		                "orgId": "",
+		                "batchSourceId": "",
+		                "lastUpdateLogin": "",
+		                "userId": "",
+		                "respId": "",
+		                "ledgerId": "",
+		                "respAppId": "",
+		                "batchSourceName": ""
+		            }
+		        }
+		    }
+		      ';
+		  $json = json_encode(json_decode($json,true));
+		  $arr = [
+		          "user"		 	=> config('endpoint.tosGetPLG.user'),
+		          "pass" 		 	=> config('endpoint.tosGetPLG.pass'),
+		          "target" 	 	=> config('endpoint.tosGetPLG.target'),
+		          "json" 		 	=> $json
+		        ];
+		  $res 							 	= static::sendRequestToExtJsonMet($arr);
+		  $res				 			 	= FunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoGet');
+
+			if (empty($res["result"]["result"])) {
+				return "TX_RENAME Up to Date";
+			}
+
+			// return $res["result"]["result"];
+
+			foreach ($res["result"]["result"] as $result) {
+					if (empty($result["RENAMED_CONT"])) {
+						$error[] = $result["RENAMED_CONT_OLD"];
+					} else {
+					// For TS_CONTAINER
+					$tsContainer 	 		= DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT"])->first();
+					// Rename Not Exist
+					if (empty($tsContainer->cont_no)) {
+						$updateData 		= [
+							"CONT_NO" 		=> $result["RENAMED_CONT"],
+						];
+						$updateContOld 	= DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT_OLD"])->update($updateData);
+						$updateHistOld  = DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where('NO_CONTAINER', $result["RENAMED_CONT_OLD"])->update(["NO_CONTAINER"=>$result["RENAMED_CONT"]]);
+					} else {
+						$tsContainerOld = DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT_OLD"])->first();
+						$counter 				= $tsContainer->cont_counter + 1;
+						$contLocOld 		= $tsContainerOld->cont_location;
+						$dataUpdate 		= [
+							"CONT_COUNTER"  => $counter,
+							"CONT_LOCATON" 	=> $contLocOld,
+						];
+						$dataUpdateHist = [
+							"COUNTER"  		 => $counter,
+							"NO_CONTAINER" => $result["RENAMED_CONT"]
+						];
+						$updateTsCont 	= DB::connection('omuster')->table('TS_CONTAINER')->where('CONT_NO', $result["RENAMED_CONT"])->update($dataUpdate);
+						$updateHist		  = DB::connection('omuster')->table('TX_HISTORY_CONTAINER')->where('NO_CONTAINER', $result["RENAMED_CONT_OLD"])->update($dataUpdateHist);
+
+					}
+
+					// FOR REQUEST
+					$request = [
+						"TX_DTL_REC" 		=> "REC_DTL_CONT",
+						"TX_DTL_STUFF" 	=> "STUFF_DTL_CONT",
+						"TX_DTL_PLUG" 	=> "PLUG_DTL_CONT",
+						"TX_DTL_FUMI" 	=> "FUMI_DTL_CONT",
+						"TX_DTL_STRIPP" => "STRIPP_DTL_CONT",
+						"TX_DTL_TL"  		=> "TL_DTL_CONT"
+					];
+
+					foreach ($request as $key => $value) {
+					  $field = strtolower($value);
+						$getRequest 		= DB::connection('omuster')->table($key)->where($value, $result["RENAMED_CONT_OLD"])->first();
+						if (!empty($getRequest->$field)) {
+							$updateReq 			 = [
+								"$value" => $result["RENAMED_CONT"]
+							];
+							$updateReqDtlCont = DB::connection('omuster')->table($key)->where($value, $result["RENAMED_CONT_OLD"])->update($updateReq);
+						}
+					}
+
+					//Update Repo
+					$json = '
+				  {
+				    "action" : "getUpateRename",
+						"header" : {
+						 "BRANCH_ID" : "'.$result["RENAMED_BRANCH_ID"].'",
+						 "CONT_NO" : "'.$result["RENAMED_CONT_OLD"].'"
+						}
+				  }';
+					$json = base64_encode(json_encode(json_decode($json,true)));
+	        $json = '
+					{
+					    "repoPostRequest": {
+					        "esbHeader": {
+					            "internalId": "",
+					            "externalId": "",
+					            "timestamp": "",
+					            "responseTimestamp": "",
+					            "responseCode": "",
+					            "responseMessage": ""
+					        },
+					        "esbBody": {
+					            "request": "'.$json.'"
+					        },
+					        "esbSecurity": {
+					            "orgId": "",
+					            "batchSourceId": "",
+					            "lastUpdateLogin": "",
+					            "userId": "",
+					            "respId": "",
+					            "ledgerId": "",
+					            "respAppId": "",
+					            "batchSourceName": ""
+					        }
+					    }
+					}
+	        ';
+	        $opt = [
+	        	"user" => config('endpoint.tosPostPLG.user'),
+	        	"pass" => config('endpoint.tosPostPLG.pass'),
+	        	"target" => config('endpoint.tosPostPLG.target'),
+	        	"json" => json_encode(json_decode($json,true))
+	        ];
+	        $res = static::sendRequestToExtJsonMet($opt);
+	        $res = FunctTOS::decodeResultAftrSendToTosNPKS($res, 'repoPost');
+					$containerUpdate[] = $res["result"]["CONT_NO"];
+				}
+			}
+
+			return ["Success" => $containerUpdate, "Rename Not Found"=>$error];
 		}
 
 		public static function storeHistory($inp){
