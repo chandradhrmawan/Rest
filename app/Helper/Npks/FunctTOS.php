@@ -118,7 +118,11 @@ class FunctTOS{
 		$config = json_decode($config->api_set, true);
 		$find = DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$input['id'])->first();
 		$find = (array)$find;
-		$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_BL'], $input['no_cont'])->where($config['head_forigen'], $input['id'])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S']);
+		if (isset($input['no_cont'])) {
+			$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['DTL_BL'], $input['no_cont'])->where($config['head_forigen'], $input['id'])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S']);
+		} else {
+			$dtlLoop = DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'], $input['id'])->whereIn($config['DTL_FL_REAL'], $config['DTL_FL_REAL_S']);
+		}
 		if (!empty($config['DTL_IS_CANCEL'])) {
 			$dtlLoop = $dtlLoop->where($config['DTL_IS_CANCEL'],'N');
 		}
