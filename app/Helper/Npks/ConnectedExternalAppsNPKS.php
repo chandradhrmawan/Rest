@@ -544,7 +544,6 @@ class ConnectedExternalAppsNPKS{
 			];
 
 			$nota_id 			= $activity[$input["activity"]];
-
 			$nota_cond 		= [
 				"FLAG_STATUS" => 'Y',
 				"NOTA_ID" => $nota_id,
@@ -596,6 +595,7 @@ class ConnectedExternalAppsNPKS{
 						}
 						if ($list[$config['head_paymethod']] == 1) { // hanya utk cash
 							$condition = [];
+							$condition[$config['DTL_BL']] = $input["no_cont"];
 							$condition[$config['head_forigen']] = $list[$config['head_primery']];
 							if (!empty($config['DTL_IS_ACTIVE'])) {
 								$condition[$config['DTL_IS_ACTIVE']] = 'Y';
