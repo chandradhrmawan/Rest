@@ -17,10 +17,12 @@ use App\Helper\Globalconfig\UserAndRoleManagemnt;
 use App\Helper\Globalconfig\ViewExt;
 use App\Helper\Globalconfig\PrintAndExport;
 
-use App\Helper\Npk\ConnectedExternalAppsNPK;
 use App\Helper\Npks\ConnectedExternalAppsNPKS;
 use App\Helper\Npks\RequestBookingNPKS;
+
 use App\Helper\Npk\UperRequest;
+use App\Helper\Npk\ConnectedExternalAppsNPK;
+use App\Helper\Npk\RequestTCA;
 
 use App\Helper\Jbi\JbiRequestBooking;
 
@@ -52,6 +54,10 @@ class ViewController extends Controller
       }else{
         return response()->json($response);
       }
+    }
+
+    function readExcelImportNoPol($input, $request){
+      return RequestTCA::readExcelImportNoPol($input);
     }
 
     function getVesselNpks($input){

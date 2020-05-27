@@ -38,6 +38,7 @@
             "app/Helper/Npk/ConnectedExternalAppsNPK.php",
             "app/Helper/Npk/RealisasiHelper.php",
             "app/Helper/Npk/RequestBookingNPK.php",
+            "app/Helper/Npk/RequestTCA.php",
             "app/Helper/Npk/UperRequest.php",
 
             "app/Helper/Npks/CanclHelper.php",
