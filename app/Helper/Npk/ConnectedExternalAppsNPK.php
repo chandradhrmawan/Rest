@@ -1077,7 +1077,23 @@ class ConnectedExternalAppsNPK{
           echo $e->getResponse() . "\n";
         }
       }
-      return [json_decode($res->getBody()->getContents())];
+
+      $response = json_decode($res->getBody()->getContents(),TRUE);
+      $success  = $response["closeTCAInterfaceResponse"]["esbHeader"]["responseCode"];
+      if (isset($response["closeTCAInterfaceResponse"]["esbBody"])) {
+        $msg      = $response["closeTCAInterfaceResponse"]["esbBody"]["vMsg"];
+      }
+
+      if ($success == "F") {
+        return ["success" => $success, "message" => "Data Tidak Ditemukan"];
+      } else {
+        if ($msg == "NOT OK") {
+          return ["success"=> $success, "message" => "Data Gagal di Hapus/ TCA Sedang Berjalan"];
+        } else {
+          $update = DB::connection('omcargo')->table('TX_HDR_TCA')->update(["TCA_IS_ACTIVE" => '0']);
+          return ["success"=> $success, "message" => "TCA Berhasil Di Hapus"];
+        }
+      }
     }
 
     public static function createTCA($input, $tca_id){
