@@ -543,6 +543,11 @@ class ConnectedExternalAppsNPKS{
 				"del_cargo" => "22"
 			];
 
+			if ($input["branch_id"] == "4") {
+				$activity["stuff"] = "7";
+				$activity["strip"] = "10";
+			}
+
 			$nota_id 			= $activity[$input["activity"]];
 			$nota_cond 		= [
 				"FLAG_STATUS" => 'Y',
@@ -550,6 +555,8 @@ class ConnectedExternalAppsNPKS{
 				"BRANCH_ID" => $input["branch_id"]
 				// "BRANCH_CODE" => $input["branch_code"]
 			];
+
+			return $nota_cond;
 
 			$res = [];
 			$nota = DB::connection('mdm')->table('TS_NOTA')->where($nota_cond)->whereNotNull('API_SET')->orderBy('nota_id', 'asc')->get();
