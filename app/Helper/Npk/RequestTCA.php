@@ -39,10 +39,13 @@ class RequestTCA{
             $tplat = $sheet->getCell('A'.$row)->getValue();
             $trck = \DB::connection('mdm')->table('TM_TRUCK')->where('TRUCK_PLAT_NO', strtoupper($tplat))->first();
             if (!empty($trck)) {
-                $awal = date_create();
-                $akhir = date_create($trck->truck_plat_exp);
-                $diff  = date_diff( $awal, $akhir );
-                if ($diff-7 > 0) {
+                $d1 = date_create();
+                $d2 = date_create($trck->truck_plat_exp);
+                $diff  = date_diff( $d1, $d2 );
+                $t1 = strtotime(Carbon::now()->format('Y-m-d'));
+                $t2 = strtotime($trck->truck_plat_exp);
+                $pm = $t2-$t1;
+                if ( $pm > 0 and $diff->d-7 > 0) {
                     $data = [
                         "tid" => $trck->truck_id,
                         "trucktype" => $trck->truck_type,
