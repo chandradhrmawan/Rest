@@ -39,13 +39,18 @@ class RequestTCA{
             $tplat = $sheet->getCell('A'.$row)->getValue();
             $trck = \DB::connection('mdm')->table('TM_TRUCK')->where('TRUCK_PLAT_NO', strtoupper($tplat))->first();
             if (!empty($trck)) {
-                $data = [
-                    "tid" => $trck->truck_id,
-                    "trucktype" => $trck->truck_type,
-                    "trucktypename" => $trck->truck_type_name,
-                    "truckcustid" => $trck->truck_cust_id,
-                    "truckcustname" => $trck->truck_cust_name
-                ];
+                $awal = date_create();
+                $akhir = date_create($trck->truck_plat_exp);
+                $diff  = date_diff( $awal, $akhir );
+                if ($diff-7 > 0) {
+                    $data = [
+                        "tid" => $trck->truck_id,
+                        "trucktype" => $trck->truck_type,
+                        "trucktypename" => $trck->truck_type_name,
+                        "truckcustid" => $trck->truck_cust_id,
+                        "truckcustname" => $trck->truck_cust_name
+                    ];
+                }
             }
             $data["platnomor"] = $tplat;
             $responseData[] = $data;
