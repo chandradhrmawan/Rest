@@ -556,8 +556,6 @@ class ConnectedExternalAppsNPKS{
 				// "BRANCH_CODE" => $input["branch_code"]
 			];
 
-			return $nota_cond;
-
 			$res = [];
 			$nota = DB::connection('mdm')->table('TS_NOTA')->where($nota_cond)->whereNotNull('API_SET')->orderBy('nota_id', 'asc')->get();
 			$nota_id_old = 0;
@@ -613,7 +611,10 @@ class ConnectedExternalAppsNPKS{
 									$upStHead = 5;
 								}else if ($list[$config['head_status']] == 10){
 									$upStHead = 11;
+								} else {
+									$upStHead = $list[$config['head_status']];
 								}
+
 								DB::connection('omuster')->table($config['head_table'])->where($config['head_primery'],$list[$config['head_primery']])->update([$config['head_status']=>$upStHead]);
 								if ($config['DTL_IS_ACTIVE'] != null) {
 									DB::connection('omuster')->table($config['head_tab_detil'])->where($config['head_forigen'],$list[$config['head_primery']])->update([

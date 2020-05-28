@@ -29,7 +29,13 @@ class RequestTCA{
         for ($row = 2; $row <= $highestRow; $row++){
             // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
             // $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
-            $data = [];
+            $data = [
+                "tid" => '',
+                "trucktype" => '',
+                "trucktypename" => '',
+                "truckcustid" => '',
+                "truckcustname" => ''
+            ];
             $tplat = $sheet->getCell('A'.$row)->getValue();
             $trck = \DB::connection('mdm')->table('TM_TRUCK')->where('TRUCK_PLAT_NO', strtoupper($tplat))->first();
             if (!empty($trck)) {

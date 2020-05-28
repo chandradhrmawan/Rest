@@ -687,6 +687,10 @@ class FunctTOS{
 	            "RECEIVING_DARI": "'.$dr->reff_name.'",
 	            "TANGGAL_LUNAS": "'.$nota_paid_date.'",
 	            "DI": "",
+							"REQ_DTL_VESSEL_NAME": "'.$head[$arr['config']['head_vessel_name']].'",
+							"REQ_DTL_VESSEL_CODE": "'.$head[$arr['config']['head_vessel_code']].'",
+							"REC_DTL_VOYIN": "'.$head[$arr['config']['head_vin']].'",
+							"REC_DTL_VOYOUT": "'.$head[$arr['config']['head_vout']].'",
 							"PAYMENT_METHOD": "'.$head[$arr['config']['head_paymethod']].'",
 	            "BRANCH_ID" : "'.$head[$arr['config']['head_branch']].'"
 	          },
