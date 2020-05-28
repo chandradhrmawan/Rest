@@ -27,14 +27,28 @@ class RequestTCA{
         // $highestColumn = $sheet->getHighestColumn();
         $responseData = [];
         for ($row = 2; $row <= $highestRow; $row++){
-        // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-            $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
+            // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+            // $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
+            $data = [];
+            $tplat = $sheet->getCell('A'.$row)->getValue();
+            $trck = \DB::connection('mdm')->table('TM_TRUCK')->where('TRUCK_PLAT_NO', strtoupper($tplat))->first();
+            if (!empty($trck)) {
+                $data = [
+                    "tid" => $trck->truck_id,
+                    "trucktype" => $trck->truck_type,
+                    "trucktypename" => $trck->truck_type_name,
+                    "truckcustid" => $trck->truck_cust_id,
+                    "truckcustname" => $trck->truck_cust_name
+                ];
+            }
+            $data["platnomor"] = $tplat;
+            $responseData[] = $data;
         }
         unlink($file_dir);
         return [
             'Success' => true,
             'result' => 'Success, read file!',
-            'no_polisi' => $responseData
+            'datas' => $responseData
         ];
     }
 }
