@@ -28,7 +28,7 @@ class RequestTCA{
         $responseData = [];
         for ($row = 2; $row <= $highestRow; $row++){
         // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-            $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
+            $responseData[] = $sheet->getCell('A'.$row)->getValue();
         }
         unlink($file_dir);
         return [
