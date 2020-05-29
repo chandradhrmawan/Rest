@@ -27,14 +27,42 @@ class RequestTCA{
         // $highestColumn = $sheet->getHighestColumn();
         $responseData = [];
         for ($row = 2; $row <= $highestRow; $row++){
-        // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-            $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
+            // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+            // $responseData[] = ["no_polisi" => $sheet->getCell('A'.$row)->getValue()];
+            $data = [
+                "tid" => '',
+                "trucktype" => '',
+                "trucktypename" => '',
+                "truckcustid" => '',
+                "truckcustname" => ''
+            ];
+            $tplat = $sheet->getCell('A'.$row)->getValue();
+            $trck = \DB::connection('mdm')->table('TM_TRUCK')->where('TRUCK_PLAT_NO', strtoupper($tplat))->first();
+            if (!empty($trck)) {
+                $d1 = date_create();
+                $d2 = date_create($trck->truck_plat_exp);
+                $diff  = date_diff( $d1, $d2 );
+                $t1 = strtotime(Carbon::now()->format('Y-m-d'));
+                $t2 = strtotime($trck->truck_plat_exp);
+                $pm = $t2-$t1;
+                if ( $pm > 0 and $diff->d-7 > 0) {
+                    $data = [
+                        "tid" => $trck->truck_id,
+                        "trucktype" => $trck->truck_type,
+                        "trucktypename" => $trck->truck_type_name,
+                        "truckcustid" => $trck->truck_cust_id,
+                        "truckcustname" => $trck->truck_cust_name
+                    ];
+                }
+            }
+            $data["platnomor"] = $tplat;
+            $responseData[] = $data;
         }
         unlink($file_dir);
         return [
             'Success' => true,
             'result' => 'Success, read file!',
-            'no_polisi' => $responseData
+            'datas' => $responseData
         ];
     }
 }
