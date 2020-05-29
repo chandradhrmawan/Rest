@@ -383,6 +383,7 @@ class ConnectedExternalAppsNPK{
       $endpoint_url=config('endpoint.sendRequestBookingNewExcute');
       $respn = [];
       $string_json_arr = [];
+      $hitEsb = [];
       foreach ($detil as $list) {
         $listA = (array)$list;
         $hsl = [];
@@ -476,7 +477,7 @@ class ConnectedExternalAppsNPK{
                   }
               }
           }';
-          $string_json_arr[] = $string_json;
+          $string_json_arr[] = json_decode($string_json);
 
           $username="npk_billing";
           $password ="npk_billing";
@@ -496,6 +497,11 @@ class ConnectedExternalAppsNPK{
             return $e->getResponse();
           }
           $hsl[] = json_decode($res->getBody()->getContents(), true);
+
+          $hitEsb[] = [
+            'request' => json_decode($string_json),
+            'response' => json_decode($res->getBody()->getContents(), true),
+          ];
         //first
 
 
@@ -587,7 +593,7 @@ class ConnectedExternalAppsNPK{
                   }
               }
           }';
-          $string_json_arr[] = $string_json;
+          $string_json_arr[] = json_decode($string_json);
 
           $username="npk_billing";
           $password ="npk_billing";
@@ -608,11 +614,20 @@ class ConnectedExternalAppsNPK{
           }
 
           $hsl[] = json_decode($res->getBody()->getContents(), true);
+          $hitEsb[] = [
+            'request' => json_decode($string_json),
+            'response' => json_decode($res->getBody()->getContents(), true),
+          ];
         }
 
         $respn[] = $hsl;
       }
-      return ['result' => 'Success', 'response' => $respn, 'json' => $string_json_arr];
+      return [
+        'result' => 'Success', 
+        'hitEsb' => $hitEsb
+        // 'response' => $respn, 
+        // 'json' => $string_json_arr
+      ];
       // return ['result' => 'Success', 'json' => $string_json_arr];
     }
 
