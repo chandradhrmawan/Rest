@@ -464,7 +464,7 @@ class ConnectedExternalAppsNPK{
           $vparam .= '^201'; // id_Port
 
           $string_json = '{
-              "savecargoNpkInterfaceRequest": {
+              "saveCargoNpkInterfaceRequest": {
                   "esbHeader": {
                       "externalId": "2",
                       "timestamp": "2"
@@ -496,11 +496,12 @@ class ConnectedExternalAppsNPK{
           } catch (ClientException $e) {
             return $e->getResponse();
           }
-          $hsl[] = json_decode($res->getBody()->getContents(), true);
+          $resB = json_decode($res->getBody()->getContents(), true);
+          $hsl[] = $resB;
 
           $hitEsb[] = [
             'request' => json_decode($string_json),
-            'response' => json_decode($res->getBody()->getContents(), true),
+            'response' => $resB
           ];
         //first
 
@@ -580,7 +581,7 @@ class ConnectedExternalAppsNPK{
           $vparam .= '^201'; // id_Port
 
           $string_json = '{
-              "savecargoNpkInterfaceRequest": {
+              "saveCargoNpkInterfaceRequest": {
                   "esbHeader": {
                       "externalId": "2",
                       "timestamp": "2"
@@ -613,10 +614,12 @@ class ConnectedExternalAppsNPK{
             return $e->getResponse();
           }
 
-          $hsl[] = json_decode($res->getBody()->getContents(), true);
+          $resB = json_decode($res->getBody()->getContents(), true);
+          $hsl[] = $resB;
+
           $hitEsb[] = [
             'request' => json_decode($string_json),
-            'response' => json_decode($res->getBody()->getContents(), true),
+            'response' => $resB
           ];
         }
 
