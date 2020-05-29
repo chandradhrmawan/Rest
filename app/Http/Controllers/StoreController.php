@@ -245,7 +245,7 @@ class StoreController extends Controller
     }
 
     function truckRegistration($input){
-      $user = json_decode($input["user"], TRUE);
+      $user = json_decode(json_encode($input["user"]), TRUE);
       $cekoldtmtruckcompany = DB::connection('mdm')->table('TM_TRUCK')->where('truck_cust_id',$input['truck_cust_id'])->first();
       if (empty($cekoldtmtruckcompany) or !is_numeric($cekoldtmtruckcompany->truck_cust_id)) {
         $new = new TmTruckCompany;
