@@ -155,6 +155,17 @@ class JbiEInvo
 		        }';
 	}
 
+	private static function getDangerous($no_container)
+	{
+		$getDG = DB::connection('omuster')
+			->table('TX_DTL_REC')
+			->select('rec_dtl_cont_danger')
+			->where('rec_dtl_cont', $no_container)
+			->first();
+
+		return $getDG;
+	}
+
 	private static function getDtlInvAR($arr)
 	{
 		$lines = '';
@@ -163,6 +174,7 @@ class JbiEInvo
 			->leftjoin('TX_TEMP_TARIFF_DTL', 'TX_TEMP_TARIFF_HDR.TEMP_HDR_ID = TX_TEMP_TARIFF_DTL.TEMP_HDR_ID')
 			->select('TX_TEMP_TARIFF_DTL.DATE_IN', 'TX_TEMP_TARIFF_DTL.DATE_OUT')->where('TX_TEMP_TARIFF_HDR.BOOKING_NUMBER', $arr['nota']['nota_req_no'])->limit(1)->get();
 		foreach ($getNotaDtl as $list) {
+			$getDG = static::getDangerous($list->dtl_bl);
 			$lines .= '
 			{
 				"billerRequestId": "' . $arr['nota']['nota_req_no'] . '",
@@ -197,7 +209,7 @@ class JbiEInvo
 				"interfaceLineAttribute10": "' . $list->dtl_cont_size . '",
 				"interfaceLineAttribute11": "' . $list->dtl_cont_type . '",
 				"interfaceLineAttribute12": "' . $list->dtl_cont_status . '",
-				"interfaceLineAttribute13": "",
+				"interfaceLineAttribute13": "' . $getDG->rec_dtl_cont_danger . '",
 				"interfaceLineAttribute14": "",
 				"interfaceLineAttribute15": "",
 				"lineDoc": ""
