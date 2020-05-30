@@ -144,6 +144,10 @@ class IndexController extends Controller
       return GlobalHelper::autoComplete($input);
     }
 
+    function autoCompleteJbi($input) {
+      return GlobalHelper::autoCompleteJbi($input);
+    }
+
     function viewHeaderDetail($input) {
         return GlobalHelper::viewHeaderDetail($input);
     }
