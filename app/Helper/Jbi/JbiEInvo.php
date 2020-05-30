@@ -7,7 +7,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Helper\Jbi\JbiConnectedExternalApps;
 
-class JbiEInvo {
+class JbiEInvo
+{
 
 	private static function getJsonInvAR($arr)
 	{
@@ -51,6 +52,7 @@ class JbiEInvo {
 			$e_materai = 6000;
 		}
 		$notaAmount = (int) $arr['nota']['nota_amount'] + $e_materai;
+		$terbilang  = static::terbilang($notaAmount);
 		return $hdr = '"header": {
 		        	"billerRequestId":"' . $arr['nota']['nota_req_no'] . '",
 		        	"orgId":"' . $arr['branch']['branch_org_id'] . '",
@@ -133,7 +135,7 @@ class JbiEInvo {
 		            "docNum": "",
 		            "statusLunas": "Y",
 		            "tglPelunasan": "' . $arr['nDateNotHour'] . '",
-		            "amountTerbilang": "",
+		            "amountTerbilang": "' . $terbilang . '",
 		            "ppnDipungutSendiri": "' . $arr['nota']['nota_ppn'] . '",
 		            "ppnDipungutPemungut": "",
 		            "ppnTidakDipungut": "",
@@ -462,5 +464,44 @@ class JbiEInvo {
 			}
 		}
 		return ["Success" => true, "sendInvAR" => $sendInvAR, "sendInvPutReceipt" => $sendInvPutReceipt, "sendInvPutApply" => $sendInvPutApply];
+	}
+
+	public static function penyebut($nilai)
+	{
+		$nilai = abs($nilai);
+		$huruf = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+		$temp = "";
+		if ($nilai < 12) {
+			$temp = " " . $huruf[$nilai];
+		} else if ($nilai < 20) {
+			$temp = static::penyebut($nilai - 10) . " Belas";
+		} else if ($nilai < 100) {
+			$temp = static::penyebut($nilai / 10) . " Puluh" . static::penyebut($nilai % 10);
+		} else if ($nilai < 200) {
+			$temp = " seratus" . static::penyebut($nilai - 100);
+		} else if ($nilai < 1000) {
+			$temp = static::penyebut($nilai / 100) . " Ratus" . static::penyebut($nilai % 100);
+		} else if ($nilai < 2000) {
+			$temp = " seribu" . static::penyebut($nilai - 1000);
+		} else if ($nilai < 1000000) {
+			$temp = static::penyebut($nilai / 1000) . " Ribu" . static::penyebut($nilai % 1000);
+		} else if ($nilai < 1000000000) {
+			$temp = static::penyebut($nilai / 1000000) . " Juta" . static::penyebut($nilai % 1000000);
+		} else if ($nilai < 1000000000000) {
+			$temp = static::penyebut($nilai / 1000000000) . " Milyar" . static::penyebut(fmod($nilai, 1000000000));
+		} else if ($nilai < 1000000000000000) {
+			$temp = static::penyebut($nilai / 1000000000000) . " Triliun" . static::penyebut(fmod($nilai, 1000000000000));
+		}
+		return $temp;
+	}
+
+	public static function terbilang($nilai)
+	{
+		if ($nilai < 0) {
+			$hasil = "Minus " . trim(static::penyebut($nilai));
+		} else {
+			$hasil = trim(static::penyebut($nilai));
+		}
+		return $hasil;
 	}
 }
