@@ -157,7 +157,7 @@ class JbiEInvo
 
 	private static function getDangerous($no_container)
 	{
-		$getDG = DB::connection('omuster')
+		$getDG = DB::connection('omuster_ilcs')
 			->table('TX_DTL_REC')
 			->select('rec_dtl_cont_danger')
 			->where('rec_dtl_cont', $no_container)
