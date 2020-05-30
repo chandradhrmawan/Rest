@@ -209,7 +209,7 @@ class JbiEInvo
 				"interfaceLineAttribute10": "' . $list->dtl_cont_size . '",
 				"interfaceLineAttribute11": "' . $list->dtl_cont_type . '",
 				"interfaceLineAttribute12": "' . $list->dtl_cont_status . '",
-				"interfaceLineAttribute13": "' . $getDG->rec_dtl_cont_danger . '",
+				"interfaceLineAttribute13": "' . (isset($getDG->rec_dtl_cont_danger) ? $getDG->rec_dtl_cont_danger : 'N') . '",
 				"interfaceLineAttribute14": "",
 				"interfaceLineAttribute15": "",
 				"lineDoc": ""
