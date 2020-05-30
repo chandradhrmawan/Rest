@@ -510,6 +510,123 @@ class GlobalHelper {
     return ["result"=>$result, "count"=>$count];
   }
 
+  public static function autoCompleteJbi($input) {
+  $connect  = DB::connection($input["db"])->table($input["table"]);
+
+  if(!empty($input["groupby"])) {
+    $connect->groupBy(strtoupper($input["groupby"]));
+  }
+
+  if (!empty($input["range"])) {
+    $result  = $connect->whereBetween($input["range"][0],[$input["range"][1],$input["range"][2]]);
+  }
+
+  if (!empty($input["selected"])) {
+    $result  = $connect->select($input["selected"]);
+  }
+
+  if(!empty($input["orderby"][0])) {
+  $in        = $input["orderby"];
+  $connect->orderby(strtoupper($in[0]), $in[1]);
+  }
+
+  if(!empty($input["where"][0])) {
+    $connect->where($input["where"]);
+  }
+
+  if(!empty($input["whereIn"][0])) {
+  $in        = $input["whereIn"];
+  $connect->whereIn(strtoupper($in[0]), $in[1]);
+  }
+
+  if(!empty($input["whereNotIn"][0])) {
+  $in        = $input["whereNotIn"];
+  $connect->whereNotIn(strtoupper($in[0]), $in[1]);
+  }
+
+  if(!empty($input["join"])) {
+          foreach ($input["join"] as $list) {
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field2"]), '=', strtoupper($list["field1"]));
+    }
+  }
+
+  if(!empty($input["stripping"])) {
+          foreach ($input["stripping"] as $list) {
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    }
+  }
+
+  if(!empty($input["stuffing"])) {
+          foreach ($input["stuffing"] as $list) {
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    }
+  }
+
+  if(!empty($input["lastActivity"])) {
+    foreach ($input["lastActivity"] as $list) {
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    }
+  }
+
+  if(!empty($input["nameActivity"])) {
+    foreach ($input["nameActivity"] as $list) {
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    }
+  }
+
+  if (!empty($input["selectedCycle"])) {
+    $result  = $connect->select($input["selectedCycle"]);
+    foreach ($input["joinCycle"] as $list) {
+      $connect->join(strtoupper($list["table"]), strtoupper($list["field1"]), '=', strtoupper($list["field2"]));
+    }
+  }
+
+  if (!empty($input["query"]) && !empty($input["field"])) {
+    if (is_array($input["field"])) {
+      foreach ($input["field"] as $field) {
+        $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%")->get();
+        $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
+        $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($field),"like", "%".strtolower($input["query"])."%")->get();
+
+        if (!empty($upper)) {
+          $connect->where(strtoupper($field),"like", "%".strtoupper($input["query"])."%");
+        } else if(!empty($capit)) {
+          $connect->where(strtoupper($field),"like", "%".ucwords(strtolower($input["query"]))."%");
+        } else if(!empty($lower)) {
+          $connect->where(strtoupper($field),"like", "%".strtolower($input["query"])."%");
+        } else {
+          $connect->where($input["field"], "like", "%".$input["query"]."%");
+        }
+      }
+    } else {
+      $upper = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%")->get();
+      $capit = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%")->get();
+      $lower = DB::connection($input["db"])->table($input["table"])->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%")->get();
+
+      if (!empty($upper)) {
+        $connect->where(strtoupper($input["field"]),"like", "%".strtoupper($input["query"])."%");
+      } else if(!empty($capit)) {
+        $connect->where(strtoupper($input["field"]),"like", "%".ucwords(strtolower($input["query"]))."%");
+      } else if(!empty($lower)) {
+        $connect->where(strtoupper($input["field"]),"like", "%".strtolower($input["query"])."%");
+      } else {
+        $connect->where($input["field"], "like", "%".$input["query"]."%");
+      }
+    }
+  }
+
+
+  $count    = $connect->count();
+  if (!empty($input['start']) || $input["start"] == '0') {
+    if (!empty($input['limit'])) {
+      $connect->skip($input['start'])->take($input['limit']);
+    }
+  }
+  $result   = $connect->get();
+
+  return ["result"=>$result, "count"=>$count];
+}
+
   public static function join($input) {
     $connect = DB::connection($input["db"])->table($input["table"]);
     if (isset($input["type"])) {
