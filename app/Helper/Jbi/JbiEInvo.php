@@ -135,7 +135,7 @@ class JbiEInvo
 		            "docNum": "",
 		            "statusLunas": "Y",
 		            "tglPelunasan": "' . $arr['nDateNotHour'] . '",
-		            "amountTerbilang": "' . $terbilang . '",
+		            "amountTerbilang": "' . $terbilang . +' Rupiah",
 		            "ppnDipungutSendiri": "' . $arr['nota']['nota_ppn'] . '",
 		            "ppnDipungutPemungut": "",
 		            "ppnTidakDipungut": "",
@@ -152,7 +152,7 @@ class JbiEInvo
 		            "statusKoreksi": "",
 		            "tanggalKoreksi": null,
 		            "keteranganKoreksi": ""
-		        }';
+				}';
 	}
 
 	private static function getDangerous($no_container)
@@ -490,11 +490,11 @@ class JbiEInvo
 		} else if ($nilai < 100) {
 			$temp = static::penyebut($nilai / 10) . " Puluh" . static::penyebut($nilai % 10);
 		} else if ($nilai < 200) {
-			$temp = " seratus" . static::penyebut($nilai - 100);
+			$temp = " Seratus" . static::penyebut($nilai - 100);
 		} else if ($nilai < 1000) {
 			$temp = static::penyebut($nilai / 100) . " Ratus" . static::penyebut($nilai % 100);
 		} else if ($nilai < 2000) {
-			$temp = " seribu" . static::penyebut($nilai - 1000);
+			$temp = " Seribu" . static::penyebut($nilai - 1000);
 		} else if ($nilai < 1000000) {
 			$temp = static::penyebut($nilai / 1000) . " Ribu" . static::penyebut($nilai % 1000);
 		} else if ($nilai < 1000000000) {
