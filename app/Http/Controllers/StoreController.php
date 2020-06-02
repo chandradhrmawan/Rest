@@ -325,6 +325,7 @@ class StoreController extends Controller
       }
       if ($head->tca_req_type  == 1) {
         $reques = DB::connection('omcargo')->table('TX_HDR_REC')->where('rec_no', $head->tca_req_no)->get();
+        if (empty($reques)) { return [ 'Success' => false, 'result' => 'not found '.$head->tca_req_no.' on rec' ]; }
         $reques = $reques[0];
         $vvdID = $reques->rec_vvd_id;
         $vvdName = $reques->rec_vessel_name;
@@ -332,6 +333,7 @@ class StoreController extends Controller
         $vvdVO = $reques->rec_voyout;
       }else if ($head->tca_req_type  == 2) {
         $reques = DB::connection('omcargo')->table('TX_HDR_DEL')->where('del_no', $head->tca_req_no)->get();
+        if (empty($reques)) { return [ 'Success' => false, 'result' => 'not found '.$head->tca_req_no.' on del' ]; }
         $reques = $reques[0];
         $vvdID = $reques->del_vvd_id;
         $vvdName = $reques->del_vessel_name;
@@ -339,6 +341,7 @@ class StoreController extends Controller
         $vvdVO = $reques->del_voyout;
       }else if ($head->tca_req_type  == 3) {
         $reques = DB::connection('omcargo')->table('TX_HDR_BM')->where('bm_no', $head->tca_req_no)->get();
+        if (empty($reques)) { return [ 'Success' => false, 'result' => 'not found '.$head->tca_req_no.' on bm' ]; }
         $reques = $reques[0];
         $vvdID = $reques->bm_vvd_id;
         $vvdName = $reques->bm_vessel_name;
