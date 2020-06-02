@@ -1067,7 +1067,7 @@ class ConnectedExternalAppsNPK{
                 "responseMessage": ""
                 },
                 "esbBody": {
-                  "vTid": "'.$truck->truck_id_seq.'",
+                  "vTid": "'.$truck->truck_plat_no.'",
                   "vNoRequest": "'.$input['tca_req_no'].'",
                   "vBlNumber": "'.$input['tca_bl'].'",
                   "vIdTerminal": "'.$terminal->terminal_id.'"
@@ -1113,7 +1113,7 @@ class ConnectedExternalAppsNPK{
             'TCA_HDR_ID' => $hdr->tca_id,
             'TCA_TRUCK_ID'=> $input['tca_truck_id']
           ];
-          $updateDTL = DB::connection('omcargo')->table('TX_DTL_TCA')->where($whereUp)->update(["TCA_IS_ACTIVE" => '0']);
+          $updateDTL = DB::connection('omcargo')->table('TX_DTL_TCA')->where($whereUp)->update(["TCA_IS_ACTIVE" => 'N']);
           return ["success"=> $success, "message" => "TCA Berhasil Di Hapus"];
         }
       }
