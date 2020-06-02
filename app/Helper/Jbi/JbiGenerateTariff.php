@@ -684,4 +684,13 @@ class JbiGenerateTariff
 		$result = static::showTempTariff($query, null, null);
 		return ["Success" => true, "result" => $result];
 	}
+	private static function getDangerous($no_container)
+	{
+		$getDG = DB::connection('omuster_ilcs')
+			->table('TX_DTL_REC')
+			->select('rec_dtl_cont', 'rec_dtl_cont_danger')
+			->where('rec_dtl_cont', $no_container)
+			->first();
+		return $getDG;
+	}
 }
