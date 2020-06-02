@@ -626,9 +626,9 @@ class ConnectedExternalAppsNPK{
         $respn[] = $hsl;
       }
       return [
-        'result' => 'Success', 
+        'result' => 'Success',
         'hitEsb' => $hitEsb
-        // 'response' => $respn, 
+        // 'response' => $respn,
         // 'json' => $string_json_arr
       ];
       // return ['result' => 'Success', 'json' => $string_json_arr];
@@ -1103,12 +1103,17 @@ class ConnectedExternalAppsNPK{
       }
 
       if ($success == "F") {
-        return ["success" => $success, "message" => "Data Tidak Ditemukan"];
+        return ["Success" => false, "message" => "Data Tidak Ditemukan"];
       } else {
         if ($msg == "NOT OK") {
-          return ["success"=> $success, "message" => "Data Gagal di Hapus/ TCA Sedang Berjalan"];
+          return ["Success" => false, "message" => "Data Gagal di Hapus/ TCA Sedang Berjalan"];
         } else {
-          $update = DB::connection('omcargo')->table('TX_HDR_TCA')->update(["TCA_IS_ACTIVE" => '0']);
+          $hdr       = DB::connection('omcargo')->table('TX_HDR_TCA')->where('TCA_REQ_NO', $input['tca_req_no'])->first();
+          $whereUp   = [
+            'TCA_HDR_ID' => $hdr->tca_id,
+            'TCA_TRUCK_ID'=> $input['tca_truck_id']
+          ];
+          $updateDTL = DB::connection('omcargo')->table('TX_DTL_TCA')->where($whereUp)->update(["TCA_IS_ACTIVE" => '0']);
           return ["success"=> $success, "message" => "TCA Berhasil Di Hapus"];
         }
       }
