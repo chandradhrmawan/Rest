@@ -254,7 +254,7 @@ class SendTos{
         $request_dtl_id = $data_head[0]->del_cargo_id;
         $data_dtl = DB::connection('omuster_ilcs')->table('TX_DTL_DEL_CARGO A')
           ->select(
-        'A.DEL_CARGO_DTL_ID','A.DEL_CARGO_HDR_ID','A.DEL_CARGO_DTL_SI_NO','A.DEL_CARGO_DTL_QTY','A.DEL_CARGO_DTL_VIA','A.DEL_CARGO_DTL_PKG_ID','A.DEL_CARGO_DTL_PKG_NAME','A.DEL_CARGO_DTL_UNIT_ID','A.DEL_CARGO_DTL_UNIT_NAME','A.DEL_CARGO_DTL_CMDTY_ID','A.DEL_CARGO_DTL_CMDTY_NAME','A.DEL_CARGO_DTL_CHARACTER_ID','A.DEL_CARGO_DTL_CHARACTER_NAME','A.DEL_CARGO_DTL_DEL_DATE','A.DEL_CARGO_DTL_CREATE_DATE','A.DEL_CARGO_DTL_STACK_DATE','A.DEL_CARGO_DTL_EXT_DATE','A.DEL_CARGO_DTL_VIA_NAME','A.DEL_CARGO_DTL_OWNER','A.DEL_CARGO_DTL_OWNER_NAME','A.DEL_CARGO_DTL_PKG_PARENT_ID','A.DEL_CARGO_DTL_ISCANCELLED','A.DEL_CARGO_DTL_STACK_AREA','A.DEL_CARGO_DTL_STACK_AREA_NAME','A.DEL_CARGO_DTL_REAL_QTY','A.DEL_CARGO_FL_REAL','A.DEL_CARGO_DTL_CANC_QTY','A.DEL_CARGO_DTL_REAL_DATE'
+        'A.DEL_CARGO_DTL_ID','A.DEL_CARGO_HDR_ID','A.DEL_CARGO_DTL_SI_NO','A.DEL_CARGO_DTL_QTY','A.DEL_CARGO_DTL_VIA','A.DEL_CARGO_DTL_PKG_ID','A.DEL_CARGO_DTL_PKG_NAME','A.DEL_CARGO_DTL_UNIT_ID','A.DEL_CARGO_DTL_UNIT_NAME','A.DEL_CARGO_DTL_CMDTY_ID','A.DEL_CARGO_DTL_CMDTY_NAME','A.DEL_CARGO_DTL_CHARACTER_ID','A.DEL_CARGO_DTL_CHARACTER_NAME','A.DEL_CARGO_DTL_DEL_DATE','A.DEL_CARGO_DTL_CREATE_DATE','A.DEL_CARGO_DTL_STACK_DATE','A.DEL_CARGO_DTL_EXT_DATE','A.DEL_CARGO_DTL_VIA_NAME','A.DEL_CARGO_DTL_OWNER','A.DEL_CARGO_DTL_OWNER_NAME','A.DEL_CARGO_DTL_PKG_PARENT_ID','A.DEL_CARGO_DTL_ISCANCELLED','A.DEL_CARGO_DTL_STACK_AREA','A.DEL_CARGO_DTL_STACK_AREA_NAME','A.DEL_CARGO_DTL_REAL_QTY','A.DEL_CARGO_FL_REAL','A.DEL_CARGO_DTL_CANC_QTY','A.DEL_CARGO_DTL_REAL_DATE','A.DEL_CARGO_DTL_TRUCK'
           )
           ->where('A.DEL_CARGO_HDR_ID',$request_dtl_id)
           ->get();
@@ -280,6 +280,7 @@ class SendTos{
             $dtl['REQUEST_DTL_OWNER_NAME']      = $valuex->del_cargo_dtl_owner_name;
             $dtl['REQUEST_DTL_TOTAL']           = $valuex->del_cargo_dtl_qty;
             $dtl['REQUEST_DTL_UNIT']            = $valuex->del_cargo_dtl_unit_name;
+            $dtl['REQUEST_DTL_TRUCK']            = $valuex->del_cargo_dtl_truck;
 
             DB::connection('npks_ilcs')->table('TX_REQ_DELIVERY_BRG_DTL')->insert($dtl);
         }
@@ -560,7 +561,8 @@ class SendTos{
                             'A.REC_CARGO_DTL_REAL_QTY',
                             'A.REC_CARGO_FL_REAL',
                             'A.REC_CARGO_REMAINING_QTY',
-                            'A.REC_CARGO_DTL_CANC_QTY'
+                            'A.REC_CARGO_DTL_CANC_QTY',
+                            'A.REC_CARGO_DTL_TRUCK'
                     )
                     ->where('A.REC_CARGO_HDR_ID',$request_hdr_id)
                     ->get();
@@ -585,6 +587,7 @@ class SendTos{
             $dtl['request_dtl_owner_name']      = $valuex->rec_cargo_dtl_owner_name;
             $dtl['request_dtl_total']           = $valuex->rec_cargo_dtl_qty;
             $dtl['request_dtl_unit']            = $valuex->rec_cargo_dtl_unit_name;
+            $dtl['request_dtl_truck']            = $valuex->rec_cargo_dtl_truck;
 
             DB::connection('npks_ilcs')->table('TX_REQ_RECEIVING_BRG_DTL')->insert($dtl);
         }
