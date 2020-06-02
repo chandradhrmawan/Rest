@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Helper\Jbi\BillingEngine;
 
-class JbiGenerateTariff {
+class JbiGenerateTariff
+{
 
 	private static function calculateHours($st, $ed)
 	{
@@ -485,6 +486,8 @@ class JbiGenerateTariff {
 	public static function showTempTariff($query, $config, $find)
 	{
 		$result = [];
+		$arrCont = [];
+		$arrHz = [];
 		$getHS = DB::connection('eng_ilcs')->select(DB::raw($query));
 		foreach ($getHS as $getH) {
 			$comp_notas = DB::connection('mdm_ilcs')->table('TM_REFF')->where([
@@ -505,6 +508,7 @@ class JbiGenerateTariff {
 					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '" . $getH->temp_hdr_id . "' AND CUSTOMER_ID = '" . $getH->customer_id . "'";
 					$group_tariff = DB::connection('eng_ilcs')->select(DB::raw($queryAgain));
 					$resultD = [];
+
 					foreach ($group_tariff as $grpTrf) {
 						$grpTrf = (array) $grpTrf;
 						if (in_array($grpTrf['group_tariff_id'], $grArr)) {
@@ -521,6 +525,34 @@ class JbiGenerateTariff {
 					$nota_view[] = $nv;
 				}
 			}
+
+			// get dangerous by no_bl(db_engine)
+			foreach ($uperD as $val) {
+				if (strpos($val->no_bl, "|")) {
+					$str_replace = str_replace('|', '', $val->no_bl);
+					$explode = explode(" ", $str_replace);
+
+					foreach ($explode as $ex) {
+						if ($ex != "") {
+							// echo "fuck";
+							array_push($arrCont, $ex);
+
+							if (in_array($ex, $arrCont)) {
+								// return false;
+								array_shift($arrCont);
+							}
+						}
+					}
+				} else {
+					array_push($arrCont, $val->no_bl);
+				}
+			}
+			foreach ($arrCont as $val) {
+				$getDG = static::getDangerous($val);
+				array_push($arrHz, $getDG);
+			}
+			$nv['hazard'] = $arrHz;
+			// end get dangerous by no_bl(db_engine)
 
 			// build head
 			$uper_req_date = null;
@@ -585,6 +617,8 @@ class JbiGenerateTariff {
 			//     $head['uper_terminal_name'] = $find[$config['head_terminal_name']];
 			// }
 			$head['nota_view'] = $nota_view;
+			$head['hazard'] = $arrHz;
+
 			// build head
 
 			$result[] = $head;
