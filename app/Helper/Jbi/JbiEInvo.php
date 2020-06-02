@@ -135,7 +135,7 @@ class JbiEInvo
 		            "docNum": "",
 		            "statusLunas": "Y",
 		            "tglPelunasan": "' . $arr['nDateNotHour'] . '",
-		            "amountTerbilang": "' . $terbilang . +' Rupiah",
+		            "amountTerbilang": "' . $terbilang . ' Rupiah",
 		            "ppnDipungutSendiri": "' . $arr['nota']['nota_ppn'] . '",
 		            "ppnDipungutPemungut": "",
 		            "ppnTidakDipungut": "",
