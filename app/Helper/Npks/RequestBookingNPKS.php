@@ -480,6 +480,7 @@ class RequestBookingNPKS{
             	$getNota->nota_status = 2;
             	$getNota->save();
             	if (!empty($cekIsCanc)){
+            		$getNota = TxHdrNota::find($input['nota_id']);
             		$arr = [
             			'config' => $config,
             			"nota" => (array)$getNota['attributes'],
@@ -487,8 +488,9 @@ class RequestBookingNPKS{
             			'reqCanc' => (array)$cekIsCanc
             		];
             		$sendInvAR = EInvo::sendInvPay($arr);
-           	        $getNota->nota_status = 5; $getNota->nota_paid = 'Y';
-            	        $getNota->save();
+           	        $getNota->nota_status = 5; 
+           	        $getNota->nota_paid = 'Y';
+           	        $getNota->save();
             	}
             	$msg='Success, approved!';
             }else if ($input['approved'] == 'false') {
