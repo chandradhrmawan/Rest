@@ -224,7 +224,7 @@ class RequestBookingNPKS{
 			// request batal
 			$canceledReqPrepare = null;
 			if (!empty($input['canceled']) and $input['canceled'] == 'true') {
-				$canceledReqPrepare = CanclHelper::canceledReqPrepare($input, $config, false);
+				$canceledReqPrepare = CanclHelper::canceledReqPrepare($input, $config, true);
 				if ($canceledReqPrepare['Success'] == false) {
 					return $canceledReqPrepare;
 				}
