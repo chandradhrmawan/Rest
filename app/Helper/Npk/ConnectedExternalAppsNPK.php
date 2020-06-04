@@ -1110,7 +1110,7 @@ class ConnectedExternalAppsNPK{
         } else {
           $hdr       = DB::connection('omcargo')->table('TX_HDR_TCA')->where('TCA_REQ_NO', $input['tca_req_no'])->first();
           $whereUp   = [
-            'TCA_HDR_ID' => $hdr->tca_id,
+            // 'TCA_HDR_ID' => $hdr->tca_id,
             'TCA_TRUCK_ID'=> $input['tca_truck_id']
           ];
           $updateDTL = DB::connection('omcargo')->table('TX_DTL_TCA')->where($whereUp)->update(["TCA_IS_ACTIVE" => 'N']);
