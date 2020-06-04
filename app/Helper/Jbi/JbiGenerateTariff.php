@@ -505,7 +505,7 @@ class JbiGenerateTariff
 
 				$nv = [];
 				if (count($grArr) > 0) {
-					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '" . $getH->temp_hdr_id . "' AND CUSTOMER_ID = '" . $getH->customer_id . "'";
+					$queryAgain = "SELECT * FROM TX_TEMP_TARIFF_SPLIT WHERE TEMP_HDR_ID = '" . $getH->temp_hdr_id . "' AND CUSTOMER_ID = '" . $getH->customer_id . "' order by GROUP_TARIFF_ID ASC";
 					$group_tariff = DB::connection('eng_ilcs')->select(DB::raw($queryAgain));
 					$resultD = [];
 

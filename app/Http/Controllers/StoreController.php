@@ -246,15 +246,17 @@ class StoreController extends Controller
 
     function truckRegistration($input){
       $user = json_decode(json_encode($input["user"]), TRUE);
-      $cekoldtmtruckcompany = DB::connection('mdm')->table('TM_TRUCK')->where('truck_cust_id',$input['truck_cust_id'])->first();
-      if (empty($cekoldtmtruckcompany) or !is_numeric($cekoldtmtruckcompany->truck_cust_id)) {
-        $new = new TmTruckCompany;
-        $new->comp_name = $input['truck_cust_name'];
-        $new->comp_address = $input['truck_cust_address'];
-        $new->comp_branch_id = $input['truck_branch_id'];
-        $new->comp_branch_code = $input['truck_branch_code'];
-        $new->save();
-        $input['truck_cust_id'] = $new->comp_id;
+      if (!is_numeric($input['truck_cust_id'])) {
+        $cekoldtmtruckcompany = DB::connection('mdm')->table('TM_TRUCK')->where('truck_cust_id',$input['truck_cust_id'])->first();
+        if (empty($cekoldtmtruckcompany) or !is_numeric($cekoldtmtruckcompany->truck_cust_id)) {
+          $new = new TmTruckCompany;
+          $new->comp_name = $input['truck_cust_name'];
+          $new->comp_address = $input['truck_cust_address'];
+          $new->comp_branch_id = $input['truck_branch_id'];
+          $new->comp_branch_code = $input['truck_branch_code'];
+          $new->save();
+          $input['truck_cust_id'] = $new->comp_id;
+        }
       }
 
       $terminal = DB::connection('mdm')->table('TM_TERMINAL')->where([
