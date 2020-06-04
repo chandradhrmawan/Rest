@@ -240,7 +240,7 @@ class RequestBookingNPKS{
 				return ['Success' => false, 'result_msg' => "Fail, requst not found!"];
 			}
 			$find = (array)$find;
-			if ($find[$config['head_status']] == 3 and empty($canceledReqPrepare)) {
+			if (in_array($find[$config['head_status']], [2,3]) and empty($canceledReqPrepare)) {
 				return ['Success' => false, 'result_msg' => "Fail, requst already send!"];
 			}
 

@@ -9,6 +9,8 @@ class CanclHelper{
 		$cnclHdr = DB::connection('omuster')->table('TX_HDR_CANCELLED')->where('cancelled_id',$input['id'])->first();
 		if (empty($cnclHdr)) {
 			return ['Success' => false, 'result_msg' => 'canceled request not found'];
+		}else if (in_array($cnclHdr->cancelled_status, [2,3])) {
+			return ['Success' => false, 'result_msg' => "Fail, requst already send!"];
 		}
 		$reqsHdr = DB::connection('omuster')->table($config['head_table'])->where($config['head_no'],$cnclHdr->cancelled_req_no)->first();
 		if (empty($reqsHdr)) {
@@ -109,12 +111,12 @@ class CanclHelper{
 					$config['DTL_IS_CANCEL'] => 'Y'
 				];
 			}else{
-        $oldDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
-					        $config['head_forigen'] => $reqsHdr[$config['head_primery']],
-					        $config['DTL_BL'] => $noDtl
-			        		])->get();
-        $oldDtl = $oldDtl[0];
-        $oldDtl = (array)$oldDtl;
+			$oldDtl = DB::connection('omuster')->table($config['head_tab_detil'])->where([
+				$config['head_forigen'] => $reqsHdr[$config['head_primery']],
+				$config['DTL_BL'] => $noDtl
+			])->get();
+			$oldDtl = $oldDtl[0];
+			$oldDtl = (array)$oldDtl;
 				$upd = [
 					$config['DTL_IS_CANCEL'] => 'Y',
 					$config['DTL_QTY_CANC'] => $list->cancl_qty + $oldDtl[$config['DTL_QTY_CANC']]
