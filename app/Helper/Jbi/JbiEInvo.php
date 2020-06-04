@@ -146,7 +146,7 @@ class JbiEInvo
 		            "branchAccount": "' . $arr['branch']['branch_account_erp'] . '",
 		            "statusCetak": "",
 		            "statusKirimEmail": "",
-		            "amountDasarPeng_ilcshasilan": "' . $arr['nota']['nota_dpp'] . '",
+		            "amountDasarPenghasilan": "' . $arr['nota']['nota_dpp'] . '",
 		            "amountMaterai": "' . $e_materai . '",
 		            "ppn10Persen": "' . $arr['nota']['nota_ppn'] . '",
 		            "statusKoreksi": "",
