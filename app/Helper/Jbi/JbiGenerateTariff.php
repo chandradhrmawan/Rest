@@ -258,6 +258,19 @@ class JbiGenerateTariff
 		// }
 		return $DTL_STACK_AREA;
 	}
+	
+	private static function getDTL_TRUCK($config, $list, $hdr, $input)
+	{
+		$DTL_TRUCK = 'NULL';
+		
+		if (!empty($list['rec_cargo_dtl_truck'])) {
+			$DTL_TRUCK = empty($list['rec_cargo_dtl_truck']) ? 'NULL' : $list['rec_cargo_dtl_truck'];
+		}else if(!empty($list['del_cargo_dtl_truck'])){
+			$DTL_TRUCK = empty($list['del_cargo_dtl_truck']) ? 'NULL' : $list['del_cargo_dtl_truck'];
+		}
+	
+		return $DTL_TRUCK;
+	}
 
 	private static function getDTL_TL($config, $list, $hdr, $input)
 	{
@@ -479,6 +492,7 @@ class JbiGenerateTariff
 		$newD['DTL_DATE_IN'] = static::getDTL_DATE_IN($config, $list, $hdr, $input);
 		$newD['DTL_DATE_OUT'] = static::getDTL_DATE_OUT($config, $list, $hdr, $input);
 		$newD['DTL_DATE_OUT_OLD'] = static::getDTL_DATE_OUT_OLD($config, $list, $hdr, $input);
+		$newD['DTL_QTY_TRUCK'] = static::getDTL_TRUCK($config, $list, $hdr, $input);
 
 		return $newD;
 	}

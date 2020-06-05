@@ -920,6 +920,11 @@ class BillingEngine {
           }else{
             $setD .= ' detail.DTL_TL := \''.$list['DTL_TL'].'\';';
           }
+          if ($list['DTL_QTY_TRUCK'] == NULL or $list['DTL_QTY_TRUCK'] == 'NULL') {
+            $setD .= ' detail.DTL_QTY_TRUCK := NULL;';
+          }else{
+            $setD .= ' detail.DTL_QTY_TRUCK := \''.$list['DTL_QTY_TRUCK'].'\';';
+          }
           $setD .= ' detail.DTL_DATE_IN := '.$list['DTL_DATE_IN'].';';
           $setD .= ' detail.DTL_DATE_OUT_OLD := '.$list['DTL_DATE_OUT_OLD'].';';
           $setD .= ' detail.DTL_DATE_OUT := '.$list['DTL_DATE_OUT'].';';
